@@ -7,14 +7,6 @@ body {
     color: #666666;
 }
 
-.logo {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    width: 150px;
-    height: auto;
-}
-
 /* Navigation */
 nav {
     background-color: #003366; /* Azul oscuro */
@@ -48,14 +40,15 @@ header {
     color: white;
     padding: 20px;
     text-align: center;
+    position: relative;
 }
 
-header h1 {
-    font-size: 2.5em;
-}
-
-header p {
-    font-size: 1.2em;
+header .logo {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 150px;
+    height: auto;
 }
 
 /* Sections */
@@ -75,13 +68,20 @@ section {
     font-size: 1.2em;
 }
 
-/* Testimonials */
-blockquote {
-    font-style: italic;
-    background-color: #e0e0e0;
-    padding: 20px;
-    border-left: 5px solid #ff6600; /* Naranja */
-    margin: 20px 0;
+/* Subscription Plans Comparison Section */
+#suscripciones-comparacion h3 {
+    font-size: 1.5em;
+    margin-top: 20px;
+}
+
+#suscripciones-comparacion ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#suscripciones-comparacion ul li {
+    margin: 10px 0;
+    font-size: 1.2em;
 }
 
 /* Buttons */
