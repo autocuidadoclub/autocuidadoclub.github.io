@@ -9,7 +9,7 @@ body {
 
 /* Navigation */
 nav {
-    background-color: #003366; /* Blue */
+    background-color: #003366; /* Azul oscuro */
     color: white;
     padding: 15px;
     text-align: center;
@@ -31,12 +31,12 @@ nav ul li a {
 }
 
 nav ul li a:hover {
-    color: #ff6600; /* Orange */
+    color: #ff6600; /* Naranja */
 }
 
 /* Header */
 header {
-    background-color: #003366; /* Blue */
+    background-color: #003366; /* Azul oscuro */
     color: white;
     padding: 20px;
     text-align: center;
@@ -56,24 +56,29 @@ section {
     text-align: center;
 }
 
-/* Process Section */
-#process {
-    background-color: #e0e0e0; /* Light Gray */
-}
-
-#process ul {
+/* Why We Are Different Section */
+#diferencia ul {
     list-style-type: none;
     padding: 0;
 }
 
-#process ul li {
+#diferencia ul li {
     margin: 10px 0;
     font-size: 1.2em;
 }
 
+/* Testimonials */
+blockquote {
+    font-style: italic;
+    background-color: #e0e0e0;
+    padding: 20px;
+    border-left: 5px solid #ff6600; /* Naranja */
+    margin: 20px 0;
+}
+
 /* Buttons */
 button {
-    background-color: #ff6600; /* Orange */
+    background-color: #ff6600; /* Naranja */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -88,7 +93,7 @@ button:hover {
 
 /* Footer */
 footer {
-    background-color: #666666; /* Metallic Gray */
+    background-color: #666666; /* Gris metálico */
     color: white;
     padding: 20px;
     text-align: center;
@@ -105,7 +110,7 @@ footer ul li {
 }
 
 footer ul li a {
-    color: #ff6600; /* Orange */
+    color: #ff6600; /* Naranja */
     text-decoration: none;
 }
 
