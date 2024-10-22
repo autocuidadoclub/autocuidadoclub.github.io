@@ -7,6 +7,14 @@ body {
     color: #666666;
 }
 
+.logo {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 150px;
+    height: auto;
+}
+
 /* Navigation */
 nav {
     background-color: #003366; /* Azul oscuro */
