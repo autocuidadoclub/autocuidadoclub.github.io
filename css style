@@ -1,0 +1,77 @@
+/* styles.css */
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; /* Light gray background for better contrast */
+}
+
+/* Header */
+header {
+    background-color: #003366; /* Deep Blue */
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+}
+
+header p {
+    font-size: 1.2em;
+}
+
+/* Buttons */
+button {
+    background-color: #ff6600; /* Bright Orange */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #cc5200; /* Darker Orange */
+}
+
+/* Sections */
+section {
+    padding: 20px;
+    text-align: center;
+}
+
+/* Footer */
+footer {
+    background-color: #666666; /* Metallic Gray */
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+footer a {
+    color: #ff6600; /* Orange links */
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #cc5200; /* Darker Orange */
+}
+
+/* Links */
+a {
+    color: #003366; /* Blue Links */
+    text-decoration: none;
+}
+
+a:hover {
+    color: #002244; /* Darker Blue */
+}
