@@ -5,12 +5,12 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4; /* Light gray background for better contrast */
+    background-color: #f4f4f4; /* Light background */
 }
 
 /* Header */
 header {
-    background-color: #003366; /* Deep Blue */
+    background-color: #003366; /* Blue */
     color: white;
     padding: 20px;
     text-align: center;
@@ -26,17 +26,16 @@ header p {
 
 /* Buttons */
 button {
-    background-color: #ff6600; /* Bright Orange */
+    background-color: #ff6600; /* Orange */
     color: white;
     border: none;
     padding: 10px 20px;
-    margin: 10px;
     font-size: 1em;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #cc5200; /* Darker Orange */
+    background-color: #cc5200;
 }
 
 /* Sections */
@@ -47,14 +46,10 @@ section {
 
 /* Footer */
 footer {
-    background-color: #666666; /* Metallic Gray */
+    background-color: #666666; /* Gray */
     color: white;
+    padding: 10px;
     text-align: center;
-    padding: 10px 0;
-}
-
-footer p {
-    margin: 5px 0;
 }
 
 footer a {
@@ -63,15 +58,5 @@ footer a {
 }
 
 footer a:hover {
-    color: #cc5200; /* Darker Orange */
-}
-
-/* Links */
-a {
-    color: #003366; /* Blue Links */
-    text-decoration: none;
-}
-
-a:hover {
-    color: #002244; /* Darker Blue */
+    color: #cc5200;
 }
