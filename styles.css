@@ -1,0 +1,114 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #666666;
+}
+
+/* Navigation */
+nav {
+    background-color: #003366; /* Blue */
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+nav ul {
+    list-style-type: none;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    color: #ff6600; /* Orange */
+}
+
+/* Header */
+header {
+    background-color: #003366; /* Blue */
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+}
+
+header p {
+    font-size: 1.2em;
+}
+
+/* Sections */
+section {
+    padding: 40px;
+    text-align: center;
+}
+
+/* Process Section */
+#process {
+    background-color: #e0e0e0; /* Light Gray */
+}
+
+#process ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#process ul li {
+    margin: 10px 0;
+    font-size: 1.2em;
+}
+
+/* Buttons */
+button {
+    background-color: #ff6600; /* Orange */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #cc5200;
+}
+
+/* Footer */
+footer {
+    background-color: #666666; /* Metallic Gray */
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+footer ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+footer ul li {
+    display: inline;
+    margin-right: 15px;
+}
+
+footer ul li a {
+    color: #ff6600; /* Orange */
+    text-decoration: none;
+}
+
+footer ul li a:hover {
+    color: white;
+}
