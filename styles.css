@@ -57,46 +57,39 @@ section {
     text-align: center;
 }
 
-/* Why We Are Different Section */
-#diferencia ul {
+/* Value Proposition */
+#propuesta-valor {
+    background-color: #e0e0e0;
+    padding: 40px;
+    text-align: left;
+}
+
+#propuesta-valor ul {
     list-style-type: none;
     padding: 0;
 }
 
-#diferencia ul li {
+#propuesta-valor ul li {
     margin: 10px 0;
     font-size: 1.2em;
 }
 
-/* Subscription Plans Comparison Section */
-#suscripciones-comparacion h3 {
-    font-size: 1.5em;
-    margin-top: 20px;
-}
-
-#suscripciones-comparacion ul {
+/* Process Section */
+#nuestro-proceso ul {
     list-style-type: none;
     padding: 0;
 }
 
-#suscripciones-comparacion ul li {
+#nuestro-proceso ul li {
     margin: 10px 0;
     font-size: 1.2em;
 }
 
-/* Buttons */
-button {
-    background-color: #ff6600; /* Naranja */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin: 10px;
-    font-size: 1em;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #cc5200;
+/* Discounts Section */
+#descuentos-partes {
+    background-color: #e6f2ff;
+    padding: 40px;
+    text-align: left;
 }
 
 /* Footer */
