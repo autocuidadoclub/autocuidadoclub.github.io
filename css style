@@ -20,6 +20,14 @@ button {
     border: none;
     cursor: pointer;
 }
+@media (max-width: 600px) {
+    header, section, footer {
+        padding: 10px;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
+}
 
 button:hover {
     background-color: #cc5200;
