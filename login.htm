@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - AutoCuidado Club</title>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+
+    function loginUser() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          alert("Inicio de sesión exitoso");
+          window.location.href = "calendar.html";  // Redirect to calendar page
+        })
+        .catch((error) => {
+          alert("Error en el inicio de sesión: " + error.message);
+        });
+    }
+  </script>
+</head>
+<body>
+  <h2>Iniciar Sesión</h2>
+  <form>
+    <label>Email:</label><br>
+    <input type="email" id="email" required><br>
+    <label>Contraseña:</label><br>
+    <input type="password" id="password" required><br><br>
+    <button type="button" onclick="loginUser()">Iniciar Sesión</button>
+  </form>
+</body>
+</html>
