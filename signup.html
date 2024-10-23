@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+
+    <script>
+      // Firebase configuration
+  const firebaseConfig = {
+  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+  authDomain: "auto-cuidadoclub.firebaseapp.com",
+  projectId: "auto-cuidadoclub",
+  storageBucket: "auto-cuidadoclub.appspot.com",
+  messagingSenderId: "986704701191",
+  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+  measurementId: "G-LBBGXV2YX5"
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+      const auth = firebase.auth();
+      
+      // Function to check if the subscription has been renewed and payment is verified
+      function checkSubscriptionStatus() {
+        const userId = auth.currentUser.uid;
+
+        db.ref('users/' + userId).once('value').then((snapshot) => {
+          const userData = snapshot.val();
+          const subscriptionEndDate = new Date(userData.subscriptionEndDate); // Subscription end date
+          const currentDate = new Date();
+          const paymentVerified = userData.paymentVerified; // Check if the payment is verified
+
+          if (currentDate > subscriptionEndDate && paymentVerified) {
+            // Allow vehicle info update if subscription has ended, been renewed, and payment is verified
+            enableVehicleUpdate();
+          } else if (!paymentVerified) {
+            alert("No puedes actualizar tu vehículo hasta que el pago de la nueva suscripción sea verificado.");
+          } else {
+            alert("No puedes actualizar la información del vehículo hasta que tu suscripción termine o se renueve.");
+          }
+        });
+      }
+
+      // Function to enable vehicle information update
+      function enableVehicleUpdate() {
+        document.getElementById('vehicle-form').style.display = 'block';
+      }
+
+      // Function to register or update vehicle info
+      function registerVehicle() {
+        const userId = auth.currentUser.uid;
+
+        const vehicleData = {
+          plate: document.getElementById('plate').value,
+          make: document.getElementById('make').value,
+          model: document.getElementById('model').value,
+          year: document.getElementById('year').value,
+          municipio: document.getElementById('municipio').value
+        };
+
+        db.ref('users/' + userId).update({
+          vehicle: vehicleData
+        });
+
+        alert("Vehículo registrado o actualizado correctamente.");
+      }
+
+      // Function to check subscription status when the page loads
+      window.onload = function() {
+        checkSubscriptionStatus();
+      }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado Club - Actualización de Vehículo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<section id="vehicle-info">
+    <h3>Actualizar Información del Vehículo</h3>
+    <p id="info-message">No puedes actualizar tu vehículo hasta que tu suscripción termine o se renueve y el pago sea verificado.</p>
+
+    <!-- Form hidden until the subscription ends or renews, and payment is verified -->
+    <form id="vehicle-form" style="display: none;">
+        <label for="plate">Número de Placa:</label>
+        <input type="text" id="plate" name="plate" required>
+        
+        <label for="make">Marca:</label>
+        <input type="text" id="make" name="make" required>
+
+        <label for="model">Modelo:</label>
+        <input type="text" id="model" name="model" required>
+
+        <label for="year">Año de Fabricación:</label>
+        <input type="number" id="year" name="year" required>
+
+        <label for="municipio">Municipio:</label>
+        <select id="municipio" name="municipio">
+            <option value="San Salvador">San Salvador</option>
+            <option value="Santa Tecla">Santa Tecla</option>
+            <option value="Soyapango">Soyapango</option>
+            <option value="Santa Ana">Santa Ana</option>
+            <!-- Add more municipios as needed -->
+        </select>
+
+        <button type="submit" onclick="registerVehicle()">Actualizar Vehículo</button>
+    </form>
+</section>
+
+</body>
+</html>
