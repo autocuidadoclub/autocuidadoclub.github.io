@@ -118,3 +118,29 @@ footer ul li a {
 footer ul li a:hover {
     color: white;
 }
+#booking-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#booking-calendar th, #booking-calendar td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+button.available {
+    background-color: #4CAF50; /* Green for available */
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button.booked {
+    background-color: #f44336; /* Red for booked */
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: not-allowed;
+}
