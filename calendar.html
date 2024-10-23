@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado Club - Calendario de Reservas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<section id="calendar">
+    <h2>Calendario de Reservas</h2>
+    <p>Consulta la disponibilidad de bloques de tiempo y selecciona el que más te convenga.</p>
+
+    <!-- Calendar HTML -->
+    <table id="booking-calendar">
+        <tr>
+            <th>Lunes</th>
+            <th>Miércoles</th>
+            <th>Viernes</th>
+            <th>Sábado</th>
+            <th>Domingo</th>
+        </tr>
+        <tr>
+            <td><button class="available" onclick="bookSlot('Lunes 9:00 - 11:00')">9:00 - 11:00</button></td>
+            <td><button class="booked">10:00 - 12:00</button></td>
+            <td><button class="available" onclick="bookSlot('Viernes 13:00 - 15:00')">13:00 - 15:00</button></td>
+            <td><button class="booked">8:00 - 10:00</button></td>
+            <td><button class="available" onclick="bookSlot('Domingo 9:00 - 11:00')">9:00 - 11:00</button></td>
+        </tr>
+        <tr>
+            <td><button class="available" onclick="bookSlot('Lunes 12:00 - 14:00')">12:00 - 14:00</button></td>
+            <td><button class="available" onclick="bookSlot('Miércoles 13:00 - 15:00')">13:00 - 15:00</button></td>
+            <td><button class="booked">16:00 - 18:00</button></td>
+            <td><button class="available" onclick="bookSlot('Sábado 11:00 - 13:00')">11:00 - 13:00</button></td>
+            <td><button class="booked">12:00 - 14:00</button></td>
+        </tr>
+    </table>
+</section>
+
+<script>
+function bookSlot(time) {
+    alert("Has reservado: " + time);
+}
+</script>
+
+</body>
+</html>
