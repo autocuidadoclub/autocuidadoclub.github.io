@@ -58,7 +58,21 @@
         </tr>
     </table>
 </section>
-  
+
+    
+<script>
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    // User is authenticated, allow booking
+    console.log("User is logged in: ", user.email);
+  } else {
+    // Redirect to login page
+    alert("Por favor inicia sesión para hacer una reserva.");
+    window.location.href = "login.html";  // Assuming you have a login page
+  }
+});
+</script>
+
 <script>
 function bookSlot(time) {
     alert("Has reservado: " + time);
