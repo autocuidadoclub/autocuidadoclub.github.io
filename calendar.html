@@ -6,15 +6,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
 
     <script>
-      // Your web app's Firebase configuration
-     const firebaseConfig = {
-  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-  authDomain: "auto-cuidadoclub.firebaseapp.com",
-  projectId: "auto-cuidadoclub",
-  storageBucket: "auto-cuidadoclub.appspot.com",
-  messagingSenderId: "986704701191",
-  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-  measurementId: "G-LBBGXV2YX5"
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+        authDomain: "auto-cuidadoclub.firebaseapp.com",
+        projectId: "auto-cuidadoclub",
+        storageBucket: "auto-cuidadoclub.appspot.com",
+        messagingSenderId: "986704701191",
+        appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+        measurementId: "G-LBBGXV2YX5"
       };
 
       // Initialize Firebase
@@ -22,10 +22,9 @@
       const db = firebase.database();
       const auth = firebase.auth();
 
-      // Mechanic slots (maximum 10 mechanics)
       const totalMechanics = 10;
 
-      // Available slots for each day
+      // Available time slots for each day
       const availableSlots = {
         "Monday": ["9:00 - 11:00", "12:00 - 14:00", "15:00 - 17:00"],
         "Wednesday": ["10:00 - 12:00", "13:00 - 15:00", "16:00 - 18:00"],
@@ -54,7 +53,6 @@
               if (mechanicsAvailable) {
                 alert("Has reservado: " + time + " en " + day);
                 
-                // Add booking with municipio and vehicle details
                 db.ref('bookings/' + day + ' ' + time + '/' + userId).set({
                   booked: true,
                   user: userId,
@@ -62,7 +60,6 @@
                   municipio: municipio
                 });
 
-                // Increment the user's bookings for the month
                 db.ref('users/' + userId).update({
                   currentMonthBookings: currentMonthBookings + 1
                 });
@@ -75,9 +72,7 @@
         });
       }
 
-      // Reminder function for next inspection
       function sendReminder(userId, bookingDate) {
-        // Logic to send email or notification for next inspection
         alert("Recordatorio: Tu próxima inspección es el " + bookingDate);
       }
     </script>
@@ -93,7 +88,6 @@
     <h2>Calendario de Reservas</h2>
     <p>Consulta la disponibilidad de bloques de tiempo y selecciona el que más te convenga.</p>
 
-    <!-- Calendar HTML -->
     <table id="booking-calendar">
         <tr>
             <th>Lunes</th>
