@@ -4,64 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Suscripciones - AutoCuidado Club</title>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
   <link rel="stylesheet" href="styles.css">
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-    
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
-
-    function showSubscriptionOptions() {
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          const userId = user.uid;
-          
-          db.ref('users/' + userId + '/vehicles').once('value').then((snapshot) => {
-            const vehicleCount = snapshot.numChildren();
-            
-            if (vehicleCount === 1) {
-              document.getElementById('basic-plan').style.display = 'block';
-              document.getElementById('plus-plan').style.display = 'none';
-            } else if (vehicleCount >= 2) {
-              document.getElementById('basic-plan').style.display = 'none';
-              document.getElementById('plus-plan').style.display = 'block';
-            }
-          }).catch((error) => {
-            console.error("Error al obtener los datos: ", error);
-          });
-        } else {
-          window.location.href = "login.html";  // Redirect to login if not authenticated
-        }
-      });
-    }
-  </script>
 </head>
-<body onload="showSubscriptionOptions()">
+<body>
   <h2>Elige tu Plan de Suscripción</h2>
-
-  <div id="basic-plan" style="display:none;">
-    <h3>Plan Básico (1 vehículo)</h3>
-    <p>Costo mensual: $34.99</p>
-    <button>Seleccionar Plan Básico</button>
-  </div>
-
-  <div id="plus-plan" style="display:none;">
-    <h3>Plan Plus (2 o 3 vehículos)</h3>
-    <p>Costo mensual: $66.48</p>
-    <button>Seleccionar Plan Plus</button>
-  </div>
-  
+  <p>Por favor, completa la información de tu vehículo a través de nuestro formulario.</p>
+  <button onclick="window.location.href='https://your-google-form-url';">Completar Formulario</button>
+  <p>Después de completar el formulario, serás redirigido para confirmar el pago y agendar tu cita.</p>
+  <button onclick="window.location.href='https://wa.me/yourtwilionumber';">Hablar con un Agente</button>
 </body>
 </html>
