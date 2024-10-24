@@ -1,92 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCuidado Club - Planes de Suscripción</title>
-    <img src="logo.jpg" alt="AutoCuidado Club Logo" style="width:150px;">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suscripciones - AutoCuidado Club</title>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+
+  <script>
+      // Your web app's Firebase configuration
+     const firebaseConfig = {
+  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+  authDomain: "auto-cuidadoclub.firebaseapp.com",
+  projectId: "auto-cuidadoclub",
+  storageBucket: "auto-cuidadoclub.appspot.com",
+  messagingSenderId: "986704701191",
+  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+  measurementId: "G-LBBGXV2YX5"
+      };
+      
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+      const auth = firebase.auth();
+
+      function showSubscriptionOptions() {
+        const userId = auth.currentUser.uid;
+
+        db.ref('users/' + userId + '/vehicles').once('value').then((snapshot) => {
+          const vehicleCount = snapshot.numChildren();
+
+          if (vehicleCount === 1) {
+            document.getElementById('basic-plan').style.display = 'block';
+            document.getElementById('plus-plan').style.display = 'none';
+          } else if (vehicleCount >= 2) {
+            document.getElementById('basic-plan').style.display = 'none';
+            document.getElementById('plus-plan').style.display = 'block';
+          }
+        });
+      }
+  </script>
 </head>
-<body>
+<body onload="showSubscriptionOptions()">
+  <h2>Elige tu Plan de Suscripción</h2>
 
-    <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-        </ul>
-    </nav>
+  <div id="basic-plan" style="display:none;">
+    <h3>Plan Básico (1 vehículo)</h3>
+    <p>Costo mensual: $34.99</p>
+    <button>Seleccionar Plan Básico</button>
+  </div>
 
-    <!-- Subscription Plans -->
-    <header>
-        <h1>Planes de Suscripción</h1>
-    </header>
-
-    <section id="por-que-elegir">
-    <h2>Por Qué Elegir AutoCuidado Club</h2>
-    <ul>
-        <li><strong>Mayor Productividad:</strong> Mantén tu ritmo de vida sin interrupciones. Nosotros nos encargamos del mantenimiento.</li>
-        <li><strong>Garantía de Calidad:</strong> Herramientas avanzadas y personal calificado para ofrecer el mejor servicio.</li>
-        <li><strong>Cuidado Total del Vehículo:</strong> Nos encargamos de todos los aspectos del mantenimiento, tú solo disfrutas de tu vehículo en perfectas condiciones.</li>
-    </ul>
-</section>
-
-    <section id="basic-plan">
-        <h2>Plan Básico</h2>
-        <p>Cobertura para un vehículo con una inspección mensual y descuentos en mano de obra para cambios de repuestos.</p>
-        <ul>
-            <li>3 meses: $34.99/mes <img src="3 month basic.jpg" alt="3 month basic" style="width:150px;"></li>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-  <input type="hidden" name="cmd" value="_s-xclick" />
-  <input type="hidden" name="hosted_button_id" value="LFK9PMUBR8TVY" />
-  <table>
-    <tr>
-      <td>
-        <input type="hidden" name="on0" value="Plan básico mensual 3 meses"/>
-        Plan básico mensual 3 meses
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <input type="text" name="os0" maxLength="200" />
-      </td>
-    </tr>
-  </table>
-  <input type="hidden" name="currency_code" value="USD" />
-  <input type="image" src="https://www.paypalobjects.com/es_XC/i/btn/btn_subscribe_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Subscribe" />
-</form>
-<p>
-            
-            <li>6 meses: $31.49/mes <img src="6 month basic.jpg" alt="6 month basic" style="width:150px;"></li>
-            <li>12 meses: $26.24/mes <img src="12 month basic.jpg" alt="12 month basic" style="width:150px;"></li>
-        </ul>
-    </section>
-
-    <section id="plus-plan">
-        <h2>Plan Plus</h2>
-        <p>Cobertura para tres vehículos, cada uno con su inspección mensual y descuentos exclusivos en repuestos y mano de obra incluida.</p>
-        <ul>
-            <li>3 meses: $66.48 para 3 vehículos <img src="3 month plus.jpg" alt="3 month plus" style="width:150px;"></li>
-            <li>6 meses: $59.84 para 3 vehículos <img src="6 month plus.jpg" alt="6 month plus" style="width:150px;"></li>
-            <li>12 meses: $49.86 para 3 vehículos <img src="12 month plus.jpg" alt="12 month plus" style="width:150px;"></li>
-        </ul>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="nosotros.html">Quiénes Somos</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-        </ul>
-    </footer>
-
+  <div id="plus-plan" style="display:none;">
+    <h3>Plan Plus (2 o 3 vehículos)</h3>
+    <p>Costo mensual: $66.48</p>
+    <button>Seleccionar Plan Plus</button>
+  </div>
 </body>
 </html>
