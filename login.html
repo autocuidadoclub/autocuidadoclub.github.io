@@ -4,38 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - AutoCuidado Club</title>
+  
+  <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+
   <script>
- // Your web app's Firebase configuration
-     const firebaseConfig = {
-  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-  authDomain: "auto-cuidadoclub.firebaseapp.com",
-  projectId: "auto-cuidadoclub",
-  storageBucket: "auto-cuidadoclub.appspot.com",
-  messagingSenderId: "986704701191",
-  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-  measurementId: "G-LBBGXV2YX5"
-};
-      };   
-    
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+      authDomain: "auto-cuidadoclub.firebaseapp.com",
+      projectId: "auto-cuidadoclub",
+      storageBucket: "auto-cuidadoclub.appspot.com",
+      messagingSenderId: "986704701191",
+      appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+      measurementId: "G-LBBGXV2YX5"
+    };
+
     // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
 
+    // Login function
     function loginUser() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       
       firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
+          // Login success
           alert("Inicio de sesión exitoso");
-          window.location.href = "calendar.html";  // Redirect to calendar page
+          window.location.href = "calendar.html";  // Redirect to the booking calendar page
         })
         .catch((error) => {
+          // Login error
           alert("Error en el inicio de sesión: " + error.message);
         });
     }
+
+    // Ensure user stays logged in on reload
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // If already logged in, redirect to calendar page
+        window.location.href = "calendar.html";
+      }
+    });
   </script>
+
 </head>
 <body>
   <h2>Iniciar Sesión</h2>
