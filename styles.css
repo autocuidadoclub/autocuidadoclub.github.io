@@ -35,6 +35,31 @@ nav ul li a:hover {
 }
 
 /* Header */
+/* Header Styles */
+.header-container {
+    background-color: #003366; /* Blue background color */
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Logo Styling */
+.header-container .logo {
+    width: 150px;
+    height: auto;
+    margin-right: 20px; /* Space between logo and heading */
+}
+
+/* Heading Styling */
+.header-container h1 {
+    color: #fff;
+    font-size: 28px;
+    margin: 0;
+}
+
 header {
     background-color: #003366; /* Azul oscuro */
     color: white;
@@ -43,13 +68,6 @@ header {
     position: relative;
 }
 
-header .logo {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    width: 150px;
-    height: auto;
-}
 
 /* Sections */
 section {
