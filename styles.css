@@ -17,35 +17,26 @@ nav {
 
 nav ul {
     list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
 }
 
 nav ul li {
     display: inline;
+    margin-right: 20px;
 }
 
 nav ul li a {
     color: white;
     text-decoration: none;
     font-weight: bold;
-    font-size: 16px;
-    padding: 8px 12px;
-    transition: background-color 0.3s;
 }
 
 nav ul li a:hover {
-    background-color: #005599; /* Slightly lighter blue for hover effect */
-    border-radius: 5px;
     color: #ff6600; /* Naranja */
 }
 
 /* Header */
 .header-container {
-    background-color: #003366; /* Blue background color */
+    background-color: #003366;
     padding: 20px;
     display: flex;
     align-items: center;
@@ -53,14 +44,12 @@ nav ul li a:hover {
     position: relative;
 }
 
-/* Logo Styling */
 .logo {
     width: 120px;
     height: auto;
     margin-right: 20px;
 }
 
-/* Header Text Styling */
 .header-text {
     color: #fff;
     text-align: left;
@@ -76,78 +65,60 @@ nav ul li a:hover {
     font-size: 14px;
 }
 
-/* Sections */
-section {
-    padding: 40px;
+/* Interactive Checks Styles */
+.car-icon {
     text-align: center;
+    margin-bottom: 20px;
 }
 
-/* Value Proposition */
-#propuesta-valor {
-    background-color: #e0e0e0;
-    padding: 40px;
-    text-align: left;
+.inspection-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
-#propuesta-valor ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-#propuesta-valor ul li {
-    margin: 10px 0;
-    font-size: 1.2em;
-}
-
-/* Process Section */
-#nuestro-proceso ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-#nuestro-proceso ul li {
-    margin: 10px 0;
-    font-size: 1.2em;
-}
-
-/* Discounts Section */
-#descuentos-partes {
-    background-color: #e6f2ff;
-    padding: 40px;
-    text-align: left;
-}
-
-/* Booking Calendar */
-#booking-calendar {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-#booking-calendar th, #booking-calendar td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-}
-
-button.available {
-    background-color: #4CAF50; /* Green for available */
+.inspection-tabs button {
+    background-color: #003366; /* Dark Blue */
     color: white;
-    padding: 10px;
+    padding: 10px 20px;
+    margin: 0 10px;
     border: none;
     cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
-button.booked {
-    background-color: #f44336; /* Red for booked */
+.inspection-tabs button:hover {
+    background-color: #ff6600; /* Orange */
+}
+
+.inspection-content {
+    background-color: #e6f2ff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    text-align: left;
+}
+
+.inspection-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.inspection-content ul li {
+    background-color: #003366;
     color: white;
     padding: 10px;
-    border: none;
-    cursor: not-allowed;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-size: 1.1em;
 }
 
 /* Footer */
 footer {
-    background-color: #666666; /* Gris metálico */
+    background-color: #666666;
     color: white;
     padding: 20px;
     text-align: center;
@@ -164,64 +135,10 @@ footer ul li {
 }
 
 footer ul li a {
-    color: #ff6600; /* Naranja */
+    color: #ff6600;
     text-decoration: none;
 }
 
 footer ul li a:hover {
     color: white;
-}
-
-/* SmartArt-like Styles */
-.smart-art {
-    background-color: #e6f2ff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    text-align: left;
-}
-
-.smart-art ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.smart-art ul li {
-    background-color: #003366;
-    color: white;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    font-size: 1.1em;
-}
-
-.smart-art h3 {
-    color: #003366;
-    font-size: 1.2em;
-    margin-top: 10px;
-}
-
-/* SmartArt-like Styles for Nuestro Proceso */
-.smart-art {
-    background-color: #e6f2ff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    text-align: left;
-}
-
-.smart-art ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.smart-art ul li {
-    background-color: #003366;
-    color: white;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    font-size: 1.1em;
 }
