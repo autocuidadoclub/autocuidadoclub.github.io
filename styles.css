@@ -260,3 +260,37 @@ body {
         font-size: 12px;
     }
 }
+
+/* Breadcrumb Navigation */
+.breadcrumb {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+.breadcrumb ul {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+}
+
+.breadcrumb ul li {
+    display: inline;
+}
+
+.breadcrumb ul li a {
+    text-decoration: none;
+    color: #003366; /* Dark blue */
+}
+
+.breadcrumb ul li::after {
+    content: ">";
+    margin-left: 10px;
+    color: #666;
+}
+
+.breadcrumb ul li:last-child::after {
+    content: "";
+}
+
