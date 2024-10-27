@@ -142,3 +142,69 @@ footer ul li a {
 footer ul li a:hover {
     color: white;
 }
+/* Subscription Plans Section */
+.subscription-section {
+    padding: 40px;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.highlight-text {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.benefits-list {
+    list-style-type: disc;
+    text-align: left;
+    max-width: 800px;
+    margin: 0 auto 30px auto;
+}
+
+.plans-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.plan-box {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    width: 45%;
+    margin: 20px;
+    text-align: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.plan-options {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.plan-option {
+    margin: 15px;
+    width: 200px;
+}
+
+.plan-option img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.subscribe-btn {
+    background-color: #003366;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.subscribe-btn:hover {
+    background-color: #ff6600;
+}
+
