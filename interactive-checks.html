@@ -3,121 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCuidado Club - Revisiones Detalladas</title>
+    <title>Revisiones Interactivas - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        function showInspection(section) {
+            // Hide all sections
+            document.querySelectorAll('.inspection-content').forEach((content) => {
+                content.style.display = 'none';
+            });
+
+            // Show the selected section
+            document.getElementById(section).style.display = 'block';
+        }
+    </script>
 </head>
 <body>
-
-    <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-        </ul>
-    </nav>
-
-    <!-- Header with Logo -->
-    <header>
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-        <h1>Revisiones Detalladas de Tu Vehículo</h1>
-        <p>Descubre cada una de las inspecciones que realizamos en tu auto para asegurar que esté en perfectas condiciones.</p>
-    </header>
-
-    <!-- Interactive Checkups Section -->
     <section id="interactive-checks">
-        <h2>Selecciona una Parte del Vehículo</h2>
-        <p>Haz clic en una parte del vehículo para ver todas las inspecciones que realizamos en esa área.</p>
-
-        <!-- Car Icon Buttons -->
-        <div class="car-areas">
-             <img src="DALL·E 2024-10-22 20.27.35 - A clean and simple car icon that can be used for an interactive web menu, showing a front-facing car silhouette. The style should be minimalistic, wit.jpg" alt="AutoCuidado Club Logo" class="logo">
-            <button onclick="showEngineChecks()">Motor</button>
-            <button onclick="showInteriorChecks()">Interior</button>
-            <button onclick="showExteriorChecks()">Exterior</button>
+        <h2>Haz clic en una parte del vehículo para ver todas las inspecciones que realizamos en esa área.</h2>
+        
+        <!-- Car Icon -->
+        <div class="car-icon">
+            <img src="car-icon.png" alt="Car Icon">
         </div>
 
-        <!-- Engine Checks Modal -->
-        <div id="engineChecksModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal('engineChecksModal')">&times;</span>
-                <h3>Revisiones del Motor</h3>
-                <ul>
-                    <li>Revisión de aceite de motor, transmisión y diferencial.</li>
-                    <li>Medición del líquido de frenos (nivel y calidad).</li>
-                    <li>Chequeo de calidad del refrigerante.</li>
-                    <li>Inspección de bujías y bobinas de encendido.</li>
-                    <li>Inspección de fugas de aceite.</li>
-                    <li>Chequeo de filtros de aire y mangueras.</li>
-                    <li>Inspección de correas y poleas.</li>
-                </ul>
-            </div>
+        <!-- Inspection Tabs -->
+        <div class="inspection-tabs">
+            <button onclick="showInspection('motor')">Motor</button>
+            <button onclick="showInspection('interior')">Interior</button>
+            <button onclick="showInspection('exterior')">Exterior</button>
         </div>
 
-        <!-- Interior Checks Modal -->
-        <div id="interiorChecksModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal('interiorChecksModal')">&times;</span>
-                <h3>Revisiones del Interior</h3>
-                <ul>
-                    <li>Chequeo de filtro de aire acondicionado.</li>
-                    <li>Inspección de cinturones de seguridad.</li>
-                    <li>Revisión de unidades de control como PCM, SRS, ABS, APS.</li>
-                    <li>Inspección de sistema de dirección y controles del volante.</li>
-                </ul>
-            </div>
+        <!-- Inspection Content -->
+        <div id="motor" class="inspection-content">
+            <h3>Revisiones del Motor</h3>
+            <ul>
+                <li>Revisión de aceite de motor, transmisión y diferencial.</li>
+                <li>Medición del líquido de frenos (nivel y calidad).</li>
+                <li>Chequeo de calidad del refrigerante.</li>
+                <li>Inspección de bujías y bobinas de encendido.</li>
+                <li>Inspección de fugas de aceite.</li>
+                <li>Chequeo de filtros de aire y mangueras.</li>
+                <li>Inspección de correas y poleas.</li>
+            </ul>
         </div>
 
-        <!-- Exterior Checks Modal -->
-        <div id="exteriorChecksModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal('exteriorChecksModal')">&times;</span>
-                <h3>Revisiones del Exterior</h3>
-                <ul>
-                    <li>Chequeo de luces (faros, luces de freno, luces de giro, luces antiniebla).</li>
-                    <li>Inspección de mangueras de freno y amortiguadores.</li>
-                    <li>Chequeo del estado de las llantas de repuesto y herramientas para cambiar la llanta.</li>
-                    <li>Chequeo del sistema de escape y presencia de óxido.</li>
-                    <li>Inspección del cuerpo del acelerador y tapa de gasolina.</li>
-                </ul>
-            </div>
+        <div id="interior" class="inspection-content" style="display:none;">
+            <h3>Revisiones del Interior</h3>
+            <ul>
+                <li>Chequeo de filtro de aire acondicionado.</li>
+                <li>Inspección de cinturones de seguridad.</li>
+                <li>Revisión de unidades de control como PCM, SRS, ABS, APS.</li>
+                <li>Inspección de sistema de dirección y controles del volante.</li>
+            </ul>
+        </div>
+
+        <div id="exterior" class="inspection-content" style="display:none;">
+            <h3>Revisiones del Exterior</h3>
+            <ul>
+                <li>Chequeo de luces (faros, luces de freno, luces de giro, luces antiniebla).</li>
+                <li>Inspección de mangueras de freno y amortiguadores.</li>
+                <li>Chequeo del estado de las llantas de repuesto y herramientas para cambiar la llanta.</li>
+                <li>Chequeo del sistema de escape y presencia de óxido.</li>
+                <li>Inspección del cuerpo del acelerador y tapa de gasolina.</li>
+            </ul>
         </div>
     </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="nosotros.html">Quiénes Somos</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-        </ul>
-        <p>Síguenos en <a href="https://www.instagram.com/autocuidadoclub">Instagram</a>, <a href="https://www.facebook.com/profile.php?id=61566547237325">Facebook</a>, y <a href="https://x.com/AutoCuidadoClub">X</a>.</p>
-    </footer>
-
-    <!-- JavaScript for Modal -->
-    <script>
-    function showEngineChecks() {
-        document.getElementById('engineChecksModal').style.display = 'block';
-    }
-
-    function showInteriorChecks() {
-        document.getElementById('interiorChecksModal').style.display = 'block';
-    }
-
-    function showExteriorChecks() {
-        document.getElementById('exteriorChecksModal').style.display = 'block';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-    </script>
-
 </body>
 </html>
