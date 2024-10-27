@@ -39,33 +39,33 @@ nav ul li a:hover {
 .header-container {
     background-color: #003366; /* Blue background color */
     padding: 20px;
-    text-align: center;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     position: relative;
 }
 
 /* Logo Styling */
-.header-container .logo {
-    width: 150px;
+.logo {
+    width: 120px;
     height: auto;
-    margin-right: 20px; /* Space between logo and heading */
+    margin-right: 20px;
 }
 
-/* Heading Styling */
-.header-container h1 {
+/* Header Text Styling */
+.header-text {
     color: #fff;
-    font-size: 28px;
-    margin: 0;
+    text-align: left;
 }
 
-header {
-    background-color: #003366; /* Azul oscuro */
-    color: white;
-    padding: 20px;
-    text-align: center;
-    position: relative;
+.header-text h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.header-text p {
+    margin: 0;
+    font-size: 14px;
 }
 
 
