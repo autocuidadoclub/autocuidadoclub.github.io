@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <script>
+        // Initialize Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Fetch and display user data
+        function displayUserData() {
+            const userId = firebase.auth().currentUser.uid;
+            db.ref('users/' + userId).once('value').then((snapshot) => {
+                const userData = snapshot.val();
+                document.getElementById('userEmail').innerText = userData.email;
+                document.getElementById('userWhatsApp').innerText = userData.whatsapp;
+                const carInfo = userData.cars[0];
+                document.getElementById('carInfo').innerText = `${carInfo.brand} ${carInfo.model}, ${carInfo.year}, Placa: ${carInfo.numberPlate}`;
+                
+                // Suggest subscription plan based on the number of cars
+                const planSuggestion = (userData.cars.length === 1) ? "Plan Básico" : "Plan Plus";
+                document.getElementById('planSuggestion').innerText = `Plan sugerido: ${planSuggestion}`;
+            });
+        }
+
+        // Display data after the user logs in
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                displayUserData();
+            } else {
+                window.location.href = "login.html"; // Redirect to login if not logged in
+            }
+        });
+    </script>
+</head>
+<body>
+    <h2>Perfil de Usuario</h2>
+    <p>Email: <span id="userEmail"></span></p>
+    <p>WhatsApp: <span id="userWhatsApp"></span></p>
+    <h3>Información del Vehículo</h3>
+    <p id="carInfo"></p>
+    <h3 id="planSuggestion"></h3>
+</body>
+</html>
