@@ -17,25 +17,33 @@ nav {
 
 nav ul {
     list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
 nav ul li {
     display: inline;
-    margin-right: 20px;
 }
 
 nav ul li a {
     color: white;
     text-decoration: none;
     font-weight: bold;
+    font-size: 16px;
+    padding: 8px 12px;
+    transition: background-color 0.3s;
 }
 
 nav ul li a:hover {
+    background-color: #005599; /* Slightly lighter blue for hover effect */
+    border-radius: 5px;
     color: #ff6600; /* Naranja */
 }
 
 /* Header */
-/* Header Styles */
 .header-container {
     background-color: #003366; /* Blue background color */
     padding: 20px;
@@ -67,7 +75,6 @@ nav ul li a:hover {
     margin: 0;
     font-size: 14px;
 }
-
 
 /* Sections */
 section {
@@ -110,32 +117,7 @@ section {
     text-align: left;
 }
 
-/* Footer */
-footer {
-    background-color: #666666; /* Gris metálico */
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-
-footer ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-footer ul li {
-    display: inline;
-    margin-right: 15px;
-}
-
-footer ul li a {
-    color: #ff6600; /* Naranja */
-    text-decoration: none;
-}
-
-footer ul li a:hover {
-    color: white;
-}
+/* Booking Calendar */
 #booking-calendar {
     width: 100%;
     border-collapse: collapse;
@@ -161,4 +143,31 @@ button.booked {
     padding: 10px;
     border: none;
     cursor: not-allowed;
+}
+
+/* Footer */
+footer {
+    background-color: #666666; /* Gris metálico */
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+footer ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+footer ul li {
+    display: inline;
+    margin-right: 15px;
+}
+
+footer ul li a {
+    color: #ff6600; /* Naranja */
+    text-decoration: none;
+}
+
+footer ul li a:hover {
+    color: white;
 }
