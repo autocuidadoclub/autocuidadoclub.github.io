@@ -111,12 +111,22 @@ nav ul li a:hover {
     margin-top: 20px;
 }
 
-.benefit-item {
-    padding: 20px;
-    color: #fff;
-    font-size: 1.2em;
-    border-radius: 5px;
-    text-align: center;
+.benefit-item:nth-child(1) {
+    background-color: #FF6600; /* Naranja */
+}
+
+.benefit-item:nth-child(2) {
+    background-color: #4CAF50; /* Verde */
+}
+
+.benefit-item:nth-child(3) {
+    background-color: #003366; /* Azul */
+}
+
+.benefit-item:nth-child(4) {
+    background-color: #800080; /* Púrpura */
+}
+
 }
 
 /* Why Different Section */
@@ -142,13 +152,26 @@ nav ul li a:hover {
     margin-top: 20px;
 }
 
-.reason-item {
-    padding: 20px;
-    background-color: #f4f4f4;
-    color: #333;
-    text-align: left;
-    border-radius: 5px;
+.reason-item:nth-child(1) {
+    background-color: #800080; /* Púrpura */
+    color: white;
 }
+
+.reason-item:nth-child(2) {
+    background-color: #4A90E2; /* Azul Medio */
+    color: white;
+}
+
+.reason-item:nth-child(3) {
+    background-color: #2ECC71; /* Verde */
+    color: white;
+}
+
+.reason-item:nth-child(4) {
+    background-color: #FF6600; /* Naranja */
+    color: white;
+}
+
 
 .schedule-section h2 {
     color: #003366; /* Dark Blue */
@@ -170,10 +193,8 @@ nav ul li a:hover {
 }
 
 .schedule-table thead th {
-    background-color: #003366; /* Dark Blue */
-    color: #fff;
-    font-weight: bold;
-    font-size: 1em;
+    background-color: #003366; /* Azul oscuro */
+    color: white;
 }
 
 .schedule-table tbody tr:nth-child(even) {
@@ -201,12 +222,10 @@ nav ul li a:hover {
 }
 
 .schedule-table tbody td:first-child {
-    background-color: #ff6600; /* Orange */
-    color: #fff;
+    background-color: #FF6600; /* Naranja */
+    color: white;
     font-weight: bold;
 }
-
-
 
 
 /* Subscription Rows */
