@@ -530,6 +530,64 @@ nav ul li a:hover {
     max-width: 600px;
 }
 
+/* Schedule Table */
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-table th, .schedule-table td {
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #ccc;
+    transition: transform 0.3s ease; /* Smooth transition for zoom effect */
+}
+
+.schedule-table thead th {
+    background-color: #003366; /* Dark Blue */
+    color: white;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.schedule-table tbody td {
+    color: #666666; /* Metallic Gray text */
+}
+
+.schedule-table tbody td:hover {
+    transform: scale(1.1); /* Zoom effect on hover */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect for more emphasis */
+    z-index: 1;
+    position: relative;
+}
+
+.schedule-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2; /* Light Gray */
+}
+
+.schedule-table tbody tr:nth-child(odd) {
+    background-color: #e6e6e6; /* Slightly darker gray for alternating rows */
+}
+
+.schedule-table tbody td:first-child {
+    background-color: #FF6600; /* Orange */
+    color: white;
+    font-weight: bold;
+}
+
+.schedule-table th, .schedule-table td {
+    border: 1px solid #ccc;
+}
+
+.schedule-table th {
+    font-weight: bold;
+}
+
+.schedule-table td {
+    font-size: 0.9em;
+}
 
 
 /* Adjust Layout for Mobile Devices */
