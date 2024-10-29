@@ -152,6 +152,7 @@ nav ul li a:hover {
     font-size: 1.1em;
     margin: 20px 0;
     border-radius: 5px;
+    transition: transform 0.3s ease-in-out;
 }
 
 /* Contenedor de las razones */
@@ -295,14 +296,17 @@ nav ul li a:hover {
 
 .schedule-table tbody tr:nth-child(even) {
     background-color: #f2f2f2; /* Light Gray */
+     transition: transform 0.3s ease-in-out;
 }
 
 .schedule-table tbody tr:nth-child(odd) {
     background-color: #e6e6e6; /* Slightly darker gray for alternating rows */
+     transition: transform 0.3s ease-in-out;
 }
 
 .schedule-table tbody td {
     color: #666666; /* Metallic Gray text */
+     transition: transform 0.3s ease-in-out;
 }
 
 .schedule-table th, .schedule-table td {
