@@ -393,6 +393,54 @@ nav ul li a:hover {
     background-color: #ff6600;
 }
 
+/* Process Section Styles */
+.process-section {
+    text-align: center;
+    padding: 40px;
+}
+
+.process-section h2 {
+    font-size: 1.8em;
+    color: #003366; /* Dark Blue */
+    margin-bottom: 20px;
+}
+
+.process-section .description-text,
+.process-section .conclusion-text {
+    font-size: 1.1em;
+    color: #333;
+    margin: 20px 0;
+}
+
+.process-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.process-item {
+    padding: 15px;
+    background-color: #f2f2f2;
+    color: #003366;
+    font-size: 1em;
+    text-align: left;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.process-item strong {
+    color: #FF6600; /* Orange for highlights */
+}
+
+/* Responsive Adjustment */
+@media (max-width: 768px) {
+    .process-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
     .benefits-container, .reasons-container {
