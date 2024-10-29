@@ -133,7 +133,7 @@ nav ul li a:hover {
 .why-different-section {
     padding: 40px;
     background: linear-gradient(to right, #003366, #4CAF50); /* Gradiente de azul a verde */
-    color: #fff;
+    color:  #666666;
     text-align: center;
 }
 
@@ -180,11 +180,11 @@ nav ul li a:hover {
 }
 
 .reason-item:nth-child(3) {
-    background-color: #f2f2f2; /* Gris metálico */
+    background-color: #FF6600; /* Naranja */
 }
 
 .reason-item:nth-child(4) {
-    background-color: #FF6600; /* Naranja */
+    background-color:  #003366; /* Dark Blue */
 }
 
 /* Ajustes de diseño para pantallas pequeñas */
