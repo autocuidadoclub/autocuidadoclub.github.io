@@ -440,6 +440,43 @@ nav ul li a:hover {
     }
 }
 
+/* Mission Section */
+.mission-section {
+    padding: 20px;
+}
+
+.mission-section h2 {
+    font-size: 2em;
+    color: #003366; /* Dark blue */
+    margin-bottom: 20px;
+}
+
+.mission-section h3 {
+    font-size: 1.5em;
+    color: #003366;
+    margin-top: 20px;
+}
+
+.logo-text-container {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.logo {
+    width: 120px;
+    height: auto;
+    margin-right: 20px;
+}
+
+.logo-description {
+    color: #666666;
+    font-size: 1em;
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+
 
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
