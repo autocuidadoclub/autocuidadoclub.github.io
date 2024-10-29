@@ -140,7 +140,7 @@ nav ul li a:hover {
 .why-different-section h2 {
     font-size: 1.8em;
     margin-bottom: 20px;
-    color: #FFFFFF;
+    color: #f2f2f2;
 }
 
 .why-different-section .description-text {
@@ -172,7 +172,7 @@ nav ul li a:hover {
 
 /* Colores para cada tarjeta */
 .reason-item:nth-child(1) {
-    background-color: #800080; /* Púrpura */
+    background-color:  #003366; /* Dark Blue */
 }
 
 .reason-item:nth-child(2) {
@@ -180,7 +180,7 @@ nav ul li a:hover {
 }
 
 .reason-item:nth-child(3) {
-    background-color: #2ECC71; /* Verde */
+    background-color: #f2f2f2; /* Gris metálico */
 }
 
 .reason-item:nth-child(4) {
