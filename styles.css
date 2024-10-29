@@ -129,17 +129,20 @@ nav ul li a:hover {
 
 }
 
-/* Sección "¿Por qué AutoCuidado Club es diferente?" */
 .why-different-section {
-    color: #003366; /* Dark Blue */
+    color: #003366; /* Azul oscuro */
     text-align: center;
-    margin-bottom: 20px;
+    margin: 40px 0;
+    padding-top: 20px; /* Espacio adicional para separar el título de otros elementos */
 }
 
 .why-different-section h2 {
-    font-size: 1.8em;
+    font-size: 2em;
     margin-bottom: 20px;
-    color: #f2f2f2;
+    color: #003366;
+    background-color: #f4f4f4; /* Fondo claro para destacar el título */
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .why-different-section .description-text {
@@ -159,32 +162,39 @@ nav ul li a:hover {
     margin-top: 20px;
 }
 
-/* Estilo para cada razón */
+/* Estilo para cada razón con los colores ajustados según la secuencia de la imagen */
 .reason-item {
     padding: 20px;
     color: white;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: bold;
     border-radius: 5px;
     text-align: center;
 }
 
-/* Colores para cada tarjeta */
 .reason-item:nth-child(1) {
-    background-color:  #003366; /* Dark Blue */
-}
-
-.reason-item:nth-child(2) {
-    background-color: #4A90E2; /* Azul Medio */
-}
-
-.reason-item:nth-child(3) {
     background-color: #FF6600; /* Naranja */
 }
 
-.reason-item:nth-child(4) {
-    background-color:  #003366; /* Dark Blue */
+.reason-item:nth-child(2) {
+    background-color: #4CAF50; /* Verde */
 }
+
+.reason-item:nth-child(3) {
+    background-color: #003366; /* Azul Oscuro */
+}
+
+.reason-item:nth-child(4) {
+    background-color: #800080; /* Púrpura */
+}
+
+/* Ajustes de diseño para pantallas pequeñas */
+@media (max-width: 768px) {
+    .reasons-container {
+        grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+    }
+}
+
 
 /* Ajustes de diseño para pantallas pequeñas */
 @media (max-width: 768px) {
