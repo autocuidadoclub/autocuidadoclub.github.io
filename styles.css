@@ -127,6 +127,56 @@ nav ul li a:hover {
     background-color: #800080; /* Púrpura */
 }
 
+/* General hover effect for benefit items */
+.benefit-item {
+    transition: transform 0.3s ease; /* Smooth transition for zoom effect */
+}
+
+.benefit-item:hover {
+    transform: scale(1.05); /* Slightly enlarge box on hover */
+}
+
+/* Individual colors for each benefit box */
+.benefit-item:nth-child(1) {
+    background-color: #FF6600; /* Orange */
+}
+
+.benefit-item:nth-child(2) {
+    background-color: #4CAF50; /* Green */
+}
+
+.benefit-item:nth-child(3) {
+    background-color: #4A90E2; /* Blue */
+}
+
+.benefit-item:nth-child(4) {
+    background-color: #003366; /* Dark Blue */
+}
+
+.benefit-item:nth-child(5) {
+    background-color: #800080; /* Purple */
+}
+
+.benefit-item:nth-child(6) {
+    background-color: #8B4513; /* Brown */
+}
+
+.benefit-item:nth-child(7) {
+    background-color: #2E8B57; /* Dark Green */
+}
+
+.benefit-item:nth-child(8) {
+    background-color: #2F4F4F; /* Dark Slate Gray */
+}
+
+/* Adjust layout if necessary for responsiveness */
+@media (max-width: 768px) {
+    .benefits-container {
+        grid-template-columns: 1fr; /* Stack boxes in one column on smaller screens */
+    }
+}
+
+
 }
 
 .why-different-section {
