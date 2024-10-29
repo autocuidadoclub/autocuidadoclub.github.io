@@ -90,7 +90,58 @@
     </p>
 </section>
 
+<section id="interactive-checks">
+        <h2>Haz clic en una parte del vehículo para ver todas las inspecciones que realizamos en esa área.</h2>
+        
+        <!-- Car Icon -->
+        <div class="car-icon">
+            <img src="caricon.jpg" alt="Car Icon">
+        </div>
 
+        <!-- Inspection Tabs -->
+        <div class="inspection-tabs">
+            <button onclick="showInspection('motor')">Motor</button>
+            <button onclick="showInspection('interior')">Interior</button>
+            <button onclick="showInspection('exterior')">Exterior</button>
+        </div>
+
+        <!-- Inspection Content -->
+        <div id="motor" class="inspection-content">
+            <h3>Revisiones del Motor</h3>
+            <ul>
+                <li>Revisión de aceite de motor, transmisión y diferencial.</li>
+                <li>Medición del líquido de frenos (nivel y calidad).</li>
+                <li>Chequeo de calidad del refrigerante.</li>
+                <li>Inspección de bujías y bobinas de encendido.</li>
+                <li>Inspección de fugas de aceite.</li>
+                <li>Chequeo de filtros de aire y mangueras.</li>
+                <li>Inspección de correas y poleas.</li>
+            </ul>
+        </div>
+
+        <div id="interior" class="inspection-content" style="display:none;">
+            <h3>Revisiones del Interior</h3>
+            <ul>
+                <li>Chequeo de filtro de aire acondicionado.</li>
+                <li>Inspección de cinturones de seguridad.</li>
+                <li>Revisión de unidades de control como PCM, SRS, ABS, APS.</li>
+                <li>Inspección de sistema de dirección y controles del volante.</li>
+            </ul>
+        </div>
+
+        <div id="exterior" class="inspection-content" style="display:none;">
+            <h3>Revisiones del Exterior</h3>
+            <ul>
+                <li>Chequeo de luces (faros, luces de freno, luces de giro, luces antiniebla).</li>
+                <li>Inspección de mangueras de freno y amortiguadores.</li>
+                <li>Chequeo del estado de las llantas de repuesto y herramientas para cambiar la llanta.</li>
+                <li>Chequeo del sistema de escape y presencia de óxido.</li>
+                <li>Inspección del cuerpo del acelerador y tapa de gasolina.</li>
+            </ul>
+        </div>
+    </section>
+
+    
     <!-- Discounts on Parts and International Support Section -->
     <section id="descuentos-partes">
         <h2>Descuentos en Repuestos y Soporte Internacional</h2>
