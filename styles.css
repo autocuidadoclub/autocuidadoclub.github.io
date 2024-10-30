@@ -631,6 +631,55 @@ nav ul li a:hover {
     margin: 0 auto 10px;
 }
 
+.inspection-section {
+    text-align: center;
+    margin: 20px;
+}
+
+.logo-small {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+.car-image {
+    width: 60%; /* Adjust as necessary to fit better */
+    max-width: 400px;
+    margin: 20px auto;
+    display: block;
+}
+
+.inspection-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.inspection-buttons button {
+    padding: 10px 20px;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.inspection-buttons button:hover {
+    background-color: #FF6600;
+}
+
+.inspection-content {
+    margin-top: 20px;
+    text-align: left;
+    display: inline-block;
+    width: 100%;
+    max-width: 400px;
+}
+
+.inspection-content h3 {
+    color: #003366;
+}
 
 
 /* Adjust Layout for Mobile Devices */
