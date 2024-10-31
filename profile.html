@@ -2,48 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Perfil - AutoCuidado Club</title>
+    <title>Perfil de Usuario - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <header>
-        <h1>Bienvenido a AutoCuidado Club</h1>
-        <p>Completa tu perfil para una experiencia personalizada</p>
-    </header>
-
-    <section>
-        <h2>Información del Usuario</h2>
-        <form id="profileForm">
-            <label for="name">Nombre Completo:</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="email">Correo Electrónico:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="phone">Número de Teléfono:</label>
-            <input type="text" id="phone" name="phone" required>
-
-            <h2>Información del Vehículo</h2>
-            <div id="vehicleSection">
-                <label for="plate">Placa:</label>
-                <input type="text" id="plate" name="plate" required>
-
-                <label for="make">Marca:</label>
-                <input type="text" id="make" name="make" required>
-
-                <label for="model">Modelo:</label>
-                <input type="text" id="model" name="model" required>
-
-                <label for="year">Año:</label>
-                <input type="number" id="year" name="year" required>
-            </div>
-
-            <button type="button" onclick="addVehicle()">Agregar Otro Vehículo</button>
-            <button type="submit">Guardar Perfil</button>
-        </form>
-    </section>
+    <h1>Perfil de Usuario</h1>
+    <div id="profileInfo"></div>
 
     <script src="firebase.js"></script>
     <script src="profile.js"></script>
