@@ -735,6 +735,10 @@ button:hover {
     background-color: #ff6600;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
