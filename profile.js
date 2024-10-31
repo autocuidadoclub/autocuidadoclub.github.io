@@ -1,4 +1,18 @@
 // profile.js
+
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+const firebaseConfig = {
+  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+  authDomain: "auto-cuidadoclub.firebaseapp.com",
+  databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+  projectId: "auto-cuidadoclub",
+  storageBucket: "auto-cuidadoclub.appspot.com",
+  messagingSenderId: "986704701191",
+  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+  measurementId: "G-LBBGXV2YX5"
+
 let vehicleCount = 1;
 
 function addVehicle() {
