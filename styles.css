@@ -683,7 +683,7 @@ nav ul li a:hover {
 
 /* Registration Form Styling */
 .register-section {
-    display: none; /* Hidden initially */
+    display: none;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
     padding: 20px;
@@ -694,10 +694,32 @@ nav ul li a:hover {
     margin: 20px auto;
 }
 
-/* Fade-in effect */
 .register-section.fade-in {
     display: block;
     opacity: 1;
+}
+
+.register-section label {
+    display: inline-block;
+    width: 120px;
+    font-weight: bold;
+}
+
+.register-section input {
+    width: calc(100% - 130px);
+    padding: 8px;
+    margin: 5px 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.vehicle-info {
+    margin-top: 15px;
+}
+
+.vehicle-info h4 {
+    color: #003366;
+    margin-bottom: 10px;
 }
 
 button {
