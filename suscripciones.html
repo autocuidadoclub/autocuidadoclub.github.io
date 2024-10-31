@@ -44,25 +44,13 @@ const firebaseConfig = {
           return;
         }
 
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            return db.collection("users").doc(userId).set({
-              name: name,
-              email: email,
-              phone: phone,
-              subscriptionStatus: "Pending",
-              vehicles: vehicles
-            });
-          })
-          .then(() => {
-            alert("Registro exitoso. ¡Bienvenido a AutoCuidado Club!");
-            window.location.href = "profile.html";
-          })
-          .catch((error) => {
-            console.error("Error en el registro:", error);
-            alert("Error en el registro: " + error.message);
-          });
+        // Add user data to Firebase
+        firebase.database().ref('users/' + userData.phone).set(userData)
+          .then(() => alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!"))
+          .catch((error) => alert("Error en el registro: " + error.message));
+
+        // Hide form after submission
+        document.getElementById('registerForm').style.display = "none";
       }
     </script>
 </head>
@@ -119,7 +107,7 @@ const firebaseConfig = {
                 <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
                 </ul>
                 <p></p>
-                <button class="subscribe-btn">Suscribirse</button>
+                 <button onclick="showRegistrationForm()">Suscribirse - Plan Básico</button>
                 </div>
         </div>
         
@@ -134,7 +122,7 @@ const firebaseConfig = {
                 <li><strong>Ideal para:</strong> Clientes que buscan estabilidad en el mantenimiento a mediano plazo.</li>
                 </ul>
                 <p><strong>10% de descuento mensual</strong> contra plan básico de 3 meses </p>
-                <button class="subscribe-btn">Suscribirse</button>
+                 <button onclick="showRegistrationForm()">Suscribirse - Plan Básico</button>
             </div>
         </div>
         
@@ -151,7 +139,7 @@ const firebaseConfig = {
                 </ul>
                 <p><strong>25% de descuento mensual</strong> contra plan básico de 3 meses </p>
                 <p><strong>15% de descuento mensual</strong> contra plan básico de 6 meses </p>
-                <button class="subscribe-btn">Suscribirse</button>
+                 <button onclick="showRegistrationForm()">Suscribirse - Plan Básico</button>
             </div>
         </div>
     </div>
@@ -170,7 +158,7 @@ const firebaseConfig = {
                 <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
                 </ul>
                 <p><strong>37% de descuento mensual por vehículo</strong> contra plan básico de 3 meses </p>
-                <button class="subscribe-btn">Suscribirse</button>
+                 <button onclick="showRegistrationForm()">Suscribirse - Plan Plus</button>
             </div>
         </div>
         
@@ -186,7 +174,7 @@ const firebaseConfig = {
                 </ul>
                 <p><strong>43% de descuento mensual por vehículo</strong> contra plan básico de 3 meses </p>
                 <p><strong>43% de descuento mensual</strong> contra plan plus de 3 meses </p>
-                <button class="subscribe-btn">Suscribirse</button>
+                 <button onclick="showRegistrationForm()">Suscribirse - Plan Plus</button>
             </div>
         </div>
         <div class="plan-item highlight">
@@ -202,12 +190,54 @@ const firebaseConfig = {
                 </ul>
                 <p><strong>53% de descuento mensual por vehículo</strong> contra plan básico de 3 meses </p>
                 <p><strong>10% de descuento mensual</strong> contra plan plus de 6 meses </p>
-                <button class="subscribe-btn">Suscribirse</button>
+                 <button onclick="showRegistrationForm()">Suscribirse - Plan Plus</button>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Registration Form Section with Smooth Animation -->
+<section id="register-section" class="register-section">
+    <h2>Regístrate y Elige Tu Plan</h2>
+    <form id="registerForm" onsubmit="registerUser(); return false;">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <label for="phone">Teléfono:</label>
+        <input type="text" id="phone" required>
+
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" required>
+
+        <h3>Información del Vehículo</h3>
+        <label for="vehicleBrand">Marca:</label>
+        <input type="text" id="vehicleBrand" required>
+
+        <label for="vehicleModel">Modelo:</label>
+        <input type="text" id="vehicleModel" required>
+
+        <label for="vehicleYear">Año:</label>
+        <input type="text" id="vehicleYear" required>
+
+        <label for="vehiclePlate">Placa:</label>
+        <input type="text" id="vehiclePlate" required>
+
+        <button type="submit">Registrarse</button>
+    </form>
+</section>
+
+<script>
+  function showRegistrationForm() {
+    const formSection = document.getElementById('register-section');
+    formSection.style.display = 'block';
+    formSection.classList.add('fade-in');
+  }
+</script>
+
+   
     <h3><strong>Suscripción básica 12 meses: Ahorras $104.97 al año </strong>en comparación con el plan básico de 3 meses.</p>
     <strong>Suscripción plus 12 meses: Ahorras $199.44 al año </strong>en comparación con el plan plus de 3 meses y <strong> $661.32 al año</h3>
     
