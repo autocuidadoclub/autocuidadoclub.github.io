@@ -681,6 +681,38 @@ nav ul li a:hover {
     color: #003366;
 }
 
+/* Registration Form Styling */
+.register-section {
+    display: none; /* Hidden initially */
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+/* Fade-in effect */
+.register-section.fade-in {
+    display: block;
+    opacity: 1;
+}
+
+button {
+    background-color: #003366;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ff6600;
+}
+
 
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
