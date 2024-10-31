@@ -1,76 +1,26 @@
-// profile.js
+import { auth, db, doc, getDoc } from './firebase.js';
 
-import firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/firestore";
-const firebaseConfig = {
-  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-  authDomain: "auto-cuidadoclub.firebaseapp.com",
-  databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-  projectId: "auto-cuidadoclub",
-  storageBucket: "auto-cuidadoclub.appspot.com",
-  messagingSenderId: "986704701191",
-  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-  measurementId: "G-LBBGXV2YX5"
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        
+        getDoc(userRef).then((docSnap) => {
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+                const vehicles = userData.vehicles.map(v => `${v.make} ${v.model} (${v.year})`).join(', ');
 
-    // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-let vehicleCount = 1;
-
-function addVehicle() {
-    const vehicleSection = document.getElementById('vehicleSection');
-    vehicleCount++;
-
-    const vehicleHTML = `
-        <h3>Vehículo ${vehicleCount}</h3>
-        <label for="plate${vehicleCount}">Placa:</label>
-        <input type="text" id="plate${vehicleCount}" name="plate${vehicleCount}" required>
-
-        <label for="make${vehicleCount}">Marca:</label>
-        <input type="text" id="make${vehicleCount}" name="make${vehicleCount}" required>
-
-        <label for="model${vehicleCount}">Modelo:</label>
-        <input type="text" id="model${vehicleCount}" name="model${vehicleCount}" required>
-
-        <label for="year${vehicleCount}">Año:</label>
-        <input type="number" id="year${vehicleCount}" name="year${vehicleCount}" required>
-    `;
-    vehicleSection.insertAdjacentHTML('beforeend', vehicleHTML);
-}
-
-document.getElementById('profileForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    saveProfile();
-});
-
-function saveProfile() {
-    // Collect form data and save it to Firebase
-    const profileData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        vehicles: []
-    };
-
-    for (let i = 1; i <= vehicleCount; i++) {
-        const vehicle = {
-            plate: document.getElementById(`plate${i}`).value,
-            make: document.getElementById(`make${i}`).value,
-            model: document.getElementById(`model${i}`).value,
-            year: document.getElementById(`year${i}`).value
-        };
-        profileData.vehicles.push(vehicle);
+                document.getElementById('profileInfo').innerHTML = `
+                    <h2>${userData.name}</h2>
+                    <p>Email: ${userData.email}</p>
+                    <p>Teléfono: ${userData.phone}</p>
+                    <p>Vehículos: ${vehicles}</p>
+                    <p>Estado de Suscripción: ${userData.subscriptionStatus}</p>
+                `;
+            } else {
+                console.error('Documento no encontrado');
+            }
+        }).catch(error => console.error('Error al obtener el documento:', error));
+    } else {
+        window.location.href = 'login.html';
     }
-
-    // Save to Firebase (assuming Firebase is initialized in firebase.js)
-    firebase.firestore().collection('profiles').doc(profileData.email).set(profileData)
-        .then(() => {
-            alert('Perfil guardado exitosamente');
-            window.location.href = 'recommendation.html';
-        })
-        .catch((error) => {
-            console.error('Error saving profile: ', error);
-            alert('Error al guardar el perfil');
-        });
-}
+});
