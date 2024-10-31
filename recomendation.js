@@ -13,6 +13,9 @@ const firebaseConfig = {
   appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
   measurementId: "G-LBBGXV2YX5"
 
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
 firebase.firestore().collection('profiles').doc(userEmail).get()
     .then((doc) => {
         if (doc.exists) {
