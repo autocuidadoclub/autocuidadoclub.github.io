@@ -14,6 +14,9 @@ const firebaseConfig = {
   appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
   measurementId: "G-LBBGXV2YX5"
 
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
 document.getElementById('registerForm').addEventListener('submit', (e) => {
     e.preventDefault();
 
