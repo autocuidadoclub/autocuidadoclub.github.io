@@ -5,6 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script>
+      // Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+  authDomain: "auto-cuidadoclub.firebaseapp.com",
+  databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+  projectId: "auto-cuidadoclub",
+  storageBucket: "auto-cuidadoclub.appspot.com",
+  messagingSenderId: "986704701191",
+  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+  measurementId: "G-LBBGXV2YX5"
+      };
+        
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = firebase.firestore();
+
+      function registerUser() {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const password = document.getElementById("password").value;
+        const vehicles = [
+          {
+            brand: document.getElementById("vehicleBrand").value,
+            model: document.getElementById("vehicleModel").value,
+            year: document.getElementById("vehicleYear").value,
+            plate: document.getElementById("vehiclePlate").value
+          }
+        ];
+
+        if (!name || !email || !phone || !password) {
+          alert("Por favor, complete todos los campos.");
+          return;
+        }
+
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            return db.collection("users").doc(userId).set({
+              name: name,
+              email: email,
+              phone: phone,
+              subscriptionStatus: "Pending",
+              vehicles: vehicles
+            });
+          })
+          .then(() => {
+            alert("Registro exitoso. ¡Bienvenido a AutoCuidado Club!");
+            window.location.href = "profile.html";
+          })
+          .catch((error) => {
+            console.error("Error en el registro:", error);
+            alert("Error en el registro: " + error.message);
+          });
+      }
+    </script>
 </head>
 
 <body>
