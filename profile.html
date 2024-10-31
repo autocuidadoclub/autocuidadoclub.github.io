@@ -1,77 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-
-    <!-- Navigation -->
-   <nav class="navbar">
-    <ul class="nav-links">
-        <li><a href="nosotros.html">Nosotros</a></li>
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
-        <li><a href="login.html">Ingresa a tu cuenta</a></li>
-    </ul>
-    <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-    </div>
-</nav>
-
-
-  
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro de Vehículos - AutoCuidado Club</title>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-
-  <script>
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-  authDomain: "auto-cuidadoclub.firebaseapp.com",
-  projectId: "auto-cuidadoclub",
-  storageBucket: "auto-cuidadoclub.appspot.com",
-  messagingSenderId: "986704701191",
-  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-  measurementId: "G-LBBGXV2YX5"
-      };
-    
-      const app = firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
-      const auth = firebase.auth();
-
-      function addVehicle() {
-        const vehicle = {
-          brand: document.getElementById('brand').value,
-          model: document.getElementById('model').value,
-          year: document.getElementById('year').value,
-          plate: document.getElementById('plate').value
-        };
-
-        const userId = auth.currentUser.uid;
-        db.ref('users/' + userId + '/vehicles').push(vehicle).then(() => {
-          alert("Vehículo agregado con éxito");
-        });
-      }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Perfil - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h2>Registra tu vehículo</h2>
-  <form>
-    <label>Marca:</label><br>
-    <input type="text" id="brand" required><br>
-    <label>Modelo:</label><br>
-    <input type="text" id="model" required><br>
-    <label>Año:</label><br>
-    <input type="number" id="year" required><br>
-    <label>Placa:</label><br>
-    <input type="text" id="plate" required><br><br>
-    <button type="button" onclick="addVehicle()">Registrar Vehículo</button>
-  </form>
 
-  <p><a href="suscripciones.html">Ver Planes de Suscripción</a></p>
+    <header>
+        <h1>Bienvenido a AutoCuidado Club</h1>
+        <p>Completa tu perfil para una experiencia personalizada</p>
+    </header>
+
+    <section>
+        <h2>Información del Usuario</h2>
+        <form id="profileForm">
+            <label for="name">Nombre Completo:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Correo Electrónico:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Número de Teléfono:</label>
+            <input type="text" id="phone" name="phone" required>
+
+            <h2>Información del Vehículo</h2>
+            <div id="vehicleSection">
+                <label for="plate">Placa:</label>
+                <input type="text" id="plate" name="plate" required>
+
+                <label for="make">Marca:</label>
+                <input type="text" id="make" name="make" required>
+
+                <label for="model">Modelo:</label>
+                <input type="text" id="model" name="model" required>
+
+                <label for="year">Año:</label>
+                <input type="number" id="year" name="year" required>
+            </div>
+
+            <button type="button" onclick="addVehicle()">Agregar Otro Vehículo</button>
+            <button type="submit">Guardar Perfil</button>
+        </form>
+    </section>
+
+    <script src="firebase.js"></script>
+    <script src="profile.js"></script>
 </body>
 </html>
