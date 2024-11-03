@@ -1,3 +1,5 @@
+Este tiene el código del box actualizado y funcoinal agregar la info de los otros planes
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -21,6 +23,7 @@ const firebaseConfig = {
   measurementId: "G-LBBGXV2YX5"
 };
         const app = firebase.initializeApp(firebaseConfig);
+       const analytics = getAnalytics(app);
         const db = firebase.firestore();
 
         function registerUser() {
@@ -94,6 +97,15 @@ const firebaseConfig = {
         </div>
     </header>
 
+<section class="subscription-section">
+<h2>Planes de Suscripción</h2>
+<p class="highlight-text">Por Qué Elegir AutoCuidado Club</p>
+<ul class="benefits-list">
+<li><strong>Mayor Productividad:</strong> Mantén tu ritmo de vida sin interrupciones. Nosotros nos encargamos del mantenimiento.</li>
+<li><strong>Garantía de Calidad:</strong> Herramientas avanzadas y personal calificado para ofrecer el mejor servicio.</li>
+<li><strong>Cuidado Total del Vehículo:</strong> Nos encargamos de todos los aspectos del mantenimiento, tú solo disfrutas.</li>
+</ul>
+
     <!-- Subscription Plans Section -->
     <section class="subscription-section">
         <h2>Planes de Suscripción</h2>
@@ -103,19 +115,102 @@ const firebaseConfig = {
                 <div class="plan-option">
                     <img src="3mb.jpg" alt="Plan Básico 3 meses" class="plan-image">
                     <p><strong>3 meses:</strong> $34.99/mes</p>
+<ul class="plan-benefits">
+<p><strong>Incluye:</strong></p>
+<li>3 inspecciones preventivas (una cada mes).</li>
+<li><strong>Beneficio:</strong> Prueba rápida y flexible para evaluar el servicio sin un compromiso a largo plazo.</li>
+<li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
+</ul>
+<p></p>
                     <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
                 </div>
             </div>
-            <!-- Plus Plan -->
-            <div class="plan-item">
-                <div class="plan-option">
-                    <img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
-                    <p><strong>3 meses:</strong> $66.48/mes</p>
-                    <button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
-                </div>
-            </div>
-        </div>
-    </section>
+
+<div class="plan-item">
+<div class="plan-option">
+<img src="6mb.jpg" alt="Plan Básico 6 meses" class="plan-image">
+<p><strong>6 meses:</strong> $31.49/mes</p>
+<ul class="plan-benefits">
+<p><strong>Incluye:</strong></p>
+<li>6 inspecciones preventivas (una cada mes).</li>
+<li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante seis meses.</li>
+<li><strong>Ideal para:</strong> Clientes que buscan estabilidad en el mantenimiento a mediano plazo.</li>
+</ul>
+<p><strong>10% de descuento mensual</strong> contra plan básico de 3 meses </p>
+<button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
+</div>
+</div>
+
+<div class="plan-item highlight">
+<div class="badge">¡Mejor Opción!</div>
+<div class="plan-option">
+<img src="12mb.jpg" alt="Plan Básico 12 meses" class="plan-image">
+<p><strong>12 meses:</strong> $26.24/mes</p>
+<ul class="plan-benefits">
+<p><strong>Incluye:</strong></p>
+<li>12 inspecciones preventivas (una cada mes).</li>
+<li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante seis meses.</li>
+<li><strong>Ideal para:</strong> Clientes que buscan estabilidad en el mantenimiento a largo plazo.</li>
+</ul>
+<p><strong>25% de descuento mensual</strong> contra plan básico de 3 meses </p>
+<p><strong>15% de descuento mensual</strong> contra plan básico de 6 meses </p>
+<button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
+</div>
+</div>
+</div>
+
+<h2>Planes de Suscripciones Plus</h2>
+<!-- Plus Subscription Plans Row -->
+<div class="subscription-row">
+<div class="plan-item">
+<div class="plan-option">
+<img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
+<p><strong>3 meses:</strong> $66.48/mes</p>
+<ul class="plan-benefits">
+<p><strong>Incluye:</strong></p>
+<li>3 inspecciones preventivas (una cada mes).</li>
+<li><strong>Beneficio:</strong> Prueba rápida y flexible para evaluar el servicio sin un compromiso a largo plazo.</li>
+<li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
+</ul>
+<p><strong>37% de descuento mensual por vehículo</strong> contra plan básico de 3 meses </p>
+<button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+</div>
+</div>
+
+<div class="plan-item">
+<div class="plan-option">
+<img src="6mp.jpg" alt="Plan Plus 6 meses" class="plan-image">
+<p><strong>6 meses:</strong> $59.83/mes</p>
+<ul class="plan-benefits">
+<p><strong>Incluye:</strong></p>
+<li>6 inspecciones preventivas (una cada mes).</li>
+<li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante seis meses.</li>
+<li><strong>Ideal para:</strong> Clientes que buscan estabilidad en el mantenimiento a mediano plazo.</li>
+</ul>
+<p><strong>43% de descuento mensual por vehículo</strong> contra plan básico de 3 meses </p>
+<p><strong>43% de descuento mensual</strong> contra plan plus de 3 meses </p>
+<button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+</div>
+</div>
+<div class="plan-item highlight">
+<div class="badge">¡Mejor Opción!</div>
+<div class="plan-option">
+<img src="12mp.jpg" alt="Plan Plus 12 meses" class="plan-image">
+<p><strong>12 meses:</strong> $49.86/mes</p>
+<ul class="plan-benefits">
+<p><strong>Incluye:</strong></p>
+<li>12 inspecciones preventivas (una cada mes).</li>
+<li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante seis meses.</li>
+<li><strong>Ideal para:</strong> Clientes que buscan estabilidad en el mantenimiento a largo plazo.</li>
+</ul>
+<p><strong>53% de descuento mensual por vehículo</strong> contra plan básico de 3 meses </p>
+<p><strong>10% de descuento mensual</strong> contra plan plus de 6 meses </p>
+<button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+</div>
+</div>
+</div>
+</section>
+
 
     <!-- Registration Form Section with Smooth Animation -->
     <section id="register-section" class="register-section" style="display: none;">
@@ -139,6 +234,10 @@ const firebaseConfig = {
             <button type="submit">Registrarse</button>
         </form>
     </section>
+
+
+<h3><strong>Suscripción básica 12 meses: Ahorras $104.97 al año </strong>en comparación con el plan básico de 3 meses.</p>
+<strong>Suscripción plus 12 meses: Ahorras $199.44 al año </strong>en comparación con el plan plus de 3 meses y <strong> $661.32 al año</h3>
 
     <!-- Footer -->
     <footer>
