@@ -265,8 +265,9 @@ const firebaseConfig = {
             formSection.style.display = 'block'; // Display the form section
             formSection.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to the form section
 
-            // Set the hidden input field to the selected plan type
+             // Set the plan type
             document.getElementById('planType').value = planType;
+
 
             // Clear any previously added vehicle sections
             const vehicleSections = document.getElementById('vehicle-sections');
