@@ -259,11 +259,13 @@ const firebaseConfig = {
 
     <script>
         // Function to show the registration form and set up vehicle sections based on selected plan
-        function showRegistrationForm(planType) {
-            // Show the registration form section
-            const formSection = document.getElementById('register-section');
-            formSection.style.display = 'block'; // Display the form section
-            formSection.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to the form section
+       function showRegistrationForm(planType) {
+    console.log("Button clicked, showing form for plan:", planType); // Debug message
+    const formSection = document.getElementById('register-section');
+    formSection.style.display = 'block';
+    formSection.classList.add('fade-in');
+    formSection.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to form
+}
 
              // Set the plan type
             document.getElementById('planType').value = planType;
