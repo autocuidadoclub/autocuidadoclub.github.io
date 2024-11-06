@@ -83,7 +83,9 @@ function showRegistrationForm(planType) {
     console.log("showRegistrationForm called with planType:", planType);
     const formSection = document.getElementById('register-section');
     formSection.style.display = 'block'; // Ensure this line is setting the display to 'block'
-    formSection.classList.add('fade-in');
+    // Temporarily comment out or remove fade-in to troubleshoot
+    // formSection.classList.add('fade-in');
+
     document.getElementById('planType').value = planType;
 
     const vehicleSections = document.getElementById('vehicle-sections');
