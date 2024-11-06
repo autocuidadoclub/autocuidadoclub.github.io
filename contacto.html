@@ -123,15 +123,19 @@
         <input type="hidden" name="_captcha" value="false">
         <input type="hidden" name="_template" value="table">
         
-        <button type="submit">Enviar</button>
-        document.getElementById('contactForm').onsubmit = function() {
-  setTimeout(function() {
-    alert('Gracias, Su mensaje ha sido enviado y nos contactamos con usted en breve.');
-    document.getElementById('contactForm').reset();
-  }, 500); // Adjust as needed
+       <button type="submit">Enviar</button>
+</form>
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+    
+<script>
+document.getElementById('contactForm').onsubmit = function() {
+    setTimeout(function() {
+        alert('Gracias, Su mensaje ha sido enviado y nos contactamos con usted en breve.');
+        document.getElementById('contactForm').reset();
+    }, 500); // Adjust as needed
 };
+</script>
 
-    </form>
     
     <div class="contact-info">
         <h3><p>Teléfono: +503 XXX-XXXX</p></h3>
