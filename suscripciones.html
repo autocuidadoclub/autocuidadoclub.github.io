@@ -78,7 +78,24 @@ function registerUser() {
         });
 }
         
+function testFirestoreWrite() {
+    db.collection("testCollection").add({
+        testField: "Hello, Firestore!"
+    })
+    .then(() => {
+        console.log("Test data written successfully!");
+        alert("Test data written successfully!");
+    })
+    .catch((error) => {
+        console.error("Error writing test data: ", error);
+        alert("Error writing test data: " + error.message);
+    });
+}
 
+// Call this function in the console or add a temporary button to test
+testFirestoreWrite();
+
+        
 function showRegistrationForm(planType) {
     console.log("showRegistrationForm called with planType:", planType);
     const formSection = document.getElementById('register-section');
