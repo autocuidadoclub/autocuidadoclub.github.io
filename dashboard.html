@@ -1,3 +1,4 @@
+<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,58 +6,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script>
-        // Initialize Firebase configuration
         const firebaseConfig = {
-const firebaseConfig = {
-  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-  authDomain: "auto-cuidadoclub.firebaseapp.com",
-  databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-  projectId: "auto-cuidadoclub",
-  storageBucket: "auto-cuidadoclub.appspot.com",
-  messagingSenderId: "986704701191",
-  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-  measurementId: "G-LBBGXV2YX5"
-};
-        
+          const firebaseConfig = {
+          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+          authDomain: "auto-cuidadoclub.firebaseapp.com",
+          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+          projectId: "auto-cuidadoclub",
+          storageBucket: "auto-cuidadoclub.appspot.com",
+          messagingSenderId: "986704701191",
+          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+          measurementId: "G-LBBGXV2YX5"
+        };
+
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const auth = firebase.auth();
 
-        // Fetch and display user data
-        function displayUserData() {
-            const userId = firebase.auth().currentUser.uid;
-            db.ref('users/' + userId).once('value').then((snapshot) => {
-                const userData = snapshot.val();
-                document.getElementById('userEmail').innerText = userData.email;
-                document.getElementById('userWhatsApp').innerText = userData.whatsapp;
-                const carInfo = userData.cars[0];
-                document.getElementById('carInfo').innerText = `${carInfo.brand} ${carInfo.model}, ${carInfo.year}, Placa: ${carInfo.numberPlate}`;
-                
-                // Suggest subscription plan based on the number of cars
-                const planSuggestion = (userData.cars.length === 1) ? "Plan Básico" : "Plan Plus";
-                document.getElementById('planSuggestion').innerText = `Plan sugerido: ${planSuggestion}`;
-            });
-        }
-
-        // Display data after the user logs in
-        firebase.auth().onAuthStateChanged((user) => {
+        // Check if the user is authenticated
+        auth.onAuthStateChanged((user) => {
             if (user) {
-                displayUserData();
+                document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             } else {
-                window.location.href = "login.html"; // Redirect to login if not logged in
+                window.location.href = 'login.html';
             }
         });
+
+        function logoutUser() {
+            auth.signOut()
+                .then(() => {
+                    alert("Logout exitoso");
+                    window.location.href = 'login.html';
+                })
+                .catch((error) => {
+                    console.error("Error en el logout:", error.message);
+                    alert("Error en el logout: " + error.message);
+                });
+        }
     </script>
 </head>
 <body>
-    <h2>Perfil de Usuario</h2>
-    <p>Email: <span id="userEmail"></span></p>
-    <p>WhatsApp: <span id="userWhatsApp"></span></p>
-    <h3>Información del Vehículo</h3>
-    <p id="carInfo"></p>
-    <h3 id="planSuggestion"></h3>
+    <h2>Dashboard</h2>
+    <p id="user-info">Cargando usuario...</p>
+    <button onclick="logoutUser()">Cerrar Sesión</button>
 </body>
 </html>
