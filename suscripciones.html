@@ -128,10 +128,6 @@
     </script>
 </head>
 <body>
-    <!-- Your HTML content here -->
-    <!-- Example button to trigger testFirestoreWrite -->
-    <button onclick="testFirestoreWrite()">Test Firestore Write</button>
-</body>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -157,6 +153,7 @@
         </div>
     </header>
 
+    <!-- Subscription Section -->
     <section class="subscription-section">
         <h2>Planes de Suscripción</h2>
         <p class="highlight-text">Por Qué Elegir AutoCuidado Club</p>
@@ -165,6 +162,9 @@
             <li><strong>Garantía de Calidad:</strong> Herramientas avanzadas y personal calificado para ofrecer el mejor servicio.</li>
             <li><strong>Cuidado Total del Vehículo:</strong> Nos encargamos de todos los aspectos del mantenimiento, tú solo disfrutas.</li>
         </ul>
+
+        <!-- Subscription Plans Here -->
+        <!-- Place your subscription plans (Básico and Plus) as in your code -->
 
         <h2>Planes de Suscripciones Básicas</h2>
         <div class="subscription-row">
@@ -243,7 +243,11 @@
             </div>
         </div>
     </section>
+        
+        <button onclick="testFirestoreWrite()">Test Firestore Write</button> <!-- Testing button -->
+    </section>
 
+    <!-- Registration Section -->
     <section id="register-section" class="register-section" style="display: none;">
         <h2>Regístrate y Elige Tu Plan</h2>
         <form id="registerForm" onsubmit="registerUser(); return false;">
@@ -260,7 +264,6 @@
             <button type="submit">Registrarse</button>
         </form>
     </section>
-
 
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
