@@ -28,13 +28,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+   
     // Function to register user
-    function registerUser() {
+function registerUser() {
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const phone = document.getElementById("phone").value;
     const planType = document.getElementById("planType").value;
-    const password = document.getElementById("password").value; // Ensure this is defined in the form
+    const password = document.getElementById("password").value;
     const vehicles = [];
 
     document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
@@ -54,63 +55,70 @@
         return;
     }
 
-        // Check if phone number is exactly 8 digits
+    // Check if phone number is exactly 8 digits
     const phonePattern = /^\d{8}$/;
     if (!phonePattern.test(phone)) {
         alert("El número de teléfono debe tener exactamente 8 dígitos.");
         console.log("Error: Phone number is not 8 digits.");
         return;
     }
-        
+
     if (planType === "plus" && vehicles.length === 0) {
         alert("Para el plan Plus, ingrese al menos un vehículo.");
         console.log("Error: No vehicle information provided for Plus plan.");
         return;
     }
 
-    // Check if phone number already exists in Firestore
-    db.collection("users").where("phone", "==", phone).get()
-        .then((querySnapshot) => {
-            if (!querySnapshot.empty) {
+    // Check if phone number or email already exists in Firestore
+    const usersRef = db.collection("users");
+    usersRef.where("phone", "==", phone).get()
+        .then((phoneSnapshot) => {
+            if (!phoneSnapshot.empty) {
                 alert("El número de teléfono ya está registrado.");
                 console.log("Error: Phone number already exists.");
-                return;
+                throw new Error("Phone number already exists.");
+            }
+            return usersRef.where("email", "==", email).get();
+        })
+        .then((emailSnapshot) => {
+            if (!emailSnapshot.empty) {
+                alert("El correo electrónico ya está registrado.");
+                console.log("Error: Email already exists.");
+                throw new Error("Email already exists.");
             }
 
-            // Proceed to create a new user with Firebase Authentication for email uniqueness check
-            return firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
+            // Create a new user with Firebase Authentication for email uniqueness check
+            return firebase.auth().createUserWithEmailAndPassword(email, password);
+        })
+        .then((userCredential) => {
+            const user = userCredential.user;
 
-                    // If the user is successfully created, save additional data in Firestore
-                    const userData = {
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        planType: planType,
-                        vehicles: vehicles,
-                        uid: user.uid
-                    };
+            // If the user is successfully created, save additional data in Firestore
+            const userData = {
+                name: name,
+                email: email,
+                phone: phone,
+                planType: planType,
+                vehicles: vehicles,
+                uid: user.uid
+            };
 
-                    return db.collection("users").doc(user.uid).set(userData);
-                })
-                .then(() => {
-                    alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
-                    console.log("User data saved successfully.");
-                    document.getElementById('registerForm').reset();
-                    document.getElementById('register-section').style.display = "none";
-                })
-                .catch((error) => {
-                    console.error("Error en el registro:", error.message);
-                    alert("Error en el registro: " + error.message);
-                });
+            return db.collection("users").doc(user.uid).set(userData);
+        })
+        .then(() => {
+            alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
+            console.log("User data saved successfully.");
+            document.getElementById('registerForm').reset();
+            document.getElementById('register-section').style.display = "none";
         })
         .catch((error) => {
-            console.error("Error al verificar el teléfono:", error.message);
-            alert("Error al verificar el teléfono: " + error.message);
+            if (error.message !== "Phone number already exists." && error.message !== "Email already exists.") {
+                console.error("Error en el registro:", error.message);
+                alert("Error en el registro: " + error.message);
+            }
         });
 }
-    
+
     
        
         // Show registration form based on plan type
