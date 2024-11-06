@@ -21,6 +21,21 @@
           measurementId: "G-LBBGXV2YX5"
         };
 
+function loginUser() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            alert("Login exitoso");
+            window.location.href = 'dashboard.html';
+        })
+        .catch((error) => {
+            console.error("Error en el login:", error); // Logs detailed error information
+            alert("Error en el login: " + error.message);
+        });
+}
+        
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
