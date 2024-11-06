@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCuidado Club - Contacto</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <!-- Header -->
+<!DOCTYPE html> 
+<html lang="es"> 
+    <head>
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>Contacto - AutoCuidado Club</title> 
+        <link rel="stylesheet" href="styles.css"> </head> <body>  
+  <!-- Header -->
    <!-- Navigation Menu -->
 
     <!-- Navigation -->
@@ -47,9 +45,29 @@
         <h2>Información de Contacto</h2>
         <p>Teléfono: +503 XXX-XXXX</p>
         <p>Email: info@autocuidadoclub.com</p>
-        <p><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfj4wvWoN83nMYn4tPTD2sOKL-V0VV5-FNddyOZPwDrW4vcvQ/viewform?embedded=true" width="640" height="954" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>
+<p>Por favor, llena este formulario para que podamos iniciar el proceso.</p> 
+        <form action="https://formsubmit.co/info@autocuidadoclub.com" method="POST"> 
+            <input type="hidden" name="_next" value="https://www.autocuidadoclub.com/thank-you.html"> 
+            <input type="hidden" name="_captcha" value="false"> 
+            
+            <!-- Customer Information --> 
+            <label for="name">Nombre:</label> 
+            <input type="text" id="name" name="name" required> 
+            
+            <label for="email">Correo Electrónico:</label> 
+            <input type="email" id="email" name="email" required> 
+            
+            <label for="phone">Teléfono:</label> 
+            <input type="tel" id="phone" name="phone" required pattern="\d{8}" title="El número debe tener 8 dígitos"> 
+            
+            <label for="message">Mensaje:</label> 
+            <textarea id="message" name="message" rows="4" required></textarea> 
+            
+            <button type="submit">Enviar</button> 
+        
+        </form> 
+    
     </section>
-
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
