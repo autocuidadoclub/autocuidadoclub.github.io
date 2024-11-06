@@ -743,6 +743,22 @@ html {
 }
 
 
+.whatsapp-button {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #25D366;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+}
+.whatsapp-button:hover {
+    background-color: #128C7E;
+}
+
+
+
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
     .benefits-container, .reasons-container {
