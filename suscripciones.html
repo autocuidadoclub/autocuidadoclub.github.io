@@ -41,13 +41,16 @@ function registerUser() {
         }
     });
 
+    // Check if all required fields are filled
     if (!name || !email || !phone) {
         alert("Por favor, complete todos los campos.");
+        console.log("Error: Not all required fields are filled.");
         return;
     }
 
     if (planType === "plus" && vehicles.length === 0) {
         alert("Para el plan Plus, ingrese al menos un vehículo.");
+        console.log("Error: No vehicle information provided for Plus plan.");
         return;
     }
 
@@ -59,9 +62,13 @@ function registerUser() {
         vehicles: vehicles
     };
 
+    console.log("Attempting to save user data:", userData);
+
+    // Attempt to save to Firestore
     db.collection("users").doc(phone).set(userData)
         .then(() => {
             alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
+            console.log("User data saved successfully.");
             document.getElementById('registerForm').reset();
             document.getElementById('register-section').style.display = "none";
         })
@@ -70,6 +77,7 @@ function registerUser() {
             alert("Error en el registro: " + error.message);
         });
 }
+        
 
 function showRegistrationForm(planType) {
     const formSection = document.getElementById('register-section');
