@@ -167,6 +167,16 @@ document.getElementById('contactForm').onsubmit = function(event) {
         alert("Error al enviar el mensaje. Por favor, inténtelo más tarde.");
     });
 };
+
+    document.getElementById('contactForm').onsubmit = function() {
+    document.getElementById('submitButton').disabled = true;
+    setTimeout(function() {
+        alert('Gracias! Su mensaje ha sido enviado.');
+        document.getElementById('contactForm').reset();
+        document.getElementById('submitButton').disabled = false;
+    }, 500);
+};
+
 </script>
 
     
