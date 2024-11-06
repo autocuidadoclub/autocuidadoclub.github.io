@@ -52,6 +52,21 @@
                 return;
             }
 
+           // In your existing registerUser function
+            db.collection("users").doc(phone).set(userData)
+                .then(() => {
+                    alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
+                    console.log("User data saved successfully.");
+                    sendTwilioMessage(phone);  // Call Twilio action after registration
+                    document.getElementById('registerForm').reset();
+                    document.getElementById('register-section').style.display = "none";
+                })
+                .catch((error) => {
+                    console.error("Error en el registro: ", error);
+                    alert("Error en el registro: " + error.message);
+                });
+                        
+            
             // Check for existing user with same email or phone
             db.collection("users")
                 .where("email", "==", email)
@@ -254,5 +269,10 @@
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
     </footer>
+
+<!-- At the end of your body in suscripciones.html -->
+<script src="twilio-action.js"></script>
+
+    
 </body>
 </html>
