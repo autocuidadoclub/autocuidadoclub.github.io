@@ -684,7 +684,7 @@ nav ul li a:hover {
 /* Registration Form Styling */
 .register-section {
     display: none;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.5s ease-in-out;
     padding: 20px;
     background-color: #f9f9f9;
@@ -692,6 +692,9 @@ nav ul li a:hover {
     border-radius: 10px;
     max-width: 400px;
     margin: 20px auto;
+}
+.fade-in {
+    opacity: 1;
 }
 
 .register-section.fade-in {
