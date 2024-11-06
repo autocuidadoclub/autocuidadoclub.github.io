@@ -80,8 +80,10 @@ function registerUser() {
         
 
 function showRegistrationForm(planType) {
+    console.log("showRegistrationForm called with planType:", planType);
     const formSection = document.getElementById('register-section');
-    formSection.style.display = 'block';
+    formSection.style.display = 'block'; // Ensure this line is setting the display to 'block'
+    formSection.classList.add('fade-in');
     document.getElementById('planType').value = planType;
 
     const vehicleSections = document.getElementById('vehicle-sections');
@@ -104,6 +106,7 @@ function showRegistrationForm(planType) {
     }
     formSection.scrollIntoView({ behavior: 'smooth' });
 }
+
 
         
     </script>
