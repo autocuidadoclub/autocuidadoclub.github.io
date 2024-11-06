@@ -53,7 +53,7 @@
             }
 
            // In your existing registerUser function
-            db.collection("users").doc(phone).set(userData)
+            db.collection("users").doc(email).set(userData)
                 .then(() => {
                     alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
                     console.log("User data saved successfully.");
