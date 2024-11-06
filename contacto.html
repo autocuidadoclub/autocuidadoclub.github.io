@@ -1,93 +1,122 @@
-<!DOCTYPE html> 
-<html lang="es"> 
-    <head>
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <title>Contacto - AutoCuidado Club</title> 
-        <link rel="stylesheet" href="styles.css"> </head> <body>  
-  <!-- Header -->
-   <!-- Navigation Menu -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Contact Form Styling */
+        .contact-form-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    <!-- Navigation -->
-   <nav class="navbar">
-    <ul class="nav-links">
-        <li><a href="nosotros.html">Nosotros</a></li>
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
-        <li><a href="login.html">Ingresa a tu cuenta</a></li>
-    </ul>
-    <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-    </div>
-</nav>
+        .contact-form-container h2 {
+            text-align: center;
+            color: #003366;
+        }
 
+        .contact-form-container label {
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
 
-<!-- Header with Logo -->
-<header>
-    <div class="header-container">
-        <div class="header-text">
-            <h1>Bienvenido a AutoCuidado Club</h1>
-            <p>Tu tiempo es oro, nuestro cuidado es total.</p>
-        </div>
-    </div>
-</header>
+        .contact-form-container input[type="text"],
+        .contact-form-container input[type="email"],
+        .contact-form-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
 
-    <section id="nuestro-compromiso">
-    <h2>Nuestro Compromiso</h2>
-    <p>AutoCuidado Club no solo es un servicio de mantenimiento, es una solución completa para la tranquilidad de tu vehículo. Nos encargamos de cada detalle para que no tengas que preocuparte. Tú solo disfrutas de tu auto y nosotros garantizamos que esté siempre en las mejores condiciones.</p>
-</section>
+        .contact-form-container button {
+            background-color: #003366;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+        }
 
-    <!-- Contact Form -->
-    <section id="contact-form">
-        <h2>Contáctanos</h2>
-    <section id="contact-info">
-        <h2>Información de Contacto</h2>
+        .contact-form-container button:hover {
+            background-color: #ff6600;
+        }
+
+        .contact-form-container .contact-info {
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Contact Section -->
+<section class="contact-form-container">
+    <h2>Contáctanos</h2>
+    <form id="contactForm" action="https://formsubmit.co/info@autocuidadoclub.com" method="POST">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="phone">Teléfono</label>
+        <input type="text" id="phone" name="phone" required>
+
+        <label for="message">Mensaje</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+
+        <!-- Optional Hidden Fields for FormSubmit configuration -->
+        <input type="hidden" name="_subject" value="Nuevo mensaje de contacto - AutoCuidado Club">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        
+        <button type="submit">Enviar</button>
+    </form>
+    
+    <div class="contact-info">
         <p>Teléfono: +503 XXX-XXXX</p>
         <p>Email: info@autocuidadoclub.com</p>
-<p>Por favor, llena este formulario para que podamos iniciar el proceso.</p> 
-        <form action="https://formsubmit.co/info@autocuidadoclub.com" method="POST"> 
-            <input type="hidden" name="_next" value="https://www.autocuidadoclub.com/thank-you.html"> 
-            <input type="hidden" name="_captcha" value="false"> 
-            
-            <!-- Customer Information --> 
-            <label for="name">Nombre:</label> 
-            <input type="text" id="name" name="name" required> 
-            
-            <label for="email">Correo Electrónico:</label> 
-            <input type="email" id="email" name="email" required> 
-            
-            <label for="phone">Teléfono:</label> 
-            <input type="tel" id="phone" name="phone" required pattern="\d{8}" title="El número debe tener 8 dígitos"> 
-            
-            <label for="message">Mensaje:</label> 
-            <textarea id="message" name="message" rows="4" required></textarea> 
-            
-            <button type="submit">Enviar</button> 
-        
-        </form> 
-    
-    </section>
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="nosotros.html">Quiénes Somos</a></li>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-        </ul>
-    </footer>
-    <footer>
-    <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-    <ul>
-        <li><a href="#terminos">Términos y Condiciones</a></li>
-        <li><a href="#privacidad">Política de Privacidad</a></li>
-        <li><a href="#contacto">Contacto</a></li>
-    </ul>
-</footer>
+    </div>
+</section>
 
+<!-- JavaScript Fallback for Email Submission -->
+<script>
+    document.getElementById("contactForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        // Use fetch to send the form data if formsubmit.co is down
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                message: document.getElementById("message").value
+            })
+        })
+        .then(response => response.json())
+        .then(data => alert("Mensaje enviado exitosamente. Gracias por contactarnos."))
+        .catch(error => alert("Error al enviar el mensaje. Por favor, inténtelo más tarde."));
+    });
+</script>
 
 </body>
 </html>
