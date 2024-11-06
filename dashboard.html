@@ -7,41 +7,34 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
     <script>
         // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
+         const firebaseConfig = {
+          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+          authDomain: "auto-cuidadoclub.firebaseapp.com",
+          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+          projectId: "auto-cuidadoclub",
+          storageBucket: "auto-cuidadoclub.appspot.com",
+          messagingSenderId: "986704701191",
+          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+          measurementId: "G-LBBGXV2YX5"
         };
 
-<script>
-    // Ensure Firebase is only initialized once
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    
-    const auth = firebase.auth();
-
-    // Check if user is logged in
-    auth.onAuthStateChanged((user) => {
-        if (!user) {
-            // User is not logged in, redirect to login page
-            window.location.href = 'login.html';
-        } else {
-            console.log("User is authenticated:", user.email);
-            // You can fetch additional user info here if needed
-            // Load dashboard data or any user-specific information here
+        // Initialize Firebase if it hasn't been initialized yet
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-    });
-</script>
 
+        const auth = firebase.auth();
 
-        // Redirect to login if not authenticated
+        // Check if the user is logged in
         auth.onAuthStateChanged((user) => {
             if (!user) {
+                // User is not logged in, redirect to login page
                 window.location.href = 'login.html';
             } else {
+                console.log("User is authenticated:", user.email);
                 document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             }
         });
