@@ -9,68 +9,95 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
     <script>
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "986704701191",
-            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5"
-        };
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+        
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+    authDomain: "auto-cuidadoclub.firebaseapp.com",
+    projectId: "auto-cuidadoclub",
+    storageBucket: "auto-cuidadoclub.appspot.com",
+    messagingSenderId: "986704701191",
+    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+    measurementId: "G-LBBGXV2YX5"
+};
 
-        function registerUser() {
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const password = document.getElementById("password").value;
-            const planType = document.getElementById("planType").value;
-            const vehicles = [];
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-            document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
-                const brand = vehicleSection.querySelector('.vehicleBrand').value;
-                const model = vehicleSection.querySelector('.vehicleModel').value;
-                const year = vehicleSection.querySelector('.vehicleYear').value;
-                const plate = vehicleSection.querySelector('.vehiclePlate').value;
-                if (brand && model && year && plate) {
-                    vehicles.push({ brand, model, year, plate });
-                }
-            });
+function registerUser() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const planType = document.getElementById("planType").value;
+    const vehicles = [];
 
-            if (!name || !email || !phone || !password) {
-                alert("Por favor, complete todos los campos.");
-                return;
-            }
-
-            if (planType === "plus" && vehicles.length === 0) {
-                alert("Para el plan Plus, ingrese al menos un vehículo.");
-                return;
-            }
-
-            const userData = {
-                name: name,
-                email: email,
-                phone: phone,
-                password: password,
-                planType: planType,
-                vehicles: vehicles
-            };
-
-            db.collection("users").doc(phone).set(userData)
-                .then(() => {
-                    alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
-                    document.getElementById('registerForm').reset();
-                    document.getElementById('register-section').style.display = "none";
-                })
-                .catch((error) => {
-                    console.error("Error en el registro: ", error);
-                    alert("Error en el registro: " + error.message);
-                });
+    document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
+        const brand = vehicleSection.querySelector('.vehicleBrand').value;
+        const model = vehicleSection.querySelector('.vehicleModel').value;
+        const year = vehicleSection.querySelector('.vehicleYear').value;
+        const plate = vehicleSection.querySelector('.vehiclePlate').value;
+        if (brand && model && year && plate) {
+            vehicles.push({ brand, model, year, plate });
         }
+    });
+
+    if (!name || !email || !phone) {
+        alert("Por favor, complete todos los campos.");
+        return;
+    }
+
+    if (planType === "plus" && vehicles.length === 0) {
+        alert("Para el plan Plus, ingrese al menos un vehículo.");
+        return;
+    }
+
+    const userData = {
+        name: name,
+        email: email,
+        phone: phone,
+        planType: planType,
+        vehicles: vehicles
+    };
+
+    db.collection("users").doc(phone).set(userData)
+        .then(() => {
+            alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
+            document.getElementById('registerForm').reset();
+            document.getElementById('register-section').style.display = "none";
+        })
+        .catch((error) => {
+            console.error("Error en el registro: ", error);
+            alert("Error en el registro: " + error.message);
+        });
+}
+
+function showRegistrationForm(planType) {
+    const formSection = document.getElementById('register-section');
+    formSection.style.display = 'block';
+    document.getElementById('planType').value = planType;
+
+    const vehicleSections = document.getElementById('vehicle-sections');
+    vehicleSections.innerHTML = "";
+    const vehicleCount = planType === 'basic' ? 1 : 3;
+    for (let i = 1; i <= vehicleCount; i++) {
+        vehicleSections.insertAdjacentHTML('beforeend', `
+            <div class="vehicle-info">
+                <h4>Información del Vehículo ${i}</h4>
+                <label for="vehicleBrand${i}">Marca:</label>
+                <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
+                <label for="vehicleModel${i}">Modelo:</label>
+                <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
+                <label for="vehicleYear${i}">Año:</label>
+                <input type="text" id="vehicleYear${i}" class="vehicleYear" required>
+                <label for="vehiclePlate${i}">Placa:</label>
+                <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
+            </div>
+        `);
+    }
+    formSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+        
     </script>
 </head>
 <body>
@@ -203,34 +230,6 @@
         </form>
     </section>
 
-    <script>
-        function showRegistrationForm(planType) {
-            const formSection = document.getElementById('register-section');
-            formSection.style.display = 'block';
-            formSection.classList.add('fade-in');
-            document.getElementById('planType').value = planType;
-
-            const vehicleSections = document.getElementById('vehicle-sections');
-            vehicleSections.innerHTML = "";
-            const vehicleCount = planType === 'basic' ? 1 : 3;
-            for (let i = 1; i <= vehicleCount; i++) {
-                vehicleSections.insertAdjacentHTML('beforeend', `
-                    <div class="vehicle-info">
-                        <h4>Información del Vehículo ${i}</h4>
-                        <label for="vehicleBrand${i}">Marca:</label>
-                        <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
-                        <label for="vehicleModel${i}">Modelo:</label>
-                        <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
-                        <label for="vehicleYear${i}">Año:</label>
-                        <input type="text" id="vehicleYear${i}" class="vehicleYear" required>
-                        <label for="vehiclePlate${i}">Placa:</label>
-                        <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
-                    </div>
-                `);
-            }
-            formSection.scrollIntoView({ behavior: 'smooth' });
-        }
-    </script>
 
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
