@@ -118,6 +118,24 @@ function registerUser() {
             }
         });
 }
+console.log("Starting registration...");
+firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        console.log("User created in Firebase Auth");
+        const user = userCredential.user;
+        const userData = { ... }; // Data as before
+        return db.collection("users").doc(user.uid).set(userData);
+    })
+    .then(() => {
+        console.log("User data saved in Firestore");
+        alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
+        document.getElementById('registerForm').reset();
+        document.getElementById('register-section').style.display = "none";
+    })
+    .catch((error) => {
+        console.error("Error during registration process:", error.message);
+        alert("Error en el registro: " + error.message);
+    });
 
     
        
