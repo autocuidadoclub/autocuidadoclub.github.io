@@ -86,10 +86,10 @@ function registerUser() {
                 console.log("Error: Email already exists.");
                 throw new Error("Email already exists.");
             }
-
+ })
             // Create a new user with Firebase Authentication for email uniqueness check
             return firebase.auth().createUserWithEmailAndPassword(email, password);
-        })
+       
         .then((userCredential) => {
             const user = userCredential.user;
 
