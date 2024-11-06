@@ -105,7 +105,7 @@
 <!-- Contact Section -->
 <section class="contact-form-container">
     <h2>Contáctanos</h2>
-    <form id="contactForm" action="https://formsubmit.co/info@autocuidadoclub.com" method="POST">
+    <form id="contactForm" action="YOUR_GOOGLE_APPS_SCRIPT_URL" method="post" target="hidden_iframe" onsubmit="submitted=true;">
         <label for="name">Nombre</label>
         <input type="text" id="name" name="name" required>
 
@@ -124,10 +124,19 @@
         <input type="hidden" name="_template" value="table">
         
         <button type="submit">Enviar</button>
+        document.getElementById('contactForm').onsubmit = function() {
+  setTimeout(function() {
+    alert('Gracias, Su mensaje ha sido enviado y nos contactamos con usted en breve.');
+    document.getElementById('contactForm').reset();
+  }, 500); // Adjust as needed
+};
+
     </form>
     
     <div class="contact-info">
         <p>Teléfono: +503 XXX-XXXX</p>
+        <a href="https://wa.me/+14155238886" target="_blank" class="whatsapp-button">Chat with us on WhatsApp</a>
+
         <p>Email: info@autocuidadoclub.com</p>
     </div>
 </section>
