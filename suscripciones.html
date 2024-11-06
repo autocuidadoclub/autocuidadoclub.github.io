@@ -83,21 +83,7 @@
                 });
         }
 
-        // Test Firestore write function
-        function testFirestoreWrite() {
-            db.collection("testCollection").add({
-                testField: "Hello, Firestore!"
-            })
-            .then(() => {
-                console.log("Test data written successfully!");
-                alert("Test data written successfully!");
-            })
-            .catch((error) => {
-                console.error("Error writing test data: ", error);
-                alert("Error writing test data: " + error.message);
-            });
-        }
-
+       
         // Show registration form based on plan type
         function showRegistrationForm(planType) {
             console.log("showRegistrationForm called with planType:", planType);
