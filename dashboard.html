@@ -1,4 +1,3 @@
-<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,61 +8,70 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script>
+        // Firebase configuration
         const firebaseConfig = {
-          const firebaseConfig = {
-          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-          authDomain: "auto-cuidadoclub.firebaseapp.com",
-          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-          projectId: "auto-cuidadoclub",
-          storageBucket: "auto-cuidadoclub.appspot.com",
-          messagingSenderId: "986704701191",
-          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-          measurementId: "G-LBBGXV2YX5"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
         };
 
-function loginUser() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            alert("Login exitoso");
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error("Error en el login:", error); // Logs detailed error information
-            alert("Error en el login: " + error.message);
-        });
-}
-        
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Check if the user is authenticated
+        // Redirect to login if not authenticated
         auth.onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-            } else {
+            if (!user) {
                 window.location.href = 'login.html';
+            } else {
+                document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             }
         });
 
+        // Logout function
         function logoutUser() {
             auth.signOut()
                 .then(() => {
-                    alert("Logout exitoso");
+                    alert("Sesión cerrada exitosamente");
                     window.location.href = 'login.html';
                 })
                 .catch((error) => {
-                    console.error("Error en el logout:", error.message);
-                    alert("Error en el logout: " + error.message);
+                    console.error("Error al cerrar sesión:", error.message);
+                    alert("Error al cerrar sesión: " + error.message);
                 });
         }
     </script>
 </head>
 <body>
-    <h2>Dashboard</h2>
-    <p id="user-info">Cargando usuario...</p>
-    <button onclick="logoutUser()">Cerrar Sesión</button>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contáctanos</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header with Welcome Message -->
+    <header>
+        <div class="header-container">
+            <h2 id="user-info">Cargando usuario...</h2>
+            <button onclick="logoutUser()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <h2>Panel de Usuario</h2>
+        <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
+        <!-- Additional dashboard content goes here -->
+    </section>
+
 </body>
 </html>
