@@ -78,6 +78,7 @@ function registerUser() {
         });
 }
         
+
 function testFirestoreWrite() {
     db.collection("testCollection").add({
         testField: "Hello, Firestore!"
@@ -92,7 +93,7 @@ function testFirestoreWrite() {
     });
 }
 
-// Call this function in the console or add a temporary button to test
+// Call this function to test writing to Firestore
 testFirestoreWrite();
 
         
