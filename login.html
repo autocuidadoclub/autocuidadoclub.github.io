@@ -8,20 +8,23 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script>
+        // Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-          authDomain: "auto-cuidadoclub.firebaseapp.com",
-          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-          projectId: "auto-cuidadoclub",
-          storageBucket: "auto-cuidadoclub.appspot.com",
-          messagingSenderId: "986704701191",
-          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-          measurementId: "G-LBBGXV2YX5"
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
         };
 
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
+        // Login function
         function loginUser() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -37,42 +40,44 @@
                 });
         }
     </script>
-
-
-    <!-- Navigation -->
-   <nav class="navbar">
-    <ul class="nav-links">
-        <li><a href="nosotros.html">Nosotros</a></li>
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
-        <li><a href="contacto.html">Contáctanos</a></li>
-    </ul>
-    <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-    </div>
-</nav>
-
-<!-- Header with Logo -->
-<header>
-    <div class="header-container">
-        <div class="header-text">
-            <h1>Bienvenido a AutoCuidado Club</h1>
-            <p>Tu tiempo es oro, nuestro cuidado es total.</p>
-        </div>
-    </div>
-</header>
-
-   
 </head>
 <body>
-    <h2>Login</h2>
-    <form onsubmit="loginUser(); return false;">
-        <label for="email">Email:</label>
-        <input type="email" id="email" required>
-        <label for="password">Contraseña:</label>
-        <input type="password" id="password" required>
-        <button type="submit">Iniciar Sesión</button>
-    </form>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contáctanos</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header with Logo -->
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Form -->
+    <section class="login-section">
+        <h2>Login</h2>
+        <form onsubmit="loginUser(); return false;">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+    </section>
+
 </body>
 </html>
