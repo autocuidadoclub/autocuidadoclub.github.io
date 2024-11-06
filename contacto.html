@@ -146,25 +146,29 @@ document.getElementById('contactForm').onsubmit = function() {
 
 <!-- JavaScript Fallback for Email Submission -->
 <script>
-    document.getElementById("contactForm").addEventListener("submit", function(event) {
-        event.preventDefault();
+document.getElementById('contactForm').onsubmit = function(event) {
+    event.preventDefault(); // Prevents the form from submitting the default way
 
-        // Use fetch to send the form data if formsubmit.co is down
-        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                phone: document.getElementById("phone").value,
-                message: document.getElementById("message").value
-            })
-        })
-        .then(response => response.json())
-        .then(data => alert("Mensaje enviado exitosamente. Gracias por contactarnos."))
-        .catch(error => alert("Error al enviar el mensaje. Por favor, inténtelo más tarde."));
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: 'POST',
+        body: new FormData(document.getElementById('contactForm'))
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message); // Show custom success message
+            document.getElementById('contactForm').reset();
+        } else {
+            alert("Error al enviar el mensaje. Por favor, inténtelo más tarde."); // Custom error message
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error al enviar el mensaje. Por favor, inténtelo más tarde.");
     });
+};
 </script>
 
+    
 </body>
 </html>
