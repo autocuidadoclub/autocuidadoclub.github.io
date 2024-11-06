@@ -15,9 +15,27 @@
             projectId: "YOUR_PROJECT_ID",
         };
 
-        // Initialize Firebase
+<script>
+    // Ensure Firebase is only initialized once
+    if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+    }
+    
+    const auth = firebase.auth();
+
+    // Check if user is logged in
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            // User is not logged in, redirect to login page
+            window.location.href = 'login.html';
+        } else {
+            console.log("User is authenticated:", user.email);
+            // You can fetch additional user info here if needed
+            // Load dashboard data or any user-specific information here
+        }
+    });
+</script>
+
 
         // Redirect to login if not authenticated
         auth.onAuthStateChanged((user) => {
