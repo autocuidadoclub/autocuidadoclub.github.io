@@ -9,6 +9,30 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
+    <style>
+        /* Add some styling for the table */
+        .profile-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .profile-table th, .profile-table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .profile-table th {
+            background-color: #00539C;
+            color: white;
+        }
+        .profile-section-title {
+            color: #00539C;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -50,19 +74,19 @@
                         document.getElementById("phone").innerText = userData.phone || "N/A";
                         document.getElementById("planType").innerText = userData.planType || "N/A";
 
-                        // Display vehicles information if available
+                        // Display vehicles information
                         const vehiclesList = document.getElementById("vehicles");
                         vehiclesList.innerHTML = ""; // Clear previous entries
                         if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
                             userData.vehicles.forEach((vehicle, index) => {
                                 vehiclesList.innerHTML += `
-                                    <div class="vehicle-info">
-                                        <h4>Información del Vehículo ${index + 1}</h4>
-                                        <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                                        <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                                        <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-                                        <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                                    </div>
+                                    <table class="profile-table">
+                                        <tr><th colspan="2">Información del Vehículo ${index + 1}</th></tr>
+                                        <tr><td>Marca</td><td>${vehicle.brand || "N/A"}</td></tr>
+                                        <tr><td>Modelo</td><td>${vehicle.model || "N/A"}</td></tr>
+                                        <tr><td>Año</td><td>${vehicle.year || "N/A"}</td></tr>
+                                        <tr><td>Placa</td><td>${vehicle.plate || "N/A"}</td></tr>
+                                    </table>
                                 `;
                             });
                         } else {
@@ -121,11 +145,12 @@
         <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
 
         <!-- User Profile Information -->
-        <div class="profile-info">
-            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
-            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
-            <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
-        </div>
+        <div class="profile-section-title">Información del Usuario</div>
+        <table class="profile-table">
+            <tr><td><strong>Nombre:</strong></td><td id="name">Cargando...</td></tr>
+            <tr><td><strong>Teléfono:</strong></td><td id="phone">Cargando...</td></tr>
+            <tr><td><strong>Tipo de Plan:</strong></td><td id="planType">Cargando...</td></tr>
+        </table>
 
         <!-- Vehicles Information -->
         <div id="vehicles"></div>
