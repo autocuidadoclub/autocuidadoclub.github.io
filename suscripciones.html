@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,84 +28,79 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Function to register user
-        function registerUser() {
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const planType = document.getElementById("planType").value;
-            const password = document.getElementById("password").value;
-            const vehicles = [];
 
-            document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
-                const brand = vehicleSection.querySelector('.vehicleBrand').value;
-                const model = vehicleSection.querySelector('.vehicleModel').value;
-                const year = vehicleSection.querySelector('.vehicleYear').value;
-                const plate = vehicleSection.querySelector('.vehiclePlate').value;
-                if (brand && model && year && plate) {
-                    vehicles.push({ brand, model, year, plate });
-                }
-            });
+function registerUser() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const planType = document.getElementById("planType").value;
+    const password = document.getElementById("password").value;
+    const vehicles = [];
 
-            if (!name || !email || !phone || !password) {
-                alert("Por favor, complete todos los campos.");
-                return;
+    document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
+        const brand = vehicleSection.querySelector('.vehicleBrand').value;
+        const model = vehicleSection.querySelector('.vehicleModel').value;
+        const year = vehicleSection.querySelector('.vehicleYear').value;
+        const plate = vehicleSection.querySelector('.vehiclePlate').value;
+        if (brand && model && year && plate) {
+            vehicles.push({ brand, model, year, plate });
+        }
+    });
+
+    if (!name || !email || !phone || !password) {
+        alert("Por favor, complete todos los campos.");
+        return;
+    }
+
+    const userData = {
+        name: name,
+        email: email,
+        phone: phone,
+        planType: planType,
+        vehicles: vehicles
+    };
+
+    // Step 1: Check if the email or phone is already registered in Firestore
+    const usersRef = db.collection("users");
+    
+    usersRef.where("email", "==", email).get()
+        .then((snapshot) => {
+            if (!snapshot.empty) {
+                throw new Error("El correo electrónico ya está registrado.");
+            }
+            return usersRef.where("phone", "==", phone).get();
+        })
+        .then((snapshot) => {
+            if (!snapshot.empty) {
+                throw new Error("El número de teléfono ya está registrado.");
             }
 
-           // In your existing registerUser function
-            db.collection("users").doc(phone).set(userData)
-                .then(() => {
-                    alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
-                    console.log("User data saved successfully.");
-                    sendTwilioMessage(phone);  // Call Twilio action after registration
-                    document.getElementById('registerForm').reset();
-                    document.getElementById('register-section').style.display = "none";
-                })
-                .catch((error) => {
-                    console.error("Error en el registro: ", error);
-                    alert("Error en el registro: " + error.message);
-                });
-                        
-            
-            // Check for existing user with same email or phone
-            db.collection("users")
-                .where("email", "==", email)
-                .get()
-                .then((snapshot) => {
-                    if (!snapshot.empty) {
-                        throw new Error("El correo electrónico ya está registrado.");
-                    }
-                    return db.collection("users").where("phone", "==", phone).get();
-                })
-                .then((snapshot) => {
-                    if (!snapshot.empty) {
-                        throw new Error("El número de teléfono ya está registrado.");
-                    }
-                    return firebase.auth().createUserWithEmailAndPassword(email, password);
-                })
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    const userData = {
-                        name,
-                        email,
-                        phone,
-                        planType,
-                        vehicles,
-                        uid: user.uid
-                    };
-                    return db.collection("users").doc(user.uid).set(userData);
-                })
-                .then(() => {
-                    alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
-                    document.getElementById('registerForm').reset();
-                    document.getElementById('register-section').style.display = "none";
-                })
-                .catch((error) => {
-                    console.error("Error en el registro:", error.message);
-                    alert("Error en el registro: " + error.message);
-                });
-        }
+            // Step 2: Create user with Firebase Auth
+            return firebase.auth().createUserWithEmailAndPassword(email, password);
+        })
+        .then((userCredential) => {
+            const user = userCredential.user;
+            userData.uid = user.uid;  // Attach the UID from Auth to the user data
 
+            // Step 3: Save user data in Firestore with email as the document ID
+            return db.collection("users").doc(email).set(userData);
+        })
+        .then(() => {
+            alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
+            document.getElementById('registerForm').reset();
+            document.getElementById('register-section').style.display = "none";
+            // Optional: Call Twilio action after registration
+            sendTwilioMessage(phone);
+        })
+        .catch((error) => {
+            console.error("Error en el registro:", error.message);
+            alert("Error en el registro: " + error.message);
+        });
+}
+
+
+
+        
         // Show registration form based on plan type
         function showRegistrationForm(planType) {
             const formSection = document.getElementById('register-section');
