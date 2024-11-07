@@ -7,37 +7,67 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
     <script>
         // Firebase configuration
-         const firebaseConfig = {
-          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-          authDomain: "auto-cuidadoclub.firebaseapp.com",
-          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-          projectId: "auto-cuidadoclub",
-          storageBucket: "auto-cuidadoclub.appspot.com",
-          messagingSenderId: "986704701191",
-          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-          measurementId: "G-LBBGXV2YX5"
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
         };
 
-        // Initialize Firebase if it hasn't been initialized yet
+        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
 
         const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        // Check if the user is logged in
+        // Check if user is logged in and load profile info
         auth.onAuthStateChanged((user) => {
             if (!user) {
-                // User is not logged in, redirect to login page
                 window.location.href = 'login.html';
             } else {
-                console.log("User is authenticated:", user.email);
+                const userId = user.uid;
+                loadUserProfile(userId);
                 document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             }
         });
+
+        // Load user profile data from Firestore
+        function loadUserProfile(userId) {
+            db.collection("users").doc(userId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById("name").innerText = userData.name;
+                        document.getElementById("phone").innerText = userData.phone;
+                        document.getElementById("planType").innerText = userData.planType;
+
+                        // Display vehicles information
+                        const vehiclesList = document.getElementById("vehicles");
+                        vehiclesList.innerHTML = ""; // Clear previous entries
+                        userData.vehicles.forEach((vehicle, index) => {
+                            vehiclesList.innerHTML += `
+                                <div class="vehicle-info">
+                                    <h4>Información del Vehículo ${index + 1}</h4>
+                                    <p><strong>Marca:</strong> ${vehicle.brand}</p>
+                                    <p><strong>Modelo:</strong> ${vehicle.model}</p>
+                                    <p><strong>Año:</strong> ${vehicle.year}</p>
+                                    <p><strong>Placa:</strong> ${vehicle.plate}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        console.error("No se encontró el perfil del usuario.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al cargar el perfil del usuario:", error);
+                });
+        }
 
         // Logout function
         function logoutUser() {
@@ -47,7 +77,7 @@
                     window.location.href = 'login.html';
                 })
                 .catch((error) => {
-                    console.error("Error al cerrar sesión:", error.message);
+                    console.error("Error al cerrar sesión:", error);
                     alert("Error al cerrar sesión: " + error.message);
                 });
         }
@@ -72,7 +102,7 @@
     <!-- Header with Welcome Message -->
     <header>
         <div class="header-container">
-            <h2 id="user-info" style="color: white;">Bienvenido, user@example.com</h2>
+            <h2 id="user-info">Cargando usuario...</h2>
             <button onclick="logoutUser()">Cerrar Sesión</button>
         </div>
     </header>
@@ -81,7 +111,16 @@
     <section class="dashboard-section">
         <h2>Panel de Usuario</h2>
         <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
-        <!-- Additional dashboard content goes here -->
+
+        <!-- User Profile Information -->
+        <div class="profile-info">
+            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+            <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+        </div>
+
+        <!-- Vehicles Information -->
+        <div id="vehicles"></div>
     </section>
 
 </body>
