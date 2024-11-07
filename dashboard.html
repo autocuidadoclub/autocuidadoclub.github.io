@@ -35,8 +35,7 @@
             if (!user) {
                 window.location.href = 'login.html';
             } else {
-                const userId = user.uid;
-                loadUserProfile(userId);
+                loadUserProfile(user.uid);
                 document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             }
         });
@@ -47,24 +46,28 @@
                 .then((doc) => {
                     if (doc.exists) {
                         const userData = doc.data();
-                        document.getElementById("name").innerText = userData.name;
-                        document.getElementById("phone").innerText = userData.phone;
-                        document.getElementById("planType").innerText = userData.planType;
+                        document.getElementById("name").innerText = userData.name || "N/A";
+                        document.getElementById("phone").innerText = userData.phone || "N/A";
+                        document.getElementById("planType").innerText = userData.planType || "N/A";
 
-                        // Display vehicles information
+                        // Display vehicles information if available
                         const vehiclesList = document.getElementById("vehicles");
                         vehiclesList.innerHTML = ""; // Clear previous entries
-                        userData.vehicles.forEach((vehicle, index) => {
-                            vehiclesList.innerHTML += `
-                                <div class="vehicle-info">
-                                    <h4>Información del Vehículo ${index + 1}</h4>
-                                    <p><strong>Marca:</strong> ${vehicle.brand}</p>
-                                    <p><strong>Modelo:</strong> ${vehicle.model}</p>
-                                    <p><strong>Año:</strong> ${vehicle.year}</p>
-                                    <p><strong>Placa:</strong> ${vehicle.plate}</p>
-                                </div>
-                            `;
-                        });
+                        if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
+                            userData.vehicles.forEach((vehicle, index) => {
+                                vehiclesList.innerHTML += `
+                                    <div class="vehicle-info">
+                                        <h4>Información del Vehículo ${index + 1}</h4>
+                                        <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                                        <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                                        <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                                        <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            vehiclesList.innerHTML = "<p>No hay información de vehículos disponible.</p>";
+                        }
                     } else {
                         console.error("No se encontró el perfil del usuario.");
                     }
