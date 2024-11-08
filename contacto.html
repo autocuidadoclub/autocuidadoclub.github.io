@@ -122,19 +122,22 @@
 document.getElementById('contactForm').onsubmit = function(event) {
     event.preventDefault(); // Prevents the default form submission
 
-    // Submit the form data using Fetch API
-    fetch("https://script.google.com/macros/s/AKfycby9sSCBz6og5wUfR1M6VQeeq1mPZV3at4l-SiTaTx8c71FRkk_6F6x9MJdb16LuHjTh/exec", {
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         method: 'POST',
         body: new FormData(document.getElementById('contactForm'))
     })
     .then(response => response.json())
     .then(data => {
-        alert('Gracias, su mensaje ha sido enviado y nos contactaremos con usted en breve.');
-        document.getElementById('contactForm').reset();
+        if (data.status === 'success') {
+            alert('Gracias, Su mensaje ha sido enviado y nos contactamos con usted en breve.');
+            document.getElementById('contactForm').reset();
+        } else {
+            alert("Error al enviar el mensaje. Por favor, inténtelo más tarde.");
+        }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error al enviar el mensaje. Por favor, inténtelo más tarde.');
+        console.error("Error:", error);
+        alert("Error al enviar el mensaje. Por favor, inténtelo más tarde.");
     });
 };
 </script>
