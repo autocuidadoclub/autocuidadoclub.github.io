@@ -168,15 +168,15 @@ document.getElementById('contactForm').onsubmit = function(event) {
     });
 };
 
-    document.getElementById('contactForm').onsubmit = function() {
+<script>
+  document.getElementById('contactForm').onsubmit = function() {
     document.getElementById('submitButton').disabled = true;
     setTimeout(function() {
-        alert('Gracias! Su mensaje ha sido enviado.');
-        document.getElementById('contactForm').reset();
-        document.getElementById('submitButton').disabled = false;
+      alert('Gracias! Su mensaje ha sido enviado.');
+      document.getElementById('contactForm').reset();
+      document.getElementById('submitButton').disabled = false;
     }, 500);
-};
-
+  };
 </script>
 
     
