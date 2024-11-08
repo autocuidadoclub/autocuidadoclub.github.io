@@ -126,24 +126,26 @@
             formSection.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Twilio Notification Function
-        async function sendTwilioMessage(planType, name, phone) {
-            try {
-                await fetch('/send-twilio-notification', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        planType: planType,
-                        name: name,
-                        phone: phone
-                    })
-                });
-            } catch (error) {
-                console.error("Error al enviar mensaje de Twilio:", error);
-            }
-        }
+           // Send Twilio notification (optional, if required)
+            sendTwilioMessage(planType, name, phone);
+
+            // Open WhatsApp chat
+            openWhatsAppChat();
+        })
+        .catch((error) => {
+            console.error("Error en el registro:", error.message);
+            alert("Error en el registro: " + error.message);
+        });
+}
+
+// WhatsApp chat function
+function openWhatsAppChat() {
+    const whatsappNumber = "+14155238886";  // Replace with your Twilio WhatsApp number
+    const message = encodeURIComponent("Hola AutoCuidado Club, vamos a ejecutar el pago de la suscripcion seleccionada.");
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+    
+    // Open WhatsApp chat in a new tab
+    window.open(whatsappUrl, "_blank");
     </script>
 </head>
 <body>
