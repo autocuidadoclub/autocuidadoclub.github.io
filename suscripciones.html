@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
+    
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -28,78 +28,80 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Registration function
-        function registerUser() {
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const planType = document.getElementById("planType").value;
-            const password = document.getElementById("password").value;
-            const vehicles = [];
 
-            document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
-                const brand = vehicleSection.querySelector('.vehicleBrand').value;
-                const model = vehicleSection.querySelector('.vehicleModel').value;
-                const year = vehicleSection.querySelector('.vehicleYear').value;
-                const plate = vehicleSection.querySelector('.vehiclePlate').value;
-                if (brand && model && year && plate) {
-                    vehicles.push({ brand, model, year, plate });
-                }
-            });
+function registerUser() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const planType = document.getElementById("planType").value;
+    const password = document.getElementById("password").value;
+    const vehicles = [];
 
-            if (!name || !email || !phone || !password) {
-                alert("Por favor, complete todos los campos.");
-                return;
+    document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
+        const brand = vehicleSection.querySelector('.vehicleBrand').value;
+        const model = vehicleSection.querySelector('.vehicleModel').value;
+        const year = vehicleSection.querySelector('.vehicleYear').value;
+        const plate = vehicleSection.querySelector('.vehiclePlate').value;
+        if (brand && model && year && plate) {
+            vehicles.push({ brand, model, year, plate });
+        }
+    });
+
+    if (!name || !email || !phone || !password) {
+        alert("Por favor, complete todos los campos.");
+        return;
+    }
+
+    const userData = {
+        name: name,
+        email: email,
+        phone: phone,
+        planType: planType,
+        vehicles: vehicles
+    };
+
+    // Step 1: Check if the email or phone is already registered in Firestore
+    const usersRef = db.collection("users");
+    
+    usersRef.where("email", "==", email).get()
+        .then((snapshot) => {
+            if (!snapshot.empty) {
+                throw new Error("El correo electrónico ya está registrado.");
+            }
+            return usersRef.where("phone", "==", phone).get();
+        })
+        .then((snapshot) => {
+            if (!snapshot.empty) {
+                throw new Error("El número de teléfono ya está registrado.");
             }
 
-            const userData = {
-                name: name,
-                email: email,
-                phone: phone,
-                planType: planType,
-                vehicles: vehicles
-            };
+            // Step 2: Create user with Firebase Auth
+            return firebase.auth().createUserWithEmailAndPassword(email, password);
+        })
+        .then((userCredential) => {
+            const user = userCredential.user;
+            userData.uid = user.uid;  // Attach the UID from Auth to the user data
 
-            // Check if the email or phone is already registered in Firestore
-            const usersRef = db.collection("users");
+            // Step 3: Save user data in Firestore with email as the document ID
+            return db.collection("users").doc(email).set(userData);
+        })
+        .then(() => {
+            alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
+            document.getElementById('registerForm').reset();
+            document.getElementById('register-section').style.display = "none";
+            // Optional: Call Twilio action after registration
+            sendTwilioMessage(phone);
+        })
+        .catch((error) => {
+            console.error("Error en el registro:", error.message);
+            alert("Error en el registro: " + error.message);
+        });
+}
 
-            usersRef.where("email", "==", email).get()
-                .then((snapshot) => {
-                    if (!snapshot.empty) {
-                        throw new Error("El correo electrónico ya está registrado.");
-                    }
-                    return usersRef.where("phone", "==", phone).get();
-                })
-                .then((snapshot) => {
-                    if (!snapshot.empty) {
-                        throw new Error("El número de teléfono ya está registrado.");
-                    }
 
-                    // Create user with Firebase Auth
-                    return firebase.auth().createUserWithEmailAndPassword(email, password);
-                })
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    userData.uid = user.uid;  // Attach the UID from Auth to the user data
 
-                    // Save user data in Firestore with email as the document ID
-                    return db.collection("users").doc(email).set(userData);
-                })
-                .then(() => {
-                    alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
-                    document.getElementById('registerForm').reset();
-                    document.getElementById('register-section').style.display = "none";
-
-                    // Call Twilio action after registration
-                    sendTwilioMessage(planType, name, phone);
-                })
-                .catch((error) => {
-                    console.error("Error en el registro:", error.message);
-                    alert("Error en el registro: " + error.message);
-                });
-        }
-
-        // Function to show the registration form based on plan type
+        
+        // Show registration form based on plan type
         function showRegistrationForm(planType) {
             const formSection = document.getElementById('register-section');
             formSection.style.display = 'block';
@@ -125,31 +127,9 @@
             }
             formSection.scrollIntoView({ behavior: 'smooth' });
         }
-
-           // Send Twilio notification (optional, if required)
-            sendTwilioMessage(planType, name, phone);
-
-            // Open WhatsApp chat
-            openWhatsAppChat();
-        })
-        .catch((error) => {
-            console.error("Error en el registro:", error.message);
-            alert("Error en el registro: " + error.message);
-        });
-}
-
-// WhatsApp chat function
-function openWhatsAppChat() {
-    const whatsappNumber = "+14155238886";  // Replace with your Twilio WhatsApp number
-    const message = encodeURIComponent("Hola AutoCuidado Club, vamos a ejecutar el pago de la suscripcion seleccionada.");
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
-    
-    // Open WhatsApp chat in a new tab
-    window.open(whatsappUrl, "_blank");
     </script>
 </head>
 <body>
-
 
     <!-- Navigation -->
     <nav class="navbar">
