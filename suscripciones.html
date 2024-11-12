@@ -179,7 +179,26 @@ function registerUser() {
                         <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
                     </ul>
                     <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
-                </div>
+                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                      <input type="hidden" name="cmd" value="_s-xclick" />
+                      <input type="hidden" name="hosted_button_id" value="LFK9PMUBR8TVY" />
+                      <table>
+                        <tr>
+                          <td>
+                            <input type="hidden" name="on0" value="Plan básico mensual 3 meses"/>
+                            Plan básico mensual 3 meses
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <input type="text" name="os0" maxLength="200" />
+                          </td>
+                        </tr>
+                      </table>
+                      <input type="hidden" name="currency_code" value="USD" />
+                      <input type="image" src="https://www.paypalobjects.com/es_XC/i/btn/btn_subscribe_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Subscribe" />
+                    </form>
+                 </div>
             </div>
             <div class="plan-item">
                 <div class="plan-option">
