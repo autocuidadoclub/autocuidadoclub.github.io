@@ -836,6 +836,41 @@ html {
     transform: translateY(1px);
 }
 
+.social-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.social-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.instagram {
+    background-color: #E1306C;
+}
+
+.facebook {
+    background-color: #1877F2;
+}
+
+.twitter {
+    background-color: #1DA1F2;
+}
+
+.social-button:hover {
+    opacity: 0.8;
+}
+
 
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
