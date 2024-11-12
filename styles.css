@@ -836,22 +836,32 @@ html {
     transform: translateY(1px);
 }
 
+.social-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.social-container p {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
 .social-buttons {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     justify-content: center;
-    margin-top: 10px;
 }
 
 .social-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 50px;  /* Increase width */
+    height: 50px; /* Increase height */
     border-radius: 50%;
     color: white;
-    font-size: 20px;
+    font-size: 24px;  /* Increase icon size */
     text-decoration: none;
 }
 
