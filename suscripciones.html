@@ -118,14 +118,43 @@
                         userData.uid = user.uid;
                         return db.collection("users").doc(email).set(userData);
                     })
-                    .then(() => {
-                        resolve();
-                    })
-                    .catch((error) => {
-                        reject(error);
-                    });
-            });
-        }
+                    .then(() => { // Show the registration success message and wait for the user to click "OK"
+            const success = confirm("Has sido registrado exitosamente. Presiona OK para proceder al pago.");
+            if (success) {
+                // Redirect to PayPal link based on the plan type
+                let paypalLink;
+                switch (planType) {
+                    case "basic3m":
+                        paypalLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_BASIC_3M";
+                        break;
+                    case "basic6m":
+                        paypalLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_BASIC_6M";
+                        break;
+                    case "basic12m":
+                        paypalLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_BASIC_12M";
+                        break;
+                    case "plus3m":
+                        paypalLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_PLUS_3M";
+                        break;
+                    case "plus6m":
+                        paypalLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_PLUS_6M";
+                        break;
+                    case "plus12m":
+                        paypalLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_PLUS_12M";
+                        break;
+                    default:
+                        alert("Tipo de plan no válido.");
+                        return;
+                }
+                window.open(paypalLink, '_blank');
+            }
+        })
+        .catch((error) => {
+            console.error("Error en el registro:", error.message);
+            alert("Error en el registro: " + error.message);
+        });
+}
+            
 
         function showRegistrationForm(planType) {
             const formSection = document.getElementById('register-section');
