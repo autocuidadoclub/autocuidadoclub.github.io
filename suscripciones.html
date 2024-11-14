@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-
     <!-- Firebase Compatibility SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -16,118 +15,114 @@
     <script>
         // Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-          authDomain: "auto-cuidadoclub.firebaseapp.com",
-          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-          projectId: "auto-cuidadoclub",
-          storageBucket: "auto-cuidadoclub.appspot.com",
-          messagingSenderId: "986704701191",
-          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-          measurementId: "G-LBBGXV2YX5"
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2"
         };
-
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        function registerAndPay() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const planType = document.getElementById("planType").value;
+            const password = document.getElementById("password").value;
+            const vehicles = [];
 
-function registerUser() {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const phone = document.getElementById("phone").value;
-    const planType = document.getElementById("planType").value;
-    const password = document.getElementById("password").value;
-    const vehicles = [];
+            document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
+                const brand = vehicleSection.querySelector('.vehicleBrand').value;
+                const model = vehicleSection.querySelector('.vehicleModel').value;
+                const year = vehicleSection.querySelector('.vehicleYear').value;
+                const plate = vehicleSection.querySelector('.vehiclePlate').value;
+                if (brand && model && year && plate) {
+                    vehicles.push({ brand, model, year, plate });
+                }
+            });
 
-    document.querySelectorAll('.vehicle-info').forEach((vehicleSection) => {
-        const brand = vehicleSection.querySelector('.vehicleBrand').value;
-        const model = vehicleSection.querySelector('.vehicleModel').value;
-        const year = vehicleSection.querySelector('.vehicleYear').value;
-        const plate = vehicleSection.querySelector('.vehiclePlate').value;
-        if (brand && model && year && plate) {
-            vehicles.push({ brand, model, year, plate });
+            if (!name || !email || !phone || !password) {
+                alert("Por favor, complete todos los campos.");
+                return;
+            }
+
+            const userData = {
+                name: name,
+                email: email,
+                phone: phone,
+                planType: planType,
+                vehicles: vehicles,
+                subscriptionStartDate: new Date(),
+                subscriptionEndDate: calculateEndDate(planType),
+                subscriptionStatus: "active"
+            };
+
+            const usersRef = db.collection("users");
+
+            usersRef.where("email", "==", email).get()
+                .then((snapshot) => {
+                    if (!snapshot.empty) {
+                        throw new Error("El correo electrónico ya está registrado.");
+                    }
+                    return usersRef.where("phone", "==", phone).get();
+                })
+                .then((snapshot) => {
+                    if (!snapshot.empty) {
+                        throw new Error("El número de teléfono ya está registrado.");
+                    }
+
+                    return firebase.auth().createUserWithEmailAndPassword(email, password);
+                })
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    userData.uid = user.uid;
+
+                    return db.collection("users").doc(email).set(userData);
+                })
+                .then(() => {
+                    const success = confirm("Has sido registrado exitosamente. Presiona OK para proceder al pago.");
+                    if (success) {
+                        const paypalLink = getPaypalLink(planType);
+                        window.open(paypalLink, '_blank');
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error en el registro:", error.message);
+                    alert("Error en el registro: " + error.message);
+                });
         }
-    });
 
-    if (!name || !email || !phone || !password) {
-        alert("Por favor, complete todos los campos.");
-        return;
-    }
-
-    const userData = {
-        name: name,
-        email: email,
-        phone: phone,
-        planType: planType,
-        vehicles: vehicles
-    };
-
-    // Step 1: Check if the email or phone is already registered in Firestore
-    const usersRef = db.collection("users");
-    
-    usersRef.where("email", "==", email).get()
-        .then((snapshot) => {
-            if (!snapshot.empty) {
-                throw new Error("El correo electrónico ya está registrado.");
+        function calculateEndDate(planType) {
+            const startDate = new Date();
+            switch (planType) {
+                case "basic3m":
+                case "plus3m":
+                    startDate.setMonth(startDate.getMonth() + 3);
+                    break;
+                case "basic6m":
+                case "plus6m":
+                    startDate.setMonth(startDate.getMonth() + 6);
+                    break;
+                case "basic12m":
+                case "plus12m":
+                    startDate.setMonth(startDate.getMonth() + 12);
+                    break;
             }
-            return usersRef.where("phone", "==", phone).get();
-        })
-        .then((snapshot) => {
-            if (!snapshot.empty) {
-                throw new Error("El número de teléfono ya está registrado.");
+            return startDate;
+        }
+
+        function getPaypalLink(planType) {
+            switch (planType) {
+                case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_BASIC_3M";
+                case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_BASIC_6M";
+                case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_BASIC_12M";
+                case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_PLUS_3M";
+                case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_PLUS_6M";
+                case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLAN_PLUS_12M";
+                default: alert("Tipo de plan no válido."); return null;
             }
-
-            // Step 2: Create user with Firebase Auth
-            return firebase.auth().createUserWithEmailAndPassword(email, password);
-        })
-        .then((userCredential) => {
-            const user = userCredential.user;
-            userData.uid = user.uid;  // Attach the UID from Auth to the user data
-
-            // Step 3: Save user data in Firestore with email as the document ID
-            return db.collection("users").doc(email).set(userData);
-        })
-        .then(() => {
-            alert("Registro exitoso. ¡Gracias por unirte a AutoCuidado Club!");
-            document.getElementById('registerForm').reset();
-            document.getElementById('register-section').style.display = "none";
-            // Optional: Call Twilio action after registration
-            sendTwilioMessage(phone);
-        })
-        .catch((error) => {
-            console.error("Error en el registro:", error.message);
-            alert("Error en el registro: " + error.message);
-        });
-}
-
-
-
-        
-        // Show registration form based on plan type
-        function showRegistrationForm(planType) {
-            const formSection = document.getElementById('register-section');
-            formSection.style.display = 'block';
-            document.getElementById('planType').value = planType;
-
-            const vehicleSections = document.getElementById('vehicle-sections');
-            vehicleSections.innerHTML = "";
-            const vehicleCount = planType === 'basic' ? 1 : 3;
-            for (let i = 1; i <= vehicleCount; i++) {
-                vehicleSections.insertAdjacentHTML('beforeend', `
-                    <div class="vehicle-info">
-                        <h4>Información del Vehículo ${i}</h4>
-                        <label for="vehicleBrand${i}">Marca:</label>
-                        <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required pattern="[A-Za-z\s]+" title="Solo letras">
-                        <label for="vehicleModel${i}">Modelo:</label>
-                        <input type="text" id="vehicleModel${i}" class="vehicleModel" required pattern="[A-Za-z0-9\s]+" title="Letras y números">
-                        <label for="vehicleYear${i}">Año:</label>
-                        <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
-                        <label for="vehiclePlate${i}">Placa:</label>
-                        <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required pattern="[A-Za-z0-9\s]+" title="Letras y números">
-                    </div>
-                `);
-            }
-            formSection.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </head>
@@ -157,15 +152,6 @@ function registerUser() {
         </div>
     </header>
 
-    <!-- Subscription Section -->
-    <section class="subscription-section">
-        <h2>Planes de Suscripción</h2>
-        <p class="highlight-text">Por Qué Elegir AutoCuidado Club</p>
-        <ul class="benefits-list">
-            <li><strong>Mayor Productividad:</strong> Mantén tu ritmo de vida sin interrupciones. Nosotros nos encargamos del mantenimiento.</li>
-            <li><strong>Garantía de Calidad:</strong> Herramientas avanzadas y personal calificado para ofrecer el mejor servicio.</li>
-            <li><strong>Cuidado Total del Vehículo:</strong> Nos encargamos de todos los aspectos del mantenimiento, tú solo disfrutas.</li>
-        </ul>
 
                 <h2>Planes de Suscripciones Básicas</h2>
         <div class="subscription-row">
@@ -178,14 +164,8 @@ function registerUser() {
                         <li><strong>Beneficio:</strong> Prueba rápida y flexible para evaluar el servicio sin un compromiso a largo plazo.</li>
                         <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
-                   <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                  <input type="hidden" name="cmd" value="_s-xclick" />
-                  <input type="hidden" name="hosted_button_id" value="LFK9PMUBR8TVY" />
-                  <input type="hidden" name="currency_code" value="USD" />
-                  <input type="image" src="https://www.paypalobjects.com/es_XC/i/btn/btn_subscribe_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Subscribe" />
-                </form>
-                 </div>
+                    <button onclick="showRegistrationForm('basic3m')">Suscribirse - Plan Básico 3 Meses</button>
+                   </div>
             </div>
             <div class="plan-item">
                 <div class="plan-option">
@@ -197,7 +177,7 @@ function registerUser() {
                         <li><strong>Ideal para:</strong> Clientes que buscan un servicio a mediano plazo con equilibrio entre compromiso y flexibilidad.</li>
                         <li><strong>Descuento: </strong> 10% de descuento en comparación con el plan básico de 3 meses.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
+                    <button onclick="showRegistrationForm('basic6m')">Suscribirse - Plan Básico 6 meses</button>
                 </div>
             </div>
             <div class="plan-item highlight">
@@ -212,7 +192,7 @@ function registerUser() {
                         <li><strong>Descuento: </strong> 25% de descuento en comparación con el plan básico de 3 meses.</li>
                         <li><strong>Descuento: </strong> 15% de descuento en comparación con el plan básico de 6 meses.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
+                    <button onclick="showRegistrationForm('basic12m')">Suscribirse - Plan Básico 12 meses</button>
                 </div>
             </div>
         </div>
@@ -230,7 +210,7 @@ function registerUser() {
                         <li><strong>Descuento: </strong> 37% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         <li><strong>Descuento: </strong> 27% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
                 </div>
             </div>
             <div class="plan-item">
@@ -244,7 +224,7 @@ function registerUser() {
                         <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+                    <button onclick="showRegistrationForm('plus6m')">Suscribirse - Plan Plus 6 meses</button>
                 </div>
             </div>
             <div class="plan-item highlight">
@@ -259,12 +239,11 @@ function registerUser() {
                         <li><strong>Descuento: </strong> 53% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+                    <button onclick="showRegistrationForm('plus12m')">Suscribirse - Plan Plus 12 meses</button>
                 </div>
             </div>
         </div>
     </section>
-
 
     <!-- Registration Section -->
     <section id="register-section" class="register-section" style="display: none;">
@@ -284,7 +263,6 @@ function registerUser() {
         </form>
     </section>
 
-      <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
         <ul>
@@ -313,10 +291,8 @@ function registerUser() {
 
        
     </footer>
-
 <!-- At the end of your body in suscripciones.html -->
 <script src="twilio-action.js"></script>
 
-    
 </body>
 </html>
