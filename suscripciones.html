@@ -15,16 +15,21 @@
     <script>
         // Firebase configuration
         const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_API_KEY",
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
             authDomain: "auto-cuidadoclub.firebaseapp.com",
+            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
             projectId: "auto-cuidadoclub",
             storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
         };
+
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Register and Pay Function
         function registerAndPay() {
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
@@ -52,46 +57,80 @@
 
             const usersRef = db.collection("users");
 
-            // Check if user already exists
             usersRef.doc(email).get()
                 .then((doc) => {
                     if (doc.exists) {
-                        return doc.id; // User exists, return the ID (email as key here)
+                        const user = doc.data();
+
+                        // Prevent duplicate active subscriptions
+                        if (user.subscriptionStatus === "active" && user.planType === planType) {
+                            throw new Error("Ya tienes una suscripción activa para este plan.");
+                        }
+
+                        // Prevent downgrades from Plus to Basic unless expired
+                        if (user.planType.startsWith("plus") && planType.startsWith("basic")) {
+                            if (user.subscriptionStatus === "active") {
+                                throw new Error("No puedes cambiar de un plan Plus a un plan Básico mientras tu suscripción esté activa.");
+                            } else {
+                                const selectedVehicle = prompt(
+                                    "Tu suscripción Plus incluye varios vehículos. Por favor, ingresa la placa del vehículo que deseas mantener en el plan Básico:"
+                                );
+
+                                if (!selectedVehicle || !user.vehicles.some(v => v.plate === selectedVehicle)) {
+                                    throw new Error("Debes seleccionar un vehículo válido para el plan Básico.");
+                                }
+
+                                const vehicleToKeep = user.vehicles.find(v => v.plate === selectedVehicle);
+                                userData.vehicles = [vehicleToKeep];
+                            }
+                        }
+
+                        // Handle upgrades from Basic to Plus
+                        if (user.planType.startsWith("basic") && planType.startsWith("plus")) {
+                            const history = user.subscriptionHistory || [];
+                            history.push({
+                                planType: user.planType,
+                                subscriptionStartDate: user.subscriptionStartDate,
+                                subscriptionEndDate: user.subscriptionEndDate,
+                                status: "upgraded",
+                            });
+
+                            return usersRef.doc(email).update({
+                                planType,
+                                subscriptionStatus: "active",
+                                subscriptionStartDate: new Date(),
+                                subscriptionEndDate: calculateEndDate(planType),
+                                vehicles: userData.vehicles,
+                                subscriptionHistory: history,
+                            });
+                        }
+
+                        // Reactivate expired subscriptions
+                        if (user.subscriptionStatus === "expired") {
+                            return usersRef.doc(email).update({
+                                planType,
+                                subscriptionStatus: "active",
+                                subscriptionStartDate: new Date(),
+                                subscriptionEndDate: calculateEndDate(planType),
+                                vehicles: user.vehicles,
+                            });
+                        }
                     } else {
-                        // Create a new user with Firebase Auth
+                        // First-time registration
                         return firebase.auth().createUserWithEmailAndPassword(email, password)
                             .then((userCredential) => {
-                                const user = userCredential.user;
-                                userData.uid = user.uid;
-                                return usersRef.doc(email).set(userData).then(() => email);
+                                const newUser = userCredential.user;
+                                userData.uid = newUser.uid;
+                                userData.subscriptionStatus = "active";
+                                userData.subscriptionStartDate = new Date();
+                                userData.subscriptionEndDate = calculateEndDate(planType);
+                                return usersRef.doc(email).set(userData);
                             });
                     }
                 })
-                .then((userId) => {
-                    // Check if the user has an active subscription
-                    return db.collection("subscriptions")
-                        .where("userId", "==", userId)
-                        .where("status", "==", "active")
-                        .get();
-                })
-                .then((querySnapshot) => {
-                    if (!querySnapshot.empty) {
-                        const confirmRenewal = confirm("Ya tienes una suscripción activa. ¿Quieres renovar o agregar una nueva suscripción?");
-                        if (!confirmRenewal) return;
-                    }
-                    // Proceed to create a new subscription
-                    const newSubscription = {
-                        userId: email,
-                        planType: planType,
-                        startDate: new Date(),
-                        endDate: calculateEndDate(planType),
-                        status: "active"
-                    };
-
-                    return db.collection("subscriptions").add(newSubscription);
-                })
                 .then(() => {
-                    const success = confirm("Has sido registrado exitosamente. Presiona OK para proceder al pago.");
+                    // Show confirmation dialog
+                    const success = confirm("Has sido registrado exitosamente o tu plan ha sido actualizado. Presiona OK para proceder al pago.");
                     if (success) {
                         const paypalLink = getPaypalLink(planType);
                         window.open(paypalLink, '_blank');
@@ -133,40 +172,187 @@
                 default: alert("Tipo de plan no válido."); return null;
             }
         }
-
-        function showRegistrationForm(planType) {
-            const formSection = document.getElementById('register-section');
-            formSection.style.display = 'block';
-            document.getElementById('planType').value = planType;
-            formSection.scrollIntoView({ behavior: 'smooth' });
-        }
     </script>
 </head>
 <body>
-    <!-- Navigation and Header code here -->
+    <!-- Existing HTML and structure for navigation, header, subscription plans, and footer -->
+        <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header with Logo -->
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+    </header>
 
     <!-- Subscription Section -->
     <section class="subscription-section">
         <h2>Planes de Suscripción</h2>
+        <p class="highlight-text">Por Qué Elegir AutoCuidado Club</p>
+        <ul class="benefits-list">
+            <li><strong>Mayor Productividad:</strong> Mantén tu ritmo de vida sin interrupciones. Nosotros nos encargamos del mantenimiento.</li>
+            <li><strong>Garantía de Calidad:</strong> Herramientas avanzadas y personal calificado para ofrecer el mejor servicio.</li>
+            <li><strong>Cuidado Total del Vehículo:</strong> Nos encargamos de todos los aspectos del mantenimiento, tú solo disfrutas.</li>
+        </ul>
+
+                <h2>Planes de Suscripciones Básicas</h2>
         <div class="subscription-row">
             <div class="plan-item">
-                <button onclick="showRegistrationForm('basic3m')">Suscribirse - Plan Básico 3M</button>
+                <div class="plan-option">
+                    <img src="3mb.jpg" alt="Plan Básico 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $34.99/mes</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para evaluar el servicio sin un compromiso a largo plazo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic3m')">Suscribirse - Plan Básico 3 Meses</button>
+                   </div>
             </div>
-            <!-- Other plan buttons similarly -->
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="6mb.jpg" alt="Plan Básico 6 meses" class="plan-image">
+                    <p><strong>6 meses:</strong> $31.49/mes</p>
+                    <ul class="plan-benefits">
+                        <li>6 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante seis meses.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan un servicio a mediano plazo con equilibrio entre compromiso y flexibilidad.</li>
+                        <li><strong>Descuento: </strong> 10% de descuento en comparación con el plan básico de 3 meses.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic6m')">Suscribirse - Plan Básico 6 meses</button>
+                </div>
+            </div>
+            <div class="plan-item highlight">
+                <div class="badge">¡Mejor Opción!</div>
+                <div class="plan-option">
+                    <img src="12mb.jpg" alt="Plan Básico 12 meses" class="plan-image">
+                    <p><strong>12 meses:</strong> $26.24/mes</p>
+                    <ul class="plan-benefits">
+                        <li>12 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante el año.</li>
+                        <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
+                        <li><strong>Descuento: </strong> 25% de descuento en comparación con el plan básico de 3 meses.</li>
+                        <li><strong>Descuento: </strong> 15% de descuento en comparación con el plan básico de 6 meses.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic12m')">Suscribirse - Plan Básico 12 meses</button>
+                </div>
+            </div>
+        </div>
+
+        <h2>Planes de Suscripciones Plus</h2>
+        <div class="subscription-row">
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $66.48/mes</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para clientes con más de un vehículo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
+                        <li><strong>Descuento: </strong> 37% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 27% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
+                </div>
+            </div>
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="6mp.jpg" alt="Plan Plus 6 meses" class="plan-image">
+                    <p><strong>6 meses:</strong> $59.83/mes</p>
+                    <ul class="plan-benefits">
+                        <li>6 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y consistencia en el mantenimiento para múltiples vehículos.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus6m')">Suscribirse - Plan Plus 6 meses</button>
+                </div>
+            </div>
+            <div class="plan-item highlight">
+                <div class="badge">¡Mejor Opción!</div>
+                <div class="plan-option">
+                    <img src="12mp.jpg" alt="Plan Plus 12 meses" class="plan-image">
+                    <p><strong>12 meses:</strong> $49.86/mes</p>
+                    <ul class="plan-benefits">
+                        <li>12 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Gran ahorro anual y mantenimiento para hasta tres vehículos.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 53% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus12m')">Suscribirse - Plan Plus 12 meses</button>
+                </div>
+            </div>
         </div>
     </section>
 
+
     <!-- Registration Section -->
     <section id="register-section" class="register-section" style="display: none;">
-        <form id="registerForm" onsubmit="registerAndPay(); return false;">
+        <h2>Regístrate y Elige Tu Plan</h2>
+        <form id="registerForm" onsubmit="registerUser(); return false;">
             <label for="name">Nombre:</label>
-            <input type="text" id="name" required>
+            <input type="text" id="name" required pattern="[A-Za-z\s]+" title="Solo letras">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+            <label for="phone">Teléfono:</label>
+            <input type="text" id="phone" required pattern="\d{8}" title="Ocho dígitos">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" required pattern="[A-Za-z0-9]+" title="Letras y números">
             <input type="hidden" id="planType">
+            <div id="vehicle-sections"></div>
             <button type="submit">Registrarse</button>
         </form>
     </section>
 
-    <!-- Footer code here -->
+      <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+          
+    <div class="social-container">
+        <p>Síguenos en nuestras redes sociales</p>
+        <div class="social-buttons">
+            <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button twitter">
+                <!-- Alternative icon for X (Twitter) if not available in Font Awesome -->
+                <i class="fab fa-twitter"></i> <!-- Replace with fa-x-twitter if supported -->
+            </a>
+        </div>
+    </div>
+
+       
+    </footer>
+
+<!-- At the end of your body in suscripciones.html -->
+<script src="twilio-action.js"></script>
 
 </body>
 </html>
