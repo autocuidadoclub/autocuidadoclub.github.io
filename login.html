@@ -3,22 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - AutoCuidado Club</title>
+    <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-   <!-- Firebase App (core SDK) -->
-<script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-<!-- Firebase Authentication SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
-<!-- Firebase Firestore SDK (if needed) -->
-<script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
-<!-- Add other Firebase services as needed -->
+    <!-- Firebase Compatibility SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-
-    
     <script>
-        // Firebase configuration
         const firebaseConfig = {
           apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
           authDomain: "auto-cuidadoclub.firebaseapp.com",
@@ -29,100 +23,241 @@
           appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
           measurementId: "G-LBBGXV2YX5"
         };
-        
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function showRegistrationForm(planType) {
+            document.getElementById('register-section').style.display = 'block';
+            document.getElementById('planType').value = planType;
+
+            const vehicleSections = document.getElementById('vehicle-sections');
+            vehicleSections.innerHTML = '';
+            const vehicleCount = planType.startsWith("plus") ? 3 : 1;
+            for (let i = 1; i <= vehicleCount; i++) {
+                vehicleSections.insertAdjacentHTML('beforeend', `
+                    <div class="vehicle-info">
+                        <h4>Información del Vehículo ${i}</h4>
+                        <label for="vehicleBrand${i}">Marca:</label>
+                        <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
+                        <label for="vehicleModel${i}">Modelo:</label>
+                        <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
+                        <label for="vehicleYear${i}">Año:</label>
+                        <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
+                        <label for="vehiclePlate${i}">Placa:</label>
+                        <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
+                    </div>
+                `);
+            }
         }
 
-        const auth = firebase.auth();
+        function registerAndPay() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const planType = document.getElementById("planType").value;
+            const password = document.getElementById("password").value;
+            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+                brand: vehicleSection.querySelector('.vehicleBrand').value,
+                model: vehicleSection.querySelector('.vehicleModel').value,
+                year: vehicleSection.querySelector('.vehicleYear').value,
+                plate: vehicleSection.querySelector('.vehiclePlate').value,
+            }));
 
-        // Login function
-        function loginUser() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            if (!name || !email || !phone || !password) {
+                alert("Por favor, complete todos los campos.");
+                return;
+            }
 
-            // Set session persistence to LOCAL
-            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            const userData = { name, email, phone, planType, vehicles, subscriptionStatus: "active" };
+            const usersRef = db.collection("users");
+
+            usersRef.doc(email).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const user = doc.data();
+                        if (user.subscriptionStatus === "active" && user.planType === planType) {
+                            throw new Error("Ya tienes una suscripción activa para este plan.");
+                        }
+                        if (user.planType.startsWith("plus") && planType.startsWith("basic") && user.subscriptionStatus === "active") {
+                            throw new Error("No puedes cambiar de un plan Plus a un plan Básico mientras tu suscripción esté activa.");
+                        }
+                        if (user.subscriptionStatus === "expired" || planType.startsWith("plus")) {
+                            userData.subscriptionHistory = user.subscriptionHistory || [];
+                            userData.subscriptionHistory.push({ ...user });
+                        }
+                    }
+                    return firebase.auth().createUserWithEmailAndPassword(email, password);
+                })
+                .then(userCredential => {
+                    const newUser = userCredential.user;
+                    userData.uid = newUser.uid;
+                    return usersRef.doc(email).set(userData);
+                })
                 .then(() => {
-                    // Sign in user
-                    return auth.signInWithEmailAndPassword(email, password);
+                    alert("Registro exitoso. Presiona OK para proceder al pago.");
+                    window.open(getPaypalLink(planType), '_blank');
                 })
-                .then((userCredential) => {
-                    // Redirect to dashboard after successful login
-                    alert("Login exitoso");
-                    window.location.href = 'dashboard.html';
-                })
-                .catch((error) => {
-                    console.error("Error en el login:", error.message);
-                    alert("Error en el login: " + error.message);
+                .catch(error => {
+                    console.error("Error:", error.message);
+                    alert(error.message);
                 });
+        }
 
-
-            const functions = require('firebase-functions');
-            const admin = require('firebase-admin');
-            admin.initializeApp();
-            
-            exports.resetPassword = functions.https.onRequest((req, res) => {
-                const email = req.body.email;
-                admin.auth().generatePasswordResetLink(email)
-                    .then(link => res.send(`Password reset email sent. Check your inbox at ${email}`))
-                    .catch(error => res.status(500).send(error.message));
-            });
-
-
+        function getPaypalLink(planType) {
+            switch (planType) {
+                case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M";
+                case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M";
+                case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M";
+                case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M";
+                case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M";
+                case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M";
+                default: alert("Plan inválido."); return null;
+            }
         }
     </script>
 </head>
 <body>
-
- <!-- Navigation -->
-   <nav class="navbar">
-    <ul class="nav-links">
-        <li><a href="nosotros.html">Nosotros</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
-        <li><a href="login.html">Ingresa a tu cuenta</a></li>
-    </ul>
-    <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-    </div>
-</nav>
-
-
-
-<!-- Header with Logo -->
-<header>
-    <div class="header-container">
-            <div class="header-text">
-            <h1>Bienvenido a AutoCuidado Club</h1>
-            <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+<nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
-    </div>
-</header>
-    
-   <!-- Login Form Section Styled Similar to Contact -->
-    <section class="login-section">
-        <div class="form-container">
-            <h2>Iniciar Sesión</h2>
-            <form onsubmit="loginUser(); return false;">
-                <label for="email">Correo Electrónico</label>
-                <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
-                <button type="submit">Iniciar Sesión</button>
-                </form>
-         </div>
+    </nav>
 
-        <a href="forgot-password.html" class="fancy-button">¿Olvidaste tu contraseña?</a>
+    <!-- Header with Logo -->
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+    </header>
 
+    <section class="subscription-section">
+        <h2>Planes de Suscripción</h2>
+        <!-- Subscription Plan Buttons -->
+<p class="highlight-text">Por Qué Elegir AutoCuidado Club</p>
+        <ul class="benefits-list">
+            <li><strong>Mayor Productividad:</strong> Mantén tu ritmo de vida sin interrupciones. Nosotros nos encargamos del mantenimiento.</li>
+            <li><strong>Garantía de Calidad:</strong> Herramientas avanzadas y personal calificado para ofrecer el mejor servicio.</li>
+            <li><strong>Cuidado Total del Vehículo:</strong> Nos encargamos de todos los aspectos del mantenimiento, tú solo disfrutas.</li>
+        </ul>
 
+                <h2>Planes de Suscripciones Básicas</h2>
+        <div class="subscription-row">
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="3mb.jpg" alt="Plan Básico 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $34.99/mes</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para evaluar el servicio sin un compromiso a largo plazo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic3m')">Suscribirse - Plan Básico 3 Meses</button>
+                   </div>
+            </div>
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="6mb.jpg" alt="Plan Básico 6 meses" class="plan-image">
+                    <p><strong>6 meses:</strong> $31.49/mes</p>
+                    <ul class="plan-benefits">
+                        <li>6 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante seis meses.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan un servicio a mediano plazo con equilibrio entre compromiso y flexibilidad.</li>
+                        <li><strong>Descuento: </strong> 10% de descuento en comparación con el plan básico de 3 meses.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic6m')">Suscribirse - Plan Básico 6 meses</button>
+                </div>
+            </div>
+            <div class="plan-item highlight">
+                <div class="badge">¡Mejor Opción!</div>
+                <div class="plan-option">
+                    <img src="12mb.jpg" alt="Plan Básico 12 meses" class="plan-image">
+                    <p><strong>12 meses:</strong> $26.24/mes</p>
+                    <ul class="plan-benefits">
+                        <li>12 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante el año.</li>
+                        <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
+                        <li><strong>Descuento: </strong> 25% de descuento en comparación con el plan básico de 3 meses.</li>
+                        <li><strong>Descuento: </strong> 15% de descuento en comparación con el plan básico de 6 meses.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic12m')">Suscribirse - Plan Básico 12 meses</button>
+                </div>
+            </div>
+        </div>
+
+        <h2>Planes de Suscripciones Plus</h2>
+        <div class="subscription-row">
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $66.48/mes</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para clientes con más de un vehículo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
+                        <li><strong>Descuento: </strong> 37% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 27% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
+                </div>
+            </div>
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="6mp.jpg" alt="Plan Plus 6 meses" class="plan-image">
+                    <p><strong>6 meses:</strong> $59.83/mes</p>
+                    <ul class="plan-benefits">
+                        <li>6 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y consistencia en el mantenimiento para múltiples vehículos.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus6m')">Suscribirse - Plan Plus 6 meses</button>
+                </div>
+            </div>
+            <div class="plan-item highlight">
+                <div class="badge">¡Mejor Opción!</div>
+                <div class="plan-option">
+                    <img src="12mp.jpg" alt="Plan Plus 12 meses" class="plan-image">
+                    <p><strong>12 meses:</strong> $49.86/mes</p>
+                    <ul class="plan-benefits">
+                        <li>12 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Gran ahorro anual y mantenimiento para hasta tres vehículos.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 53% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus12m')">Suscribirse - Plan Plus 12 meses</button>
+                </div>
+            </div>
+        </div>
         
     </section>
+    <section id="register-section" style="display: none;">
+        <h2>Registro</h2>
+        <form onsubmit="registerAndPay(); return false;">
+            <label>Nombre: <input id="name" type="text" required></label>
+            <label>Email: <input id="email" type="email" required></label>
+            <label>Teléfono: <input id="phone" type="text" required></label>
+            <label>Contraseña: <input id="password" type="password" required></label>
+            <input id="planType" type="hidden">
+            <div id="vehicle-sections"></div>
+            <button type="submit">Registrarse y Pagar</button>
+        </form>
+    </section>
 
-
-        <!-- Footer -->
+      <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
         <ul>
@@ -132,8 +267,7 @@
             <li><a href="contacto.html">Contacto</a></li>
             <li><a href="login.html">Ingresa a tu cuenta</a></li>
         </ul>
-       
-
+          
     <div class="social-container">
         <p>Síguenos en nuestras redes sociales</p>
         <div class="social-buttons">
@@ -149,11 +283,8 @@
             </a>
         </div>
     </div>
+
     
-       
-        
-       </footer>
-
-
+    </footer>
 </body>
 </html>
