@@ -11,18 +11,19 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    
+
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
+         const firebaseConfig = {
+          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+          authDomain: "auto-cuidadoclub.firebaseapp.com",
+          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+          projectId: "auto-cuidadoclub",
+          storageBucket: "auto-cuidadoclub.appspot.com",
+          messagingSenderId: "986704701191",
+          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+          measurementId: "G-LBBGXV2YX5"
         };
+
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -119,15 +120,16 @@
 </head>
 <body>
     <nav>
-        <!-- Navbar here -->
-        
+        <!-- Navbar -->
     </nav>
     <header>
-        <!-- Header here -->
+        <!-- Header -->
     </header>
-    <section>
-        <!-- Subscription Plans with buttons -->
+    <section class="subscription-section">
+        <h2>Planes de Suscripción</h2>
+        <!-- Subscription Plan Buttons -->
         <button onclick="showRegistrationForm('basic3m')">Plan Básico 3 Meses</button>
+        <button onclick="showRegistrationForm('plus3m')">Plan Plus 3 Meses</button>
     </section>
     <section id="register-section" style="display: none;">
         <h2>Registro</h2>
@@ -142,7 +144,7 @@
         </form>
     </section>
     <footer>
-        <!-- Footer here -->
+        <!-- Footer -->
     </footer>
 </body>
 </html>
