@@ -13,7 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <script>
-                const firebaseConfig = {
+        const firebaseConfig = {
           apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
           authDomain: "auto-cuidadoclub.firebaseapp.com",
           databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
@@ -43,77 +43,26 @@
                 });
         }
 
-        function showRegistrationForm(planType) {
-            document.getElementById('register-section').style.display = 'block';
-            document.getElementById('planType').value = planType;
-            const vehicleSections = document.getElementById('vehicle-sections');
-            vehicleSections.innerHTML = '';
-            const vehicleCount = planType.startsWith("plus") ? 3 : 1;
-            for (let i = 1; i <= vehicleCount; i++) {
-                vehicleSections.insertAdjacentHTML('beforeend', `
-                    <div class="vehicle-info">
-                        <h4>Información del Vehículo ${i}</h4>
-                        <label>Marca:</label>
-                        <input type="text" class="vehicleBrand" required>
-                        <label>Modelo:</label>
-                        <input type="text" class="vehicleModel" required>
-                        <label>Año:</label>
-                        <input type="text" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
-                        <label>Placa:</label>
-                        <input type="text" class="vehiclePlate" required>
-                    </div>
-                `);
-            }
-        }
-
-        function registerAndPay() {
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const planType = document.getElementById("planType").value;
-            const password = document.getElementById("password").value;
-
-            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(section => ({
-                brand: section.querySelector('.vehicleBrand').value,
-                model: section.querySelector('.vehicleModel').value,
-                year: section.querySelector('.vehicleYear').value,
-                plate: section.querySelector('.vehiclePlate').value,
-            }));
-
-            const userData = { name, email, phone, planType, vehicles, subscriptionStatus: "active" };
-            const usersRef = db.collection("users");
-
-            usersRef.doc(email).get()
-                .then(doc => {
-                    if (doc.exists && doc.data().subscriptionStatus === "active") {
-                        throw new Error("Ya tienes una suscripción activa.");
-                    }
-                    return auth.createUserWithEmailAndPassword(email, password);
-                })
-                .then(userCredential => {
-                    userData.uid = userCredential.user.uid;
-                    return usersRef.doc(email).set(userData);
-                })
+        function forgotPassword() {
+            const email = document.getElementById('forgot-email').value;
+            auth.sendPasswordResetEmail(email)
                 .then(() => {
-                    alert("Registro exitoso. Presiona OK para proceder al pago.");
-                    window.open(getPaypalLink(planType), '_blank');
+                    alert("Correo de recuperación enviado. Revisa tu bandeja de entrada.");
                 })
-                .catch(error => {
-                    console.error("Error:", error.message);
-                    alert(error.message);
+                .catch((error) => {
+                    console.error("Error al enviar el correo de recuperación:", error.message);
+                    alert("Error: " + error.message);
                 });
         }
 
-        function getPaypalLink(planType) {
-            const links = {
-                "basic3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M",
-                "basic6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M",
-                "basic12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M",
-                "plus3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M",
-                "plus6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M",
-                "plus12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M"
-            };
-            return links[planType] || alert("Plan inválido.");
+        function showForgotPassword() {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('forgot-password-section').style.display = 'block';
+        }
+
+        function showLoginSection() {
+            document.getElementById('forgot-password-section').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
         }
     </script>
 </head>
@@ -126,50 +75,44 @@
             <li><a href="servicios.html">Servicios</a></li>
             <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
             <li><a href="contacto.html">Contacto</a></li>
-            </ul>
-    <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-    </div>
-</nav>
-
-
-
-<!-- Header with Logo -->
-<header>
-    <div class="header-container">
-            <div class="header-text">
-            <h1>Bienvenido a AutoCuidado Club</h1>
-            <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
-    </div>
-</header>
+    </nav>
 
-    
+    <!-- Header with Logo -->
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+    </header>
+
     <!-- Login Section -->
-    <section>
+    <section id="login-section">
         <h2>Iniciar Sesión</h2>
         <form onsubmit="loginUser(); return false;">
             <label>Email: <input type="email" id="email" required></label>
             <label>Contraseña: <input type="password" id="password" required></label>
             <button type="submit">Iniciar Sesión</button>
         </form>
+        <p><a href="#" onclick="showForgotPassword()">¿Olvidaste tu contraseña?</a></p>
     </section>
 
-    <!-- Registration Section -->
-    <section id="register-section" style="display: none;">
-        <h2>Registro</h2>
-        <form onsubmit="registerAndPay(); return false;">
-            <label>Nombre: <input id="name" type="text" required></label>
-            <label>Email: <input id="email" type="email" required></label>
-            <label>Teléfono: <input id="phone" type="text" required></label>
-            <label>Contraseña: <input id="password" type="password" required></label>
-            <input id="planType" type="hidden">
-            <div id="vehicle-sections"></div>
-            <button type="submit">Registrarse y Pagar</button>
+    <!-- Forgot Password Section -->
+    <section id="forgot-password-section" style="display: none;">
+        <h2>Recuperar Contraseña</h2>
+        <form onsubmit="forgotPassword(); return false;">
+            <label>Email: <input type="email" id="forgot-email" required></label>
+            <button type="submit">Enviar Enlace de Recuperación</button>
         </form>
+        <p><a href="#" onclick="showLoginSection()">Volver al inicio de sesión</a></p>
     </section>
 
-   <!-- Footer -->
+    <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
         <ul>
@@ -178,28 +121,21 @@
             <li><a href="servicios.html">Servicios</a></li>
             <li><a href="suscripciones.html">Suscripciones</a></li>
             <li><a href="contacto.html">Contacto</a></li>
-            </ul>
-       
-
-    <div class="social-container">
-        <p>Síguenos en nuestras redes sociales</p>
-        <div class="social-buttons">
-            <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button instagram">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button facebook">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button twitter">
-                <!-- Alternative icon for X (Twitter) if not available in Font Awesome -->
-                <i class="fab fa-twitter"></i> <!-- Replace with fa-x-twitter if supported -->
-            </a>
+        </ul>
+        <div class="social-container">
+            <p>Síguenos en nuestras redes sociales</p>
+            <div class="social-buttons">
+                <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
         </div>
-    </div>
-    
-       
-        
-       </footer>
-
+    </footer>
 </body>
 </html>
