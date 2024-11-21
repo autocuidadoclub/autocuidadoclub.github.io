@@ -72,7 +72,6 @@
 
          
 // Highlight selected schedule box and capture day and time block
-// Highlight selected schedule box and capture day and time block
 window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
     
@@ -83,19 +82,45 @@ window.selectScheduleBox = function (cell) {
         return; // Do not allow selection of invalid cells
     }
 
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
-
-    // Get the corresponding day from the column header
+       // Get the corresponding day from the column header
     const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText : "Unknown";
 
-    // Store the selected day and time block in a hidden input field
-    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+   let selectedBlocks = []; // Declare a global variable to track selected blocks
+
+window.selectScheduleBox = function (cell) {
+    const planType = document.getElementById("planType").value;
+    const maxBlocks = planType.startsWith("plus") ? 3 : 1;
+
+    // Check if the cell contains a valid time
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    if (!planType.startsWith("plus")) {
+        // For Non-Plus plans: Allow only one selection
+        selectedBlocks = [cell];
+        cells.forEach((c) => c.classList.remove("selected-box"));
+        cell.classList.add("selected-box");
+    } else {
+        // For Plus plans: Allow up to 3 selections
+        if (selectedBlocks.includes(cell)) {
+            // Deselect if already selected
+            selectedBlocks = selectedBlocks.filter((c) => c !== cell);
+            cell.classList.remove("selected-box");
+        } else if (selectedBlocks.length < maxBlocks) {
+            // Select if under limit
+            selectedBlocks.push(cell);
+            cell.classList.add("selected-box");
+        } else {
+            alert("Solo puedes seleccionar hasta 3 horarios.");
+        }
+    }
+};
+
 };
 
 
