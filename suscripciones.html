@@ -344,5 +344,43 @@
     
     </footer>
 
+<script>
+    // Show Registration Form and Schedule Table
+    function showRegistrationForm(planType) {
+        const registerSection = document.getElementById("register-section");
+        const scheduleSection = document.getElementById("schedule-section");
+
+        // Show form and schedule table
+        registerSection.style.display = "block";
+        scheduleSection.style.display = "block";
+
+        // Scroll to the registration section
+        registerSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Highlight Selected Schedule Row
+    function selectSchedule(row) {
+        const rows = document.querySelectorAll(".schedule-table tbody tr");
+        rows.forEach((r) => r.classList.remove("selected-row"));
+        row.classList.add("selected-row");
+    }
+
+    // Add a class for selected rows
+    document.addEventListener("DOMContentLoaded", function () {
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .schedule-table tbody tr.selected-row {
+                background-color: #FF6600;
+                color: white;
+                font-weight: bold;
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+</body>
+
+
+    
 </body>
 </html>
