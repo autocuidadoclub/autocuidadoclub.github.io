@@ -102,9 +102,7 @@ window.selectScheduleBox = function (cell) {
             // Select if under the limit
             window.selectedBlocks.push(cell);
             cell.classList.add("selected-box");
-        } else {
-            alert(`Solo puedes seleccionar hasta ${maxBlocks} horarios.`);
-        }
+        } 
     }
 
     // Update the hidden input with selected schedules
