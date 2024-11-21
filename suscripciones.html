@@ -29,8 +29,33 @@
         const db = firebase.firestore();
 
         function showRegistrationForm(planType) {
-            document.getElementById('register-section').style.display = 'block';
-            document.getElementById('planType').value = planType;
+    const registerSection = document.getElementById("register-section");
+    const scheduleSection = document.getElementById("schedule-section");
+
+    registerSection.style.display = "block";
+    scheduleSection.style.display = "block";
+
+    // Scroll to the form
+    registerSection.scrollIntoView({ behavior: "smooth" });
+}
+
+function selectSchedule(cell) {
+    const allCells = document.querySelectorAll(".schedule-table tbody td");
+    allCells.forEach((cell) => cell.classList.remove("selected-box"));
+
+    // Highlight only the clicked cell
+    cell.classList.add("selected-box");
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const tableCells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
+    tableCells.forEach((cell) => {
+        cell.addEventListener("click", function () {
+            selectSchedule(cell);
+        });
+    });
+});
+
 
             const vehicleSections = document.getElementById('vehicle-sections');
             vehicleSections.innerHTML = '';
@@ -246,61 +271,85 @@
 <section id="register-section" class="register-section" style="display: none;">
     <h2>Regístrate y Selecciona tu Horario de Inspección</h2>
     <form id="registerForm">
-        <!-- Form Fields -->
-        <label for="name">Nombre:</label>
-        <input type="text" id="name" required>
-        <label for="email">Email:</label>
-        <input type="email" id="email" required>
-        <label for="phone">Teléfono:</label>
-        <input type="text" id="phone" required>
-        <label for="password">Contraseña:</label>
-        <input type="password" id="password" required>
-        <input type="hidden" id="planType">
-        <button type="submit">Registrar y Pagar Suscripción</button>
+        <div class="form-group">
+            <label for="name">Nombre:</label>
+            <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Teléfono:</label>
+            <input type="text" id="phone" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" required>
+        </div>
+
+        <div id="vehicle-info-section">
+            <h3>Información del Vehículo</h3>
+            <div class="vehicle-info">
+                <label for="vehicleBrand1">Marca:</label>
+                <input type="text" id="vehicleBrand1" class="vehicleBrand" required>
+                <label for="vehicleModel1">Modelo:</label>
+                <input type="text" id="vehicleModel1" class="vehicleModel" required>
+                <label for="vehicleYear1">Año:</label>
+                <input type="text" id="vehicleYear1" class="vehicleYear" required>
+                <label for="vehiclePlate1">Placa:</label>
+                <input type="text" id="vehiclePlate1" class="vehiclePlate" required>
+            </div>
+        </div>
+
+        <div id="schedule-section" class="schedule-section" style="display: none;">
+            <h2>Selecciona tu Horario de Inspección</h2>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Horario</th>
+                        <th>Lunes</th>
+                        <th>Miércoles</th>
+                        <th>Viernes</th>
+                        <th>Sábado</th>
+                        <th>Domingo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bloque 1</td>
+                        <td onclick="selectSchedule(this)">9:00 - 11:00</td>
+                        <td onclick="selectSchedule(this)">10:00 - 12:00</td>
+                        <td onclick="selectSchedule(this)">13:00 - 15:00</td>
+                        <td onclick="selectSchedule(this)">8:00 - 10:00</td>
+                        <td onclick="selectSchedule(this)">9:00 - 11:00</td>
+                    </tr>
+                    <tr>
+                        <td>Bloque 2</td>
+                        <td onclick="selectSchedule(this)">12:00 - 14:00</td>
+                        <td onclick="selectSchedule(this)">13:00 - 15:00</td>
+                        <td onclick="selectSchedule(this)">16:00 - 18:00</td>
+                        <td onclick="selectSchedule(this)">11:00 - 13:00</td>
+                        <td onclick="selectSchedule(this)">12:00 - 14:00</td>
+                    </tr>
+                    <tr>
+                        <td>Bloque 3</td>
+                        <td onclick="selectSchedule(this)">15:00 - 17:00</td>
+                        <td onclick="selectSchedule(this)">16:00 - 18:00</td>
+                        <td onclick="selectSchedule(this)">-</td>
+                        <td onclick="selectSchedule(this)">14:00 - 16:00</td>
+                        <td onclick="selectSchedule(this)">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <button type="submit">Registrar y Pagar Suscripción</button>
+        </div>
     </form>
 </section>
 
-<section id="schedule-section" class="schedule-section" style="display: none;">
-    <h2>Selecciona tu Horario de Inspección</h2>
-    <table class="schedule-table">
-        <thead>
-            <tr>
-                <th>Horario</th>
-                <th>Lunes</th>
-                <th>Miércoles</th>
-                <th>Viernes</th>
-                <th>Sábado</th>
-                <th>Domingo</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Bloque 1</td>
-                <td onclick="selectSchedule(this)">9:00 - 11:00</td>
-                <td onclick="selectSchedule(this)">10:00 - 12:00</td>
-                <td onclick="selectSchedule(this)">13:00 - 15:00</td>
-                <td onclick="selectSchedule(this)">8:00 - 10:00</td>
-                <td onclick="selectSchedule(this)">9:00 - 11:00</td>
-            </tr>
-            <tr>
-                <td>Bloque 2</td>
-                <td onclick="selectSchedule(this)">12:00 - 14:00</td>
-                <td onclick="selectSchedule(this)">13:00 - 15:00</td>
-                <td onclick="selectSchedule(this)">16:00 - 18:00</td>
-                <td onclick="selectSchedule(this)">11:00 - 13:00</td>
-                <td onclick="selectSchedule(this)">12:00 - 14:00</td>
-            </tr>
-            <tr>
-                <td>Bloque 3</td>
-                <td onclick="selectSchedule(this)">15:00 - 17:00</td>
-                <td onclick="selectSchedule(this)">16:00 - 18:00</td>
-                <td onclick="selectSchedule(this)">-</td>
-                <td onclick="selectSchedule(this)">14:00 - 16:00</td>
-                <td onclick="selectSchedule(this)">-</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
 
     
     <!-- Footer -->
