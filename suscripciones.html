@@ -73,29 +73,53 @@
          
 // Highlight selected schedule box and capture day and time block
 window.selectScheduleBox = function (cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-    
+    const planType = document.getElementById("planType").value;
+    const maxBlocks = planType.startsWith("plus") ? 3 : 1;
+
+    if (!window.selectedBlocks) {
+        window.selectedBlocks = [];
+    }
+
     // Check if the cell contains a valid time
     const timeBlock = cell.innerText.trim();
     if (timeBlock === "-" || timeBlock === "") {
         alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
+        return;
     }
 
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
+    if (!planType.startsWith("plus")) {
+        // For non-Plus plans: Only allow one selection
+        window.selectedBlocks.forEach((block) => block.classList.remove("selected-box"));
+        window.selectedBlocks = [cell];
+        cell.classList.add("selected-box");
+    } else {
+        // For Plus plans: Allow up to 3 selections
+        if (window.selectedBlocks.includes(cell)) {
+            // Deselect if already selected
+            window.selectedBlocks = window.selectedBlocks.filter((c) => c !== cell);
+            cell.classList.remove("selected-box");
+        } else if (window.selectedBlocks.length < maxBlocks) {
+            // Select if under the limit
+            window.selectedBlocks.push(cell);
+            cell.classList.add("selected-box");
+        } else {
+            alert(`Solo puedes seleccionar hasta ${maxBlocks} horarios.`);
+        }
+    }
 
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
+    // Update the hidden input with selected schedules
+    const scheduleSummary = window.selectedBlocks
+        .map((block) => {
+            const dayIndex = block.cellIndex;
+            const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+            const day = dayHeader ? dayHeader.innerText : "Unknown";
+            return `${day} - ${block.innerText.trim()}`;
+        })
+        .join(", ");
 
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText : "Unknown";
-
-    // Store the selected day and time block in a hidden input field
-    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+    document.getElementById("selectedSchedule").value = scheduleSummary;
 };
+
 
 
 
@@ -364,6 +388,7 @@ window.selectScheduleBox = function (cell) {
     </section>
             
             <button type="submit">Registrar y Pagar Suscripción</button>
+            <input type="hidden" id="selectedSchedule" name="selectedSchedule">
         </form>
     </section>
 
