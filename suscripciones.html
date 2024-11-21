@@ -181,12 +181,12 @@ window.selectScheduleBox = function (cell) {
 
         function getPaypalLink(planType) {
             switch (planType) {
-                case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
-                case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
-                case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
-                case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
-                case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
-                case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
+                case "basic3m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
+                case "basic6m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
+                case "basic12m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
+                case "plus3m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
+                case "plus6m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
+                case "plus12m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
                 default: alert("Plan inválido."); return null;
             }
         }
