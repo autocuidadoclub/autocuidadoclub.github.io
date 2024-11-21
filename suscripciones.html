@@ -93,6 +93,11 @@ window.selectScheduleBox = function (cell) {
     const planType = document.getElementById("planType").value;
     const maxBlocks = planType.startsWith("plus") ? 3 : 1;
 
+    // Initialize selectedBlocks as an array if not already done
+    if (!window.selectedBlocks) {
+        window.selectedBlocks = [];
+    }
+
     // Check if the cell contains a valid time
     const timeBlock = cell.innerText.trim();
     if (timeBlock === "-" || timeBlock === "") {
@@ -102,26 +107,25 @@ window.selectScheduleBox = function (cell) {
 
     if (!planType.startsWith("plus")) {
         // For Non-Plus plans: Allow only one selection
-        selectedBlocks = [cell];
-        cells.forEach((c) => c.classList.remove("selected-box"));
+        window.selectedBlocks.forEach((block) => block.classList.remove("selected-box"));
+        window.selectedBlocks = [cell];
         cell.classList.add("selected-box");
     } else {
         // For Plus plans: Allow up to 3 selections
-        if (selectedBlocks.includes(cell)) {
+        if (window.selectedBlocks.includes(cell)) {
             // Deselect if already selected
-            selectedBlocks = selectedBlocks.filter((c) => c !== cell);
+            window.selectedBlocks = window.selectedBlocks.filter((c) => c !== cell);
             cell.classList.remove("selected-box");
-        } else if (selectedBlocks.length < maxBlocks) {
+        } else if (window.selectedBlocks.length < maxBlocks) {
             // Select if under limit
-            selectedBlocks.push(cell);
+            window.selectedBlocks.push(cell);
             cell.classList.add("selected-box");
         } else {
-            alert("Solo puedes seleccionar hasta 3 horarios.");
+            alert(`Solo puedes seleccionar hasta ${maxBlocks} horarios.`);
         }
     }
 };
 
-};
 
 
 
