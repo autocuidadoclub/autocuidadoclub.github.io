@@ -12,49 +12,33 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
+        };
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-    authDomain: "auto-cuidadoclub.firebaseapp.com",
-    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-    projectId: "auto-cuidadoclub",
-    storageBucket: "auto-cuidadoclub.appspot.com",
-    messagingSenderId: "986704701191",
-    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-    measurementId: "G-LBBGXV2YX5"
-  };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
- const db = firebase.firestore();
-
-        // Function to show the registration form and initialize fields
+        // Show registration form and initialize vehicle fields
         function showRegistrationForm(planType) {
             const registerSection = document.getElementById("register-section");
             const vehicleSections = document.getElementById("vehicle-sections");
 
-            </script>
-
-            // Display the registration form
             registerSection.style.display = "block";
+            scheduleSection.style.display = "block";
 
-          // Set the hidden plan type field
-            document.getElementById("planType").value = planType;
-            
-            // Smooth scroll to the form
+            // Scroll to the form smoothly
             registerSection.scrollIntoView({ behavior: "smooth" });
-        }
 
-            // Adjust vehicle fields based on plan type
+            // Dynamically add vehicle fields based on the selected plan
             vehicleSections.innerHTML = '';
             const vehicleCount = planType.startsWith("plus") ? 3 : 1;
             for (let i = 1; i <= vehicleCount; i++) {
@@ -73,22 +57,17 @@
                 `);
             }
 
-            // Set the hidden plan type field
             document.getElementById("planType").value = planType;
-
-            // Smooth scroll to the form
-            registerSection.scrollIntoView({ behavior: "smooth" });
         }
 
-        // Function to handle registration and payment
+        // Registration and payment function
         function registerAndPay(event) {
             event.preventDefault();
-
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
             const phone = document.getElementById("phone").value;
-            const planType = document.getElementById("planType").value;
             const password = document.getElementById("password").value;
+            const planType = document.getElementById("planType").value;
 
             const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
                 brand: vehicleSection.querySelector('.vehicleBrand').value,
@@ -131,18 +110,31 @@
                 });
         }
 
-        // Function to get PayPal link based on plan type
         function getPaypalLink(planType) {
-            switch (planType) {
-                case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M";
-                case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M";
-                case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M";
-                case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M";
-                case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M";
-                case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M";
-                default: alert("Plan inválido."); return null;
-            }
+            const links = {
+                "basic3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M",
+                "basic6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M",
+                "basic12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M",
+                "plus3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M",
+                "plus6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M",
+                "plus12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M",
+            };
+            return links[planType] || null;
         }
+
+        // Highlight selected schedule
+        function selectScheduleBox(cell) {
+            const cells = document.querySelectorAll(".schedule-table tbody td");
+            cells.forEach(c => c.classList.remove("selected-box"));
+            cell.classList.add("selected-box");
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const cells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
+            cells.forEach(cell => {
+                cell.addEventListener("click", () => selectScheduleBox(cell));
+            });
+        });
     </script>
 </head>
 <body>
