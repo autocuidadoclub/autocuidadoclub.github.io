@@ -204,10 +204,17 @@ nav ul li a:hover {
 
 .reasons-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Create 5 columns for all boxes */
-    gap: 20px;
+    grid-template-columns: repeat(3, 1fr); /* 3 boxes in the first row */
+    gap: 20px; /* Space between boxes */
     margin-top: 20px;
 }
+
+@media (max-width: 768px) {
+    .reasons-container {
+        grid-template-columns: repeat(2, 1fr); /* Adjust to 2 boxes per row on smaller screens */
+    }
+}
+
 
 .reason-item {
     padding: 20px;
