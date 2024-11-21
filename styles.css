@@ -239,6 +239,17 @@ nav ul li a:hover {
     background-color: #800080; /* Púrpura */
 }
 
+.reason-item:nth-child(5) {
+    background-color: #8B4513; /* Marrón */
+    color: white;
+    padding: 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 5px;
+    text-align: center;
+}
+
+
 /* Ajustes de diseño para pantallas pequeñas */
 @media (max-width: 768px) {
     .reasons-container {
