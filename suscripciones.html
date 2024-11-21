@@ -80,58 +80,86 @@
         });
 
         // Register and Save to Firebase
-        function registerAndPay(event) {
-            event.preventDefault();
+function registerAndPay(event) {
+    event.preventDefault();
 
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const planType = document.getElementById("planType").value;
-            const password = document.getElementById("password").value;
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const planType = document.getElementById("planType").value;
+    const password = document.getElementById("password").value;
 
-            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
-                brand: vehicleSection.querySelector('.vehicleBrand').value,
-                model: vehicleSection.querySelector('.vehicleModel').value,
-                year: vehicleSection.querySelector('.vehicleYear').value,
-                plate: vehicleSection.querySelector('.vehiclePlate').value,
-            }));
+    const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+        brand: vehicleSection.querySelector('.vehicleBrand').value,
+        model: vehicleSection.querySelector('.vehicleModel').value,
+        year: vehicleSection.querySelector('.vehicleYear').value,
+        plate: vehicleSection.querySelector('.vehiclePlate').value,
+    }));
 
-            const selectedSchedule = document.querySelector(".schedule-table td.selected-box");
-            if (!selectedSchedule) {
-                alert("Por favor selecciona un horario de inspección.");
-                return;
+    const selectedSchedule = document.querySelector(".schedule-table td.selected-box");
+    if (!selectedSchedule) {
+        alert("Por favor selecciona un horario de inspección.");
+        return;
+    }
+    const schedule = selectedSchedule.innerText;
+
+    if (!name || !email || !phone || !password) {
+        alert("Por favor, completa todos los campos.");
+        return;
+    }
+
+    const userData = {
+        name,
+        email,
+        phone,
+        planType,
+        vehicles,
+        schedule,
+        subscriptionStatus: "active",
+        registrationDate: firebase.firestore.Timestamp.now()
+    };
+
+    console.log("User Data to be saved:", userData);
+
+    const usersRef = db.collection("users");
+
+    usersRef.doc(email).get()
+        .then(doc => {
+            if (doc.exists) {
+                console.log("Existing user found:", doc.data());
+                const user = doc.data();
+                if (user.subscriptionStatus === "active" && user.planType === planType) {
+                    throw new Error("Ya tienes una suscripción activa para este plan.");
+                }
+                if (user.planType.startsWith("plus") && planType.startsWith("basic") && user.subscriptionStatus === "active") {
+                    throw new Error("No puedes cambiar de un plan Plus a un plan Básico mientras tu suscripción esté activa.");
+                }
+                if (user.subscriptionStatus === "expired" || planType.startsWith("plus")) {
+                    userData.subscriptionHistory = user.subscriptionHistory || [];
+                    userData.subscriptionHistory.push({ ...user });
+                }
             }
-            const schedule = selectedSchedule.innerText;
+            return firebase.auth().createUserWithEmailAndPassword(email, password);
+        })
+        .then(userCredential => {
+            const newUser = userCredential.user;
+            userData.uid = newUser.uid;
+            console.log("User authenticated:", newUser.uid);
+            return usersRef.doc(email).set(userData);
+        })
+        .then(() => {
+            console.log("User successfully saved to Firestore");
+            alert("Registro exitoso. Presiona OK para proceder al pago.");
+            const paypalLink = getPaypalLink(planType);
+            if (paypalLink) window.open(paypalLink, '_blank');
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            alert("Hubo un error en el registro: " + error.message);
+        });
+}
 
-            if (!name || !email || !phone || !password) {
-                alert("Por favor, completa todos los campos.");
-                return;
-            }
-
-            const userData = {
-                name,
-                email,
-                phone,
-                planType,
-                vehicles,
-                schedule,
-                subscriptionStatus: "active",
-                registrationDate: firebase.firestore.Timestamp.now()
-            };
-
-            const usersRef = db.collection("users");
-            usersRef.doc(email).set(userData)
-                .then(() => {
-                    alert("Registro exitoso. Presiona OK para proceder al pago.");
-                    const paypalLink = getPaypalLink(planType);
-                    if (paypalLink) window.open(paypalLink, '_blank');
-                })
-                .catch(error => {
-                    console.error("Error al registrar:", error.message);
-                    alert("Hubo un error en el registro: " + error.message);
-                });
-        }
-
+        
         function getPaypalLink(planType) {
             switch (planType) {
                 case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M";
