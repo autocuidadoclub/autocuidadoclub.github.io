@@ -243,74 +243,54 @@
 
 
 <!-- Registration Section -->
-<section id="register-section" class="register-section" style="display: none;">
-    <h2>Regístrate y Selecciona tu Horario de Inspección</h2>
-    <form id="registerForm" onsubmit="registerAndPay(); return false;">
-        <label for="name">Nombre:</label>
-        <input type="text" id="name" required>
-        <label for="email">Email:</label>
-        <input type="email" id="email" required>
-        <label for="phone">Teléfono:</label>
-        <input type="text" id="phone" required>
-        <label for="password">Contraseña:</label>
-        <input type="password" id="password" required>
-        <div id="vehicle-sections">
-            <h3>Información del Vehículo 1</h3>
-            <label for="vehicleBrand">Marca:</label>
-            <input type="text" id="vehicleBrand" class="vehicleBrand" required>
-            <label for="vehicleModel">Modelo:</label>
-            <input type="text" id="vehicleModel" class="vehicleModel" required>
-            <label for="vehicleYear">Año:</label>
-            <input type="text" id="vehicleYear" class="vehicleYear" required>
-            <label for="vehiclePlate">Placa:</label>
-            <input type="text" id="vehiclePlate" class="vehiclePlate" required>
-        </div>
+<script>
+    // Show Registration Form and Schedule Table
+    function showRegistrationForm(planType) {
+        const registerSection = document.getElementById("register-section");
+        const scheduleSection = document.getElementById("schedule-section");
 
-        <!-- Inspection Schedule Table -->
-        <div id="schedule-section" style="display: none; margin-top: 20px;">
-            <h3>Selecciona tu Horario de Inspección</h3>
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th>Horario</th>
-                        <th>Lunes</th>
-                        <th>Miércoles</th>
-                        <th>Viernes</th>
-                        <th>Sábado</th>
-                        <th>Domingo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr onclick="selectSchedule(this)">
-                        <td>Bloque 1</td>
-                        <td>9:00 - 11:00</td>
-                        <td>10:00 - 12:00</td>
-                        <td>13:00 - 15:00</td>
-                        <td>8:00 - 10:00</td>
-                        <td>9:00 - 11:00</td>
-                    </tr>
-                    <tr onclick="selectSchedule(this)">
-                        <td>Bloque 2</td>
-                        <td>12:00 - 14:00</td>
-                        <td>13:00 - 15:00</td>
-                        <td>16:00 - 18:00</td>
-                        <td>11:00 - 13:00</td>
-                        <td>12:00 - 14:00</td>
-                    </tr>
-                    <tr onclick="selectSchedule(this)">
-                        <td>Bloque 3</td>
-                        <td>15:00 - 17:00</td>
-                        <td>16:00 - 18:00</td>
-                        <td>-</td>
-                        <td>14:00 - 16:00</td>
-                        <td>-</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <button type="submit">Registrar y Pagar Suscripción</button>
-    </form>
-</section>
+        // Ensure the sections are displayed
+        registerSection.style.display = "block";
+        scheduleSection.style.display = "block";
+
+        // Set the selected plan type
+        document.getElementById("planType").value = planType;
+
+        // Smoothly scroll to the registration section
+        registerSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Highlight Selected Schedule Box
+    function selectSchedule(cell) {
+        // Remove highlights from all schedule cells
+        const cells = document.querySelectorAll(".schedule-table tbody td");
+        cells.forEach((c) => c.classList.remove("selected-box"));
+
+        // Add highlight to the clicked cell
+        cell.classList.add("selected-box");
+    }
+
+    // Add JavaScript Event Listeners on Page Load
+    document.addEventListener("DOMContentLoaded", function () {
+        // Style for the selected box
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .schedule-table tbody td.selected-box {
+                background-color: #FF6600 !important;
+                color: white !important;
+                font-weight: bold;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add click event listeners to all selectable cells
+        const scheduleCells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
+        scheduleCells.forEach((cell) => {
+            cell.addEventListener("click", () => selectSchedule(cell));
+        });
+    });
+</script>
+
 
 
 
