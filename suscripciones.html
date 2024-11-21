@@ -70,7 +70,8 @@
                 registerSection.scrollIntoView({ behavior: "smooth" });
             };
 
-           // Highlight selected schedule box and capture day and time block
+         
+// Highlight selected schedule box and capture day and time block
 window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
     cells.forEach((c) => c.classList.remove("selected-box"));
@@ -136,7 +137,7 @@ window.selectScheduleBox = function (cell) {
                 phone,
                 planType,
                 vehicles,
-                selectedSchedule: selectedSchedule.textContent,
+                selectedSchedule: document.getElementById("selectedSchedule").value,
                 subscriptionStatus: "active",
                 registrationDate: firebase.firestore.Timestamp.now()
             };
