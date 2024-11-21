@@ -242,28 +242,44 @@
     </section>
 
 
-       <!-- Registration Section -->
-    <section id="register-section" class="register-section">
-        <h2>Regístrate y Selecciona tu Horario de Inspección</h2>
-        <form id="registerForm" onsubmit="registerAndPay(); return false;">
-            <label for="name">Nombre:</label>
-            <input type="text" id="name" required pattern="[A-Za-z\s]+" title="Solo letras">
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" required>
-            
-            <label for="phone">Teléfono:</label>
-            <input type="text" id="phone" required pattern="\d{8}" title="Ocho dígitos">
-            
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" required pattern="[A-Za-z0-9]+" title="Letras y números">
-            
-            <input type="hidden" id="planType">
-            
-            <div id="vehicle-sections"></div>
+<section id="register-section" class="register-section">
+    <h2>Regístrate y Selecciona tu Horario de Inspección</h2>
+    <form id="registerForm" onsubmit="registerAndPay(); return false;">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" required pattern="[A-Za-z\s]+" title="Solo letras">
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+        
+        <label for="phone">Teléfono:</label>
+        <input type="text" id="phone" required pattern="\d{8}" title="Ocho dígitos">
+        
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" required pattern="[A-Za-z0-9]+" title="Letras y números">
+        
+        <input type="hidden" id="planType">
+        
+        <!-- Vehicle Information -->
+        <div id="vehicle-sections">
+            <div class="vehicle-info">
+                <h4>Información del Vehículo 1</h4>
+                <label for="vehicleBrand1">Marca:</label>
+                <input type="text" id="vehicleBrand1" class="vehicleBrand" required>
+                
+                <label for="vehicleModel1">Modelo:</label>
+                <input type="text" id="vehicleModel1" class="vehicleModel" required>
+                
+                <label for="vehicleYear1">Año:</label>
+                <input type="text" id="vehicleYear1" class="vehicleYear" required pattern="\d{4}">
+                
+                <label for="vehiclePlate1">Placa:</label>
+                <input type="text" id="vehiclePlate1" class="vehiclePlate" required>
+            </div>
+        </div>
 
-            <!-- Schedule Selection -->
-            <h3>Selecciona tu Horario de Inspección</h3>
+        <!-- Schedule Selection -->
+        <h3>Selecciona tu Horario de Inspección</h3>
+        <div class="schedule-container">
             <table class="schedule-table">
                 <thead>
                     <tr>
@@ -284,12 +300,22 @@
                         <td><input type="radio" name="schedule" value="Sábado 8:00 - 10:00"> 8:00 - 10:00</td>
                         <td><input type="radio" name="schedule" value="Domingo 9:00 - 11:00"> 9:00 - 11:00</td>
                     </tr>
+                    <tr>
+                        <td>Bloque 2</td>
+                        <td><input type="radio" name="schedule" value="Lunes 12:00 - 14:00"> 12:00 - 14:00</td>
+                        <td><input type="radio" name="schedule" value="Miércoles 13:00 - 15:00"> 13:00 - 15:00</td>
+                        <td><input type="radio" name="schedule" value="Viernes 16:00 - 18:00"> 16:00 - 18:00</td>
+                        <td><input type="radio" name="schedule" value="Sábado 11:00 - 13:00"> 11:00 - 13:00</td>
+                        <td><input type="radio" name="schedule" value="Domingo 12:00 - 14:00"> 12:00 - 14:00</td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
 
-            <button type="submit">Registrar y Pagar Suscripción</button>
-        </form>
-    </section>
+        <button type="submit">Registrar y Pagar Suscripción</button>
+    </form>
+</section>
+
     
     <!-- Footer -->
     <footer>
