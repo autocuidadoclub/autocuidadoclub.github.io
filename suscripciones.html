@@ -70,12 +70,26 @@
                 registerSection.scrollIntoView({ behavior: "smooth" });
             };
 
-            // Highlight selected schedule box
-            window.selectScheduleBox = function (cell) {
-                const cells = document.querySelectorAll(".schedule-table tbody td");
-                cells.forEach((c) => c.classList.remove("selected-box"));
-                cell.classList.add("selected-box");
-            };
+           // Highlight selected schedule box and capture day and time block
+window.selectScheduleBox = function (cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the selected time block
+    const timeBlock = cell.innerText;
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText : "Unknown";
+
+    // Store the selected day and time block in a hidden input field
+    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+};
+
 
             // Add CSS for selected box
             const style = document.createElement("style");
