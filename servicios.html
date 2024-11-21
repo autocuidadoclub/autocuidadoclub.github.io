@@ -84,15 +84,11 @@
         <div id="inspection-content">
             <h3>Revisiones del Motor</h3>
             <ul id="inspection-list">
-                    <li>Revisión de aceite de motor, transmisión y diferencial.</li>
-                    <li>Medición y reemplazo del líquido de frenos (nivel y calidad).</li>
-                    <li>Chequeo de calidad del refrigerante y control de fugas.</li>
-                    <li>Inspección de bujías, bobinas de encendido y sistema de encendido.</li>
-                    <li>Verificación del sistema de inyección de combustible y limpieza de inyectores.</li>
-                    <li>Inspección de correas, poleas y tensores.</li>
-                    <li>Diagnóstico de batería y sistema de carga.</li>
-                    <li>Evaluación del estado del sistema de escape y catalizador.</li>
-                    <li>Chequeo del sistema de enfriamiento del motor.</li>
+            <li>Análisis del rendimiento de lubricantes mediante pruebas de viscosidad y degradación.</li>
+            <li>Inspección de integridad en los sistemas de combustión y encendido para maximizar la eficiencia térmica.</li>
+            <li>Monitoreo de parámetros críticos del sistema de refrigeración para evitar sobrecalentamiento.</li>
+            <li>Evaluación de la sinergia entre inyectores y componentes de ignición.</li>
+            <li>Diagnóstico computarizado de sistemas eléctricos relacionados con el motor.</li>
             </ul>
         </div>
     </section>
@@ -106,43 +102,30 @@
             if (section === 'motor') {
                 inspectionContent.querySelector("h3").textContent = "Revisiones del Motor";
                 inspectionList.innerHTML = `
-                    <li>Revisión de aceite de motor, transmisión y diferencial.</li>
-                    <li>Medición y reemplazo del líquido de frenos (nivel y calidad).</li>
-                    <li>Chequeo de calidad del refrigerante y control de fugas.</li>
-                    <li>Inspección de bujías, bobinas de encendido y sistema de encendido.</li>
-                    <li>Verificación del sistema de inyección de combustible y limpieza de inyectores.</li>
-                    <li>Inspección de correas, poleas y tensores.</li>
-                    <li>Diagnóstico de batería y sistema de carga.</li>
-                    <li>Evaluación del estado del sistema de escape y catalizador.</li>
-                    <li>Chequeo del sistema de enfriamiento del motor.</li>
+            <li>Análisis del rendimiento de lubricantes mediante pruebas de viscosidad y degradación.</li>
+            <li>Inspección de integridad en los sistemas de combustión y encendido para maximizar la eficiencia térmica.</li>
+            <li>Monitoreo de parámetros críticos del sistema de refrigeración para evitar sobrecalentamiento.</li>
+            <li>Evaluación de la sinergia entre inyectores y componentes de ignición.</li>
+            <li>Diagnóstico computarizado de sistemas eléctricos relacionados con el motor.</li>
                     
                 `;
             } else if (section === 'interior') {
                 inspectionContent.querySelector("h3").textContent = "Revisiones del Interior";
                 inspectionList.innerHTML = `
-                    <li>Diagnóstico de los sistemas electrónicos (ECU, sensores).</li>
-                    <li>Inspección y limpieza del sistema de aire acondicionado y calefacción.</li>
-                    <li>Revisión de filtros de aire y cabina para mantener el aire limpio.</li>
-                    <li>Prueba de funcionamiento del tablero, luces internas y sistemas de control.</li>
-                    <li>Inspección de cinturones de seguridad y sistema de airbags.</li>
-                    <li>Verificación de los asientos y mecanismos de ajuste.</li>
-                    <li>Chequeo del sistema de sonido y entretenimiento.</li>
-                    <li>Revisión del sistema de bloqueo centralizado y alarmas.</li>
-                    <li>Revisión de unidades de control como PCM, SRS, ABS, APS.</li>
+            <li>Validación funcional de sistemas de seguridad pasiva como airbags y pretensores de cinturón.</li>
+            <li>Verificación de la calibración de sensores de confort climático (temperatura, humedad, presión).</li>
+            <li>Pruebas de diagnóstico en módulos ECU y unidades electrónicas críticas.</li>
+            <li>Inspección de interfaces de usuario: tableros, controles multimedia y sistemas avanzados de asistencia.</li>
                 `;
+                
             } else if (section === 'exterior') {
                 inspectionContent.querySelector("h3").textContent = "Revisiones del Exterior";
                 inspectionList.innerHTML = `
-                    <li>Inspección de neumáticos, alineación y balanceo.</li>
-                    <li>Verificación y ajuste del sistema de frenos (pastillas, discos, tambores).</li>
-                    <li>Revisión del sistema de suspensión y estado de amortiguadores.</li>
-                    <li>Chequeo de luces delanteras, traseras y direccionales para visibilidad óptima.</li>
-                    <li>Inspección y recarga de líquido limpiaparabrisas y revisión de escobillas.</li>
-                    <li>Verificación de cerraduras, funcionamiento de puertas y ventanas.</li>
-                    <li>Inspección de espejos laterales y retrovisor.</li>
-                    <li>Revisión del estado de pintura y posibles daños en la carrocería.</li>
-                    
-                `;
+            <li>Análisis del desgaste de neumáticos mediante escaneo tridimensional de patrones.</li>
+            <li>Evaluación de la dinámica del sistema de frenos y ajuste de componentes hidráulicos.</li>
+            <li>Revisión de elementos aerodinámicos y su impacto en la eficiencia vehicular.</li>
+            <li>Inspección del sistema de iluminación para garantizar proyección óptica en condiciones extremas.</li>
+                 `;
             }
         }
     </script>
