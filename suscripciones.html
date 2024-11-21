@@ -72,15 +72,22 @@
 
          
 // Highlight selected schedule box and capture day and time block
+// Highlight selected schedule box and capture day and time block
 window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
+    
+    // Check if the cell contains a valid time
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
     cells.forEach((c) => c.classList.remove("selected-box"));
 
     // Highlight the selected cell
     cell.classList.add("selected-box");
-
-    // Get the selected time block
-    const timeBlock = cell.innerText;
 
     // Get the corresponding day from the column header
     const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
@@ -90,6 +97,7 @@ window.selectScheduleBox = function (cell) {
     // Store the selected day and time block in a hidden input field
     document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
 };
+
 
 
             // Add CSS for selected box
