@@ -158,22 +158,36 @@ window.selectScheduleBox = function (cell) {
                 return;
             }
 
-            const selectedSchedule = document.querySelector(".schedule-table tbody td.selected-box");
-            if (!selectedSchedule) {
-                alert("Por favor, seleccione un horario.");
-                return;
-            }
+            const selectedBlocks = Array.from(document.querySelectorAll(".schedule-table tbody td.selected-box"))
+    .map((block) => {
+        const timeBlock = block.innerText.trim();
+        const dayIndex = block.cellIndex; // Get the column index
+        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+        const day = dayHeader ? dayHeader.innerText : "Unknown";
+        return `${day} - ${timeBlock}`;
+    });
 
-            const userData = {
-                name,
-                email,
-                phone,
-                planType,
-                vehicles,
-                selectedSchedule: document.getElementById("selectedSchedule").value,
-                subscriptionStatus: "active",
-                registrationDate: firebase.firestore.Timestamp.now()
-            };
+if (selectedBlocks.length === 0) {
+    alert("Por favor, seleccione al menos un horario.");
+    return;
+}
+
+const maxBlocks = planType.startsWith("plus") ? 3 : 1;
+if (selectedBlocks.length > maxBlocks) {
+    alert(`Solo puedes seleccionar hasta ${maxBlocks} horarios.`);
+    return;
+}
+
+const userData = {
+    name,
+    email,
+    phone,
+    planType,
+    vehicles,
+    selectedSchedules: selectedBlocks, // Store selected schedules as an array
+    subscriptionStatus: "active",
+    registrationDate: firebase.firestore.Timestamp.now()
+};
 
             const usersRef = db.collection("users");
 
