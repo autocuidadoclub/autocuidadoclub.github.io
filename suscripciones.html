@@ -75,25 +75,25 @@
 window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
 
-    // Check if the cell contains a valid time
+    // Clear any previously selected boxes
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the currently selected cell
+    cell.classList.add("selected-box");
+
+    // Get the time block from the selected cell
     const timeBlock = cell.innerText.trim();
     if (timeBlock === "-" || timeBlock === "") {
         alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
+        return; // Do not allow invalid selection
     }
 
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
-
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    // Get the day from the column header
+    const dayIndex = cell.cellIndex; // Get column index
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText : "Unknown";
 
-    // Store only the last selected schedule in the hidden input field
+    // Store the final selection in the hidden input
     document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
 };
 
@@ -127,61 +127,57 @@ window.selectScheduleBox = function (cell) {
         });
 
         function registerAndPay(event) {
-            event.preventDefault();
+    event.preventDefault();
 
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const planType = document.getElementById("planType").value;
-            const password = document.getElementById("password").value;
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const planType = document.getElementById("planType").value;
+    const password = document.getElementById("password").value;
+    const selectedSchedule = document.getElementById("selectedSchedule").value; // Get the final selected schedule
 
-            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
-                brand: vehicleSection.querySelector('.vehicleBrand').value,
-                model: vehicleSection.querySelector('.vehicleModel').value,
-                year: vehicleSection.querySelector('.vehicleYear').value,
-                plate: vehicleSection.querySelector('.vehiclePlate').value,
-            }));
+    const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+        brand: vehicleSection.querySelector('.vehicleBrand').value,
+        model: vehicleSection.querySelector('.vehicleModel').value,
+        year: vehicleSection.querySelector('.vehicleYear').value,
+        plate: vehicleSection.querySelector('.vehiclePlate').value,
+    }));
 
-            if (!name || !email || !phone || !password) {
-                alert("Por favor, complete todos los campos.");
-                return;
-            }
+    if (!name || !email || !phone || !password || !selectedSchedule) {
+        alert("Por favor, complete todos los campos y seleccione un horario.");
+        return;
+    }
 
-            const selectedSchedule = document.querySelector(".schedule-table tbody td.selected-box");
-            if (!selectedSchedule) {
-                alert("Por favor, seleccione un horario.");
-                return;
-            }
+    const userData = {
+        name,
+        email,
+        phone,
+        planType,
+        vehicles,
+        selectedSchedule, // Add the selected schedule directly here
+        subscriptionStatus: "active",
+        registrationDate: firebase.firestore.Timestamp.now()
+    };
 
-            const userData = {
-                name,
-                email,
-                phone,
-                planType,
-                vehicles,
-                selectedSchedule: document.getElementById("selectedSchedule").value,
-                subscriptionStatus: "active",
-                registrationDate: firebase.firestore.Timestamp.now()
-            };
+    const usersRef = db.collection("users");
 
-            const usersRef = db.collection("users");
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            const newUser = userCredential.user;
+            userData.uid = newUser.uid;
+            return usersRef.doc(email).set(userData);
+        })
+        .then(() => {
+            alert("Registro exitoso. Presiona OK para proceder al pago.");
+            const paypalLink = getPaypalLink(planType);
+            if (paypalLink) window.open(paypalLink, '_blank');
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            alert("Hubo un error en el registro: " + error.message);
+        });
+}
 
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then(userCredential => {
-                    const newUser = userCredential.user;
-                    userData.uid = newUser.uid;
-                    return usersRef.doc(email).set(userData);
-                })
-                .then(() => {
-                    alert("Registro exitoso. Presiona OK para proceder al pago.");
-                    const paypalLink = getPaypalLink(planType);
-                    if (paypalLink) window.open(paypalLink, '_blank');
-                })
-                .catch(error => {
-                    console.error("Error:", error.message);
-                    alert("Hubo un error en el registro: " + error.message);
-                });
-        }
 
         function getPaypalLink(planType) {
             switch (planType) {
