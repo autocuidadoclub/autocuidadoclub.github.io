@@ -60,82 +60,136 @@
             document.getElementById("planType").value = planType;
         }
 
-        // Registration and payment function
-        function registerAndPay(event) {
-            event.preventDefault();
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const password = document.getElementById("password").value;
-            const planType = document.getElementById("planType").value;
 
-            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
-                brand: vehicleSection.querySelector('.vehicleBrand').value,
-                model: vehicleSection.querySelector('.vehicleModel').value,
-                year: vehicleSection.querySelector('.vehicleYear').value,
-                plate: vehicleSection.querySelector('.vehiclePlate').value,
-            }));
+    // Function to handle registration and payment
+    function registerAndPay(event) {
+        event.preventDefault();
 
-            if (!name || !email || !phone || !password) {
-                alert("Por favor, complete todos los campos.");
-                return;
-            }
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const password = document.getElementById("password").value;
+        const planType = document.getElementById("planType").value;
 
-            const userData = {
-                name,
-                email,
-                phone,
-                planType,
-                vehicles,
-                subscriptionStatus: "active",
-                registrationDate: firebase.firestore.Timestamp.now()
-            };
-
-            const usersRef = db.collection("users");
-
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then(userCredential => {
-                    const newUser = userCredential.user;
-                    userData.uid = newUser.uid;
-                    return usersRef.doc(email).set(userData);
-                })
-                .then(() => {
-                    alert("Registro exitoso. Presiona OK para proceder al pago.");
-                    const paypalLink = getPaypalLink(planType);
-                    if (paypalLink) window.open(paypalLink, '_blank');
-                })
-                .catch(error => {
-                    console.error("Error:", error.message);
-                    alert("Hubo un error en el registro: " + error.message);
-                });
+        // Capture selected schedule details
+        const selectedBlock = document.querySelector(".schedule-table td.selected-box");
+        if (!selectedBlock) {
+            alert("Por favor, seleccione un bloque de horario.");
+            return;
         }
 
-        function getPaypalLink(planType) {
-            const links = {
-                "basic3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M",
-                "basic6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M",
-                "basic12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M",
-                "plus3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M",
-                "plus6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M",
-                "plus12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M",
-            };
-            return links[planType] || null;
+        const scheduleDay = selectedBlock.closest("tr").querySelector("td").textContent.trim();
+        const scheduleTime = selectedBlock.textContent.trim();
+
+        const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+            brand: vehicleSection.querySelector('.vehicleBrand').value,
+            model: vehicleSection.querySelector('.vehicleModel').value,
+            year: vehicleSection.querySelector('.vehicleYear').value,
+            plate: vehicleSection.querySelector('.vehiclePlate').value,
+        }));
+
+        if (!name || !email || !phone || !password) {
+            alert("Por favor, complete todos los campos.");
+            return;
         }
 
-        // Highlight selected schedule
-        function selectScheduleBox(cell) {
-            const cells = document.querySelectorAll(".schedule-table tbody td");
-            cells.forEach(c => c.classList.remove("selected-box"));
-            cell.classList.add("selected-box");
-        }
+        const userData = {
+            name,
+            email,
+            phone,
+            planType,
+            vehicles,
+            subscriptionStatus: "active",
+            schedule: {
+                day: scheduleDay,
+                time: scheduleTime
+            },
+            subscriptionDuration: planType.includes("3m") ? 3 : planType.includes("6m") ? 6 : 12,
+            registrationDate: firebase.firestore.Timestamp.now()
+        };
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const cells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
-            cells.forEach(cell => {
-                cell.addEventListener("click", () => selectScheduleBox(cell));
+        const usersRef = db.collection("users");
+
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                const newUser = userCredential.user;
+                userData.uid = newUser.uid;
+                return usersRef.doc(email).set(userData);
+            })
+            .then(() => {
+                alert("Registro exitoso. Presiona OK para proceder al pago.");
+                const paypalLink = getPaypalLink(planType);
+                if (paypalLink) window.open(paypalLink, '_blank');
+            })
+            .catch(error => {
+                console.error("Error:", error.message);
+                alert("Hubo un error en el registro: " + error.message);
             });
+    }
+
+    // Adjust vehicle fields dynamically based on plan type
+    function showRegistrationForm(planType) {
+        const registerSection = document.getElementById("register-section");
+        const vehicleSections = document.getElementById("vehicle-sections");
+
+        registerSection.style.display = "block";
+        scheduleSection.style.display = "block";
+
+        vehicleSections.innerHTML = '';
+        const vehicleCount = planType.startsWith("plus") ? 3 : 1;
+
+        for (let i = 1; i <= vehicleCount; i++) {
+            vehicleSections.insertAdjacentHTML('beforeend', `
+                <div class="vehicle-info">
+                    <h4>Información del Vehículo ${i}</h4>
+                    <label for="vehicleBrand${i}">Marca:</label>
+                    <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
+                    <label for="vehicleModel${i}">Modelo:</label>
+                    <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
+                    <label for="vehicleYear${i}">Año:</label>
+                    <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
+                    <label for="vehiclePlate${i}">Placa:</label>
+                    <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
+                </div>
+            `);
+        }
+
+        document.getElementById("planType").value = planType;
+
+        registerSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Get PayPal link for the selected plan
+    function getPaypalLink(planType) {
+        const links = {
+            "basic3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M",
+            "basic6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M",
+            "basic12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M",
+            "plus3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M",
+            "plus6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M",
+            "plus12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M",
+        };
+        return links[planType] || null;
+    }
+
+    // Highlight selected schedule box
+    function selectScheduleBox(cell) {
+        const cells = document.querySelectorAll(".schedule-table tbody td");
+        cells.forEach(c => c.classList.remove("selected-box"));
+        cell.classList.add("selected-box");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const cells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
+        cells.forEach(cell => {
+            cell.addEventListener("click", () => selectScheduleBox(cell));
         });
-    </script>
+    });
+</script>
+
+
+
+        
 </head>
 <body>
     <!-- Navigation -->
