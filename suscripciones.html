@@ -13,197 +13,149 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <script>
+        // Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "986704701191",
-            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
         };
 
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Show registration form and initialize vehicle fields
-        function showRegistrationForm(planType) {
+        document.addEventListener("DOMContentLoaded", function () {
             const registerSection = document.getElementById("register-section");
+            const scheduleSection = document.getElementById("schedule-section");
             const vehicleSections = document.getElementById("vehicle-sections");
 
-            registerSection.style.display = "block";
-            scheduleSection.style.display = "block";
+            // Hide sections initially
+            registerSection.style.display = "none";
+            scheduleSection.style.display = "none";
 
-            // Scroll to the form smoothly
-            registerSection.scrollIntoView({ behavior: "smooth" });
+            // Show registration and schedule sections when a subscription button is clicked
+            window.showRegistrationForm = function (planType) {
+                // Set the selected plan type
+                document.getElementById("planType").value = planType;
 
-            // Dynamically add vehicle fields based on the selected plan
-            vehicleSections.innerHTML = '';
-            const vehicleCount = planType.startsWith("plus") ? 3 : 1;
-            for (let i = 1; i <= vehicleCount; i++) {
-                vehicleSections.insertAdjacentHTML('beforeend', `
-                    <div class="vehicle-info">
-                        <h4>Información del Vehículo ${i}</h4>
-                        <label for="vehicleBrand${i}">Marca:</label>
-                        <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
-                        <label for="vehicleModel${i}">Modelo:</label>
-                        <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
-                        <label for="vehicleYear${i}">Año:</label>
-                        <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
-                        <label for="vehiclePlate${i}">Placa:</label>
-                        <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
-                    </div>
-                `);
+                // Adjust vehicle fields
+                vehicleSections.innerHTML = '';
+                const vehicleCount = planType.startsWith("plus") ? 3 : 1;
+                for (let i = 1; i <= vehicleCount; i++) {
+                    vehicleSections.insertAdjacentHTML('beforeend', `
+                        <div class="vehicle-info">
+                            <h4>Información del Vehículo ${i}</h4>
+                            <label for="vehicleBrand${i}">Marca:</label>
+                            <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
+                            <label for="vehicleModel${i}">Modelo:</label>
+                            <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
+                            <label for="vehicleYear${i}">Año:</label>
+                            <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
+                            <label for="vehiclePlate${i}">Placa:</label>
+                            <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
+                        </div>
+                    `);
+                }
+
+                // Show the sections
+                registerSection.style.display = "block";
+                scheduleSection.style.display = "block";
+
+                // Smooth scroll to the registration section
+                registerSection.scrollIntoView({ behavior: "smooth" });
+            };
+
+            // Highlight selected schedule box
+            window.selectScheduleBox = function (cell) {
+                const cells = document.querySelectorAll(".schedule-table tbody td");
+                cells.forEach((c) => c.classList.remove("selected-box"));
+                cell.classList.add("selected-box");
+            };
+
+            // Add CSS for selected box
+            const style = document.createElement("style");
+            style.innerHTML = `
+                .schedule-table tbody td.selected-box {
+                    background-color: #FF6600 !important;
+                    color: white !important;
+                    font-weight: bold;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        function registerAndPay(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const planType = document.getElementById("planType").value;
+            const password = document.getElementById("password").value;
+
+            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+                brand: vehicleSection.querySelector('.vehicleBrand').value,
+                model: vehicleSection.querySelector('.vehicleModel').value,
+                year: vehicleSection.querySelector('.vehicleYear').value,
+                plate: vehicleSection.querySelector('.vehiclePlate').value,
+            }));
+
+            if (!name || !email || !phone || !password) {
+                alert("Por favor, complete todos los campos.");
+                return;
             }
 
-            document.getElementById("planType").value = planType;
+            const selectedSchedule = document.querySelector(".schedule-table tbody td.selected-box");
+            if (!selectedSchedule) {
+                alert("Por favor, seleccione un horario.");
+                return;
+            }
+
+            const userData = {
+                name,
+                email,
+                phone,
+                planType,
+                vehicles,
+                selectedSchedule: selectedSchedule.textContent,
+                subscriptionStatus: "active",
+                registrationDate: firebase.firestore.Timestamp.now()
+            };
+
+            const usersRef = db.collection("users");
+
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const newUser = userCredential.user;
+                    userData.uid = newUser.uid;
+                    return usersRef.doc(email).set(userData);
+                })
+                .then(() => {
+                    alert("Registro exitoso. Presiona OK para proceder al pago.");
+                    const paypalLink = getPaypalLink(planType);
+                    if (paypalLink) window.open(paypalLink, '_blank');
+                })
+                .catch(error => {
+                    console.error("Error:", error.message);
+                    alert("Hubo un error en el registro: " + error.message);
+                });
         }
 
-
-   // Function to handle registration form and schedule table display
-function showRegistrationForm(planType) {
-    const registerSection = document.getElementById("register-section");
-    const scheduleSection = document.getElementById("schedule-section");
-    const vehicleSections = document.getElementById("vehicle-sections");
-
-    // Display both the registration form and the schedule table
-    registerSection.style.display = "block";
-    scheduleSection.style.display = "block";
-
-    // Set the selected plan type in the hidden field
-    document.getElementById("planType").value = planType;
-
-    // Clear and add vehicle fields dynamically
-    vehicleSections.innerHTML = "";
-    const vehicleCount = planType.startsWith("plus") ? 3 : 1;
-
-    for (let i = 1; i <= vehicleCount; i++) {
-        vehicleSections.insertAdjacentHTML("beforeend", `
-            <div class="vehicle-info">
-                <h4>Información del Vehículo ${i}</h4>
-                <label for="vehicleBrand${i}">Marca:</label>
-                <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
-                <label for="vehicleModel${i}">Modelo:</label>
-                <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
-                <label for="vehicleYear${i}">Año:</label>
-                <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
-                <label for="vehiclePlate${i}">Placa:</label>
-                <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
-            </div>
-        `);
-    }
-
-    // Smooth scroll to the registration section
-    registerSection.scrollIntoView({ behavior: "smooth" });
-}
-
-// Highlight selected schedule box
-function selectScheduleBox(cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the clicked cell
-    cell.classList.add("selected-box");
-}
-
-// Register the user and proceed with payment
-function registerAndPay(event) {
-    event.preventDefault();
-
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const phone = document.getElementById("phone").value;
-    const password = document.getElementById("password").value;
-    const planType = document.getElementById("planType").value;
-
-    const selectedCell = document.querySelector(".schedule-table td.selected-box");
-    if (!selectedCell) {
-        alert("Por favor, seleccione un bloque de horario.");
-        return;
-    }
-
-    const scheduleDay = selectedCell.closest("tr").querySelector("td").textContent.trim();
-    const scheduleTime = selectedCell.textContent.trim();
-
-    const vehicles = Array.from(document.querySelectorAll(".vehicle-info")).map(vehicleSection => ({
-        brand: vehicleSection.querySelector(".vehicleBrand").value,
-        model: vehicleSection.querySelector(".vehicleModel").value,
-        year: vehicleSection.querySelector(".vehicleYear").value,
-        plate: vehicleSection.querySelector(".vehiclePlate").value,
-    }));
-
-    if (!name || !email || !phone || !password) {
-        alert("Por favor, complete todos los campos.");
-        return;
-    }
-
-    const userData = {
-        name,
-        email,
-        phone,
-        planType,
-        vehicles,
-        subscriptionStatus: "active",
-        schedule: { day: scheduleDay, time: scheduleTime },
-        subscriptionDuration: planType.includes("3m") ? 3 : planType.includes("6m") ? 6 : 12,
-        registrationDate: firebase.firestore.Timestamp.now(),
-    };
-
-    const usersRef = db.collection("users");
-
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            const newUser = userCredential.user;
-            userData.uid = newUser.uid;
-            return usersRef.doc(email).set(userData);
-        })
-        .then(() => {
-            alert("Registro exitoso. Presiona OK para proceder al pago.");
-            const paypalLink = getPaypalLink(planType);
-            if (paypalLink) window.open(paypalLink, "_blank");
-        })
-        .catch(error => {
-            console.error("Error:", error.message);
-            alert("Hubo un error en el registro: " + error.message);
-        });
-}
-
-// Retrieve the PayPal link based on plan type
-function getPaypalLink(planType) {
-    const links = {
-        "basic3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M",
-        "basic6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M",
-        "basic12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M",
-        "plus3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M",
-        "plus6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M",
-        "plus12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M",
-    };
-    return links[planType] || null;
-}
-
-// Add event listeners for schedule selection
-document.addEventListener("DOMContentLoaded", () => {
-    const cells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
-    cells.forEach(cell => {
-        cell.addEventListener("click", () => selectScheduleBox(cell));
-    });
-
-    // Add style for selected schedule box
-    const style = document.createElement("style");
-    style.innerHTML = `
-        .schedule-table tbody td.selected-box {
-            background-color: #FF6600 !important;
-            color: white !important;
-            font-weight: bold;
+        function getPaypalLink(planType) {
+            switch (planType) {
+                case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_3M";
+                case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_6M";
+                case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_BASIC_12M";
+                case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_3M";
+                case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_6M";
+                case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ID_PLUS_12M";
+                default: alert("Plan inválido."); return null;
+            }
         }
-    `;
-    document.head.appendChild(style);
-});
     </script>
-    
-
-        
 </head>
 <body>
     <!-- Navigation -->
@@ -220,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     </nav>
 
-    <!-- Header -->
+<!-- Header -->
     <header>
         <div class="header-container">
             <div class="header-text">
@@ -230,8 +182,11 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     </header>
 
+    
     <!-- Subscription Plans -->
-<h2>Planes de Suscripciones Básicas</h2>
+    <section>
+        <h2>Planes de Suscripciones</h2>
+ nes de Suscripciones Básicas</h2>
         <div class="subscription-row">
             <div class="plan-item">
                 <div class="plan-option">
@@ -242,7 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li><strong>Beneficio:</strong> Prueba rápida y flexible para evaluar el servicio sin un compromiso a largo plazo.</li>
                         <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
+                    <button onclick="showRegistrationForm('basic3m')">Suscribirse - Plan Básico 3 meses</button>
+
                    </div>
             </div>
             <div class="plan-item">
@@ -255,7 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li><strong>Ideal para:</strong> Clientes que buscan un servicio a mediano plazo con equilibrio entre compromiso y flexibilidad.</li>
                         <li><strong>Descuento: </strong> 10% de descuento en comparación con el plan básico de 3 meses.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
+                    <button onclick="showRegistrationForm('basic6m')">Suscribirse - Plan Básico 6 meses</button>
                 </div>
             </div>
             <div class="plan-item highlight">
@@ -270,7 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li><strong>Descuento: </strong> 25% de descuento en comparación con el plan básico de 3 meses.</li>
                         <li><strong>Descuento: </strong> 15% de descuento en comparación con el plan básico de 6 meses.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('basic')">Suscribirse - Plan Básico</button>
+                     <button onclick="showRegistrationForm('basic12m')">Suscribirse - Plan Básico 12 meses</button>
                 </div>
             </div>
         </div>
@@ -288,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li><strong>Descuento: </strong> 37% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         <li><strong>Descuento: </strong> 27% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
                 </div>
             </div>
             <div class="plan-item">
@@ -302,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+                    <button onclick="showRegistrationForm('plus6m')">Suscribirse - Plan Plus 6 meses</button>
                 </div>
             </div>
             <div class="plan-item highlight">
@@ -317,16 +273,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li><strong>Descuento: </strong> 53% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
                     </ul>
-                    <button onclick="showRegistrationForm('plus')">Suscribirse - Plan Plus</button>
+                    <button onclick="showRegistrationForm('plus12m')">Suscribirse - Plan Plus 12 meses</button>
                 </div>
             </div>
         </div>
     </section>
-   
 
-<!-- Schedule Section -->
+        
+       
+    <!-- Schedule Section -->
     <section id="schedule-section" class="schedule-section">
-        <h2>Selecciona tu Horario de preferencia para que ejecutemos la inspección en el bloque seleccionado que se encuentre disponible y más próximo</h2>
+        <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
             <thead>
                 <tr>
@@ -366,9 +323,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </tbody>
         </table>
     </section>
-    
+
     <!-- Registration Form -->
-    <section id="register-section" class="register-section" style="display: none;">
+    <section id="register-section" class="register-section">
         <h2>Regístrate y Elige Tu Plan</h2>
         <form id="registerForm" onsubmit="registerAndPay(event)">
             <label for="name">Nombre:</label>
@@ -386,7 +343,6 @@ document.addEventListener("DOMContentLoaded", () => {
     </section>
 
     <!-- Footer -->
-     <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
         <ul>
