@@ -896,6 +896,14 @@ html {
 }
 
 
+.schedule-table tbody td.selected-box {
+    background-color: #FF6600;
+    color: white;
+    font-weight: bold;
+}
+
+
+
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
     .benefits-container, .reasons-container {
