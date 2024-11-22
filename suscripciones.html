@@ -13,16 +13,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <script>
-        // Firebase configuration
         const firebaseConfig = {
-    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-    authDomain: "auto-cuidadoclub.firebaseapp.com",
-    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-    projectId: "auto-cuidadoclub",
-    storageBucket: "auto-cuidadoclub.appspot.com",
-    messagingSenderId: "986704701191",
-    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-    measurementId: "G-LBBGXV2YX5"
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
         };
 
         // Initialize Firebase
@@ -30,168 +29,55 @@
         const db = firebase.firestore();
 
         document.addEventListener("DOMContentLoaded", function () {
-            const registerSection = document.getElementById("register-section");
-            const scheduleSection = document.getElementById("schedule-section");
-            const vehicleSections = document.getElementById("vehicle-sections");
+            window.registerAndPay = async function (planType) {
+                try {
+                    const userInput = getUserInput();
+                    validateInput(userInput);
 
-            // Hide sections initially
-            registerSection.style.display = "none";
-            scheduleSection.style.display = "none";
+                    const { email, password, planType } = userInput;
+                    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
 
-            // Show registration and schedule sections when a subscription button is clicked
-            window.showRegistrationForm = function (planType) {
-                // Set the selected plan type
-                document.getElementById("planType").value = planType;
+                    const userData = { ...userInput, uid: userCredential.user.uid, subscriptionStatus: "active" };
+                    await db.collection("users").doc(email).set(userData);
 
-                // Adjust vehicle fields
-                vehicleSections.innerHTML = '';
-                const vehicleCount = planType.startsWith("plus") ? 3 : 1;
-                for (let i = 1; i <= vehicleCount; i++) {
-                    vehicleSections.insertAdjacentHTML('beforeend', `
-                        <div class="vehicle-info">
-                            <h4>Información del Vehículo ${i}</h4>
-                            <label for="vehicleBrand${i}">Marca:</label>
-                            <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
-                            <label for="vehicleModel${i}">Modelo:</label>
-                            <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
-                            <label for="vehicleYear${i}">Año:</label>
-                            <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
-                            <label for="vehiclePlate${i}">Placa:</label>
-                            <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
-                        </div>
-                    `);
+                    const paypalLink = getPaypalLink(planType);
+                    if (paypalLink) window.open(paypalLink, '_blank');
+                } catch (error) {
+                    alert("Error: " + error.message);
                 }
-
-                // Show the sections
-                registerSection.style.display = "block";
-                scheduleSection.style.display = "block";
-
-                // Smooth scroll to the registration section
-                registerSection.scrollIntoView({ behavior: "smooth" });
             };
 
-         
-// Highlight selected schedule box and capture day and time block
-window.selectScheduleBox = function (cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-
-    // Clear any previously selected boxes
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the currently selected cell
-    cell.classList.add("selected-box");
-
-    // Get the time block from the selected cell
-    const timeBlock = cell.innerText.trim();
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow invalid selection
-    }
-
-    // Get the day from the column header
-    const dayIndex = cell.cellIndex; // Get column index
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText : "Unknown";
-
-    // Store the final selection in the hidden input
-    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
-};
-
-
-    // Update the hidden input with selected schedules
-    const scheduleSummary = window.selectedBlocks
-        .map((block) => {
-            const dayIndex = block.cellIndex;
-            const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-            const day = dayHeader ? dayHeader.innerText : "Unknown";
-            return `${day} - ${block.innerText.trim()}`;
-        })
-        .join(", ");
-
-    document.getElementById("selectedSchedule").value = scheduleSummary;
-};
-
-
-
-
-            // Add CSS for selected box
-            const style = document.createElement("style");
-            style.innerHTML = `
-                .schedule-table tbody td.selected-box {
-                    background-color: #FF6600 !important;
-                    color: white !important;
-                    font-weight: bold;
-                }
-            `;
-            document.head.appendChild(style);
-        });
-
-        function registerAndPay(event) {
-    event.preventDefault();
-
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const phone = document.getElementById("phone").value;
-    const planType = document.getElementById("planType").value;
-    const password = document.getElementById("password").value;
-    const selectedSchedule = document.getElementById("selectedSchedule").value; // Get the final selected schedule
-
-    const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
-        brand: vehicleSection.querySelector('.vehicleBrand').value,
-        model: vehicleSection.querySelector('.vehicleModel').value,
-        year: vehicleSection.querySelector('.vehicleYear').value,
-        plate: vehicleSection.querySelector('.vehiclePlate').value,
-    }));
-
-    if (!name || !email || !phone || !password || !selectedSchedule) {
-        alert("Por favor, complete todos los campos y seleccione un horario.");
-        return;
-    }
-
-    const userData = {
-        name,
-        email,
-        phone,
-        planType,
-        vehicles,
-        selectedSchedule, // Add the selected schedule directly here
-        subscriptionStatus: "active",
-        registrationDate: firebase.firestore.Timestamp.now()
-    };
-
-    const usersRef = db.collection("users");
-
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            const newUser = userCredential.user;
-            userData.uid = newUser.uid;
-            return usersRef.doc(email).set(userData);
-        })
-        .then(() => {
-            alert("Registro exitoso. Presiona OK para proceder al pago.");
-            const paypalLink = getPaypalLink(planType);
-            if (paypalLink) window.open(paypalLink, '_blank');
-        })
-        .catch(error => {
-            console.error("Error:", error.message);
-            alert("Hubo un error en el registro: " + error.message);
-        });
-}
-
-
-        function getPaypalLink(planType) {
-            switch (planType) {
-                case "basic3m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
-                case "basic6m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
-                case "basic12m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
-                case "plus3m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
-                case "plus6m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
-                case "plus12m": return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
-                default: alert("Plan inválido."); return null;
+            function getPaypalLink(planType) {
+                const links = {
+                    basic3m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
+                    basic6m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A",
+                    basic12m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ",
+                    plus3m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS",
+                    plus6m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56",
+                    plus12m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN",
+                };
+                return links[planType] || null;
             }
-        }
+
+            function getUserInput() {
+                return {
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    phone: document.getElementById("phone").value,
+                    password: document.getElementById("password").value,
+                    planType: document.getElementById("planType").value,
+                };
+            }
+
+            function validateInput(input) {
+                for (const [key, value] of Object.entries(input)) {
+                    if (!value) throw new Error(`Por favor, complete el campo: ${key}`);
+                }
+            }
+        });
     </script>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar">
