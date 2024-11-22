@@ -47,6 +47,62 @@
                 }
             };
 
+window.selectScheduleBox = function (cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    
+    // Remove selection from all cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the clicked cell
+    cell.classList.add("selected-box");
+
+    // Validate and save the selected schedule
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return;
+    }
+
+    const dayIndex = cell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText : "Unknown";
+
+    // Store in the hidden input field
+    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+};
+
+            
+            
+// Adjust vehicle fields based on the plan type
+window.showRegistrationForm = function (planType) {
+    const vehicleSections = document.getElementById("vehicle-sections");
+    const registerSection = document.getElementById("register-section");
+    const scheduleSection = document.getElementById("schedule-section");
+
+    vehicleSections.innerHTML = ''; // Clear previous vehicle fields
+    const vehicleCount = planType.startsWith("plus") ? 3 : 1;
+    for (let i = 1; i <= vehicleCount; i++) {
+        vehicleSections.insertAdjacentHTML('beforeend', `
+            <div class="vehicle-info">
+                <h4>Información del Vehículo ${i}</h4>
+                <label for="vehicleBrand${i}">Marca:</label>
+                <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
+                <label for="vehicleModel${i}">Modelo:</label>
+                <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
+                <label for="vehicleYear${i}">Año:</label>
+                <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
+                <label for="vehiclePlate${i}">Placa:</label>
+                <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
+            </div>
+        `);
+    }
+
+    document.getElementById("planType").value = planType; // Set the plan type
+    registerSection.style.display = "block"; // Show the registration section
+    scheduleSection.style.display = "block"; // Show the schedule section
+    registerSection.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to the form
+};
+
             function getPaypalLink(planType) {
                 const links = {
                     basic3m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
@@ -75,6 +131,58 @@
                 }
             }
         });
+
+        function registerAndPay(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const planType = document.getElementById("planType").value;
+    const password = document.getElementById("password").value;
+    const selectedSchedule = document.getElementById("selectedSchedule").value;
+
+    const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+        brand: vehicleSection.querySelector('.vehicleBrand').value,
+        model: vehicleSection.querySelector('.vehicleModel').value,
+        year: vehicleSection.querySelector('.vehicleYear').value,
+        plate: vehicleSection.querySelector('.vehiclePlate').value,
+    }));
+
+    if (!name || !email || !phone || !password || !selectedSchedule) {
+        alert("Por favor, complete todos los campos y seleccione un horario.");
+        return;
+    }
+
+    const userData = {
+        name,
+        email,
+        phone,
+        planType,
+        vehicles,
+        selectedSchedule,
+        subscriptionStatus: "active",
+        registrationDate: firebase.firestore.Timestamp.now()
+    };
+
+    const usersRef = db.collection("users");
+
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            userData.uid = userCredential.user.uid;
+            return usersRef.doc(email).set(userData);
+        })
+        .then(() => {
+            alert("Registro exitoso. Presiona OK para proceder al pago.");
+            const paypalLink = getPaypalLink(planType);
+            if (paypalLink) window.open(paypalLink, '_blank');
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            alert("Hubo un error en el registro: " + error.message);
+        });
+}
+
     </script>
 </head>
 
