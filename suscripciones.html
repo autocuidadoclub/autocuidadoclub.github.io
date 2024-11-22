@@ -131,26 +131,68 @@ window.showRegistrationForm = function (planType) {
             }
         });
 
-        function registerAndPay(event) {
+       function registerAndPay(event) {
     event.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const phone = document.getElementById("phone").value;
+    // Clear previous error messages
+    clearErrorMessages();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
     const planType = document.getElementById("planType").value;
-    const password = document.getElementById("password").value;
+    const password = document.getElementById("password").value.trim();
     const selectedSchedule = document.getElementById("selectedSchedule").value;
 
     const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
-        brand: vehicleSection.querySelector('.vehicleBrand').value,
-        model: vehicleSection.querySelector('.vehicleModel').value,
-        year: vehicleSection.querySelector('.vehicleYear').value,
-        plate: vehicleSection.querySelector('.vehiclePlate').value,
+        brand: vehicleSection.querySelector('.vehicleBrand').value.trim(),
+        model: vehicleSection.querySelector('.vehicleModel').value.trim(),
+        year: vehicleSection.querySelector('.vehicleYear').value.trim(),
+        plate: vehicleSection.querySelector('.vehiclePlate').value.trim(),
     }));
 
-    if (!name || !email || !phone || !password || !selectedSchedule) {
-        alert("Por favor, complete todos los campos y seleccione un horario.");
-        return;
+    let isValid = true;
+
+    // Validation for name
+    if (!name) {
+        showError("name", "Por favor, ingrese su nombre.");
+        isValid = false;
+    }
+
+    // Validation for email
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+        showError("email", "Por favor, ingrese un correo electrónico válido.");
+        isValid = false;
+    }
+
+    // Validation for phone (must be numeric and exactly 8 digits)
+    if (!phone || !/^\d{8}$/.test(phone)) {
+        showError("phone", "Por favor, ingrese un número de teléfono válido de 8 dígitos.");
+        isValid = false;
+    }
+
+    // Validation for password (minimum 6 characters)
+    if (!password || password.length < 6) {
+        showError("password", "La contraseña debe tener al menos 6 caracteres.");
+        isValid = false;
+    }
+
+    // Validation for selected schedule
+    if (!selectedSchedule) {
+        alert("Por favor, seleccione un horario.");
+        isValid = false;
+    }
+
+    // Validation for vehicles
+    vehicles.forEach((vehicle, index) => {
+        if (!vehicle.brand || !vehicle.model || !vehicle.year || !vehicle.plate) {
+            showError("vehicle-sections", `Por favor, complete todos los campos del vehículo ${index + 1}.`);
+            isValid = false;
+        }
+    });
+
+    if (!isValid) {
+        return; // Stop execution if validation fails
     }
 
     const userData = {
@@ -161,7 +203,7 @@ window.showRegistrationForm = function (planType) {
         vehicles,
         selectedSchedule,
         subscriptionStatus: "active",
-        registrationDate: firebase.firestore.Timestamp.now()
+        registrationDate: firebase.firestore.Timestamp.now(),
     };
 
     const usersRef = db.collection("users");
@@ -180,6 +222,23 @@ window.showRegistrationForm = function (planType) {
             console.error("Error:", error.message);
             alert("Hubo un error en el registro: " + error.message);
         });
+}
+
+// Function to show error messages
+function showError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorContainer = document.createElement("div");
+    errorContainer.className = "error-message";
+    errorContainer.style.color = "red";
+    errorContainer.style.marginTop = "5px";
+    errorContainer.innerText = message;
+    field.parentNode.appendChild(errorContainer);
+}
+
+// Function to clear previous error messages
+function clearErrorMessages() {
+    const errorMessages = document.querySelectorAll(".error-message");
+    errorMessages.forEach(errorMessage => errorMessage.remove());
 }
 
     </script>
