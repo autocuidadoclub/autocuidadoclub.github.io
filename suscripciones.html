@@ -27,6 +27,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        firebase.firestore.setLogLevel("debug");
+        
         document.addEventListener("DOMContentLoaded", function () {
             window.registerAndPay = async function (planType) {
                 try {
@@ -211,7 +213,8 @@ window.showRegistrationForm = function (planType) {
     firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
             userData.uid = userCredential.user.uid;
-            return usersRef.doc(email).set(userData);
+            return db.collection("users").doc(userData.uid).set(userData);
+
         })
         .then(() => {
             alert("Registro exitoso. Presiona OK para proceder al pago.");
@@ -492,7 +495,8 @@ function clearErrorMessages() {
         const db = firebase.firestore();
 
         function startPaymentListener(email) {
-            const userRef = db.collection("users").doc(email);
+            const userRef = db.collection("users").doc(userData.uid);
+
 
             // Listen for changes in payment status
             userRef.onSnapshot((doc) => {
@@ -543,17 +547,19 @@ function clearErrorMessages() {
                     paymentStatus: "pending", // Await payment confirmation
                     registrationDate: firebase.firestore.Timestamp.now(),
                 };
-                await db.collection("users").doc(email).set(userData);
+                await db.collection("users").doc(userData.uid).set(userData);
+
 
                 const paypalLink = getPaypalLink(planType);
                 if (paypalLink) {
                     window.open(paypalLink, '_blank');
                     startPaymentListener(email); // Start listening for payment updates
                 }
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        };
+            } .catch(error => {
+    console.error("Error during Firebase operation:", error);
+    alert("Hubo un error en el registro: " + error.message);
+});
+
 
         function getPaypalLink(planType) {
             const links = {
