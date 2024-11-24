@@ -7,270 +7,107 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- Firebase Compatibility SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <!-- Firebase Modular SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-    <script>
+        // Firebase configuration
         const firebaseConfig = {
-    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-    authDomain: "auto-cuidadoclub.firebaseapp.com",
-    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-    projectId: "auto-cuidadoclub",
-    storageBucket: "auto-cuidadoclub.appspot.com",
-    messagingSenderId: "986704701191",
-    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-    measurementId: "G-LBBGXV2YX5"
-  };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        firebase.firestore.setLogLevel("debug");
-        
-        document.addEventListener("DOMContentLoaded", function () {
-
-            window.registerAndPay = async function (planType) {
-    try {
-        const userInput = getUserInput();
-        validateInput(userInput);
-
-        const { email, password } = userInput;
-
-        // Create user in Firebase Auth
-        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-
-        const userData = {
-            ...userInput,
-            uid: userCredential.user.uid,
-            subscriptionStatus: "pending", // Default to pending
-            paymentStatus: "pending", // Await payment confirmation
-            registrationDate: firebase.firestore.Timestamp.now(),
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5",
         };
 
-        // Save user data to Firestore
-        await db.collection("users").doc(email).set(userData)
-            .then(() => {
-                console.log("User data successfully written to Firestore:", userData);
-            })
-            .catch((error) => {
-                console.error("Error writing document to Firestore:", error);
-                alert("Failed to save user information. Please try again.");
-            });
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        // Proceed to payment
-        alert("Registro exitoso. Presiona OK para proceder al pago.");
-        const paypalLink = getPaypalLink(planType);
-        if (paypalLink) {
-            window.open(paypalLink, "_blank");
+        // Helper functions
+        function getUserInput() {
+            return {
+                name: document.getElementById("name").value.trim(),
+                email: document.getElementById("email").value.trim().toLowerCase(), // Store email in lowercase
+                phone: document.getElementById("phone").value.trim(),
+                password: document.getElementById("password").value.trim(),
+                planType: document.getElementById("planType").value,
+                selectedSchedule: document.getElementById("selectedSchedule").value,
+            };
         }
-    } catch (error) {
-        console.error("Error during registration process:", error);
-        alert("Hubo un error en el registro: " + error.message);
-    }
-};
 
-;
-
-window.selectScheduleBox = function (cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-    
-    // Remove selection from all cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the clicked cell
-    cell.classList.add("selected-box");
-
-    // Validate and save the selected schedule
-    const timeBlock = cell.innerText.trim();
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return;
-    }
-
-    const dayIndex = cell.cellIndex;
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText : "Unknown";
-
-    // Store in the hidden input field
-    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
-};
-
-            
-            
-// Adjust vehicle fields based on the plan type
-window.showRegistrationForm = function (planType) {
-    const vehicleSections = document.getElementById("vehicle-sections");
-    const registerSection = document.getElementById("register-section");
-    const scheduleSection = document.getElementById("schedule-section");
-
-    vehicleSections.innerHTML = ''; // Clear previous vehicle fields
-    const vehicleCount = planType.startsWith("plus") ? 3 : 1;
-    for (let i = 1; i <= vehicleCount; i++) {
-        vehicleSections.insertAdjacentHTML('beforeend', `
-            <div class="vehicle-info">
-                <h4>Información del Vehículo ${i}</h4>
-                <label for="vehicleBrand${i}">Marca:</label>
-                <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
-                <label for="vehicleModel${i}">Modelo:</label>
-                <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
-                <label for="vehicleYear${i}">Año:</label>
-                <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
-                <label for="vehiclePlate${i}">Placa:</label>
-                <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
-            </div>
-        `);
-    }
-
-    document.getElementById("planType").value = planType; // Set the plan type
-    registerSection.style.display = "block"; // Show the registration section
-    scheduleSection.style.display = "block"; // Show the schedule section
-    registerSection.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to the form
-};
-
-            function getPaypalLink(planType) {
-                const links = {
-                    basic3m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
-                    basic6m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A",
-                    basic12m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ",
-                    plus3m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS",
-                    plus6m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56",
-                    plus12m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN",
-                };
-                return links[planType] || null;
-            }
-
-            function getUserInput() {
-                return {
-                    name: document.getElementById("name").value,
-                    email: document.getElementById("email").value,
-                    phone: document.getElementById("phone").value,
-                    password: document.getElementById("password").value,
-                    planType: document.getElementById("planType").value,
-                };
-            }
-
-            function validateInput(input) {
-                for (const [key, value] of Object.entries(input)) {
-                    if (!value) throw new Error(`Por favor, complete el campo: ${key}`);
+        function validateInput(input) {
+            for (const [key, value] of Object.entries(input)) {
+                if (!value) {
+                    throw new Error(`Por favor, complete el campo: ${key}`);
                 }
             }
-        });
-
-       function registerAndPay(event) {
-    event.preventDefault();
-
-    // Clear previous error messages
-    clearErrorMessages();
-
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const planType = document.getElementById("planType").value;
-    const password = document.getElementById("password").value.trim();
-    const selectedSchedule = document.getElementById("selectedSchedule").value;
-
-    const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
-        brand: vehicleSection.querySelector('.vehicleBrand').value.trim(),
-        model: vehicleSection.querySelector('.vehicleModel').value.trim(),
-        year: vehicleSection.querySelector('.vehicleYear').value.trim(),
-        plate: vehicleSection.querySelector('.vehiclePlate').value.trim(),
-    }));
-
-    let isValid = true;
-
-    // Validation for name
-    if (!name) {
-        showError("name", "Por favor, ingrese su nombre.");
-        isValid = false;
-    }
-
-    // Validation for email
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-        showError("email", "Por favor, ingrese un correo electrónico válido.");
-        isValid = false;
-    }
-
-    // Validation for phone (must be numeric and exactly 8 digits)
-    if (!phone || !/^\d{8}$/.test(phone)) {
-        showError("phone", "Por favor, ingrese un número de teléfono válido de 8 dígitos.");
-        isValid = false;
-    }
-
-    // Validation for password (minimum 6 characters)
-    if (!password || password.length < 6) {
-        showError("password", "La contraseña debe tener al menos 6 caracteres.");
-        isValid = false;
-    }
-
-    // Validation for selected schedule
-    if (!selectedSchedule) {
-        alert("Por favor, seleccione un horario.");
-        isValid = false;
-    }
-
-    // Validation for vehicles
-    vehicles.forEach((vehicle, index) => {
-        if (!vehicle.brand || !vehicle.model || !vehicle.year || !vehicle.plate) {
-            showError("vehicle-sections", `Por favor, complete todos los campos del vehículo ${index + 1}.`);
-            isValid = false;
         }
-    });
 
-    if (!isValid) {
-        return; // Stop execution if validation fails
-    }
+        function getPaypalLink(planType) {
+            const links = {
+                basic3m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
+                basic6m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A",
+                basic12m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ",
+                plus3m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS",
+                plus6m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56",
+                plus12m: "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN",
+            };
+            return links[planType] || null;
+        }
 
-    const userData = {
-        name,
-        email,
-        phone,
-        planType,
-        vehicles,
-        selectedSchedule,
-        subscriptionStatus: "active",
-        registrationDate: firebase.firestore.Timestamp.now(),
-    };
+        // Main function to register and pay
+        async function registerAndPay(event) {
+            event.preventDefault();
+            try {
+                const userInput = getUserInput();
+                validateInput(userInput);
 
-    const usersRef = db.collection("users");
+                const { email, password, planType } = userInput;
 
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            userData.uid = userCredential.user.uid;
-            return db.collection("users").doc(userData.uid).set(userData);
+                // Create user in Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-        })
-        .then(() => {
-            alert("Registro exitoso. Presiona OK para proceder al pago.");
-            const paypalLink = getPaypalLink(planType);
-            if (paypalLink) window.open(paypalLink, '_blank');
-        })
-        .catch(error => {
-            console.error("Error:", error.message);
-            alert("Hubo un error en el registro: " + error.message);
+                const userData = {
+                    ...userInput,
+                    uid: userCredential.user.uid,
+                    subscriptionStatus: "pending",
+                    paymentStatus: "pending",
+                    registrationDate: new Date(),
+                };
+
+                // Save user data to Firestore
+                await setDoc(doc(db, "users", email), userData);
+                console.log("User data successfully written to Firestore:", userData);
+
+                alert("Registro exitoso. Presiona OK para proceder al pago.");
+
+                const paypalLink = getPaypalLink(planType);
+                if (paypalLink) {
+                    window.open(paypalLink, "_blank");
+                }
+            } catch (error) {
+                console.error("Error during registration process:", error);
+                alert("Hubo un error en el registro: " + error.message);
+            }
+        }
+
+        // Event listener to attach the function to the form
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("registerForm");
+            if (form) {
+                form.addEventListener("submit", registerAndPay);
+            }
         });
-}
-
-// Function to show error messages
-function showError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    const errorContainer = document.createElement("div");
-    errorContainer.className = "error-message";
-    errorContainer.style.color = "red";
-    errorContainer.style.marginTop = "5px";
-    errorContainer.innerText = message;
-    field.parentNode.appendChild(errorContainer);
-}
-
-// Function to clear previous error messages
-function clearErrorMessages() {
-    const errorMessages = document.querySelectorAll(".error-message");
-    errorMessages.forEach(errorMessage => errorMessage.remove());
-}
-
     </script>
 </head>
+
 
 <body>
     <!-- Navigation -->
