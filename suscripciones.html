@@ -29,6 +29,63 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Schedule Selection Function
+        function selectScheduleBox(cell) {
+            const cells = document.querySelectorAll(".schedule-table tbody td");
+
+            // Remove selection from all cells
+            cells.forEach((c) => c.classList.remove("selected-box"));
+
+            // Highlight the clicked cell
+            cell.classList.add("selected-box");
+
+            // Validate and save the selected schedule
+            const timeBlock = cell.innerText.trim();
+            if (timeBlock === "-" || timeBlock === "") {
+                alert("Por favor, seleccione un horario válido.");
+                return;
+            }
+
+            const dayIndex = cell.cellIndex;
+            const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+            const day = dayHeader ? dayHeader.innerText : "Desconocido";
+
+            // Store in the hidden input field
+            document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+        }
+
+        // Helper Functions
+        function getUserInput() {
+            return {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                password: document.getElementById("password").value,
+                planType: document.getElementById("planType").value,
+                selectedSchedule: document.getElementById("selectedSchedule").value,
+            };
+        }
+
+        function validateInput(input) {
+            for (const [key, value] of Object.entries(input)) {
+                if (!value) throw new Error(`Por favor, complete el campo: ${key}`);
+            }
+        }
+
+        function getPaypalLink(planType) {
+            const links = {
+                basic3m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
+                basic6m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A",
+                basic12m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ",
+                plus3m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS",
+                plus6m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56",
+                plus12m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN",
+            };
+            return links[planType] || null;
+        }
+    </script>
+
+        
         // Register and Pay Function
         async function registerAndPay(planType) {
             try {
@@ -120,63 +177,6 @@
         }
     }
 </script>
-
-
-        // Schedule Selection Function
-        function selectScheduleBox(cell) {
-            const cells = document.querySelectorAll(".schedule-table tbody td");
-
-            // Remove selection from all cells
-            cells.forEach((c) => c.classList.remove("selected-box"));
-
-            // Highlight the clicked cell
-            cell.classList.add("selected-box");
-
-            // Validate and save the selected schedule
-            const timeBlock = cell.innerText.trim();
-            if (timeBlock === "-" || timeBlock === "") {
-                alert("Por favor, seleccione un horario válido.");
-                return;
-            }
-
-            const dayIndex = cell.cellIndex;
-            const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-            const day = dayHeader ? dayHeader.innerText : "Desconocido";
-
-            // Store in the hidden input field
-            document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
-        }
-
-        // Helper Functions
-        function getUserInput() {
-            return {
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                phone: document.getElementById("phone").value,
-                password: document.getElementById("password").value,
-                planType: document.getElementById("planType").value,
-                selectedSchedule: document.getElementById("selectedSchedule").value,
-            };
-        }
-
-        function validateInput(input) {
-            for (const [key, value] of Object.entries(input)) {
-                if (!value) throw new Error(`Por favor, complete el campo: ${key}`);
-            }
-        }
-
-        function getPaypalLink(planType) {
-            const links = {
-                basic3m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
-                basic6m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A",
-                basic12m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ",
-                plus3m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS",
-                plus6m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56",
-                plus12m: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN",
-            };
-            return links[planType] || null;
-        }
-    </script>
 
      <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.4.1/dist/email.min.js"></script>
