@@ -30,23 +30,48 @@
         firebase.firestore.setLogLevel("debug");
         
         document.addEventListener("DOMContentLoaded", function () {
+
             window.registerAndPay = async function (planType) {
-                try {
-                    const userInput = getUserInput();
-                    validateInput(userInput);
+    try {
+        const userInput = getUserInput();
+        validateInput(userInput);
 
-                    const { email, password, planType } = userInput;
-                    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+        const { email, password } = userInput;
 
-                    const userData = { ...userInput, uid: userCredential.user.uid, subscriptionStatus: "active" };
-                    await db.collection("users").doc(email).set(userData);
+        // Create user in Firebase Auth
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
 
-                    const paypalLink = getPaypalLink(planType);
-                    if (paypalLink) window.open(paypalLink, '_blank');
-                } catch (error) {
-                    alert("Error: " + error.message);
-                }
-            };
+        const userData = {
+            ...userInput,
+            uid: userCredential.user.uid,
+            subscriptionStatus: "pending", // Default to pending
+            paymentStatus: "pending", // Await payment confirmation
+            registrationDate: firebase.firestore.Timestamp.now(),
+        };
+
+        // Save user data to Firestore
+        await db.collection("users").doc(email).set(userData)
+            .then(() => {
+                console.log("User data successfully written to Firestore:", userData);
+            })
+            .catch((error) => {
+                console.error("Error writing document to Firestore:", error);
+                alert("Failed to save user information. Please try again.");
+            });
+
+        // Proceed to payment
+        alert("Registro exitoso. Presiona OK para proceder al pago.");
+        const paypalLink = getPaypalLink(planType);
+        if (paypalLink) {
+            window.open(paypalLink, "_blank");
+        }
+    } catch (error) {
+        console.error("Error during registration process:", error);
+        alert("Hubo un error en el registro: " + error.message);
+    }
+};
+
+;
 
 window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
