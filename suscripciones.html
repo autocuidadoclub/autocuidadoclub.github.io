@@ -12,22 +12,30 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
     <script>
         // Firebase configuration
         const firebaseConfig = {
-    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-    authDomain: "auto-cuidadoclub.firebaseapp.com",
-    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-    projectId: "auto-cuidadoclub",
-    storageBucket: "auto-cuidadoclub.appspot.com",
-    messagingSenderId: "986704701191",
-    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-    measurementId: "G-LBBGXV2YX5"
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // Initialize EmailJS
+        (function () {
+            emailjs.init("your_emailjs_user_id"); // Replace with your EmailJS user ID
+        })();
 
         document.addEventListener("DOMContentLoaded", function () {
             const registerSection = document.getElementById("register-section");
@@ -69,46 +77,6 @@
                 // Smooth scroll to the registration section
                 registerSection.scrollIntoView({ behavior: "smooth" });
             };
-
-         
-// Highlight selected schedule box and capture day and time block
-window.selectScheduleBox = function (cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-    
-    // Check if the cell contains a valid time
-    const timeBlock = cell.innerText.trim();
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
-    }
-
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
-
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText : "Unknown";
-
-    // Store the selected day and time block in a hidden input field
-    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
-};
-
-
-
-            // Add CSS for selected box
-            const style = document.createElement("style");
-            style.innerHTML = `
-                .schedule-table tbody td.selected-box {
-                    background-color: #FF6600 !important;
-                    color: white !important;
-                    font-weight: bold;
-                }
-            `;
-            document.head.appendChild(style);
         });
 
         function registerAndPay(event) {
@@ -132,39 +100,54 @@ window.selectScheduleBox = function (cell) {
                 return;
             }
 
-            const selectedSchedule = document.querySelector(".schedule-table tbody td.selected-box");
-            if (!selectedSchedule) {
-                alert("Por favor, seleccione un horario.");
-                return;
-            }
-
             const userData = {
                 name,
                 email,
                 phone,
                 planType,
                 vehicles,
-                selectedSchedule: document.getElementById("selectedSchedule").value,
-                subscriptionStatus: "active",
+                subscriptionStatus: "pending",
                 registrationDate: firebase.firestore.Timestamp.now()
             };
-
-            const usersRef = db.collection("users");
 
             firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then(userCredential => {
                     const newUser = userCredential.user;
                     userData.uid = newUser.uid;
-                    return usersRef.doc(email).set(userData);
+                    return db.collection("users").doc(email).set(userData);
                 })
                 .then(() => {
-                    alert("Registro exitoso. Presiona OK para proceder al pago.");
+                    alert("Registro exitoso. Revisa tu correo para más detalles.");
+                    sendEmailToStaff(userData);
                     const paypalLink = getPaypalLink(planType);
                     if (paypalLink) window.open(paypalLink, '_blank');
                 })
                 .catch(error => {
                     console.error("Error:", error.message);
                     alert("Hubo un error en el registro: " + error.message);
+                });
+        }
+
+        function sendEmailToStaff(userData) {
+            const serviceID = "service_zwuz34v";
+            const templateID = "template_staff_notification";
+
+            const emailParams = {
+                staff_name: "AutoCuidado Staff",
+                user_name: userData.name,
+                user_email: userData.email,
+                user_phone: userData.phone,
+                plan_type: userData.planType,
+                vehicle_info: userData.vehicles.map(vehicle => `Marca: ${vehicle.brand}, Modelo: ${vehicle.model}, Año: ${vehicle.year}, Placa: ${vehicle.plate}`).join("\n"),
+                subscription_status: userData.subscriptionStatus,
+            };
+
+            emailjs.send(serviceID, templateID, emailParams)
+                .then(() => {
+                    console.log("Email sent to staff successfully.");
+                })
+                .catch((error) => {
+                    console.error("Error sending email to staff:", error);
                 });
         }
 
@@ -181,6 +164,7 @@ window.selectScheduleBox = function (cell) {
         }
     </script>
 </head>
+    
 <body>
     <!-- Navigation -->
     <nav class="navbar">
