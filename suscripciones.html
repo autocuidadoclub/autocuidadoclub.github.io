@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,20 +28,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // WhatsApp Notification Function
-        async function sendWhatsApp(phone, message) {
-            const url = "https://your-server-endpoint/send-whatsapp"; // Replace with your server endpoint
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, message }),
-            });
-
-            if (!response.ok) {
-                console.error("Failed to send WhatsApp message:", response.statusText);
-            }
-        }
 
         // Register and Pay Function
         async function registerAndPay(planType) {
@@ -69,9 +58,8 @@
                 // Save user data to Firestore
                 await setDoc(doc(db, "users", email), userData);
 
-                // Send WhatsApp to the customer
-                const whatsappMessage = `Hola ${userInput.name}, gracias por registrarte en AutoCuidado Club. Plan: ${userInput.planType}, Horario: ${userInput.selectedSchedule}`;
-                await sendWhatsApp(phone, whatsappMessage);
+                // Show success message
+                alert("Registro exitoso. Revisa tu correo y WhatsApp para más detalles.");
 
                 // Redirect to payment link
                 const paypalLink = getPaypalLink(planType);
@@ -79,11 +67,35 @@
                     window.open(paypalLink, "_blank");
                 }
 
-                alert("Registro exitoso. Revisa tu WhatsApp para más detalles.");
+                // Send Email (EmailJS Integration)
+                sendEmail(userInput);
+
             } catch (error) {
                 console.error("Error during registration process:", error);
                 alert("Hubo un error en el registro: " + error.message);
             }
+        }
+
+        // EmailJS Integration
+        function sendEmail(userInput) {
+            const serviceID = "service_zwuz34v";
+            const templateID = "template_w457s55";
+            const emailParams = {
+                to_name: userInput.name,
+                to_email: "info@autocuidadoclub.com",
+                user_email: userInput.email,
+                user_phone: userInput.phone,
+                plan_type: userInput.planType,
+                selected_schedule: userInput.selectedSchedule,
+            };
+
+            emailjs.send(serviceID, templateID, emailParams)
+                .then(() => {
+                    console.log("Email sent successfully to staff.");
+                })
+                .catch((error) => {
+                    console.error("Error sending email:", error);
+                });
         }
 
         // Function to Show Registration Form and Scroll Down
@@ -101,8 +113,33 @@
                 // Scroll to the form
                 registerSection.scrollIntoView({ behavior: "smooth" });
             } else {
-                console.error("Registration or schedule section not found.");
+                console.error("Registration or schedule section not found in the DOM.");
             }
+        }
+
+        // Schedule Selection Function
+        function selectScheduleBox(cell) {
+            const cells = document.querySelectorAll(".schedule-table tbody td");
+
+            // Remove selection from all cells
+            cells.forEach((c) => c.classList.remove("selected-box"));
+
+            // Highlight the clicked cell
+            cell.classList.add("selected-box");
+
+            // Validate and save the selected schedule
+            const timeBlock = cell.innerText.trim();
+            if (timeBlock === "-" || timeBlock === "") {
+                alert("Por favor, seleccione un horario válido.");
+                return;
+            }
+
+            const dayIndex = cell.cellIndex;
+            const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+            const day = dayHeader ? dayHeader.innerText : "Desconocido";
+
+            // Store in the hidden input field
+            document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
         }
 
         // Helper Functions
@@ -135,9 +172,15 @@
             return links[planType] || null;
         }
     </script>
+
+     <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.4.1/dist/email.min.js"></script>
+    <script>
+        (function () {
+            emailjs.init("user_yourEmailJSUserID"); // Replace with your EmailJS user ID
+        })();
+    </script>
 </head>
-
-
 
 <body>
     <!-- Navigation -->
