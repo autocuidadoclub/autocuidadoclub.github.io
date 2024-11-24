@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +5,12 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- Firebase Modular SDK -->
+    <!-- Firebase Latest SDK -->
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
             authDomain: "auto-cuidadoclub.firebaseapp.com",
@@ -22,21 +18,100 @@
             storageBucket: "auto-cuidadoclub.appspot.com",
             messagingSenderId: "986704701191",
             appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5",
+            measurementId: "G-LBBGXV2YX5"
         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Helper functions
+        // WhatsApp Notification Function
+        async function sendWhatsApp(phone, message) {
+            const url = "https://your-server-endpoint/send-whatsapp"; // Replace with your server endpoint
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone, message }),
+            });
+
+            if (!response.ok) {
+                console.error("Failed to send WhatsApp message:", response.statusText);
+            }
+        }
+
+        // Register and Pay Function
+        async function registerAndPay(planType) {
+            try {
+                const userInput = getUserInput();
+                validateInput(userInput);
+
+                const { email, password, phone } = userInput;
+
+                // Check if the user already exists in Firestore
+                const userDoc = await getDoc(doc(db, "users", email));
+                if (userDoc.exists()) {
+                    alert("El usuario ya está registrado. Por favor, use otro correo electrónico.");
+                    return;
+                }
+
+                // Create user in Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+                const userData = {
+                    ...userInput,
+                    uid: userCredential.user.uid,
+                    subscriptionStatus: "pending", // Default to pending
+                    paymentStatus: "pending", // Await payment confirmation
+                    registrationDate: new Date(),
+                };
+
+                // Save user data to Firestore
+                await setDoc(doc(db, "users", email), userData);
+
+                // Send WhatsApp to the customer
+                const whatsappMessage = `Hola ${userInput.name}, gracias por registrarte en AutoCuidado Club. Plan: ${userInput.planType}, Horario: ${userInput.selectedSchedule}`;
+                await sendWhatsApp(phone, whatsappMessage);
+
+                // Redirect to payment link
+                const paypalLink = getPaypalLink(planType);
+                if (paypalLink) {
+                    window.open(paypalLink, "_blank");
+                }
+
+                alert("Registro exitoso. Revisa tu WhatsApp para más detalles.");
+            } catch (error) {
+                console.error("Error during registration process:", error);
+                alert("Hubo un error en el registro: " + error.message);
+            }
+        }
+
+        // Function to Show Registration Form and Scroll Down
+        function showRegistrationForm(planType) {
+            const registerSection = document.getElementById("register-section");
+            const scheduleSection = document.getElementById("schedule-section");
+
+            if (registerSection && scheduleSection) {
+                registerSection.style.display = "block";
+                scheduleSection.style.display = "block";
+
+                // Set the selected plan type
+                document.getElementById("planType").value = planType;
+
+                // Scroll to the form
+                registerSection.scrollIntoView({ behavior: "smooth" });
+            } else {
+                console.error("Registration or schedule section not found.");
+            }
+        }
+
+        // Helper Functions
         function getUserInput() {
             return {
-                name: document.getElementById("name").value.trim(),
-                email: document.getElementById("email").value.trim().toLowerCase(), // Store email in lowercase
-                phone: document.getElementById("phone").value.trim(),
-                password: document.getElementById("password").value.trim(),
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                password: document.getElementById("password").value,
                 planType: document.getElementById("planType").value,
                 selectedSchedule: document.getElementById("selectedSchedule").value,
             };
@@ -44,9 +119,7 @@
 
         function validateInput(input) {
             for (const [key, value] of Object.entries(input)) {
-                if (!value) {
-                    throw new Error(`Por favor, complete el campo: ${key}`);
-                }
+                if (!value) throw new Error(`Por favor, complete el campo: ${key}`);
             }
         }
 
@@ -61,52 +134,9 @@
             };
             return links[planType] || null;
         }
-
-        // Main function to register and pay
-        async function registerAndPay(event) {
-            event.preventDefault();
-            try {
-                const userInput = getUserInput();
-                validateInput(userInput);
-
-                const { email, password, planType } = userInput;
-
-                // Create user in Firebase Authentication
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-                const userData = {
-                    ...userInput,
-                    uid: userCredential.user.uid,
-                    subscriptionStatus: "pending",
-                    paymentStatus: "pending",
-                    registrationDate: new Date(),
-                };
-
-                // Save user data to Firestore
-                await setDoc(doc(db, "users", email), userData);
-                console.log("User data successfully written to Firestore:", userData);
-
-                alert("Registro exitoso. Presiona OK para proceder al pago.");
-
-                const paypalLink = getPaypalLink(planType);
-                if (paypalLink) {
-                    window.open(paypalLink, "_blank");
-                }
-            } catch (error) {
-                console.error("Error during registration process:", error);
-                alert("Hubo un error en el registro: " + error.message);
-            }
-        }
-
-        // Event listener to attach the function to the form
-        document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("registerForm");
-            if (form) {
-                form.addEventListener("submit", registerAndPay);
-            }
-        });
     </script>
 </head>
+
 
 
 <body>
