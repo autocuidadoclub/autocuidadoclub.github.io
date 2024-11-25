@@ -13,36 +13,6 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="manifest" href="/site.webmanifest">
 
-    <!-- Firebase Compatibility SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
-    <script>
-        const firebaseConfig = {
-          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-          authDomain: "auto-cuidadoclub.firebaseapp.com",
-          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-          projectId: "auto-cuidadoclub",
-          storageBucket: "auto-cuidadoclub.appspot.com",
-          messagingSenderId: "986704701191",
-          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-          measurementId: "G-LBBGXV2YX5"
-        };
-
-firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        auth.onAuthStateChanged((user) => {
-    if (user) {
-        // User is logged in, show the dashboard content
-        document.getElementById('dashboard-content').style.display = 'block';
-    } else {
-        // User is not logged in, redirect to the login page
-        window.location.href = "login.html";
-    }
-});
-
     
 
 <!-- Navigation -->
@@ -246,7 +216,7 @@ firebase.initializeApp(firebaseConfig);
 </table>
 <button onclick="updateSchedule()">Guardar Nuevo Horario</button>
 
-<h3>Contactar al Soporte</h3>
+<h3>Contactar a Soporte</h3>
 <form id="contactForm">
     <label for="contactMessage">Mensaje:</label>
     <textarea id="contactMessage" required></textarea>
