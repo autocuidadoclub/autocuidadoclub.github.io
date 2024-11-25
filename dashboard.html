@@ -174,8 +174,17 @@
         <div id="vehicles"></div>
    
 
-      <h3>Reprogramar Horario</h3>
+     <h3>Reprogramar Horario</h3>
 <p>Seleccione un nuevo horario para su plan:</p>
+<div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+    Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
+</div>
+<div id="current-schedule">
+    <h4>Horario Actual:</h4>
+    <ul id="current-schedule-list">
+        <li>Cargando...</li>
+    </ul>
+</div>
 <table class="schedule-table">
     <thead>
         <tr>
