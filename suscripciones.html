@@ -387,13 +387,31 @@ function sendEmailToStaff(userInput) {
         }
     }
 
-    function selectSchedule(cell) {
-        const cells = document.querySelectorAll(".schedule-table tbody td");
-        cells.forEach((c) => c.classList.remove("selected-box"));
+   function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
 
-        // Highlight the clicked cell
-        cell.classList.add("selected-box");
+    // Remove selection from all cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Check if the clicked cell is valid
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido."); // Display validation message
+        return; // Stop further execution
     }
+
+    // Highlight the clicked cell
+    cell.classList.add("selected-box");
+
+    // Find the day header
+    const dayIndex = cell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText : "Desconocido";
+
+    // Store the selected schedule in the hidden input field
+    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+}
+
 
     document.addEventListener("DOMContentLoaded", function () {
         const style = document.createElement("style");
