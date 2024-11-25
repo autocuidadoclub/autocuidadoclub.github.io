@@ -32,6 +32,107 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
+        const db = firebase.firestore();
+const auth = firebase.auth();
+
+let lastRescheduleDate; // To store the last reschedule date
+
+// Function to fetch the user's last reschedule date and current schedule
+function fetchScheduleData(userId) {
+    db.collection("users").doc(userId).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+
+            // Display current schedule
+            const currentSchedule = userData.schedule || [];
+            const currentScheduleList = document.getElementById("current-schedule-list");
+            currentScheduleList.innerHTML = ""; // Clear previous entries
+            currentSchedule.forEach((block) => {
+                currentScheduleList.innerHTML += `<li>${block}</li>`;
+            });
+
+            // Check if the user has already rescheduled this month
+            lastRescheduleDate = userData.lastRescheduleDate
+                ? new Date(userData.lastRescheduleDate.seconds * 1000)
+                : null;
+
+            const now = new Date();
+            if (
+                lastRescheduleDate &&
+                lastRescheduleDate.getFullYear() === now.getFullYear() &&
+                lastRescheduleDate.getMonth() === now.getMonth()
+            ) {
+                document.getElementById("reschedule-warning").style.display = "block";
+                document.querySelectorAll(".schedule-table td").forEach((cell) => {
+                    cell.classList.add("disabled");
+                });
+            }
+        } else {
+            console.log("No user data found.");
+        }
+    }).catch((error) => {
+        console.error("Error fetching schedule data:", error);
+    });
+}
+
+// Highlight selected schedule box
+function selectScheduleBox(cell) {
+    if (cell.classList.contains("disabled")) return; // Prevent changes for disabled cells
+    document.querySelectorAll(".schedule-table td").forEach((cell) => {
+        cell.classList.remove("selected");
+    });
+    cell.classList.add("selected");
+}
+
+// Update schedule in Firestore
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected");
+    if (!selectedCell) {
+        alert("Por favor selecciona un horario.");
+        return;
+    }
+
+    const newSchedule = selectedCell.innerText.trim();
+    const user = auth.currentUser;
+
+    if (user) {
+        // Check if the user already rescheduled this month
+        if (lastRescheduleDate) {
+            const now = new Date();
+            if (
+                lastRescheduleDate.getFullYear() === now.getFullYear() &&
+                lastRescheduleDate.getMonth() === now.getMonth()
+            ) {
+                alert("Solo puedes cambiar tu horario una vez al mes.");
+                return;
+            }
+        }
+
+        // Update Firestore with the new schedule and current date
+        db.collection("users").doc(user.uid).update({
+            schedule: firebase.firestore.FieldValue.arrayUnion(newSchedule),
+            lastRescheduleDate: firebase.firestore.Timestamp.now(),
+        }).then(() => {
+            alert("Horario actualizado correctamente.");
+            window.location.reload(); // Reload page to reflect changes
+        }).catch((error) => {
+            console.error("Error al actualizar el horario:", error);
+        });
+    } else {
+        alert("Por favor inicia sesión para guardar el horario.");
+    }
+}
+
+// Initialize page
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        fetchScheduleData(user.uid);
+    } else {
+        window.location.href = "login.html";
+    }
+});
+
+
         function loginUser() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
