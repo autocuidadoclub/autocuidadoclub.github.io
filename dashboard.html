@@ -96,6 +96,45 @@
             }
         });
 
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected");
+    if (!selectedCell) {
+        alert("Por favor selecciona un horario.");
+        return;
+    }
+
+    const newSchedule = selectedCell.innerText.trim();
+    const user = auth.currentUser;
+
+    if (user) {
+        // Check if the user already rescheduled this month
+        if (lastRescheduleDate) {
+            const now = new Date();
+            if (
+                lastRescheduleDate.getFullYear() === now.getFullYear() &&
+                lastRescheduleDate.getMonth() === now.getMonth()
+            ) {
+                alert("Solo puedes cambiar tu horario una vez al mes.");
+                return;
+            }
+        }
+
+        // Update Firestore with the new schedule and current date
+        db.collection("users").doc(user.uid).update({
+            schedule: firebase.firestore.FieldValue.arrayUnion(newSchedule),
+            lastRescheduleDate: firebase.firestore.Timestamp.now(),
+        }).then(() => {
+            alert("Horario actualizado correctamente.");
+            window.location.reload(); // Reload page to reflect changes
+        }).catch((error) => {
+            console.error("Error al actualizar el horario:", error);
+        });
+    } else {
+        alert("Por favor inicia sesión para guardar el horario.");
+    }
+}
+
+        
         // Load user profile data from Firestore
         function loadUserProfile(userId) {
             db.collection("users").doc(userId).get()
