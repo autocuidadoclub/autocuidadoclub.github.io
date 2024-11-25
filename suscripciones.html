@@ -128,28 +128,28 @@
                 });
         }
 
-        function sendEmailToStaff(userData) {
-            const serviceID = "service_zwuz34v";
-            const templateID = "template_staff_notification";
+// Updated Send Email using EmailJS
+function sendEmail(userInput) {
+    const serviceID = "service_zwuz34v";
+    const templateID = "template_w457s55";
+    const emailParams = {
+        to_name: userInput.name, // Customer's name
+        user_email: userInput.email, // Customer's email to receive a copy
+        to_email: "info@autocuidadoclub.com", // Staff email
+        user_phone: userInput.phone, // Customer's phone
+        plan_type: userInput.planType, // Selected subscription plan
+        selected_schedule: userInput.selectedSchedule, // Selected schedule
+    };
 
-            const emailParams = {
-                staff_name: "AutoCuidado Staff",
-                user_name: userData.name,
-                user_email: userData.email,
-                user_phone: userData.phone,
-                plan_type: userData.planType,
-                vehicle_info: userData.vehicles.map(vehicle => `Marca: ${vehicle.brand}, Modelo: ${vehicle.model}, Año: ${vehicle.year}, Placa: ${vehicle.plate}`).join("\n"),
-                subscription_status: userData.subscriptionStatus,
-            };
+    emailjs.send(serviceID, templateID, emailParams)
+        .then(() => {
+            console.log("Email sent successfully to staff and customer.");
+        })
+        .catch((error) => {
+            console.error("Error sending email:", error);
+        });
+}
 
-            emailjs.send(serviceID, templateID, emailParams)
-                .then(() => {
-                    console.log("Email sent to staff successfully.");
-                })
-                .catch((error) => {
-                    console.error("Error sending email to staff:", error);
-                });
-        }
 
         function getPaypalLink(planType) {
             switch (planType) {
