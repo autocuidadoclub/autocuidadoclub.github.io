@@ -129,26 +129,30 @@
         }
 
 // Updated Send Email using EmailJS
-function sendEmail(userInput) {
-    const serviceID = "service_zwuz34v";
-    const templateID = "template_w457s55";
+function sendEmailToStaff(userInput) {
+    const serviceID = "service_zwuz34v"; // Your EmailJS service ID
+    const templateID = "template_w457s55"; // Your EmailJS template ID
+
     const emailParams = {
-        to_name: userInput.name, // Customer's name
-        user_email: userInput.email, // Customer's email to receive a copy
+        to_name: "Staff",
         to_email: "info@autocuidadoclub.com", // Staff email
-        user_phone: userInput.phone, // Customer's phone
-        plan_type: userInput.planType, // Selected subscription plan
-        selected_schedule: userInput.selectedSchedule, // Selected schedule
+        user_name: userInput.name,
+        user_email: userInput.email,
+        user_phone: userInput.phone,
+        plan_type: userInput.planType,
+        selected_schedule: userInput.selectedSchedule,
     };
 
     emailjs.send(serviceID, templateID, emailParams)
         .then(() => {
-            console.log("Email sent successfully to staff and customer.");
+            console.log("Email sent to staff successfully.");
         })
         .catch((error) => {
-            console.error("Error sending email:", error);
+            console.error("Error sending email to staff:", error);
+            alert("There was an error sending an email to staff. Please try again.");
         });
 }
+
 
 
         function getPaypalLink(planType) {
