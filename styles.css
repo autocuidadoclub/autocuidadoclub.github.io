@@ -918,6 +918,20 @@ html {
     font-weight: bold;
 }
 
+/* Highlight selected cell */
+.schedule-table td.selected {
+    background-color: #FFD700;
+    color: #000;
+    font-weight: bold;
+}
+
+/* Disable selected cells (user can't reselect) */
+.schedule-table td.disabled {
+    background-color: #f8d7da;
+    color: #721c24;
+    pointer-events: none;
+    font-weight: bold;
+}
 
 
 /* Adjust Layout for Mobile Devices */
