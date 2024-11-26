@@ -59,7 +59,13 @@
                 // Set the selected plan type
                 document.getElementById("planType").value = planType;
 
-                // Adjust vehicle fields
+         // Adjust vehicle fields
+    const vehicleSections = document.getElementById("vehicle-sections");
+    if (!vehicleSections) {
+        console.error("Vehicle sections container not found!");
+        return;
+    }
+                
                 vehicleSections.innerHTML = '';
                 const vehicleCount = planType.startsWith("plus") ? 3 : 1;
                 for (let i = 1; i <= vehicleCount; i++) {
@@ -79,13 +85,14 @@
                 }
 
                 // Show the sections
-                registerSection.style.display = "block";
-                scheduleSection.style.display = "block";
+    const registerSection = document.getElementById("register-section");
+    const scheduleSection = document.getElementById("schedule-section");
+    if (registerSection) registerSection.style.display = "block";
+    if (scheduleSection) scheduleSection.style.display = "block";
 
-                // Smooth scroll to the registration section
-                registerSection.scrollIntoView({ behavior: "smooth" });
-            };
-        });
+    // Smooth scroll to the registration section
+    registerSection.scrollIntoView({ behavior: "smooth" });
+};
 
         function registerAndPay(event) {
             event.preventDefault();
