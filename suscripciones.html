@@ -6,6 +6,7 @@
     <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -19,6 +20,7 @@
 
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
 
     <script>
         // Firebase configuration
@@ -39,7 +41,8 @@
 
         // Initialize EmailJS
         (function () {
-            emailjs.init("your_emailjs_user_id"); // Replace with your EmailJS user ID
+            emailjs.init("OqGA8w7HpjAu0L8x5"); // Replace with your EmailJS user ID
+            
         })();
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -138,6 +141,11 @@ function sendEmailToStaff(userInput) {
     const serviceID = "service_zwuz34v"; // Your EmailJS service ID
     const templateID = "template_w457s55"; // Your EmailJS template ID
 
+// Check if required fields are present
+    if (!userInput.name || !userInput.email || !userInput.phone || !userInput.planType || !userInput.selectedSchedule) {
+        alert("Por favor, complete todos los campos antes de continuar.");
+        return;
+    
     const emailParams = {
         to_name: "Staff",
         to_email: "info@autocuidadoclub.com", // Staff email
@@ -148,13 +156,14 @@ function sendEmailToStaff(userInput) {
         selected_schedule: userInput.selectedSchedule,
     };
 
-    emailjs.send(serviceID, templateID, emailParams)
-        .then(() => {
-            console.log("Email sent to staff successfully.");
+   emailjs.send(serviceID, templateID, emailParams)
+         .then((response) => {
+            console.log("Email sent successfully:", response);
+            alert("El correo al equipo de soporte fue enviado correctamente.");
         })
-        .catch((error) => {
+         .catch((error) => {
             console.error("Error sending email to staff:", error);
-            alert("There was an error sending an email to staff. Please try again.");
+            alert("Hubo un error al enviar el correo al equipo de soporte. Intente nuevamente.");
         });
 }
 
