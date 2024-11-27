@@ -1,39 +1,35 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Términos y Condiciones | AutoCuidado Club</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        h1, h2, h3 {
-            color: #0078d7;
-        }
-        h1 {
-            text-align: center;
-        }
-        section {
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        ul {
-            padding-left: 20px;
-        }
-        ul li {
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms and Conditions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+    .button-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .regresar-button {
+      background-color: #003366;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .regresar-button:hover {
+      background-color: #002244;
+    }
+  </style>
 </head>
+
 <body>
     <h1>Términos y Condiciones de AutoCuidado Club</h1>
     <p><strong>Fecha de entrada en vigor:</strong> [Especificar la fecha]</p>
@@ -125,5 +121,18 @@
             <li><strong>Teléfono:</strong> [+503] 1234-5678</li>
         </ul>
     </section>
+<div class="button-container">
+    <button class="regresar-button" onclick="closeTab()">Regresar</button>
+  </div>
+  <script>
+    function closeTab() {
+      // Close the current tab
+      window.close();
+
+      // Redirect back to the registration form URL if the tab can't be closed
+      window.open('https://www.autocuidadoclub.com/register.html', '_self');
+    }
+  </script>
+
 </body>
 </html>
