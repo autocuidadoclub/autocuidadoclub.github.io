@@ -330,60 +330,58 @@ function sendEmailToStaff(userInput) {
             <div id="vehicle-sections"></div>
 
  <!-- Schedule Section -->
-    <section id="schedule-section" class="schedule-section">
-        <h2>Selecciona tu Horario</h2>
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Horario</th>
-                    <th>Lunes</th>
-                    <th>Miércoles</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Bloque 1</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 2</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 3</td>
-                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-<!-- Terms and Conditions -->
-  <div>
+    <div style="text-align: center; margin: 20px auto; width: 90%; max-width: 600px; border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f9f9f9;">
+  <h2>Selecciona tu Horario</h2>
+  <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #003366; color: white;">Horario</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #003366; color: white;">Lunes</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #003366; color: white;">Miércoles</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #003366; color: white;">Viernes</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #003366; color: white;">Sábado</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #003366; color: white;">Domingo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border: 1px solid #ccc; padding: 10px; background-color: #ffa500; font-weight: bold;">Bloque 1</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">9:00 - 11:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">10:00 - 12:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">13:00 - 15:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">8:00 - 10:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">9:00 - 11:00</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ccc; padding: 10px; background-color: #ffa500; font-weight: bold;">Bloque 2</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">12:00 - 14:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">13:00 - 15:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">16:00 - 18:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">11:00 - 14:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">12:00 - 14:00</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ccc; padding: 10px; background-color: #ffa500; font-weight: bold;">Bloque 3</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">15:00 - 17:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">16:00 - 18:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">-</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">14:00 - 16:00</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">-</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="text-align: left; margin: 20px 0;">
     <input type="checkbox" id="termsCheckbox" name="termsCheckbox" required>
     <label for="termsCheckbox">
-      I agree to the <a href="/terms-and-conditions.html" target="_blank">Terms and Conditions</a>.
+      I agree to the <a href="/terms-and-conditions.html" target="_blank" style="color: #003366; text-decoration: underline;">Terms and Conditions</a>.
     </label>
   </div>
-            
-            <button type="submit">Registrar y Pagar Suscripción</button>
-        </form>
-    </section>
+  <button type="submit" style="background-color: #003366; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+    Registrar y Pagar Suscripción
+  </button>
+</div>
 
+            
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
