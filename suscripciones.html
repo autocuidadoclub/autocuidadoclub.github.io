@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Firebase Compatibility SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+    authDomain: "auto-cuidadoclub.firebaseapp.com",
+    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+    projectId: "auto-cuidadoclub",
+    storageBucket: "auto-cuidadoclub.appspot.com",
+    messagingSenderId: "986704701191",
+    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+    measurementId: "G-LBBGXV2YX5"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const registerSection = document.getElementById("register-section");
+            const scheduleSection = document.getElementById("schedule-section");
+            const vehicleSections = document.getElementById("vehicle-sections");
+
+            // Hide sections initially
+            registerSection.style.display = "none";
+            scheduleSection.style.display = "none";
+
+            // Show registration and schedule sections when a subscription button is clicked
+            window.showRegistrationForm = function (planType) {
+                // Set the selected plan type
+                document.getElementById("planType").value = planType;
+
+                // Adjust vehicle fields
+                vehicleSections.innerHTML = '';
+                const vehicleCount = planType.startsWith("plus") ? 3 : 1;
+                for (let i = 1; i <= vehicleCount; i++) {
+                    vehicleSections.insertAdjacentHTML('beforeend', `
+                        <div class="vehicle-info">
+                            <h4>Información del Vehículo ${i}</h4>
+                            <label for="vehicleBrand${i}">Marca:</label>
+                            <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
+                            <label for="vehicleModel${i}">Modelo:</label>
+                            <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
+                            <label for="vehicleYear${i}">Año:</label>
+                            <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
+                            <label for="vehiclePlate${i}">Placa:</label>
+                            <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
+                        </div>
+                    `);
+                }
+
+                // Show the sections
+                registerSection.style.display = "block";
+                scheduleSection.style.display = "block";
+
+                // Smooth scroll to the registration section
+                registerSection.scrollIntoView({ behavior: "smooth" });
+            };
+
+         
+// Highlight selected schedule box and capture day and time block
+window.selectScheduleBox = function (cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    
+    // Check if the cell contains a valid time
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText : "Unknown";
+
+    // Store the selected day and time block in a hidden input field
+    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+};
+
+
+
+            // Add CSS for selected box
+            const style = document.createElement("style");
+            style.innerHTML = `
+                .schedule-table tbody td.selected-box {
+                    background-color: #FF6600 !important;
+                    color: white !important;
+                    font-weight: bold;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        function registerAndPay(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const planType = document.getElementById("planType").value;
+            const password = document.getElementById("password").value;
+
+            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+                brand: vehicleSection.querySelector('.vehicleBrand').value,
+                model: vehicleSection.querySelector('.vehicleModel').value,
+                year: vehicleSection.querySelector('.vehicleYear').value,
+                plate: vehicleSection.querySelector('.vehiclePlate').value,
+            }));
+
+            if (!name || !email || !phone || !password) {
+                alert("Por favor, complete todos los campos.");
+                return;
+            }
+
+            const selectedSchedule = document.querySelector(".schedule-table tbody td.selected-box");
+            if (!selectedSchedule) {
+                alert("Por favor, seleccione un horario.");
+                return;
+            }
+
+            const userData = {
+                name,
+                email,
+                phone,
+                planType,
+                vehicles,
+                selectedSchedule: document.getElementById("selectedSchedule").value,
+                subscriptionStatus: "active",
+                registrationDate: firebase.firestore.Timestamp.now()
+            };
+
+            const usersRef = db.collection("users");
+
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const newUser = userCredential.user;
+                    userData.uid = newUser.uid;
+                    return usersRef.doc(email).set(userData);
+                })
+                .then(() => {
+                    alert("Registro exitoso. Presiona OK para proceder al pago.");
+                    const paypalLink = getPaypalLink(planType);
+                    if (paypalLink) window.open(paypalLink, '_blank');
+                })
+                .catch(error => {
+                    console.error("Error:", error.message);
+                    alert("Hubo un error en el registro: " + error.message);
+                });
+        }
+
+        function getPaypalLink(planType) {
+            switch (planType) {
+                case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
+                case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
+                case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
+                case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
+                case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
+                case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
+                default: alert("Plan inválido."); return null;
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+<!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+    </header>
+
+    
+    <!-- Subscription Plans -->
+    <section>
+        <h2>Planes de Suscripciones</h2>
+ nes de Suscripciones Básicas</h2>
+        <div class="subscription-row">
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="3mb.jpg" alt="Plan Básico 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $34.99/mes</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para evaluar el servicio sin un compromiso a largo plazo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos que desean probar el servicio.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic3m')">Suscribirse - Plan Básico 3 meses</button>
+
+                   </div>
+            </div>
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="6mb.jpg" alt="Plan Básico 6 meses" class="plan-image">
+                    <p><strong>6 meses:</strong> $31.49/mes</p>
+                    <ul class="plan-benefits">
+                        <li>6 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante seis meses.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan un servicio a mediano plazo con equilibrio entre compromiso y flexibilidad.</li>
+                        <li><strong>Descuento: </strong> 10% de descuento en comparación con el plan básico de 3 meses.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('basic6m')">Suscribirse - Plan Básico 6 meses</button>
+                </div>
+            </div>
+            <div class="plan-item highlight">
+                <div class="badge">¡Mejor Opción!</div>
+                <div class="plan-option">
+                    <img src="12mb.jpg" alt="Plan Básico 12 meses" class="plan-image">
+                    <p><strong>12 meses:</strong> $26.24/mes</p>
+                    <ul class="plan-benefits">
+                        <li>12 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante el año.</li>
+                        <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
+                        <li><strong>Descuento: </strong> 25% de descuento en comparación con el plan básico de 3 meses.</li>
+                        <li><strong>Descuento: </strong> 15% de descuento en comparación con el plan básico de 6 meses.</li>
+                    </ul>
+                     <button onclick="showRegistrationForm('basic12m')">Suscribirse - Plan Básico 12 meses</button>
+                </div>
+            </div>
+        </div>
+
+        <h2>Planes de Suscripciones Plus</h2>
+        <div class="subscription-row">
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $66.48/mes</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para clientes con más de un vehículo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
+                        <li><strong>Descuento: </strong> 37% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 27% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
+                </div>
+            </div>
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="6mp.jpg" alt="Plan Plus 6 meses" class="plan-image">
+                    <p><strong>6 meses:</strong> $59.83/mes</p>
+                    <ul class="plan-benefits">
+                        <li>6 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Ahorro mensual y consistencia en el mantenimiento para múltiples vehículos.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus6m')">Suscribirse - Plan Plus 6 meses</button>
+                </div>
+            </div>
+            <div class="plan-item highlight">
+                <div class="badge">¡Mejor Opción!</div>
+                <div class="plan-option">
+                    <img src="12mp.jpg" alt="Plan Plus 12 meses" class="plan-image">
+                    <p><strong>12 meses:</strong> $49.86/mes</p>
+                    <ul class="plan-benefits">
+                        <li>12 inspecciones preventivas (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Gran ahorro anual y mantenimiento para hasta tres vehículos.</li>
+                        <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 53% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                        <li><strong>Descuento: </strong> 43% de descuento en comparación con el plan básico de 6 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus12m')">Suscribirse - Plan Plus 12 meses</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     
+    <!-- Registration Form -->
+    <section id="register-section" class="register-section">
+        <h2>Regístrate y Elige Tu Plan</h2>
+        <form id="registerForm" onsubmit="registerAndPay(event)">
+            <label for="name">Nombre:</label>
+            <input type="text" id="name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+            <label for="phone">Teléfono:</label>
+            <input type="text" id="phone" required>
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" required>
+            <input type="hidden" id="planType">
+            <input type="hidden" id="selectedSchedule" name="selectedSchedule">
+            <div id="vehicle-sections"></div>
+
+ <!-- Schedule Section -->
+    <section id="schedule-section" class="schedule-section">
+        <h2>Selecciona tu Horario</h2>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+            
+            <button type="submit">Registrar y Pagar Suscripción</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+    </footer>
+
+    <script>
+    function showRegistrationForm(planType) {
+        const registerSection = document.getElementById("register-section");
+        const scheduleSection = document.getElementById("schedule-section");
+
+        if (registerSection && scheduleSection) {
+            // Make both sections visible
+            registerSection.style.display = "block";
+            scheduleSection.style.display = "block";
+
+            // Set the selected plan type
+            document.getElementById("planType").value = planType;
+
+            // Scroll smoothly to the registration section
+            registerSection.scrollIntoView({ behavior: "smooth" });
+        } else {
+            console.error("Registration or schedule section not found.");
+        }
+    }
+
+    function selectSchedule(cell) {
+        const cells = document.querySelectorAll(".schedule-table tbody td");
+        cells.forEach((c) => c.classList.remove("selected-box"));
+
+        // Highlight the clicked cell
+        cell.classList.add("selected-box");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .schedule-table tbody td.selected-box {
+                background-color: #FF6600 !important;
+                color: white !important;
+                font-weight: bold;
+            }
+        `;
+        document.head.appendChild(style);
+
+        const scheduleCells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
+        scheduleCells.forEach((cell) => {
+            cell.addEventListener("click", () => selectSchedule(cell));
+        });
+    });
+</script>
+
+    
+    <!-- Optional Twilio Action Script -->
+    <script src="twilio-action.js"></script>
+
+</body>
+</html>
