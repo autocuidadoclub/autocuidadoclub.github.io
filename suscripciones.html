@@ -11,7 +11,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 
+    
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -180,6 +182,60 @@ window.selectScheduleBox = function (cell) {
             }
         }
     </script>
+
+    <script>
+    // Initialize EmailJS
+    emailjs.init("OqGA8w7HpjAu0L8x5"); // Your EmailJS public key
+
+    function sendEmail(data) {
+        emailjs.send("service_zwuz34v", "template_w457s55", data)
+            .then((response) => {
+                console.log("Email sent successfully!", response.status, response.text);
+                alert("Email sent successfully to staff and customer!");
+            })
+            .catch((error) => {
+                console.error("Failed to send email:", error);
+                alert("Error sending email.");
+            });
+    }
+
+    function registerAndSendEmail(event) {
+        event.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const planType = document.getElementById("planType").value;
+
+        const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+            brand: vehicleSection.querySelector('.vehicleBrand').value,
+            model: vehicleSection.querySelector('.vehicleModel').value,
+            year: vehicleSection.querySelector('.vehicleYear').value,
+            plate: vehicleSection.querySelector('.vehiclePlate').value,
+        }));
+
+        const selectedSchedule = document.getElementById("selectedSchedule").value;
+
+        if (!name || !email || !phone || !planType || !selectedSchedule) {
+            alert("Por favor, complete todos los campos.");
+            return;
+        }
+
+        // Prepare email data
+        const emailData = {
+            name,
+            email,
+            phone,
+            planType,
+            vehicles: vehicles.map(v => `${v.brand} ${v.model} (${v.year}) - ${v.plate}`).join(", "),
+            schedule: selectedSchedule
+        };
+
+        // Send email via EmailJS
+        sendEmail(emailData);
+    }
+</script>
+    
 </head>
 <body>
     <!-- Navigation -->
