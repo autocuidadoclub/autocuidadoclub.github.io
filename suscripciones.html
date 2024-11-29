@@ -373,7 +373,51 @@ window.selectScheduleBox = function (cell) {
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    function showRegistrationForm(planType) {
+        const registerSection = document.getElementById("register-section");
+        const scheduleSection = document.getElementById("schedule-section");
+
+        if (registerSection && scheduleSection) {
+            // Make both sections visible
+            registerSection.style.display = "block";
+            scheduleSection.style.display = "block";
+
+            // Set the selected plan type
+            document.getElementById("planType").value = planType;
+
+            // Scroll smoothly to the registration section
+            registerSection.scrollIntoView({ behavior: "smooth" });
+        } else {
+            console.error("Registration or schedule section not found.");
+        }
+    }
+
+    function selectSchedule(cell) {
+        const cells = document.querySelectorAll(".schedule-table tbody td");
+        cells.forEach((c) => c.classList.remove("selected-box"));
+
+        // Highlight the clicked cell
+        cell.classList.add("selected-box");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .schedule-table tbody td.selected-box {
+                background-color: #FF6600 !important;
+                color: white !important;
+                font-weight: bold;
+            }
+        `;
+        document.head.appendChild(style);
+
+        const scheduleCells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
+        scheduleCells.forEach((cell) => {
+            cell.addEventListener("click", () => selectSchedule(cell));
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('registerForm').onsubmit = function (event) {
         event.preventDefault(); // Prevent the default form submission
 
@@ -422,49 +466,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 });
 
-    function showRegistrationForm(planType) {
-        const registerSection = document.getElementById("register-section");
-        const scheduleSection = document.getElementById("schedule-section");
-
-        if (registerSection && scheduleSection) {
-            // Make both sections visible
-            registerSection.style.display = "block";
-            scheduleSection.style.display = "block";
-
-            // Set the selected plan type
-            document.getElementById("planType").value = planType;
-
-            // Scroll smoothly to the registration section
-            registerSection.scrollIntoView({ behavior: "smooth" });
-        } else {
-            console.error("Registration or schedule section not found.");
-        }
-    }
-
-    function selectSchedule(cell) {
-        const cells = document.querySelectorAll(".schedule-table tbody td");
-        cells.forEach((c) => c.classList.remove("selected-box"));
-
-        // Highlight the clicked cell
-        cell.classList.add("selected-box");
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const style = document.createElement("style");
-        style.innerHTML = `
-            .schedule-table tbody td.selected-box {
-                background-color: #FF6600 !important;
-                color: white !important;
-                font-weight: bold;
-            }
-        `;
-        document.head.appendChild(style);
-
-        const scheduleCells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
-        scheduleCells.forEach((cell) => {
-            cell.addEventListener("click", () => selectSchedule(cell));
-        });
-    });
+    
 </script>
 
         <!-- Footer -->
