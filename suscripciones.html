@@ -423,6 +423,55 @@ window.selectScheduleBox = function (cell) {
             cell.addEventListener("click", () => selectSchedule(cell));
         });
     });
+
+        document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById('registerForm').onsubmit = function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const planType = document.getElementById("planType").value;
+        const selectedSchedule = document.getElementById("selectedSchedule").value;
+
+        const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+            brand: vehicleSection.querySelector('.vehicleBrand').value,
+            model: vehicleSection.querySelector('.vehicleModel').value,
+            year: vehicleSection.querySelector('.vehicleYear').value,
+            plate: vehicleSection.querySelector('.vehiclePlate').value,
+        }));
+
+        const vehicleDetails = vehicles.map(v => `${v.brand} ${v.model} (${v.year}) - ${v.plate}`).join(", ");
+
+        // Prepare data for submission
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("planType", planType);
+        formData.append("selectedSchedule", selectedSchedule);
+        formData.append("vehicles", vehicleDetails);
+
+        // Send the form data to the Google Apps Script endpoint
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Gracias, su registro ha sido enviado exitosamente.");
+                document.getElementById("registerForm").reset();
+            } else {
+                alert("Hubo un problema al enviar su registro. Por favor, inténtelo nuevamente.");
+            }
+        })
+        .catch(error => {
+            console.error("Error al enviar el formulario:", error);
+            alert("Hubo un error al enviar su registro. Inténtelo más tarde.");
+        });
+    };
+});
 </script>
 
     
