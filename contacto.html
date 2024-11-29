@@ -181,10 +181,13 @@ document.getElementById('contactForm').onsubmit = function(event) {
             </a>
         </div>
     </div>
-    
-       
-        
+            
        </footer>
+
+    function showLoader(show) {
+    const loader = document.getElementById("loader");
+    loader.style.display = show ? "flex" : "none";
+}
 
     
 </body>
