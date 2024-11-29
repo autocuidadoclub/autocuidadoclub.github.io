@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
-   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <!-- Firebase Compatibility SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -13,7 +14,7 @@
 
     <script>
         // Firebase configuration
-      const firebaseConfig = {
+        const firebaseConfig = {
     apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
     authDomain: "auto-cuidadoclub.firebaseapp.com",
     databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
@@ -22,7 +23,7 @@
     messagingSenderId: "986704701191",
     appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
     measurementId: "G-LBBGXV2YX5"
-  };
+        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -366,12 +367,19 @@ window.selectScheduleBox = function (cell) {
         </form>
     </section>
 
-    <div id="loader" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-    <img src="loading.gif" alt="Cargando..." style="width:80px; border-radius:8px;">
-</div>
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+    </footer>
 
-
-<script>
+    <script>
     function showRegistrationForm(planType) {
         const registerSection = document.getElementById("register-section");
         const scheduleSection = document.getElementById("schedule-section");
@@ -416,21 +424,60 @@ window.selectScheduleBox = function (cell) {
         });
     });
 
-    
-    
+        document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById('registerForm').onsubmit = function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const planType = document.getElementById("planType").value;
+        const selectedSchedule = document.getElementById("selectedSchedule").value;
+
+        const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
+            brand: vehicleSection.querySelector('.vehicleBrand').value,
+            model: vehicleSection.querySelector('.vehicleModel').value,
+            year: vehicleSection.querySelector('.vehicleYear').value,
+            plate: vehicleSection.querySelector('.vehiclePlate').value,
+        }));
+
+        const vehicleDetails = vehicles.map(v => `${v.brand} ${v.model} (${v.year}) - ${v.plate}`).join(", ");
+
+        // Prepare data for submission
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("planType", planType);
+        formData.append("selectedSchedule", selectedSchedule);
+        formData.append("vehicles", vehicleDetails);
+
+        // Send the form data to the Google Apps Script endpoint
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Gracias, su registro ha sido enviado exitosamente.");
+                document.getElementById("registerForm").reset();
+            } else {
+                alert("Hubo un problema al enviar su registro. Por favor, inténtelo nuevamente.");
+            }
+        })
+        .catch(error => {
+            console.error("Error al enviar el formulario:", error);
+            alert("Hubo un error al enviar su registro. Inténtelo más tarde.");
+        });
+    };
+});
+        
 </script>
 
-        <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-        </ul>
-    </footer>
+    
+    <!-- Optional Twilio Action Script -->
+    <script src="twilio-action.js"></script>
 
 </body>
 </html>
