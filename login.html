@@ -7,212 +7,59 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <!-- Firebase Compatibility SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <script>
+        // Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-          authDomain: "auto-cuidadoclub.firebaseapp.com",
-          databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-          projectId: "auto-cuidadoclub",
-          storageBucket: "auto-cuidadoclub.appspot.com",
-          messagingSenderId: "986704701191",
-          appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-          measurementId: "G-LBBGXV2YX5"
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
         };
 
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        const db = firebase.firestore();
-const auth = firebase.auth();
-
-let lastRescheduleDate; // To store the last reschedule date
-
-// Function to fetch the user's last reschedule date and current schedule
-function fetchScheduleData(userId) {
-    db.collection("users").doc(userId).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-
-            // Display current schedule
-            const currentSchedule = userData.schedule || [];
-            const currentScheduleList = document.getElementById("current-schedule-list");
-            currentScheduleList.innerHTML = ""; // Clear previous entries
-            currentSchedule.forEach((block) => {
-                currentScheduleList.innerHTML += `<li>${block}</li>`;
+        // Set authentication persistence to local
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => {
+                console.log("Authentication persistence set to LOCAL.");
+            })
+            .catch((error) => {
+                console.error("Error setting authentication persistence:", error);
             });
 
-            // Check if the user has already rescheduled this month
-            lastRescheduleDate = userData.lastRescheduleDate
-                ? new Date(userData.lastRescheduleDate.seconds * 1000)
-                : null;
+        // Login user function
+        function loginUser() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            const now = new Date();
-            if (
-                lastRescheduleDate &&
-                lastRescheduleDate.getFullYear() === now.getFullYear() &&
-                lastRescheduleDate.getMonth() === now.getMonth()
-            ) {
-                document.getElementById("reschedule-warning").style.display = "block";
-                document.querySelectorAll(".schedule-table td").forEach((cell) => {
-                    cell.classList.add("disabled");
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    console.log("User logged in:", userCredential.user);
+                    alert("Login exitoso");
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    console.error("Error en el login:", error);
+                    alert("Error en el login: " + error.message);
                 });
-            }
-        } else {
-            console.log("No user data found.");
-        }
-    }).catch((error) => {
-        console.error("Error fetching schedule data:", error);
-    });
-}
-
-// Highlight selected schedule box
-function selectScheduleBox(cell) {
-    if (cell.classList.contains("disabled")) return; // Prevent changes for disabled cells
-    document.querySelectorAll(".schedule-table td").forEach((cell) => {
-        cell.classList.remove("selected");
-    });
-    cell.classList.add("selected");
-}
-
-// Update schedule in Firestore
-function updateSchedule() {
-    const selectedCell = document.querySelector(".schedule-table td.selected");
-    if (!selectedCell) {
-        alert("Por favor selecciona un horario.");
-        return;
-    }
-
-    const newSchedule = selectedCell.innerText.trim();
-    const user = auth.currentUser;
-
-    if (user) {
-        // Check if the user already rescheduled this month
-        if (lastRescheduleDate) {
-            const now = new Date();
-            if (
-                lastRescheduleDate.getFullYear() === now.getFullYear() &&
-                lastRescheduleDate.getMonth() === now.getMonth()
-            ) {
-                alert("Solo puedes cambiar tu horario una vez al mes.");
-                return;
-            }
         }
 
-        // Update Firestore with the new schedule and current date
-        db.collection("users").doc(user.uid).update({
-            schedule: firebase.firestore.FieldValue.arrayUnion(newSchedule),
-            lastRescheduleDate: firebase.firestore.Timestamp.now(),
-        }).then(() => {
-            alert("Horario actualizado correctamente.");
-            window.location.reload(); // Reload page to reflect changes
-        }).catch((error) => {
-            console.error("Error al actualizar el horario:", error);
-        });
-    } else {
-        alert("Por favor inicia sesión para guardar el horario.");
-    }
-}
-
-// Initialize page
-auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        console.log("User logged in:", userCredential.user);
-        alert("Login exitoso");
-        window.location.href = 'dashboard.html';
-    })
-    .catch((error) => {
-        console.error("Login error:", error);
-        alert("Error en el login: " + error.message);
-    });
-
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log("User is authenticated:", user);
-    } else {
-        console.log("User is not authenticated.");
-    }
-});
-
-       function loginUser() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log("User logged in successfully:", userCredential.user);
-            alert("Login exitoso");
-            // Redirect to the dashboard
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error("Login error:", error);
-            alert("Error en el login: " + error.message);
-        });
-}
-
-
-function updateSchedule() {
-    const user = firebase.auth().currentUser;
-
-    if (user) {
-        const selectedSchedule = document.getElementById("selectedSchedule").value;
-        if (!selectedSchedule) {
-            alert("Por favor, seleccione un horario válido.");
-            return;
-        }
-
-        db.collection("users").doc(user.email).update({ schedule: selectedSchedule })
-            .then(() => {
-                alert("Horario actualizado exitosamente.");
-            })
-            .catch((error) => {
-                console.error("Error al actualizar el horario:", error);
-                alert("Hubo un error al actualizar el horario. Intente nuevamente.");
-            });
-    } else {
-        alert("Debe iniciar sesión para reprogramar su horario.");
-    }
-}
-
-        function sendContactMessage() {
-    const user = firebase.auth().currentUser;
-    const message = document.getElementById("contactMessage").value;
-
-    if (!message) {
-        alert("Por favor, escriba un mensaje.");
-        return;
-    }
-
-    if (user) {
-        const emailParams = {
-            user_email: user.email,
-            user_message: message,
-        };
-
-        emailjs.send("your_service_id", "your_template_id", emailParams)
-            .then(() => {
-                alert("Mensaje enviado al soporte exitosamente.");
-            })
-            .catch((error) => {
-                console.error("Error al enviar el mensaje:", error);
-                alert("Hubo un error al enviar el mensaje. Intente nuevamente.");
-            });
-    } else {
-        alert("Debe iniciar sesión para enviar un mensaje al soporte.");
-    }
-}
-
-        
+        // Forgot password function
         function forgotPassword() {
             const email = document.getElementById('forgot-email').value;
             auth.sendPasswordResetEmail(email)
@@ -220,10 +67,12 @@ function updateSchedule() {
                     alert("Correo de recuperación enviado. Revisa tu bandeja de entrada.");
                 })
                 .catch((error) => {
+                    console.error("Error:", error);
                     alert("Error: " + error.message);
                 });
         }
 
+        // Toggle sections (login and forgot password)
         function toggleSection(sectionToShow) {
             document.getElementById('login-section').style.display = sectionToShow === 'login' ? 'block' : 'none';
             document.getElementById('forgot-password-section').style.display = sectionToShow === 'forgot-password' ? 'block' : 'none';
@@ -283,8 +132,6 @@ function updateSchedule() {
         </div>
     </section>
 
-  
-    
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
