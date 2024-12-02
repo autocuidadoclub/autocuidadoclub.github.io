@@ -124,6 +124,13 @@
         }
         const auth = firebase.auth();
         const db = firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error);
+    });
 
         // Check if user is logged in and load profile info
         auth.onAuthStateChanged((user) => {
