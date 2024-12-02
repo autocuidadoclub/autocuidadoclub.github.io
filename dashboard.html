@@ -104,10 +104,17 @@
         <button onclick="updateSchedule()">Guardar Nuevo Horario</button>
 
         <!-- Contactar a Soporte -->
-        <h3>Contactar a Soporte</h3>
-        <form id="contactForm">
-            <button type="button" onclick="contacto.html">Contáctanos!</button>
-        </form>
+<h3>Contactar a Soporte</h3>
+<form id="contactForm">
+    <button type="button" onclick="redirectToContacto()">Contáctanos!</button>
+</form>
+
+<script>
+    function redirectToContacto() {
+        window.location.href = "contacto.html"; // Redirect to contacto.html
+    }
+</script>
+
     </section>
 
     <script>
