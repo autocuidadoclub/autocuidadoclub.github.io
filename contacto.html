@@ -8,11 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 
-    
     <style>
         /* Contact Form Styling */
         .contact-form-container {
@@ -70,6 +69,25 @@
             text-align: center;
             margin-top: 20px;
         }
+
+        /* Loader Styling */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loader img {
+            width: 80px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -101,30 +119,26 @@
 <!-- Contact Form -->
 <section class="contact-form-container">
     <h2>Contáctanos</h2>
-   <form id="contactForm" action="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" method="post" target="hidden_iframe">
-    <label for="name">Nombre</label>
-    <input type="text" id="name" name="name" required>
-    
-    <label for="email">Correo Electrónico</label>
-    <input type="email" id="email" name="email" required>
-    
-    <label for="phone">Número de WhatsApp</label>
-    <input type="text" id="phone" name="phone" required>
-    
-    <label for="message">Mensaje</label>
-    <textarea id="message" name="message" rows="4" required></textarea>
-    
-    <button type="submit">Enviar</button>
-</form>
+    <form id="contactForm">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="phone">Número de WhatsApp</label>
+        <input type="text" id="phone" name="phone" required>
+        
+        <label for="message">Mensaje</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+        
+        <button type="submit">Enviar</button>
+    </form>
 
-<div id="loader" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-    <img src="loading.gif" alt="Cargando..." style="width:80px; border-radius:8px;">
-</div>
+    <div id="loader">
+        <img src="loading.gif" alt="Cargando...">
+    </div>
 
-    
-<iframe name="hidden_iframe" style="display:none;"></iframe>
-
-    
     <div class="contact-info">
         <h3>Teléfono: +503 XXX-XXXX</h3>
         <h3><a href="https://wa.me/+14155238886" target="_blank" class="whatsapp-button">Contácta con nosotros en WhatsApp</a></h3>
@@ -132,40 +146,46 @@
     </div>
 </section>
 
-<!-- JavaScript for Form Submission Confirmation -->
+<!-- JavaScript for Form Submission -->
 <script>
-document.getElementById('contactForm').onsubmit = function(event) {
-    event.preventDefault(); // Prevents the default form submission
+    document.getElementById('contactForm').onsubmit = function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex'; // Show loader
 
-    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: 'POST',
-        body: new FormData(document.getElementById('contactForm'))
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('Gracias, Su mensaje ha sido enviado y nos contactamos con usted en breve.');
-            document.getElementById('contactForm').reset();
-        } else {
-            alert("Mensaje enviado, nos contactamos asap contigo.");
-        }
-    })
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: 'POST',
+            body: new FormData(document.getElementById('contactForm'))
+        })
+        .then(response => response.json())
+        .then(data => {
+            loader.style.display = 'none'; // Hide loader
+            if (data.success) {
+                alert('Gracias, su mensaje ha sido enviado.');
+                document.getElementById('contactForm').reset();
+            } else {
+                alert('Hubo un error al enviar su mensaje. Por favor, inténtelo nuevamente.');
+            }
+        })
+        .catch(error => {
+            loader.style.display = 'none'; // Hide loader
+            console.error('Error:', error);
+            alert('Hubo un error al enviar su mensaje.');
+        });
     };
 </script>
 
-
-     <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-        </ul>
-       
-
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+    <ul>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+    </ul>
     <div class="social-container">
         <p>Síguenos en nuestras redes sociales</p>
         <div class="social-buttons">
@@ -176,21 +196,11 @@ document.getElementById('contactForm').onsubmit = function(event) {
                 <i class="fab fa-facebook-f"></i>
             </a>
             <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button twitter">
-                <!-- Alternative icon for X (Twitter) if not available in Font Awesome -->
-                <i class="fab fa-twitter"></i> <!-- Replace with fa-x-twitter if supported -->
+                <i class="fab fa-twitter"></i>
             </a>
         </div>
     </div>
-            
-       </footer>
+</footer>
 
-  <script>
-    function showLoader(show) {
-        const loader = document.getElementById("loader");
-        loader.style.display = show ? "flex" : "none";
-    }
-</script>
-
-    
 </body>
 </html>
