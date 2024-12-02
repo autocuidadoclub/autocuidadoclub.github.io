@@ -31,6 +31,14 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error);
+    });
+
 
         // Set authentication persistence to local
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
