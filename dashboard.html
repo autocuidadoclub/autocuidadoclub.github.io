@@ -106,9 +106,7 @@
         <!-- Contactar a Soporte -->
         <h3>Contactar a Soporte</h3>
         <form id="contactForm">
-            <label for="contactMessage">Mensaje:</label>
-            <textarea id="contactMessage" required></textarea>
-            <button type="button" onclick="sendContactMessage()">Enviar Mensaje</button>
+            <button type="button" onclick="contacto.html">Contáctanos!</button>
         </form>
     </section>
 
@@ -241,26 +239,7 @@
             }
         }
 
-        // Send contact message
-        function sendContactMessage() {
-            const message = document.getElementById("contactMessage").value;
-            const user = auth.currentUser;
-
-            if (user && message) {
-                db.collection("contacts").add({
-                    message: message,
-                    user: user.email,
-                    timestamp: firebase.firestore.Timestamp.now(),
-                }).then(() => {
-                    alert("Mensaje enviado exitosamente.");
-                    document.getElementById("contactForm").reset(); // Reset form
-                }).catch((error) => {
-                    console.error("Error al enviar mensaje:", error);
-                });
-            } else {
-                alert("Por favor, ingresa un mensaje.");
-            }
-        }
+        
     </script>
 </body>
 </html>
