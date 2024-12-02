@@ -135,7 +135,13 @@ auth.signInWithEmailAndPassword(email, password)
         alert("Error en el login: " + error.message);
     });
 
-
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("User is authenticated:", user);
+    } else {
+        console.log("User is not authenticated.");
+    }
+});
 
        function loginUser() {
     const email = document.getElementById('email').value;
