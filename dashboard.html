@@ -133,14 +133,18 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     });
 
         // Check if user is logged in and load profile info
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-            } else {
-                loadUserProfile(user.email);
-                document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-            }
-        });
+       auth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is logged in, load profile
+        loadUserProfile(user.email);
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+    } else {
+        // Redirect to login if not authenticated
+        console.log("No user authenticated. Redirecting to login...");
+        window.location.href = 'login.html';
+    }
+});
+
 
         // Load user profile data
         function loadUserProfile(email) {
