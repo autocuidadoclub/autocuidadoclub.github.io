@@ -8,62 +8,109 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 
-    
-
-<!-- Navigation -->
-   <nav class="navbar">
-    <ul class="nav-links">
-        <li><a href="nosotros.html">Nosotros</a></li>
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
         </ul>
-    <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-    </div>
-</nav>
-
-
-<!-- Header with Logo -->
-<header>
-    <div class="header-container">
-            <div class="header-text">
-            <h1>Bienvenido a AutoCuidado Club</h1>
-            <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
-    </div>
-</header>
+    </nav>
 
-    
-    <style>
-        /* Add some styling for the table */
-        .profile-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .profile-table th, .profile-table td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        .profile-table th {
-            background-color: #00539C;
-            color: white;
-        }
-        .profile-section-title {
-            color: #00539C;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-top: 20px;
-        }
-    </style>
+    <!-- Header with Logo -->
+    <header>
+        <div class="header-container">
+            <h2 id="user-info">Cargando usuario...</h2>
+            <button onclick="logoutUser()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <h2>Panel de Usuario</h2>
+        <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
+
+        <!-- User Profile Information -->
+        <div class="profile-section-title">Información del Usuario</div>
+        <table class="profile-table">
+            <tr><td><strong>Nombre:</strong></td><td id="name">Cargando...</td></tr>
+            <tr><td><strong>Teléfono:</strong></td><td id="phone">Cargando...</td></tr>
+            <tr><td><strong>Tipo de Plan:</strong></td><td id="planType">Cargando...</td></tr>
+        </table>
+
+        <!-- Vehicles Information -->
+        <div id="vehicles"></div>
+
+        <!-- Reprogramar Horario -->
+        <h3>Reprogramar Horario</h3>
+        <p>Seleccione un nuevo horario para su plan:</p>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
+        </div>
+        <div id="current-schedule">
+            <h4>Horario Actual:</h4>
+            <ul id="current-schedule-list">
+                <li>Cargando...</li>
+            </ul>
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+        <button onclick="updateSchedule()">Guardar Nuevo Horario</button>
+
+        <!-- Contactar a Soporte -->
+        <h3>Contactar a Soporte</h3>
+        <form id="contactForm">
+            <label for="contactMessage">Mensaje:</label>
+            <textarea id="contactMessage" required></textarea>
+            <button type="button" onclick="sendContactMessage()">Enviar Mensaje</button>
+        </form>
+    </section>
 
     <script>
         // Firebase configuration
@@ -96,45 +143,6 @@
             }
         });
 
-function updateSchedule() {
-    const selectedCell = document.querySelector(".schedule-table td.selected");
-    if (!selectedCell) {
-        alert("Por favor selecciona un horario.");
-        return;
-    }
-
-    const newSchedule = selectedCell.innerText.trim();
-    const user = auth.currentUser;
-
-    if (user) {
-        // Check if the user already rescheduled this month
-        if (lastRescheduleDate) {
-            const now = new Date();
-            if (
-                lastRescheduleDate.getFullYear() === now.getFullYear() &&
-                lastRescheduleDate.getMonth() === now.getMonth()
-            ) {
-                alert("Solo puedes cambiar tu horario una vez al mes.");
-                return;
-            }
-        }
-
-        // Update Firestore with the new schedule and current date
-        db.collection("users").doc(user.uid).update({
-            schedule: firebase.firestore.FieldValue.arrayUnion(newSchedule),
-            lastRescheduleDate: firebase.firestore.Timestamp.now(),
-        }).then(() => {
-            alert("Horario actualizado correctamente.");
-            window.location.reload(); // Reload page to reflect changes
-        }).catch((error) => {
-            console.error("Error al actualizar el horario:", error);
-        });
-    } else {
-        alert("Por favor inicia sesión para guardar el horario.");
-    }
-}
-
-        
         // Load user profile data from Firestore
         function loadUserProfile(userId) {
             db.collection("users").doc(userId).get()
@@ -184,93 +192,75 @@ function updateSchedule() {
                     alert("Error al cerrar sesión: " + error.message);
                 });
         }
+
+        // Select schedule box function
+        function selectScheduleBox(cell) {
+            const allCells = document.querySelectorAll(".schedule-table td");
+            allCells.forEach(c => c.classList.remove("selected"));
+            cell.classList.add("selected");
+        }
+
+        // Update the schedule function
+        function updateSchedule() {
+            const selectedCell = document.querySelector(".schedule-table td.selected");
+            if (!selectedCell) {
+                alert("Por favor selecciona un horario.");
+                return;
+            }
+
+            const newSchedule = selectedCell.innerText.trim();
+            const user = auth.currentUser;
+
+            if (user) {
+                // Check if the user already rescheduled this month
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    const userData = doc.data();
+                    const lastRescheduleDate = userData.lastRescheduleDate?.toDate();
+
+                    if (lastRescheduleDate) {
+                        const now = new Date();
+                        if (lastRescheduleDate.getFullYear() === now.getFullYear() && lastRescheduleDate.getMonth() === now.getMonth()) {
+                            alert("Solo puedes cambiar tu horario una vez al mes.");
+                            return;
+                        }
+                    }
+
+                    // Update Firestore with the new schedule and current date
+                    db.collection("users").doc(user.uid).update({
+                        schedule: firebase.firestore.FieldValue.arrayUnion(newSchedule),
+                        lastRescheduleDate: firebase.firestore.Timestamp.now(),
+                    }).then(() => {
+                        alert("Horario actualizado correctamente.");
+                        window.location.reload(); // Reload page to reflect changes
+                    }).catch((error) => {
+                        console.error("Error al actualizar el horario:", error);
+                    });
+                });
+            } else {
+                alert("Por favor inicia sesión para guardar el horario.");
+            }
+        }
+
+        // Send contact message
+        function sendContactMessage() {
+            const message = document.getElementById("contactMessage").value;
+            const user = auth.currentUser;
+
+            if (user && message) {
+                db.collection("contacts").add({
+                    message: message,
+                    user: user.email,
+                    timestamp: firebase.firestore.Timestamp.now(),
+                }).then(() => {
+                    alert("Mensaje enviado exitosamente.");
+                    document.getElementById("contactForm").reset(); // Reset form
+                }).catch((error) => {
+                    console.error("Error al enviar mensaje:", error);
+                });
+            } else {
+                alert("Por favor, ingresa un mensaje.");
+            }
+        }
     </script>
-</head>
-<body>
-
-        <!-- Header with Welcome Message -->
-    <header>
-        <div class="header-container">
-            <h2 id="user-info">Cargando usuario...</h2>
-            <button onclick="logoutUser()">Cerrar Sesión</button>
-        </div>
-    </header>
-
-    <!-- Dashboard Content -->
-    <section class="dashboard-section">
-        <h2>Panel de Usuario</h2>
-        <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
-
-        <!-- User Profile Information -->
-        <div class="profile-section-title">Información del Usuario</div>
-        <table class="profile-table">
-            <tr><td><strong>Nombre:</strong></td><td id="name">Cargando...</td></tr>
-            <tr><td><strong>Teléfono:</strong></td><td id="phone">Cargando...</td></tr>
-            <tr><td><strong>Tipo de Plan:</strong></td><td id="planType">Cargando...</td></tr>
-        </table>
-
-        <!-- Vehicles Information -->
-        <div id="vehicles"></div>
-   
-
-     <h3>Reprogramar Horario</h3>
-<p>Seleccione un nuevo horario para su plan:</p>
-<div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
-    Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
-</div>
-<div id="current-schedule">
-    <h4>Horario Actual:</h4>
-    <ul id="current-schedule-list">
-        <li>Cargando...</li>
-    </ul>
-</div>
-<table class="schedule-table">
-    <thead>
-        <tr>
-            <th>Horario</th>
-            <th>Lunes</th>
-            <th>Miércoles</th>
-            <th>Viernes</th>
-            <th>Sábado</th>
-            <th>Domingo</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Bloque 1</td>
-            <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-            <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-            <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-            <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-            <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-        </tr>
-        <tr>
-            <td>Bloque 2</td>
-            <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-            <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-            <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-            <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-            <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-        </tr>
-        <tr>
-            <td>Bloque 3</td>
-            <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-            <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-            <td onclick="selectScheduleBox(this)">-</td>
-            <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-            <td onclick="selectScheduleBox(this)">-</td>
-        </tr>
-    </tbody>
-</table>
-<button onclick="updateSchedule()">Guardar Nuevo Horario</button>
-
-<h3>Contactar a Soporte</h3>
-<form id="contactForm">
-    <label for="contactMessage">Mensaje:</label>
-    <textarea id="contactMessage" required></textarea>
-    <button type="button" onclick="sendContactMessage()">Enviar Mensaje</button>
-</form>
- </section>
-    
 </body>
 </html>
