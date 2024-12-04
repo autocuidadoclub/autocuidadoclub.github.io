@@ -55,22 +55,21 @@
             });
 
         // Login user function
-        function loginUser() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+       function loginUser() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    console.log("User logged in:", userCredential.user);
-                    alert("Login exitoso");
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.html';
-                })
-                .catch((error) => {
-                    console.error("Error en el login:", error);
-                    alert("Error en el login: " + error.message);
-                });
-        }
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log("Login successful:", userCredential.user.email);
+            alert("Login exitoso");
+            window.location.href = 'dashboard.html'; // Redirect to dashboard
+        })
+        .catch((error) => {
+            console.error("Login error:", error.message);
+            alert("Error en el login: " + error.message);
+        });
+}
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
