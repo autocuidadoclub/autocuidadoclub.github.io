@@ -131,6 +131,11 @@
             measurementId: "YOUR_MEASUREMENT_ID",
         };
 
+        if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+        
         // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
