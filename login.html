@@ -28,6 +28,11 @@
             measurementId: "G-LBBGXV2YX5"
         };
 
+        if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+        
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
