@@ -207,6 +207,15 @@ function loginUser() {
                 });
         }
 
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error.message);
+    });
+
+        
         // Logout function
         function logoutUser() {
             auth.signOut()
