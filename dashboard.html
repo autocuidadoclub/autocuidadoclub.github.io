@@ -106,6 +106,19 @@
         <button onclick="updateSchedule()">Guardar Nuevo Horario</button>
     </section>
 
+<button onclick="checkLoginState()">Check Login State</button>
+<script>
+    function checkLoginState() {
+        const user = auth.currentUser;
+        if (user) {
+            alert(`Logged in as: ${user.email}`);
+        } else {
+            alert("No user is logged in.");
+        }
+    }
+</script>
+
+    
     <script>
         // Firebase configuration
         const firebaseConfig = {
