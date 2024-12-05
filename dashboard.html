@@ -242,10 +242,57 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         }
 
         // Schedule selection logic
-        function selectScheduleBox(cell) {
-            document.querySelectorAll(".schedule-table td").forEach(c => c.classList.remove("selected"));
-            cell.classList.add("selected");
+        // Highlight selected schedule box and capture day and time block
+function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
+// Add CSS for selected box
+document.addEventListener("DOMContentLoaded", function () {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .schedule-table tbody td.selected-box {
+            background-color: #FF6600 !important;
+            color: white !important;
+            font-weight: bold;
         }
+    `;
+    document.head.appendChild(style);
+
+    // Attach the click event to schedule table cells
+    const scheduleCells = document.querySelectorAll(".schedule-table tbody td");
+    scheduleCells.forEach((cell) => {
+        cell.addEventListener("click", () => selectScheduleBox(cell));
+    });
+});
 
         // Update schedule
         function updateSchedule() {
