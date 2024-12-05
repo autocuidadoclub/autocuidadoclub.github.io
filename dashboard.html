@@ -37,30 +37,33 @@
     </header>
 
     <!-- Dashboard Content -->
-    <section class="dashboard-section">
-        <h2>Panel de Usuario</h2>
-        <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
+   <section class="dashboard-section">
+    <h2>Panel de Usuario</h2>
+    <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
 
-        <!-- User Profile Information -->
-        <div class="profile-section-title">Información del Usuario</div>
-        <table class="profile-table">
-            <tr><td><strong>Nombre:</strong></td><td id="name">Cargando...</td></tr>
-            <tr><td><strong>Teléfono:</strong></td><td id="phone">Cargando...</td></tr>
-            <tr><td><strong>Tipo de Plan:</strong></td><td id="planType">Cargando...</td></tr>
-        </table>
+    <!-- User Profile Card -->
+    <div class="card">
+        <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+        <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+        <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+        <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+    </div>
 
-        <!-- Vehicles Information -->
-        <div id="vehicles">
-            <h3>Vehículos</h3>
-            <div id="vehicles-list">Cargando información de vehículos...</div>
-        </div>
+    <!-- Vehicles Card -->
+    <div class="card">
+        <h3><i class="fas fa-car"></i> Vehículos</h3>
+        <div id="vehicles-list">Cargando información de vehículos...</div>
+    </div>
 
-        <!-- Current Schedule -->
-        <h3>Horario Actual</h3>
+    <!-- Current Schedule Card -->
+    <div class="card">
+        <h3><i class="fas fa-calendar-alt"></i> Horario Actual</h3>
         <p id="current-schedule">Cargando...</p>
+    </div>
 
-        <!-- Reprogramar Horario -->
-        <h3>Reprogramar Horario</h3>
+    <!-- Reprogram Schedule Card -->
+    <div class="card">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
         <p>Seleccione un nuevo horario para su plan:</p>
         <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
             Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
@@ -104,7 +107,8 @@
             </tbody>
         </table>
         <button onclick="updateSchedule()">Guardar Nuevo Horario</button>
-    </section>
+    </div>
+</section>
 
 <button onclick="checkLoginState()">Check Login State</button>
 <script>
