@@ -266,6 +266,48 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                 console.error("Error al actualizar el horario:", error);
             });
         }
+
+        // Highlight selected schedule box and capture day and time block
+window.selectScheduleBox = function (cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    const timeBlock = cell.innerText.trim();
+
+    // Check if the cell contains a valid time
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText : "Desconocido";
+
+    // Store the selected day and time block in a hidden input field
+    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+    console.log(`Selected Schedule: ${day} - ${timeBlock}`);
+};
+
+// Add CSS for selected box
+document.addEventListener("DOMContentLoaded", function () {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .schedule-table tbody td.selected-box {
+            background-color: #FF6600 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+        
     </script>
 
      <footer>
