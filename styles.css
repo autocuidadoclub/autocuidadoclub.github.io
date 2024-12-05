@@ -952,6 +952,74 @@ html {
     animation: spin 1.5s linear infinite;
 }
 
+.dashboard-section {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: #0056b3;
+    display: flex;
+    align-items: center;
+}
+
+.card h3 i {
+    margin-right: 10px;
+    color: #0056b3;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.schedule-table th, .schedule-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.schedule-table th {
+    background-color: #0056b3;
+    color: #ffffff;
+}
+
+.schedule-table td {
+    cursor: pointer;
+}
+
+.schedule-table td.selected {
+    background-color: #f8c471;
+    color: #000;
+    font-weight: bold;
+}
+
+button {
+    background-color: #0056b3;
+    color: #ffffff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #003f7f;
+}
+
 
 
 /* Adjust Layout for Mobile Devices */
