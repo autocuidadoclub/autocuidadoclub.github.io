@@ -1055,16 +1055,6 @@ button:hover {
     opacity: 0.8;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #ff6600; /* Default background color */
-    color: white; /* Default text color */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
 
 button:hover {
     background-color: orange; /* Change to orange on hover */
