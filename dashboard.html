@@ -178,7 +178,7 @@ function loginUser() {
 
 
         // Load user profile data
-        function loadUserProfile(email) {
+function loadUserProfile(email) {
     db.collection("users").doc(email).get()
         .then((doc) => {
             if (doc.exists) {
@@ -194,10 +194,22 @@ function loginUser() {
                     const lastChange = new Date(userData.lastScheduleChange.seconds * 1000);
                     const now = new Date();
 
+                    // Format the last change with date and time in GT-6
+                    const options = { 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: true, 
+                        timeZone: 'America/Guatemala' 
+                    };
+                    const formattedDateTime = lastChange.toLocaleString('es-ES', options);
+
                     // Check if the last change was within the same month
                     if (lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
                         lastChangeElement.style.display = "block";
-                        lastChangeElement.innerText = `Ya cambiaste tu horario el ${lastChange.toLocaleDateString()}. Solo puedes cambiarlo una vez al mes.`;
+                        lastChangeElement.innerText = `Ya cambiaste tu horario el ${formattedDateTime}. Solo puedes cambiarlo una vez al mes.`;
                     } else {
                         lastChangeElement.style.display = "none";
                     }
@@ -231,6 +243,7 @@ function loginUser() {
             console.error("Error al cargar el perfil del usuario:", error);
         });
 }
+
 
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -301,7 +314,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
         // Update schedule
-        function updateSchedule() {
+function updateSchedule() {
     const selectedSchedule = document.getElementById("selectedSchedule").value;
     if (!selectedSchedule) {
         alert("Por favor selecciona un horario.");
@@ -320,24 +333,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 const now = new Date();
 
                 // Check if the last change was within the same month
-               if (lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
-    // Format the date and time in GT-6 timezone
-    const options = { 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: true, 
-        timeZone: 'America/Guatemala' 
-    };
-    const formattedDateTime = lastChange.toLocaleString('es-ES', options);
-
-    lastChangeElement.style.display = "block";
-    lastChangeElement.innerText = `Ya cambiaste tu horario el ${formattedDateTime}. Solo puedes cambiarlo una vez al mes.`;
-}
-
-
+                if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+                    const options = { 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: true, 
+                        timeZone: 'America/Guatemala' 
+                    };
+                    const formattedDateTime = lastChange.toLocaleString('es-ES', options);
+                    alert(`Ya cambiaste tu horario el ${formattedDateTime}. Solo puedes cambiarlo una vez al mes.`);
+                    return;
+                }
 
                 // Update the schedule and the last change date
                 db.collection("users").doc(user.email).update({
@@ -357,6 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error al verificar el horario:", error);
         });
 }
+
 
 
         // Highlight selected schedule box and capture day and time block
