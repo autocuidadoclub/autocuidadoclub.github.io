@@ -320,10 +320,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 const now = new Date();
 
                 // Check if the last change was within the same month
-                if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
-                    alert("Ya has cambiado tu horario este mes. Solo puedes cambiarlo una vez al mes.");
-                    return;
-                }
+                if (lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    const formattedDate = lastChange.toLocaleDateString('es-ES', options);
+    lastChangeElement.style.display = "block";
+    lastChangeElement.innerText = `Ya cambiaste tu horario el ${formattedDate}. Solo puedes cambiarlo una vez al mes.`;
+}
+
 
                 // Update the schedule and the last change date
                 db.collection("users").doc(user.email).update({
