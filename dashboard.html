@@ -321,8 +321,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Check if the last change was within the same month
                if (lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+    // Format the date and time in GT-6 timezone
+    const options = { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true, 
+        timeZone: 'America/Guatemala' 
+    };
+    const formattedDateTime = lastChange.toLocaleString('es-ES', options);
+
     lastChangeElement.style.display = "block";
-    lastChangeElement.innerText = `Ya cambiaste tu horario el ${lastChange.toLocaleDateString()}. Solo puedes cambiarlo una vez al mes.`;
+    lastChangeElement.innerText = `Ya cambiaste tu horario el ${formattedDateTime}. Solo puedes cambiarlo una vez al mes.`;
 }
 
 
