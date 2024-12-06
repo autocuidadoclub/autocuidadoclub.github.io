@@ -66,7 +66,9 @@
             <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
             <p>Seleccione un nuevo horario para su plan:</p>
             <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
-                Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
+    Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
+</div>
+
             </div>
             <table class="schedule-table">
                 <thead>
@@ -106,7 +108,9 @@
                     </tr>
                 </tbody>
             </table>
-            <input type="hidden" id="selectedSchedule">
+           <input type="hidden" id="selectedSchedule">
+            <input type="hidden" id="lastScheduleChange">
+
             <button onclick="updateSchedule()">Guardar Nuevo Horario</button>
         </div>
     </section>
@@ -174,41 +178,59 @@ function loginUser() {
 
         // Load user profile data
         function loadUserProfile(email) {
-            db.collection("users").doc(email).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        document.getElementById("name").innerText = userData.name || "N/A";
-                        document.getElementById("phone").innerText = userData.phone || "N/A";
-                        document.getElementById("planType").innerText = userData.planType || "N/A";
-                        document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+    db.collection("users").doc(email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById("name").innerText = userData.name || "N/A";
+                document.getElementById("phone").innerText = userData.phone || "N/A";
+                document.getElementById("planType").innerText = userData.planType || "N/A";
+                document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
 
-                        // Load vehicle data
-                        const vehiclesList = document.getElementById("vehicles-list");
-                        vehiclesList.innerHTML = "";
-                        if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
-                            userData.vehicles.forEach(vehicle => {
-                                vehiclesList.innerHTML += `
-                                    <div>
-                                        <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
-                                        <strong>Modelo:</strong> ${vehicle.model || "N/A"}<br>
-                                        <strong>Año:</strong> ${vehicle.year || "N/A"}<br>
-                                        <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
-                                        <hr>
-                                    </div>
-                                `;
-                            });
-                        } else {
-                            vehiclesList.innerHTML = "No hay vehículos registrados.";
-                        }
+                // Display last schedule change date
+                const lastChangeElement = document.getElementById("reschedule-warning");
+                if (userData.lastScheduleChange) {
+                    const lastChange = new Date(userData.lastScheduleChange.seconds * 1000);
+                    const now = new Date();
+
+                    // Check if the last change was within the same month
+                    if (lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+                        lastChangeElement.style.display = "block";
+                        lastChangeElement.innerText = `Ya cambiaste tu horario el ${lastChange.toLocaleDateString()}. Solo puedes cambiarlo una vez al mes.`;
                     } else {
-                        console.error("Perfil de usuario no encontrado.");
+                        lastChangeElement.style.display = "none";
                     }
-                })
-                .catch((error) => {
-                    console.error("Error al cargar el perfil del usuario:", error);
-                });
-        }
+                } else {
+                    lastChangeElement.style.display = "none";
+                }
+
+                // Load vehicle data
+                const vehiclesList = document.getElementById("vehicles-list");
+                vehiclesList.innerHTML = "";
+                if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
+                    userData.vehicles.forEach(vehicle => {
+                        vehiclesList.innerHTML += `
+                            <div>
+                                <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
+                                <strong>Modelo:</strong> ${vehicle.model || "N/A"}<br>
+                                <strong>Año:</strong> ${vehicle.year || "N/A"}<br>
+                                <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
+                                <hr>
+                            </div>
+                        `;
+                    });
+                } else {
+                    vehiclesList.innerHTML = "No hay vehículos registrados.";
+                }
+            } else {
+                console.error("Perfil de usuario no encontrado.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al cargar el perfil del usuario:", error);
+        });
+}
+
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
@@ -234,14 +256,12 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         // Highlight selected schedule box and capture day and time block
 function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
-
-    // Get the clicked cell's text
     const timeBlock = cell.innerText.trim();
 
-    // Validate the clicked cell
+    // Check if the cell contains a valid time
     if (timeBlock === "-" || timeBlock === "") {
         alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
+        return;
     }
 
     // Remove selection from all other cells
@@ -253,15 +273,11 @@ function selectScheduleBox(cell) {
     // Get the corresponding day from the column header
     const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    const day = dayHeader ? dayHeader.innerText : "Desconocido";
 
-    // Update the hidden input field to include both the day and time block
-    const scheduleField = document.getElementById("selectedSchedule");
-    if (scheduleField) {
-        scheduleField.value = `${day} - ${timeBlock}`;
-    }
-
-    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+    // Store the selected day and time block in a hidden input field
+    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+    console.log(`Selected Schedule: ${day} - ${timeBlock}`);
 }
 
 // Add CSS for selected box
@@ -285,23 +301,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Update schedule
         function updateSchedule() {
-            const selectedCell = document.querySelector(".schedule-table td.selected");
-            if (!selectedCell) {
-                alert("Por favor selecciona un horario.");
-                return;
-            }
-            const user = auth.currentUser;
-            const newSchedule = selectedCell.innerText.trim();
+    const selectedSchedule = document.getElementById("selectedSchedule").value;
+    if (!selectedSchedule) {
+        alert("Por favor selecciona un horario.");
+        return;
+    }
 
-            db.collection("users").doc(user.email).update({
-                selectedSchedule: newSchedule
-            }).then(() => {
-                alert("Horario actualizado correctamente.");
-                loadUserProfile(user.email); // Reload profile info
-            }).catch((error) => {
-                console.error("Error al actualizar el horario:", error);
-            });
-        }
+    const user = auth.currentUser;
+
+    db.collection("users").doc(user.email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const lastChange = userData.lastScheduleChange
+                    ? new Date(userData.lastScheduleChange.seconds * 1000)
+                    : null;
+                const now = new Date();
+
+                // Check if the last change was within the same month
+                if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+                    alert("Ya has cambiado tu horario este mes. Solo puedes cambiarlo una vez al mes.");
+                    return;
+                }
+
+                // Update the schedule and the last change date
+                db.collection("users").doc(user.email).update({
+                    selectedSchedule: selectedSchedule,
+                    lastScheduleChange: firebase.firestore.Timestamp.now(),
+                }).then(() => {
+                    alert("Horario actualizado correctamente.");
+                    loadUserProfile(user.email);
+                }).catch((error) => {
+                    console.error("Error al actualizar el horario:", error);
+                });
+            } else {
+                console.error("Usuario no encontrado.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al verificar el horario:", error);
+        });
+}
+
 
         // Highlight selected schedule box and capture day and time block
 window.selectScheduleBox = function (cell) {
