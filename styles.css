@@ -1076,6 +1076,26 @@ button:hover {
     background-color: #fff;
 }
 
+#save-schedule-btn {
+    background-color: #003366; /* Dark blue */
+    color: white;
+    padding: 10px 20px; /* Compact padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px; /* Adjust font size */
+    text-align: center;
+    display: inline-block;
+    width: auto; /* Ensure no unnecessary width */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+#save-schedule-btn:hover {
+    background-color: #ff6600; /* Orange on hover */
+    color: white; /* Keep text white */
+}
+
 
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
