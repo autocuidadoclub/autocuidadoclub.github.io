@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loyalty Progress with Timeline</title>
+  <title>Interactive Loyalty Timeline</title>
   <style>
     /* General Styling */
     body {
@@ -36,214 +36,182 @@
       margin-bottom: 20px;
     }
 
-    .holes {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      justify-items: center;
-    }
-
-    .hole {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      transition: all 0.3s ease-in-out;
-    }
-
-    /* Filled Holes */
-    .hole.filled {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-    }
-
-    /* Unfilled Holes */
-    .hole {
-      border: 2px dashed #ccc;
-      background-color: #fff;
-      color: #ccc;
-    }
-
-    /* Milestone Indicator */
-    .hole.milestone {
-      border: 2px solid gold;
-    }
-
-    .hole.milestone::after {
-      content: "★";
-      color: gold;
-      font-size: 16px;
-    }
-
-    .label {
-      font-size: 12px;
-      color: #555;
-      text-align: center;
-      margin-top: 5px;
-    }
-
-    /* Timeline Styling */
+    /* Timeline Container */
     .timeline {
       margin: 30px auto;
       max-width: 600px;
       padding: 0 20px;
-      text-align: left;
+      position: relative;
     }
 
-    .timeline-event {
-      margin-bottom: 20px;
+    .timeline .step {
       display: flex;
       align-items: center;
+      margin-bottom: 30px;
     }
 
-    .timeline-marker {
+    .timeline .step:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Timeline Progress Line */
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #ccc;
+      z-index: 0;
+    }
+
+    /* Step Marker */
+    .timeline .marker {
+      position: relative;
       width: 20px;
       height: 20px;
       border-radius: 50%;
       background-color: #ccc;
-      flex-shrink: 0;
+      z-index: 1;
     }
 
-    .timeline-marker.filled {
+    .timeline .marker.active {
       background-color: #4caf50;
     }
 
-    .timeline-content {
-      margin-left: 15px;
+    .timeline .marker.achieved {
+      background-color: gold;
     }
 
-    .timeline-content p {
-      margin: 0;
-      color: #555;
-      font-size: 14px;
+    /* Step Content */
+    .timeline .content {
+      margin-left: 40px;
+      text-align: left;
     }
 
-    .timeline-content .highlight {
-      font-weight: bold;
+    .timeline .content h3 {
+      font-size: 18px;
       color: #333;
+      margin: 0;
+    }
+
+    .timeline .content p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #555;
+    }
+
+    /* Blurred Rewards */
+    .reward {
+      width: 100px;
+      height: 100px;
+      margin-top: 10px;
+      filter: blur(5px);
+      opacity: 0.5;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .reward.unlocked {
+      filter: none;
+      opacity: 1;
+    }
+
+    .reward img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
   <div class="loyalty-card">
-    <h2>Loyalty Progress</h2>
-    <p>Earn rewards by registering, paying for subscriptions, and upgrading your plan!</p>
-    <div class="holes">
-      <!-- Holes with labels -->
-      <div class="hole filled" title="Welcome Reward!">✔</div>
-      <span class="label">Register Reward</span>
+    <h2>Interactive Loyalty Timeline</h2>
+    <p>Track your progress and unlock rewards!</p>
+  </div>
 
-      <div class="hole" title="First Payment or AC Check">○</div>
-      <span class="label">First Payment / AC Check</span>
+  <div class="timeline">
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="marker active"></div>
+      <div class="content">
+        <h3>Step 1: Registration</h3>
+        <p>Thank you for registering! Your loyalty journey begins here.</p>
+        <div class="reward unlocked">
+          <img src="https://via.placeholder.com/100x100?text=Welcome" alt="Welcome Reward">
+        </div>
+      </div>
+    </div>
 
-      <div class="hole" title="1st Month Paid">○</div>
-      <span class="label">Month 1</span>
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="marker active"></div>
+      <div class="content">
+        <h3>Step 2: First Payment</h3>
+        <p>First payment received! You’re on your way to rewards.</p>
+        <div class="reward unlocked">
+          <img src="https://via.placeholder.com/100x100?text=AC+Check" alt="AC Check Reward">
+        </div>
+      </div>
+    </div>
 
-      <div class="hole" title="2nd Month Paid">○</div>
-      <span class="label">Month 2</span>
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="marker"></div>
+      <div class="content">
+        <h3>Step 3: Month 1</h3>
+        <p>Complete your first month to unlock this reward.</p>
+        <div class="reward">
+          <img src="https://via.placeholder.com/100x100?text=Reward" alt="Monthly Reward">
+        </div>
+      </div>
+    </div>
 
-      <div class="hole" title="3rd Month Paid">○</div>
-      <span class="label">Month 3</span>
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="marker"></div>
+      <div class="content">
+        <h3>Step 4: 4 Months</h3>
+        <p>You're halfway there! Unlock this reward at 4 months.</p>
+        <div class="reward">
+          <img src="https://via.placeholder.com/100x100?text=Reward" alt="4-Month Reward">
+        </div>
+      </div>
+    </div>
 
-      <div class="hole" title="4th Month Paid">○</div>
-      <span class="label">Month 4</span>
-
-      <div class="hole" title="5th Month Paid">○</div>
-      <span class="label">Month 5</span>
-
-      <div class="hole milestone" title="Upgrade Plan Reward"></div>
-      <span class="label">Upgrade Plan</span>
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="marker"></div>
+      <div class="content">
+        <h3>Step 5: 6 Months</h3>
+        <p>Complete 6 months to unlock an exclusive reward!</p>
+        <div class="reward">
+          <img src="https://via.placeholder.com/100x100?text=6M+Reward" alt="6-Month Reward">
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Timeline -->
-  <div class="timeline">
-    <!-- Dynamic Timeline Events -->
-  </div>
-
   <script>
-    // Example user data (replace with dynamic data from your backend)
     const userData = {
-      hasRegistered: true,          // User has registered
-      monthsPaid: 3,                // Number of months paid (or a 3-month plan)
-      isSixMonthSubscriber: false,  // If user registered for a 6-month subscription
-      isUpgraded: false,            // If the user upgraded their plan
+      hasRegistered: true,
+      monthsPaid: 2, // Dynamic user progress
     };
 
-    // Timeline messages
-    const timelineMessages = [
-      "Thank you for registering! Your loyalty journey begins here.",
-      "First payment received! You're on your way to rewards.",
-      "Great job completing your 1st month! Keep going for more rewards.",
-      "Amazing! You’ve completed your 2nd month of loyalty.",
-      "You’re halfway there! 3rd month completed successfully.",
-      "4th month milestone unlocked. Keep up the great work!",
-      "Almost there! 5 months down, 1 to go!",
-      "Upgrade your plan now to unlock exclusive rewards!",
-    ];
+    function updateTimeline(userData) {
+      const markers = document.querySelectorAll('.marker');
+      const rewards = document.querySelectorAll('.reward');
 
-    // Update the loyalty card dynamically
-    function updateLoyaltyCard(userData) {
-      const holes = document.querySelectorAll('.hole');
-      const labels = document.querySelectorAll('.label');
-      const timeline = document.querySelector('.timeline');
-
-      // Hole 1: Registration Reward
-      if (userData.hasRegistered) {
-        holes[0].classList.add('filled');
-        labels[0].textContent = "Welcome Reward";
-      }
-
-      // Hole 2: First Payment or AC Check
-      if (userData.isSixMonthSubscriber) {
-        holes[1].classList.add('filled');
-        labels[1].textContent = "Free AC System Check";
-      } else if (userData.monthsPaid >= 1) {
-        holes[1].classList.add('filled');
-        labels[1].textContent = "First Payment";
-      }
-
-      // Holes 3–7: Monthly Payments
-      for (let i = 2; i < 7; i++) {
-        if (userData.monthsPaid >= i - 1) {
-          holes[i].classList.add('filled');
-          labels[i].textContent = `Month ${i - 1}`;
+      markers.forEach((marker, index) => {
+        if (index <= userData.monthsPaid) {
+          marker.classList.add('active');
+          if (index === 1) marker.classList.add('achieved'); // Example for special reward
+          rewards[index].classList.add('unlocked');
         }
-      }
-
-      // Hole 8: Upgrade Plan
-      if (userData.isUpgraded) {
-        holes[7].classList.add('filled');
-        labels[7].textContent = "Upgrade Reward";
-      }
-
-      // Populate Timeline
-      timelineMessages.forEach((message, index) => {
-        const event = document.createElement('div');
-        event.classList.add('timeline-event');
-
-        const marker = document.createElement('div');
-        marker.classList.add('timeline-marker');
-        if (index <= userData.monthsPaid || (index === 1 && userData.hasRegistered)) {
-          marker.classList.add('filled');
-        }
-
-        const content = document.createElement('div');
-        content.classList.add('timeline-content');
-        content.innerHTML = `<p><span class="highlight">Step ${index + 1}:</span> ${message}</p>`;
-
-        event.appendChild(marker);
-        event.appendChild(content);
-        timeline.appendChild(event);
       });
     }
 
-    // Initialize the loyalty card and timeline
-    updateLoyaltyCard(userData);
+    updateTimeline(userData);
   </script>
 </body>
 </html>
