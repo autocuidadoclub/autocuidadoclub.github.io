@@ -70,7 +70,6 @@
     .hole.star {
       font-size: 28px;
       color: gold;
-      position: relative;
     }
 
     .hole.star.completed {
@@ -78,7 +77,16 @@
       color: white;
     }
 
-    /* Description */
+    /* Legends */
+    .legends {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      font-size: 12px;
+      color: #555;
+      text-align: center;
+    }
+
     .description {
       text-align: center;
       font-size: 14px;
@@ -101,17 +109,28 @@
         <!-- Hole 2 -->
         <div class="hole completed" title="First Payment Complete">✔</div>
         <!-- Hole 3 -->
-        <div class="hole completed" title="Month 1 Subscription Complete">✔</div>
+        <div class="hole completed" title="1st Month Subscription Progress">✔</div>
         <!-- Hole 4 -->
-        <div class="hole" title="Month 2 Progress">○</div>
+        <div class="hole" title="2nd Month Subscription Progress">○</div>
         <!-- Hole 5 -->
-        <div class="hole" title="Month 3 Progress">○</div>
+        <div class="hole" title="3rd Month Subscription Progress">○</div>
         <!-- Hole 6 -->
-        <div class="hole" title="Month 4 Progress">○</div>
+        <div class="hole" title="4th Month Subscription Progress">○</div>
         <!-- Hole 7 -->
-        <div class="hole" title="Month 5 Progress">○</div>
+        <div class="hole" title="5th Month Subscription Progress">○</div>
         <!-- Hole 8 (Star Reward) -->
-        <div class="hole star" title="Final Reward (Star)">★</div>
+        <div class="hole star" title="Upgrade Plan Reward">★</div>
+      </div>
+      <!-- Legends for Each Hole -->
+      <div class="legends">
+        <p>Registration</p>
+        <p>First Payment</p>
+        <p>1st Month</p>
+        <p>2nd Month</p>
+        <p>3rd Month</p>
+        <p>4th Month</p>
+        <p>5th Month</p>
+        <p>Upgrade Plan</p>
       </div>
       <div class="description">
         <p><strong>Current Progress:</strong> 3 of 8 steps completed.</p>
@@ -126,7 +145,7 @@
       hasRegistered: true,
       monthsPaid: 3, // Number of months paid
     };
-    
+
     function updateLoyaltyCard(userData) {
       const holes = document.querySelectorAll('.hole');
       let progress = 1; // Start with registration reward filled
