@@ -3,91 +3,155 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loyalty Card</title>
+  <title>Loyalty Progress</title>
   <style>
-  .loyalty-card {
-    text-align: center;
-    padding: 20px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    width: 300px;
-    margin: 20px auto;
-    background-color: #fff;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .holes {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    justify-content: center;
-  }
-
-  .hole {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    transition: all 0.3s ease-in-out;
-  }
-
-  /* Filled Hole */
-  .hole.filled {
-    background-color: #4caf50;
-    border: none;
-    color: #fff;
-  }
-
-  /* Empty Hole */
-  .hole {
-    border: 2px dashed #ccc;
-    background-color: #fff;
-    color: #ccc;
-  }
-</style>
-
-<div class="loyalty-card">
-  <h2>Loyalty Progress</h2>
-  <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
-  <div class="holes">
-    <div class="hole filled">✔</div>
-    <div class="hole filled">✔</div>
-    <div class="hole filled">✔</div>
-    <div class="hole">○</div>
-    <div class="hole">○</div>
-    <div class="hole">○</div>
-    <div class="hole">○</div>
-    <div class="hole">○</div>
-  </div>
-</div>
-
-
-  <script>
-    // Placeholder for loyalty data fetching logic
-    function updateLoyaltyCard(consecutiveMonths) {
-      const holes = document.querySelectorAll('.hole');
-      holes.forEach((hole, index) => {
-        if (index < consecutiveMonths) {
-          hole.classList.add('filled');
-        } else {
-          hole.classList.remove('filled');
-        }
-      });
-
-      // Show redeem button if all 8 holes are filled
-      const redeemBtn = document.querySelector('.redeem-btn');
-      if (consecutiveMonths === 8) {
-        redeemBtn.style.display = 'block';
-      } else {
-        redeemBtn.style.display = 'none';
-      }
+    /* General Styling */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background-color: #f8f9fa;
     }
 
-    // Example: Simulate updating the card with 6 consecutive months
-    updateLoyaltyCard(6);
+    .loyalty-card {
+      text-align: center;
+      padding: 20px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      width: 300px;
+      margin: 20px auto;
+      background-color: #fff;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .loyalty-card h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .loyalty-card p {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .holes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      justify-items: center;
+    }
+
+    .hole {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Filled Holes */
+    .hole.filled {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+    }
+
+    /* Unfilled Holes */
+    .hole {
+      border: 2px dashed #ccc;
+      background-color: #fff;
+      color: #ccc;
+    }
+
+    /* Milestone Indicator */
+    .hole.milestone {
+      border: 2px solid gold;
+    }
+
+    .hole.milestone::after {
+      content: "★";
+      color: gold;
+      font-size: 16px;
+    }
+
+    .label {
+      font-size: 12px;
+      color: #555;
+      text-align: center;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="loyalty-card">
+    <h2>Loyalty Progress</h2>
+    <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+    <div class="holes">
+      <!-- Filled holes -->
+      <div class="hole filled" title="Completed">✔</div>
+      <span class="label">Month 1</span>
+
+      <div class="hole filled" title="Completed">✔</div>
+      <span class="label">Month 2</span>
+
+      <div class="hole filled" title="Completed">✔</div>
+      <span class="label">Month 3</span>
+
+      <!-- Unfilled holes with motivational message -->
+      <div class="hole" title="Subscribe to unlock!">○</div>
+      <span class="label">Next Month</span>
+
+      <div class="hole" title="Upgrade to unlock!">○</div>
+      <span class="label">Upgrade Plan</span>
+
+      <!-- Milestone indicator -->
+      <div class="hole milestone" title="Special Milestone!"></div>
+      <span class="label">6th Month Reward</span>
+
+      <!-- Remaining unfilled -->
+      <div class="hole" title="Subscribe to unlock!">○</div>
+      <span class="label">Month 7</span>
+
+      <div class="hole milestone" title="Final Reward!"></div>
+      <span class="label">Grand Reward</span>
+    </div>
+  </div>
+
+  <script>
+    // Example user data (replace with dynamic data from your backend)
+    const userData = {
+      consecutiveMonthsPaid: 3, // Months user has subscribed
+    };
+
+    // Update the loyalty card dynamically
+    function updateLoyaltyCard(userData) {
+      const holes = document.querySelectorAll('.hole');
+      const labels = document.querySelectorAll('.label');
+
+      holes.forEach((hole, index) => {
+        if (index < userData.consecutiveMonthsPaid) {
+          hole.classList.add('filled');
+          labels[index].textContent = `Month ${index + 1}`;
+        } else if (index === userData.consecutiveMonthsPaid) {
+          labels[index].textContent = 'Next Month';
+          hole.title = "Stay subscribed to unlock this hole!";
+        } else if (index === 4) {
+          labels[index].textContent = 'Upgrade Plan';
+          hole.title = "Upgrade your plan to unlock these rewards!";
+        } else {
+          labels[index].textContent = `Month ${index + 1}`;
+          hole.title = "Subscribe to unlock this milestone!";
+        }
+      });
+    }
+
+    // Initialize the loyalty card with example data
+    updateLoyaltyCard(userData);
   </script>
 </body>
 </html>
