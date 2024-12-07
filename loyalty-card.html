@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loyalty Card with Rewards</title>
+  <title>Loyalty Progress</title>
   <style>
     /* General Styling */
     body {
@@ -46,11 +46,10 @@
       height: 60px;
       border-radius: 50%;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      position: relative;
+      font-size: 24px;
+      transition: all 0.3s ease-in-out;
     }
 
     /* Completed Holes */
@@ -67,150 +66,57 @@
       color: #ccc;
     }
 
-    /* Star Icon */
-    .hole .star {
-      font-size: 24px;
+    /* Special Last Hole with Star */
+    .hole.star {
+      font-size: 28px;
       color: gold;
-      margin-bottom: 5px;
+      position: relative;
     }
 
-    .hole.completed .star {
+    .hole.star.completed {
+      background-color: #4caf50;
       color: white;
     }
 
-    /* Rewards Section */
-    .rewards {
-      margin-top: 30px;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      background-color: #fff;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .reward {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .reward:last-child {
-      margin-bottom: 0;
-    }
-
-    .reward-text {
-      text-align: left;
-    }
-
-    .reward-status {
-      font-weight: bold;
-      color: #4caf50;
-    }
-
-    .reward-status.locked {
-      color: #ccc;
-    }
-
-    /* Final Message */
-    .final-message {
+    /* Description */
+    .description {
       text-align: center;
-      margin-top: 20px;
-      font-size: 16px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .description strong {
       font-weight: bold;
-      color: #333;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Loyalty Card Progress</h2>
+    <h2>Loyalty Progress</h2>
     <div class="loyalty-card">
-      <p>Stay subscribed to unlock rewards!</p>
+      <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
       <div class="holes">
         <!-- Hole 1 -->
-        <div class="hole completed" title="Registration Reward">
-          <div class="star">★</div>
-          <p>Registration</p>
-        </div>
-
+        <div class="hole completed" title="Registration Complete">✔</div>
         <!-- Hole 2 -->
-        <div class="hole" title="First Payment">
-          <div class="star">★</div>
-          <p>First Payment</p>
-        </div>
-
+        <div class="hole completed" title="First Payment Complete">✔</div>
         <!-- Hole 3 -->
-        <div class="hole" title="Month 1 Progress">
-          <div class="star">★</div>
-          <p>Month 1</p>
-        </div>
-
+        <div class="hole completed" title="Month 1 Subscription Complete">✔</div>
         <!-- Hole 4 -->
-        <div class="hole" title="Month 2 Progress">
-          <div class="star">★</div>
-          <p>Month 2</p>
-        </div>
-
+        <div class="hole" title="Month 2 Progress">○</div>
         <!-- Hole 5 -->
-        <div class="hole" title="Month 3 Progress">
-          <div class="star">★</div>
-          <p>Month 3</p>
-        </div>
-
+        <div class="hole" title="Month 3 Progress">○</div>
         <!-- Hole 6 -->
-        <div class="hole" title="Month 4 Progress">
-          <div class="star">★</div>
-          <p>Month 4</p>
-        </div>
-
+        <div class="hole" title="Month 4 Progress">○</div>
         <!-- Hole 7 -->
-        <div class="hole" title="Month 5 Progress">
-          <div class="star">★</div>
-          <p>Month 5</p>
-        </div>
-
-        <!-- Hole 8 -->
-        <div class="hole" title="Upgrade Plan Reward">
-          <div class="star">★</div>
-          <p>Upgrade Plan</p>
-        </div>
+        <div class="hole" title="Month 5 Progress">○</div>
+        <!-- Hole 8 (Star Reward) -->
+        <div class="hole star" title="Final Reward (Star)">★</div>
       </div>
       <div class="description">
-        <p><strong>Current Progress:</strong> 1 of 8 stars collected.</p>
-        <p>Complete all steps to unlock all rewards!</p>
+        <p><strong>Current Progress:</strong> 3 of 8 steps completed.</p>
+        <p>Complete all steps to unlock the final reward!</p>
       </div>
-    </div>
-
-    <!-- Rewards Section -->
-    <div class="rewards">
-      <h3>Available Rewards</h3>
-      <div class="reward">
-        <div class="reward-text">
-          <p><strong>Recarga de aire acondicionado</strong></p>
-          <p>Unlocked at Step 1 (Registration)</p>
-        </div>
-        <div class="reward-status">Unlocked</div>
-      </div>
-      <div class="reward">
-        <div class="reward-text">
-          <p><strong>Carwash gratis</strong></p>
-          <p>Unlocked at Step 2 (First Payment)</p>
-        </div>
-        <div class="reward-status locked">Locked</div>
-      </div>
-      <div class="reward">
-        <div class="reward-text">
-          <p><strong>Inspección adicional en el mes</strong></p>
-          <p>Unlocked at Step 4 (4 Months Progress)</p>
-        </div>
-        <div class="reward-status locked">Locked</div>
-      </div>
-    </div>
-
-    <!-- Final Message -->
-    <div class="final-message">
-      Unlock the final reward by collecting all 8 stars!
     </div>
   </div>
 
@@ -218,41 +124,26 @@
     // Example user progress
     const userData = {
       hasRegistered: true,
-      monthsPaid: 2, // Number of months paid
-      subscriptionType: "3-month", // "monthly", "3-month", or "6-month"
+      monthsPaid: 3, // Number of months paid
     };
 
     function updateLoyaltyCard(userData) {
       const holes = document.querySelectorAll('.hole');
-      const rewardStatuses = document.querySelectorAll('.reward-status');
       let progress = 1; // Start with registration reward filled
 
-      // Fill holes based on subscription type
-      if (userData.subscriptionType === "monthly") {
-        progress += userData.monthsPaid;
-      } else if (userData.subscriptionType === "3-month") {
-        progress += 3; // Fill 3 holes for 3-month subscription
-      } else if (userData.subscriptionType === "6-month") {
-        progress += 6; // Fill 6 holes for 6-month subscription
-      }
+      // Increment progress for paid months
+      progress += userData.monthsPaid;
 
-      // Update holes and rewards dynamically
+      // Update holes dynamically
       holes.forEach((hole, index) => {
         if (index < progress) {
           hole.classList.add('completed');
         }
       });
 
-      rewardStatuses.forEach((status, index) => {
-        if (index < progress) {
-          status.textContent = "Unlocked";
-          status.classList.remove('locked');
-        }
-      });
-
       // Update progress description
       const description = document.querySelector('.description p strong');
-      description.textContent = `Current Progress: ${progress} of 8 stars collected.`;
+      description.textContent = `Current Progress: ${progress} of 8 steps completed.`;
     }
 
     updateLoyaltyCard(userData);
