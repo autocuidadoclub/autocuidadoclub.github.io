@@ -457,7 +457,60 @@ function updateSchedule() {
 }
 
 
+ // Example user data from Firebase
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            db.collection("users").doc(user.email).get().then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    updateLoyaltyCard({
+                        hasRegistered: true,
+                        subscriptionPlan: userData.planType, // E.g., "6-month", "3-month"
+                        carsRegistered: userData.vehicles.length || 1, // Number of vehicles
+                    });
+                }
+            });
+        }
+    });
 
+    function updateLoyaltyCard(userData) {
+        const holes = document.querySelectorAll('.hole');
+        const rewardStatusElements = document.querySelectorAll('.reward-status');
+        const acRewards = document.getElementById('ac-rewards');
+        const carwashRewards = document.getElementById('carwash-rewards');
+        const reviewRewards = document.getElementById('review-rewards');
+        let progress = 1;
+
+        // Calculate progress based on subscription plan
+        switch (userData.subscriptionPlan) {
+            case "3-month":
+                progress += 3;
+                break;
+            case "6-month":
+                progress += 6;
+                break;
+            case "12-month":
+                progress += 8;
+                break;
+        }
+
+        holes.forEach((hole, index) => {
+            if (index < progress) hole.classList.add('completed');
+        });
+
+        const rewardsMultiplier = userData.carsRegistered;
+        acRewards.textContent = `${rewardsMultiplier}x`;
+        carwashRewards.textContent = `${rewardsMultiplier}x`;
+        reviewRewards.textContent = `${rewardsMultiplier}x`;
+
+        if (progress >= 8) {
+            rewardStatusElements.forEach((status) => {
+                status.textContent = "Unlocked";
+                status.classList.add("unlocked");
+                status.classList.remove("locked");
+            });
+        }
+    }
 
         // Highlight selected schedule box and capture day and time block
 window.selectScheduleBox = function (cell) {
