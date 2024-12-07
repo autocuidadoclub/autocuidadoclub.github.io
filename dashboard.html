@@ -346,15 +346,31 @@
         document.getElementById("paymentStatus").innerText = data.paymentStatus || "Pendiente";
         document.getElementById("nextPaymentDate").innerText = data.nextPaymentDate || "No asignado";
         document.getElementById("memberSince").innerText = formatTimestamp(data.memberSince) || "Desconocido";
+
+         // Format and display "Miembro Desde"
+                if (userData.registrationDate) {
+                    const registrationDate = formatTimestamp(userData.registrationDate);
+                    document.getElementById("memberSince").innerText = registrationDate;
+                } else {
+                    document.getElementById("memberSince").innerText = "Desconocido";
+                }
+
+        
         loadVehicles(data.vehicles || []);
         handleScheduleRestriction(data.lastScheduleChange);
         updateLoyaltyProgress(data);
-    }
+      } else {
+                console.error("User profile not found in database.");
+            }
+        })
+        .catch((error) => console.error("Error loading user profile:", error));
+}
+
 
     // Format Firestore timestamp to readable date
     function formatTimestamp(timestamp) {
         if (!timestamp) return null;
-        const date = new Date(timestamp.seconds * 1000);
+       const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
         return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
