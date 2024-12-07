@@ -18,7 +18,7 @@
       padding: 20px;
       border: 2px solid #ccc;
       border-radius: 10px;
-      width: 300px;
+      width: 350px;
       margin: 20px auto;
       background-color: #fff;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -90,42 +90,41 @@
 <body>
   <div class="loyalty-card">
     <h2>Loyalty Progress</h2>
-    <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+    <p>Earn rewards by registering, paying for subscriptions, and upgrading your plan!</p>
     <div class="holes">
-      <!-- Filled holes -->
-      <div class="hole filled" title="Completed">✔</div>
+      <!-- Holes with labels -->
+      <div class="hole filled" title="Welcome Reward!">✔</div>
+      <span class="label">Register Reward</span>
+
+      <div class="hole" title="First Payment Reward">○</div>
+      <span class="label">First Payment</span>
+
+      <div class="hole" title="1st Month Paid">○</div>
       <span class="label">Month 1</span>
 
-      <div class="hole filled" title="Completed">✔</div>
+      <div class="hole" title="2nd Month Paid">○</div>
       <span class="label">Month 2</span>
 
-      <div class="hole filled" title="Completed">✔</div>
+      <div class="hole" title="3rd Month Paid">○</div>
       <span class="label">Month 3</span>
 
-      <!-- Unfilled holes with motivational message -->
-      <div class="hole" title="Subscribe to unlock!">○</div>
-      <span class="label">Next Month</span>
+      <div class="hole" title="4th Month Paid">○</div>
+      <span class="label">Month 4</span>
 
-      <div class="hole" title="Upgrade to unlock!">○</div>
+      <div class="hole" title="5th Month Paid">○</div>
+      <span class="label">Month 5</span>
+
+      <div class="hole milestone" title="Upgrade Plan Reward"></div>
       <span class="label">Upgrade Plan</span>
-
-      <!-- Milestone indicator -->
-      <div class="hole milestone" title="Special Milestone!"></div>
-      <span class="label">6th Month Reward</span>
-
-      <!-- Remaining unfilled -->
-      <div class="hole" title="Subscribe to unlock!">○</div>
-      <span class="label">Month 7</span>
-
-      <div class="hole milestone" title="Final Reward!"></div>
-      <span class="label">Grand Reward</span>
     </div>
   </div>
 
   <script>
     // Example user data (replace with dynamic data from your backend)
     const userData = {
-      consecutiveMonthsPaid: 3, // Months user has subscribed
+      hasRegistered: true,         // User has registered
+      monthsPaid: 3,               // Number of months paid (or a 3-month plan)
+      isUpgraded: false,           // If the user upgraded their plan
     };
 
     // Update the loyalty card dynamically
@@ -133,21 +132,34 @@
       const holes = document.querySelectorAll('.hole');
       const labels = document.querySelectorAll('.label');
 
-      holes.forEach((hole, index) => {
-        if (index < userData.consecutiveMonthsPaid) {
-          hole.classList.add('filled');
-          labels[index].textContent = `Month ${index + 1}`;
-        } else if (index === userData.consecutiveMonthsPaid) {
-          labels[index].textContent = 'Next Month';
-          hole.title = "Stay subscribed to unlock this hole!";
-        } else if (index === 4) {
-          labels[index].textContent = 'Upgrade Plan';
-          hole.title = "Upgrade your plan to unlock these rewards!";
-        } else {
-          labels[index].textContent = `Month ${index + 1}`;
-          hole.title = "Subscribe to unlock this milestone!";
+      // Hole 1: Registration Reward
+      if (userData.hasRegistered) {
+        holes[0].classList.add('filled');
+        labels[0].textContent = "Welcome Reward";
+      }
+
+      // Hole 2: First Payment
+      if (userData.monthsPaid >= 1) {
+        holes[1].classList.add('filled');
+        labels[1].textContent = "First Payment";
+      }
+
+      // Holes 3–7: Monthly Payments
+      for (let i = 2; i < 7; i++) {
+        if (userData.monthsPaid >= i - 1) {
+          holes[i].classList.add('filled');
+          labels[i].textContent = `Month ${i - 1}`;
         }
-      });
+      }
+
+      // Hole 8: Upgrade Plan
+      if (userData.isUpgraded) {
+        holes[7].classList.add('filled');
+        labels[7].textContent = "Upgrade Reward";
+      } else {
+        labels[7].textContent = "Upgrade Plan";
+        holes[7].title = "Upgrade your plan to unlock this reward!";
+      }
     }
 
     // Initialize the loyalty card with example data
