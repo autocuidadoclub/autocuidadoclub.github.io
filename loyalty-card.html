@@ -34,7 +34,7 @@
 
     .loyalty-card h2 {
       font-size: 24px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .holes {
@@ -69,69 +69,45 @@
       color: #ccc;
     }
 
-    /* Rewards Section */
-    .timeline {
-      margin: 20px 0;
-      position: relative;
-    }
-
-    .step {
-      display: flex;
-      margin-bottom: 20px;
-      align-items: center;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 15px;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background: #ccc;
-    }
-
-    .marker {
-      position: relative;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background-color: #ccc;
-      margin-right: 15px;
-    }
-
-    .marker.active {
-      background-color: #4caf50;
-    }
-
-    .content {
-      text-align: left;
-      margin-left: 10px;
-    }
-
-    .content p {
-      margin: 0;
+    /* Hole Descriptions */
+    .description {
+      font-size: 14px;
       color: #555;
+      text-align: center;
     }
 
-    /* Blurred Rewards */
+    /* Rewards Section */
+    .rewards {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
     .reward {
-      width: 100px;
-      height: 100px;
-      filter: blur(5px);
-      opacity: 0.5;
-      transition: all 0.3s ease-in-out;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
-    .reward.unlocked {
-      filter: none;
-      opacity: 1;
+    .reward:last-child {
+      margin-bottom: 0;
     }
 
-    .reward img {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
+    .reward-text {
+      text-align: left;
+    }
+
+    .reward-status {
+      font-weight: bold;
+      color: #4caf50;
+    }
+
+    .reward-status.locked {
+      color: #ccc;
     }
   </style>
 </head>
@@ -140,57 +116,46 @@
     <!-- Loyalty Card Section -->
     <div class="loyalty-card">
       <h2>Loyalty Card Progress</h2>
-      <p>Stay subscribed to unlock rewards!</p>
+      <p>Stay subscribed to unlock all rewards!</p>
       <div class="holes">
-        <div class="hole filled" title="Reward Unlocked">✔</div>
-        <div class="hole" title="Earn your first reward!">○</div>
-        <div class="hole" title="Complete Month 1">○</div>
-        <div class="hole" title="Complete Month 2">○</div>
-        <div class="hole" title="Complete Month 3">○</div>
-        <div class="hole" title="Complete Month 4">○</div>
-        <div class="hole" title="Complete Month 5">○</div>
-        <div class="hole milestone" title="Upgrade Plan">★</div>
+        <div class="hole filled" title="Registration Reward">✔</div>
+        <div class="hole" title="First Payment">○</div>
+        <div class="hole" title="Month 1 Progress">○</div>
+        <div class="hole" title="Month 2 Progress">○</div>
+        <div class="hole" title="Month 3 Progress">○</div>
+        <div class="hole" title="Month 4 Progress">○</div>
+        <div class="hole" title="Month 5 Progress">○</div>
+        <div class="hole milestone" title="Upgrade Plan Reward">★</div>
+      </div>
+      <div class="description">
+        <p><strong>Current Progress:</strong> 1 of 8 steps completed.</p>
+        <p>Complete all steps to unlock all rewards!</p>
       </div>
     </div>
 
-    <!-- Interactive Timeline Section -->
-    <div class="timeline">
-      <h2>Interactive Timeline</h2>
-
-      <!-- Step 1 -->
-      <div class="step">
-        <div class="marker active"></div>
-        <div class="content">
-          <h3>Step 1: Registration</h3>
-          <p>Reward: <strong>Recarga de aire acondicionado</strong></p>
-          <div class="reward unlocked">
-            <img src="https://via.placeholder.com/100x100?text=A/C+Recarga" alt="Recarga de Aire Acondicionado">
-          </div>
+    <!-- Rewards Section -->
+    <div class="rewards">
+      <h3>Available Rewards</h3>
+      <div class="reward">
+        <div class="reward-text">
+          <p><strong>Recarga de aire acondicionado</strong></p>
+          <p>Unlocked at Step 1 (Registration)</p>
         </div>
+        <div class="reward-status">Unlocked</div>
       </div>
-
-      <!-- Step 2 -->
-      <div class="step">
-        <div class="marker active"></div>
-        <div class="content">
-          <h3>Step 2: First Payment</h3>
-          <p>Reward: <strong>Carwash gratis</strong></p>
-          <div class="reward unlocked">
-            <img src="https://via.placeholder.com/100x100?text=Carwash" alt="Carwash Gratis">
-          </div>
+      <div class="reward">
+        <div class="reward-text">
+          <p><strong>Carwash gratis</strong></p>
+          <p>Unlocked at Step 2 (First Payment)</p>
         </div>
+        <div class="reward-status locked">Locked</div>
       </div>
-
-      <!-- Step 3 -->
-      <div class="step">
-        <div class="marker"></div>
-        <div class="content">
-          <h3>Step 3: Month 1</h3>
-          <p>Reward: <strong>Inspección adicional en el mes</strong></p>
-          <div class="reward">
-            <img src="https://via.placeholder.com/100x100?text=Inspeccion" alt="Inspección Adicional">
-          </div>
+      <div class="reward">
+        <div class="reward-text">
+          <p><strong>Inspección adicional en el mes</strong></p>
+          <p>Unlocked at Step 4 (4 Months Progress)</p>
         </div>
+        <div class="reward-status locked">Locked</div>
       </div>
     </div>
   </div>
@@ -202,19 +167,31 @@
       monthsPaid: 1, // Number of months paid
     };
 
-    function updateInteractiveRewards(userData) {
-      const markers = document.querySelectorAll('.marker');
-      const rewards = document.querySelectorAll('.reward');
+    function updateLoyaltyCard(userData) {
+      const holes = document.querySelectorAll('.hole');
+      const rewardStatuses = document.querySelectorAll('.reward-status');
 
-      markers.forEach((marker, index) => {
+      // Update holes based on progress
+      holes.forEach((hole, index) => {
         if (index <= userData.monthsPaid) {
-          marker.classList.add('active');
-          rewards[index].classList.add('unlocked');
+          hole.classList.add('filled');
         }
       });
+
+      // Update reward statuses
+      rewardStatuses.forEach((status, index) => {
+        if (index <= userData.monthsPaid) {
+          status.textContent = "Unlocked";
+          status.classList.remove('locked');
+        }
+      });
+
+      // Update progress description
+      const description = document.querySelector('.description p strong');
+      description.textContent = `Current Progress: ${userData.monthsPaid + 1} of 8 steps completed.`;
     }
 
-    updateInteractiveRewards(userData);
+    updateLoyaltyCard(userData);
   </script>
 </body>
 </html>
