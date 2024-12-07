@@ -314,9 +314,13 @@ function updateSchedule() {
         .then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
+                console.log("User Data:", userData);
+
                 const lastChange = userData.lastScheduleChange
                     ? new Date(userData.lastScheduleChange.seconds * 1000)
                     : null;
+                console.log("Last Schedule Change:", lastChange);
+
                 const now = new Date();
 
                 // Check if the last change was within the same month
@@ -331,8 +335,10 @@ function updateSchedule() {
                         timeZone: 'America/Guatemala' 
                     };
                     const formattedDateTime = lastChange.toLocaleString('es-ES', options);
+                    console.log("Formatted Last Change:", formattedDateTime);
+
                     alert(`Ya cambiaste tu horario el ${formattedDateTime}. Solo puedes cambiarlo una vez al mes.`);
-                    return;
+                    return; // Exit the function without updating
                 }
 
                 // Update the schedule and the last change date
@@ -353,6 +359,7 @@ function updateSchedule() {
             console.error("Error al verificar el horario:", error);
         });
 }
+
 
 
 
