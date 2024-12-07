@@ -37,13 +37,9 @@
     </header>
 
     <!-- Dashboard Content -->
-    <section class="dashboard-section">
-        <h2>Panel de Usuario</h2>
-        <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
-
-
-         <div class="dashboard-grid">
-        <!-- User Info -->
+<section class="dashboard-section">
+    <!-- User Info -->
+    <div class="dashboard-grid">
         <div class="card">
             <h3><i class="fas fa-user"></i> Información del Usuario</h3>
             <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
@@ -51,77 +47,60 @@
             <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
         </div>
 
-        <!-- Vehicle Info -->
-        <div class="card">
-            <h3><i class="fas fa-car"></i> Vehículos</h3>
-            <div id="vehicles-list">Cargando información de vehículos...</div>
-        </div>
-
-        <!-- Current Schedule -->
         <div class="card">
             <h3><i class="fas fa-calendar-alt"></i> Horario Actual</h3>
             <p id="current-schedule">Cargando...</p>
         </div>
+    </div>
 
-        <!-- Reschedule -->
-        <div class="card">
-            <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
-            <p>Seleccione un nuevo horario para su plan:</p>
-            <p><div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
-            <div style="color: red; font-weight: bold; display: none;"> Ten en cuenta por favor, que solo puedes cambiar la preferencia de dia y hora de tu inspección una vez al mes </p></div> 
-    Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
-                <div id="disclaimer" style="color: #000; font-size: 0.9em; margin-top: 10px;">
-    <strong>Nota:</strong> Puedes cambiar tu horario solo una vez por mes.
-</div>
-
-</div>
-
-            </div>
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th>Horario</th>
-                        <th>Lunes</th>
-                        <th>Miércoles</th>
-                        <th>Viernes</th>
-                        <th>Sábado</th>
-                        <th>Domingo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Bloque 1</td>
-                        <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                        <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                        <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                        <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                        <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                    </tr>
-                    <tr>
-                        <td>Bloque 2</td>
-                        <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                        <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                        <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                        <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                        <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                    </tr>
-                    <tr>
-                        <td>Bloque 3</td>
-                        <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                        <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                        <td onclick="selectScheduleBox(this)">-</td>
-                        <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                        <td onclick="selectScheduleBox(this)">-</td>
-                    </tr>
-                </tbody>
-            </table>
-           <input type="hidden" id="selectedSchedule">
-            <input type="hidden" id="lastScheduleChange">
-
-            <button id="save-schedule-btn" onclick="updateSchedule()">Guardar Nuevo Horario</button>
-
+    <!-- Reschedule Section -->
+    <div class="card reschedule-section">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>Seleccione un nuevo horario para su plan:</p>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
         </div>
-    </section>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="save-schedule-btn" onclick="updateSchedule()">Guardar Nuevo Horario</button>
+    </div>
+</section>
 
    
     <script>
