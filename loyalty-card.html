@@ -22,129 +22,128 @@
       margin-bottom: 20px;
     }
 
-    /* Scrollable Loyalty Card */
+    /* Loyalty Card */
     .loyalty-card {
-      display: flex;
-      overflow-x: auto;
-      gap: 20px;
+      text-align: center;
       padding: 20px;
       border: 2px solid #ccc;
       border-radius: 10px;
       background-color: #fff;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      scroll-behavior: smooth;
+      margin-bottom: 40px;
     }
 
-    .step {
-      min-width: 120px;
-      flex-shrink: 0;
-      text-align: center;
+    .holes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      justify-items: center;
     }
 
-    .circle {
-      width: 80px;
-      height: 80px;
+    .hole {
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      margin: 0 auto 10px;
+      font-size: 20px;
       transition: all 0.3s ease-in-out;
     }
 
-    /* Completed Step */
-    .circle.completed {
+    /* Completed Holes */
+    .hole.completed {
       background-color: #4caf50;
       color: white;
       border: none;
     }
 
-    /* Incomplete Step */
-    .circle {
+    /* Incomplete Holes */
+    .hole {
       border: 2px dashed #ccc;
       background-color: #fff;
       color: #ccc;
     }
 
     /* Rewards Section */
+    .rewards {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
     .reward {
-      margin-top: 10px;
-      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
-    .reward.locked {
+    .reward:last-child {
+      margin-bottom: 0;
+    }
+
+    .reward-text {
+      text-align: left;
+    }
+
+    .reward-status {
+      font-weight: bold;
+      color: #4caf50;
+    }
+
+    .reward-status.locked {
       color: #ccc;
-      text-decoration: line-through;
-    }
-
-    /* Tooltip for Steps */
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: pointer;
-    }
-
-    .tooltip .tooltiptext {
-      visibility: hidden;
-      width: 140px;
-      background-color: #555;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%; /* Position above the tooltip icon */
-      left: 50%;
-      margin-left: -70px;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .tooltip:hover .tooltiptext {
-      visibility: visible;
-      opacity: 1;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Interactive Loyalty Card</h2>
+    <h2>Loyalty Card Progress</h2>
     <div class="loyalty-card">
-      <!-- Step 1 -->
-      <div class="step">
-        <div class="circle completed" title="Registration Complete">✔</div>
-        <p>Step 1: Registration</p>
-        <p class="reward">Recarga de aire acondicionado</p>
+      <p>Stay subscribed to unlock rewards!</p>
+      <div class="holes">
+        <div class="hole completed" title="Registration Reward">✔</div>
+        <div class="hole" title="First Payment">○</div>
+        <div class="hole" title="Month 1 Progress">○</div>
+        <div class="hole" title="Month 2 Progress">○</div>
+        <div class="hole" title="Month 3 Progress">○</div>
+        <div class="hole" title="Month 4 Progress">○</div>
+        <div class="hole" title="Month 5 Progress">○</div>
+        <div class="hole" title="Upgrade Plan Reward">★</div>
       </div>
-
-      <!-- Step 2 -->
-      <div class="step">
-        <div class="circle tooltip" title="Complete First Payment">○</div>
-        <p>Step 2: First Payment</p>
-        <p class="reward locked">Carwash gratis</p>
+      <div class="description">
+        <p><strong>Current Progress:</strong> 1 of 8 steps completed.</p>
+        <p>Complete all steps to unlock all rewards!</p>
       </div>
+    </div>
 
-      <!-- Step 3 -->
-      <div class="step">
-        <div class="circle tooltip" title="Complete Month 1">○</div>
-        <p>Step 3: Month 1</p>
-        <p class="reward locked">Inspección adicional</p>
+    <!-- Rewards Section -->
+    <div class="rewards">
+      <h3>Available Rewards</h3>
+      <div class="reward">
+        <div class="reward-text">
+          <p><strong>Recarga de aire acondicionado</strong></p>
+          <p>Unlocked at Step 1 (Registration)</p>
+        </div>
+        <div class="reward-status">Unlocked</div>
       </div>
-
-      <!-- Step 4 -->
-      <div class="step">
-        <div class="circle tooltip" title="Complete Month 4">○</div>
-        <p>Step 4: Month 4</p>
-        <p class="reward locked">Special Bonus</p>
+      <div class="reward">
+        <div class="reward-text">
+          <p><strong>Carwash gratis</strong></p>
+          <p>Unlocked at Step 2 (First Payment)</p>
+        </div>
+        <div class="reward-status locked">Locked</div>
       </div>
-
-      <!-- Step 5 -->
-      <div class="step">
-        <div class="circle tooltip" title="Complete 6 Months">○</div>
-        <p>Step 5: Final Reward</p>
-        <p class="reward locked">Upgrade Bonus</p>
+      <div class="reward">
+        <div class="reward-text">
+          <p><strong>Inspección adicional en el mes</strong></p>
+          <p>Unlocked at Step 4 (4 Months Progress)</p>
+        </div>
+        <div class="reward-status locked">Locked</div>
       </div>
     </div>
   </div>
@@ -153,24 +152,44 @@
     // Example user progress
     const userData = {
       hasRegistered: true,
-      monthsPaid: 1, // Number of months paid
+      monthsPaid: 3, // Number of months paid (e.g., 3 for a 3-month subscription)
+      subscriptionType: "3-month", // Can be "monthly", "3-month", or "6-month"
     };
 
-    function updateInteractiveCard(userData) {
-      const circles = document.querySelectorAll('.circle');
-      const rewards = document.querySelectorAll('.reward');
+    function updateLoyaltyCard(userData) {
+      const holes = document.querySelectorAll('.hole');
+      const rewardStatuses = document.querySelectorAll('.reward-status');
+      let progress = 1; // Start with registration reward filled
 
-      // Update circles and rewards based on user progress
-      circles.forEach((circle, index) => {
-        if (index <= userData.monthsPaid) {
-          circle.classList.add('completed');
-          circle.textContent = '✔'; // Mark as complete
-          rewards[index].classList.remove('locked'); // Unlock reward
+      // Fill holes based on subscription type
+      if (userData.subscriptionType === "monthly") {
+        progress += userData.monthsPaid;
+      } else if (userData.subscriptionType === "3-month") {
+        progress += 3; // Fill 3 holes for 3-month subscription
+      } else if (userData.subscriptionType === "6-month") {
+        progress += 6; // Fill 6 holes for 6-month subscription
+      }
+
+      // Update holes and rewards dynamically
+      holes.forEach((hole, index) => {
+        if (index < progress) {
+          hole.classList.add('completed');
         }
       });
+
+      rewardStatuses.forEach((status, index) => {
+        if (index < progress) {
+          status.textContent = "Unlocked";
+          status.classList.remove('locked');
+        }
+      });
+
+      // Update progress description
+      const description = document.querySelector('.description p strong');
+      description.textContent = `Current Progress: ${progress} of 8 steps completed.`;
     }
 
-    updateInteractiveCard(userData);
+    updateLoyaltyCard(userData);
   </script>
 </body>
 </html>
