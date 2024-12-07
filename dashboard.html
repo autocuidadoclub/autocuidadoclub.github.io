@@ -278,13 +278,7 @@ function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
     const timeBlock = cell.innerText.trim();
 
-    // Check if the cell contains a valid time
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return;
-    }
-
-    // Remove selection from all other cells
+       // Remove selection from all other cells
     cells.forEach((c) => c.classList.remove("selected-box"));
 
     // Highlight the selected cell
