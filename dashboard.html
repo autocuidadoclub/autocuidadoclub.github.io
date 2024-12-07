@@ -291,7 +291,7 @@
     </section>
 
       
-    <script>
+   <script>
     // Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
@@ -304,28 +304,21 @@
         measurementId: "G-LBBGXV2YX5"
     };
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    // Initialize Firebase
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => {
-            console.log("Authentication persistence set to LOCAL.");
-        })
-        .catch((error) => {
-            console.error("Error setting authentication persistence:", error.message);
-        });
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => 
+        console.error("Error setting persistence:", error)
+    );
 
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(user => {
         if (user) {
-            console.log("User is logged in:", user.email);
             document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             loadUserProfile(user.email);
         } else {
-            console.log("No authenticated user. Redirecting to login.");
             window.location.href = 'login.html';
         }
     });
@@ -333,196 +326,127 @@
     // Load user profile data
     function loadUserProfile(email) {
         db.collection("users").doc(email).get()
-            .then((doc) => {
+            .then(doc => {
                 if (doc.exists) {
                     const userData = doc.data();
-
-                    document.getElementById("name").innerText = userData.name || "N/A";
-                    document.getElementById("phone").innerText = userData.phone || "N/A";
-                    document.getElementById("planType").innerText = userData.planType || "N/A";
-                    document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
-
-                    // Display schedule change restriction
-                    displayScheduleRestriction(userData);
-
-                    // Update loyalty card
-                    if (userData.subscriptionStatus === "active") {
-                        updateLoyaltyCard({
-                            hasRegistered: true,
-                            subscriptionPlan: userData.planType || "N/A",
-                            carsRegistered: userData.vehicles ? userData.vehicles.length : 1,
-                            monthsPaid: userData.monthsPaid || 0,
-                        });
-                    } else {
-                        resetLoyaltyCard();
-                    }
+                    populateDashboard(userData);
                 } else {
-                    console.error("User profile not found.");
+                    console.error("User profile not found in database.");
                 }
             })
-            .catch((error) => {
-                console.error("Error loading user profile:", error);
-            });
+            .catch(error => console.error("Error loading user profile:", error));
     }
 
-    function displayScheduleRestriction(userData) {
-        const lastChangeElement = document.getElementById("reschedule-warning");
-        if (userData.lastScheduleChange) {
-            const lastChange = new Date(userData.lastScheduleChange.seconds * 1000);
+    // Populate dashboard with user data
+    function populateDashboard(data) {
+        document.getElementById("name").innerText = data.name || "N/A";
+        document.getElementById("phone").innerText = data.phone || "N/A";
+        document.getElementById("planType").innerText = data.planType || "N/A";
+        document.getElementById("current-schedule").innerText = data.selectedSchedule || "No asignado";
+        document.getElementById("paymentStatus").innerText = data.paymentStatus || "Pendiente";
+        document.getElementById("nextPaymentDate").innerText = data.nextPaymentDate || "No asignado";
+        document.getElementById("memberSince").innerText = formatTimestamp(data.memberSince) || "Desconocido";
+        loadVehicles(data.vehicles || []);
+        handleScheduleRestriction(data.lastScheduleChange);
+        updateLoyaltyProgress(data);
+    }
+
+    // Format Firestore timestamp to readable date
+    function formatTimestamp(timestamp) {
+        if (!timestamp) return null;
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // Load vehicles into dashboard
+    function loadVehicles(vehicles) {
+        const vehiclesList = document.getElementById("vehicles-list");
+        vehiclesList.innerHTML = vehicles.length 
+            ? vehicles.map(vehicle => `
+                <div class="vehicle-card">
+                    <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                    <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                    <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                    <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                    <hr>
+                </div>
+            `).join("")
+            : "<p>No hay vehículos registrados.</p>";
+    }
+
+    // Handle schedule restriction logic
+    function handleScheduleRestriction(lastScheduleChange) {
+        const warningElement = document.getElementById("reschedule-warning");
+        const saveButton = document.getElementById("save-schedule-btn");
+
+        if (lastScheduleChange) {
+            const lastChange = new Date(lastScheduleChange.seconds * 1000);
             const now = new Date();
 
-            // Format the last change with date and time
-            const options = {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true,
-                timeZone: 'America/Guatemala'
-            };
-            const formattedDateTime = lastChange.toLocaleString('es-ES', options);
-
-            // Check if the last change was within the same month
             if (lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
-                lastChangeElement.style.display = "block";
-                lastChangeElement.innerText = `Ya cambiaste tu horario el ${formattedDateTime}. Solo puedes cambiarlo una vez al mes.`;
-                document.getElementById("save-schedule-btn").disabled = true; // Disable save button
-            } else {
-                lastChangeElement.style.display = "none";
-                document.getElementById("save-schedule-btn").disabled = false;
+                const formattedDate = lastChange.toLocaleString('es-ES', {
+                    day: 'numeric', month: 'long', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true,
+                    timeZone: 'America/Guatemala'
+                });
+                warningElement.style.display = "block";
+                warningElement.innerText = `Ya cambiaste tu horario el ${formattedDate}. Solo puedes cambiarlo una vez al mes.`;
+                saveButton.disabled = true;
+                return;
             }
-        } else {
-            lastChangeElement.style.display = "none";
-            document.getElementById("save-schedule-btn").disabled = false;
         }
+
+        warningElement.style.display = "none";
+        saveButton.disabled = false;
     }
 
+    // Update user schedule
     function updateSchedule() {
         const selectedSchedule = document.getElementById("selectedSchedule").value;
-        if (!selectedSchedule) {
-            alert("Por favor selecciona un horario.");
-            return;
-        }
+        if (!selectedSchedule) return alert("Por favor selecciona un horario.");
 
         const user = auth.currentUser;
         db.collection("users").doc(user.email).get()
-            .then((doc) => {
+            .then(doc => {
                 if (doc.exists) {
                     const userData = doc.data();
-                    const lastChange = userData.lastScheduleChange
-                        ? new Date(userData.lastScheduleChange.seconds * 1000)
+                    const lastChange = userData.lastScheduleChange 
+                        ? new Date(userData.lastScheduleChange.seconds * 1000) 
                         : null;
-                    const now = new Date();
 
-                    if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
-                        alert(`Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.`);
-                        return; // Exit if already updated this month
+                    if (lastChange && lastChange.getMonth() === new Date().getMonth()) {
+                        return alert("Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.");
                     }
 
-                    // Update schedule and last change date
                     db.collection("users").doc(user.email).update({
                         selectedSchedule: selectedSchedule,
                         lastScheduleChange: firebase.firestore.Timestamp.now(),
                     }).then(() => {
                         alert("Horario actualizado correctamente.");
-                        loadUserProfile(user.email); // Reload profile
-                    }).catch((error) => {
-                        console.error("Error updating schedule:", error);
+                        loadUserProfile(user.email);
                     });
                 } else {
-                    console.error("User not found.");
+                    console.error("User profile not found.");
                 }
             })
-            .catch((error) => {
-                console.error("Error verifying schedule:", error);
-            });
+            .catch(error => console.error("Error updating schedule:", error));
     }
 
-    function updateLoyaltyCard(userData) {
-        const holes = document.querySelectorAll('.hole');
-        const rewardStatusElements = document.querySelectorAll('.reward-status');
-        const acRewards = document.getElementById('ac-rewards');
-        const carwashRewards = document.getElementById('carwash-rewards');
-        const reviewRewards = document.getElementById('review-rewards');
-        let progress = 1; // Start with registration as completed
-
-        progress += userData.monthsPaid || 0;
-
-        // Cap progress based on subscription plan
-        switch (userData.subscriptionPlan) {
-            case "3-month":
-                if (progress > 3) progress = 3;
-                break;
-            case "6-month":
-                if (progress > 6) progress = 6;
-                break;
-            case "12-month":
-                if (progress > 8) progress = 8;
-                break;
-        }
-
+    // Update loyalty progress
+    function updateLoyaltyProgress(data) {
+        const holes = document.querySelectorAll(".hole");
+        const monthsPaid = data.monthsPaid || 0;
+        const progress = Math.min(1 + monthsPaid, 8); // 1 for registration + paid months
         holes.forEach((hole, index) => {
-            if (index < progress) {
-                hole.classList.add('completed');
-            } else {
-                hole.classList.remove('completed');
-            }
+            hole.classList.toggle("completed", index < progress);
         });
-
-        const rewardsMultiplier = userData.carsRegistered || 1;
-        acRewards.textContent = `${rewardsMultiplier}x`;
-        carwashRewards.textContent = `${rewardsMultiplier}x`;
-        reviewRewards.textContent = `${rewardsMultiplier}x`;
-
-        if (progress >= 8) {
-            rewardStatusElements.forEach((status) => {
-                status.textContent = "Unlocked";
-                status.classList.add("unlocked");
-                status.classList.remove("locked");
-            });
-        } else {
-            rewardStatusElements.forEach((status) => {
-                status.textContent = "Locked";
-                status.classList.add("locked");
-                status.classList.remove("unlocked");
-            });
-        }
-
-        const progressDescription = document.querySelector('.description p strong');
-        progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
     }
 
-    function resetLoyaltyCard() {
-        const holes = document.querySelectorAll('.hole');
-        const rewardStatusElements = document.querySelectorAll('.reward-status');
-        const acRewards = document.getElementById('ac-rewards');
-        const carwashRewards = document.getElementById('carwash-rewards');
-        const reviewRewards = document.getElementById('review-rewards');
-
-        holes.forEach((hole) => hole.classList.remove('completed'));
-        acRewards.textContent = `0x`;
-        carwashRewards.textContent = `0x`;
-        reviewRewards.textContent = `0x`;
-
-        rewardStatusElements.forEach((status) => {
-            status.textContent = "Locked";
-            status.classList.add("locked");
-            status.classList.remove("unlocked");
-        });
-
-        const progressDescription = document.querySelector('.description p strong');
-        progressDescription.textContent = `Current Progress: 0 of 8 steps completed.`;
-    }
-
+    // Logout function
     function logoutUser() {
         auth.signOut()
-            .then(() => {
-                window.location.href = 'login.html';
-            })
-            .catch((error) => {
-                console.error("Error during logout:", error);
-            });
+            .then(() => window.location.href = 'login.html')
+            .catch(error => console.error("Error during logout:", error));
     }
 </script>
 
