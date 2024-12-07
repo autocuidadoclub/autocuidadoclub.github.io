@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Loyalty Card</title>
+  <title>Loyalty Card with Rewards</title>
   <style>
     /* General Styling */
     body {
@@ -38,17 +38,19 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 15px;
       justify-items: center;
+      margin-bottom: 20px;
     }
 
     .hole {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      transition: all 0.3s ease-in-out;
+      font-size: 14px;
+      position: relative;
     }
 
     /* Completed Holes */
@@ -63,6 +65,17 @@
       border: 2px dashed #ccc;
       background-color: #fff;
       color: #ccc;
+    }
+
+    /* Star Icon */
+    .hole .star {
+      font-size: 24px;
+      color: gold;
+      margin-bottom: 5px;
+    }
+
+    .hole.completed .star {
+      color: white;
     }
 
     /* Rewards Section */
@@ -98,6 +111,15 @@
     .reward-status.locked {
       color: #ccc;
     }
+
+    /* Final Message */
+    .final-message {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -106,17 +128,56 @@
     <div class="loyalty-card">
       <p>Stay subscribed to unlock rewards!</p>
       <div class="holes">
-        <div class="hole completed" title="Registration Reward">✔</div>
-        <div class="hole" title="First Payment">○</div>
-        <div class="hole" title="Month 1 Progress">○</div>
-        <div class="hole" title="Month 2 Progress">○</div>
-        <div class="hole" title="Month 3 Progress">○</div>
-        <div class="hole" title="Month 4 Progress">○</div>
-        <div class="hole" title="Month 5 Progress">○</div>
-        <div class="hole" title="Upgrade Plan Reward">★</div>
+        <!-- Hole 1 -->
+        <div class="hole completed" title="Registration Reward">
+          <div class="star">★</div>
+          <p>Registration</p>
+        </div>
+
+        <!-- Hole 2 -->
+        <div class="hole" title="First Payment">
+          <div class="star">★</div>
+          <p>First Payment</p>
+        </div>
+
+        <!-- Hole 3 -->
+        <div class="hole" title="Month 1 Progress">
+          <div class="star">★</div>
+          <p>Month 1</p>
+        </div>
+
+        <!-- Hole 4 -->
+        <div class="hole" title="Month 2 Progress">
+          <div class="star">★</div>
+          <p>Month 2</p>
+        </div>
+
+        <!-- Hole 5 -->
+        <div class="hole" title="Month 3 Progress">
+          <div class="star">★</div>
+          <p>Month 3</p>
+        </div>
+
+        <!-- Hole 6 -->
+        <div class="hole" title="Month 4 Progress">
+          <div class="star">★</div>
+          <p>Month 4</p>
+        </div>
+
+        <!-- Hole 7 -->
+        <div class="hole" title="Month 5 Progress">
+          <div class="star">★</div>
+          <p>Month 5</p>
+        </div>
+
+        <!-- Hole 8 -->
+        <div class="hole" title="Upgrade Plan Reward">
+          <div class="star">★</div>
+          <p>Upgrade Plan</p>
+        </div>
       </div>
       <div class="description">
-        <p><strong>Current Progress:</strong> 1 of 8 steps completed.</p>
+        <p><strong>Current Progress:</strong> 1 of 8 stars collected.</p>
         <p>Complete all steps to unlock all rewards!</p>
       </div>
     </div>
@@ -145,6 +206,11 @@
         </div>
         <div class="reward-status locked">Locked</div>
       </div>
+    </div>
+
+    <!-- Final Message -->
+    <div class="final-message">
+      Unlock the final reward by collecting all 8 stars!
     </div>
   </div>
 
@@ -186,7 +252,7 @@
 
       // Update progress description
       const description = document.querySelector('.description p strong');
-      description.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+      description.textContent = `Current Progress: ${progress} of 8 stars collected.`;
     }
 
     updateLoyaltyCard(userData);
