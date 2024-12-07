@@ -10,33 +10,47 @@
       font-family: Arial, sans-serif;
       margin: 20px;
       line-height: 1.8;
-      background-color: #ffffff;
+      background-color: #f4f4f9;
       color: #333;
     }
-    h1, h2 {
-      color: #003366;
-    }
+
     h1 {
-      margin-bottom: 20px;
       text-align: center;
+      color: #003366;
+      margin-bottom: 20px;
     }
-    p {
-      margin-bottom: 15px;
+
+    .card {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 20px;
     }
+
+    .card h2 {
+      color: #003366;
+      margin-top: 0;
+    }
+
+    .card p, .card ul {
+      margin: 10px 0;
+    }
+
     ul {
-      margin: 15px 0;
       padding-left: 20px;
     }
+
     ul li {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    .section {
-      margin-bottom: 30px;
-    }
+
     .button-container {
       text-align: center;
       margin-top: 30px;
     }
+
     .regresar-button {
       background-color: #003366;
       color: white;
@@ -47,6 +61,7 @@
       cursor: pointer;
       text-decoration: none;
     }
+
     .regresar-button:hover {
       background-color: #002244;
     }
@@ -55,13 +70,13 @@
 <body>
   <h1>Términos y Condiciones de AutoCuidado Club</h1>
 
-  <div class="section">
+  <div class="card">
     <h2>Introducción</h2>
     <p>Los siguientes términos y condiciones legales y políticas de navegación, uso y compra de los servicios se establecen para la página web <strong>AutoCuidado Club</strong>. Al utilizar nuestros servicios, usted acepta y se compromete a cumplir con los presentes Términos y Condiciones.</p>
     <p>AutoCuidado Club ofrece servicios exclusivamente en la zona metropolitana de San Salvador, El Salvador.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>1. Usuarios</h2>
     <p>Los Usuarios deben ser personas mayores de 18 años con capacidad legal para contratar servicios. Al registrarse, el Usuario acepta proporcionar información precisa y completa.</p>
     <ul>
@@ -74,7 +89,7 @@
     </ul>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>2. Servicios ofrecidos</h2>
     <p>AutoCuidado Club proporciona suscripciones para el mantenimiento preventivo de vehículos, incluyendo:</p>
     <ul>
@@ -86,23 +101,23 @@
     <p>Los servicios se agendan con anticipación y los precios incluyen IVA.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>3. Registro de usuarios</h2>
     <p>Para acceder a los servicios, el Usuario debe registrarse proporcionando información precisa y actualizada, como se detalla en la sección anterior.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>4. Membresías y suscripciones</h2>
     <p>AutoCuidado Club ofrece dos tipos de suscripciones: <strong>Básica</strong> y <strong>Plus</strong>. Las suscripciones tienen una duración de 3, 6 o 12 meses.</p>
     <p>Los usuarios pueden cancelar su suscripción en cualquier momento, pero no se realizarán reembolsos por pagos ya efectuados.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>5. Agendamiento de citas</h2>
     <p>Los usuarios pueden agendar una cita mensual a través de la plataforma. Se permite reagendar citas solo una vez al mes con un mínimo de 48 horas de anticipación.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>6. Limitaciones de responsabilidad</h2>
     <p>AutoCuidado Club no se responsabiliza por:</p>
     <ul>
@@ -112,22 +127,22 @@
     </ul>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>7. Métodos de pago</h2>
     <p>Aceptamos pagos mediante tarjeta de crédito, débito y transferencias bancarias. Los cargos se procesarán automáticamente según la suscripción.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>8. Cambios en los términos</h2>
     <p>AutoCuidado Club se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios serán notificados por correo electrónico y a través del sitio web.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>9. Ley aplicable</h2>
     <p>Estos términos se rigen por las leyes de El Salvador. Cualquier disputa será resuelta en los tribunales de San Salvador.</p>
   </div>
 
-  <div class="section">
+  <div class="card">
     <h2>10. Contacto</h2>
     <p>Para consultas, contáctenos en:</p>
     <ul>
@@ -143,7 +158,7 @@
   <script>
     function closeTab() {
       window.close();
-      window.open('https://www.autocuidadoclub.com/suscripciones.html', '_self');
+      window.open('https://www.autocuidadoclub.com/register.html', '_self');
     }
   </script>
 </body>
