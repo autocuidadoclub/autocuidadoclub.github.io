@@ -97,7 +97,7 @@
       font-weight: bold;
     }
 
-    /* Rewards Section */
+    /* Enhanced Rewards Section */
     .rewards {
       margin-top: 30px;
       padding: 20px;
@@ -105,33 +105,69 @@
       border-radius: 10px;
       background-color: #fff;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      text-align: center;
     }
 
     .rewards h3 {
       margin-bottom: 15px;
+      font-size: 24px;
+      color: #333;
+      text-align: center;
+    }
+
+    .reward-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .reward-card:hover {
+      background-color: #e6f7e6;
+    }
+
+    .reward-icon {
+      font-size: 36px;
+      margin-right: 15px;
+    }
+
+    .reward-info {
+      flex-grow: 1;
+      text-align: left;
+    }
+
+    .reward-info h4 {
+      margin: 0;
       font-size: 18px;
       color: #333;
     }
 
-    .reward-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      color: #555;
-    }
-
-    .reward-list li {
-      margin-bottom: 10px;
+    .reward-info p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #777;
     }
 
     .reward-status {
+      font-size: 14px;
       font-weight: bold;
-      color: #4caf50;
+      padding: 5px 10px;
+      border-radius: 4px;
+      text-align: center;
     }
 
     .reward-status.locked {
-      color: #ccc;
+      background-color: #ccc;
+      color: #fff;
+    }
+
+    .reward-status.unlocked {
+      background-color: #4caf50;
+      color: #fff;
     }
   </style>
 </head>
@@ -172,74 +208,80 @@
       </div>
     </div>
 
-    <!-- Rewards Section -->
+    <!-- Enhanced Rewards Section -->
     <div class="rewards">
       <h3>Available Rewards</h3>
-      <ul class="reward-list">
-        <li><span id="ac-rewards">0x</span> Recarga de A/C</li>
-        <li><span id="carwash-rewards">0x</span> Carwash gratis</li>
-        <li><span id="review-rewards">0x</span> Revisión extra del mes en curso</li>
-      </ul>
-      <p class="reward-status locked">Locked - Complete all 8 steps to unlock!</p>
+      <div class="reward-card">
+        <div class="reward-icon">🎐</div>
+        <div class="reward-info">
+          <h4>Recarga de A/C</h4>
+          <p><span id="ac-rewards">0x</span> for your registered cars</p>
+        </div>
+        <span class="reward-status locked">Locked</span>
+      </div>
+      <div class="reward-card">
+        <div class="reward-icon">🚗</div>
+        <div class="reward-info">
+          <h4>Carwash gratis</h4>
+          <p><span id="carwash-rewards">0x</span> for your registered cars</p>
+        </div>
+        <span class="reward-status locked">Locked</span>
+      </div>
+      <div class="reward-card">
+        <div class="reward-icon">📝</div>
+        <div class="reward-info">
+          <h4>Revisión extra del mes en curso</h4>
+          <p><span id="review-rewards">0x</span> for your registered cars</p>
+        </div>
+        <span class="reward-status locked">Locked</span>
+      </div>
     </div>
   </div>
 
   <script>
-    // Example user progress
     const userData = {
       hasRegistered: true,
       subscriptionPlan: "6-month", // Options: "3-month", "6-month", "12-month"
-      carsRegistered: 2, // Number of cars registered by the user
+      carsRegistered: 2, // Number of cars registered
     };
 
     function updateLoyaltyCard(userData) {
       const holes = document.querySelectorAll('.hole');
-      const rewardStatus = document.querySelector('.reward-status');
+      const rewardStatusElements = document.querySelectorAll('.reward-status');
       const acRewards = document.getElementById('ac-rewards');
       const carwashRewards = document.getElementById('carwash-rewards');
       const reviewRewards = document.getElementById('review-rewards');
-      let progress = 1; // Start with registration reward filled
+      let progress = 1;
 
-      // Calculate progress based on the subscription plan
+      // Calculate progress
       switch (userData.subscriptionPlan) {
         case "3-month":
-          progress += 3; // Registration + First Payment + 3 months
+          progress += 3;
           break;
         case "6-month":
-          progress += 6; // Registration + First Payment + 6 months
+          progress += 6;
           break;
         case "12-month":
-          progress += 8; // All milestones completed
-          break;
-        default:
+          progress += 8;
           break;
       }
 
-      // Update holes dynamically
       holes.forEach((hole, index) => {
-        if (index < progress) {
-          hole.classList.add('completed');
-        }
+        if (index < progress) hole.classList.add('completed');
       });
 
-      // Calculate rewards based on the number of cars
       const rewardsMultiplier = userData.carsRegistered;
       acRewards.textContent = `${rewardsMultiplier}x`;
       carwashRewards.textContent = `${rewardsMultiplier}x`;
       reviewRewards.textContent = `${rewardsMultiplier}x`;
 
-      // Unlock rewards if all 8 steps are completed
       if (progress >= 8) {
-        rewardStatus.textContent = `Unlocked - Enjoy your rewards!`;
-        rewardStatus.classList.remove('locked');
-      } else {
-        rewardStatus.textContent = "Locked - Complete all 8 steps to unlock!";
-        rewardStatus.classList.add('locked');
+        rewardStatusElements.forEach((status) => {
+          status.textContent = "Unlocked";
+          status.classList.add("unlocked");
+          status.classList.remove("locked");
+        });
       }
-
-      // Update progress description
-      const description = document.querySelector('.description p strong');
-      description.textContent = `Current Progress: ${progress} of 8 steps completed.`;
     }
 
     updateLoyaltyCard(userData);
