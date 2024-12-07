@@ -319,7 +319,6 @@
             console.error("Error setting authentication persistence:", error.message);
         });
 
-    // Check if user is logged in and load profile info
     auth.onAuthStateChanged((user) => {
         if (user) {
             console.log("User is logged in:", user.email);
@@ -337,21 +336,25 @@
             .then((doc) => {
                 if (doc.exists) {
                     const userData = doc.data();
+
                     document.getElementById("name").innerText = userData.name || "N/A";
                     document.getElementById("phone").innerText = userData.phone || "N/A";
                     document.getElementById("planType").innerText = userData.planType || "N/A";
                     document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
 
-                    // Dynamically update loyalty card based on subscription status
+                    // Display schedule change restriction
+                    displayScheduleRestriction(userData);
+
+                    // Update loyalty card
                     if (userData.subscriptionStatus === "active") {
                         updateLoyaltyCard({
                             hasRegistered: true,
                             subscriptionPlan: userData.planType || "N/A",
                             carsRegistered: userData.vehicles ? userData.vehicles.length : 1,
-                            monthsPaid: userData.monthsPaid || 0
+                            monthsPaid: userData.monthsPaid || 0,
                         });
                     } else {
-                        resetLoyaltyCard(); // Reset progress if subscription is inactive
+                        resetLoyaltyCard();
                     }
                 } else {
                     console.error("User profile not found.");
@@ -362,18 +365,91 @@
             });
     }
 
+    function displayScheduleRestriction(userData) {
+        const lastChangeElement = document.getElementById("reschedule-warning");
+        if (userData.lastScheduleChange) {
+            const lastChange = new Date(userData.lastScheduleChange.seconds * 1000);
+            const now = new Date();
+
+            // Format the last change with date and time
+            const options = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'America/Guatemala'
+            };
+            const formattedDateTime = lastChange.toLocaleString('es-ES', options);
+
+            // Check if the last change was within the same month
+            if (lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+                lastChangeElement.style.display = "block";
+                lastChangeElement.innerText = `Ya cambiaste tu horario el ${formattedDateTime}. Solo puedes cambiarlo una vez al mes.`;
+                document.getElementById("save-schedule-btn").disabled = true; // Disable save button
+            } else {
+                lastChangeElement.style.display = "none";
+                document.getElementById("save-schedule-btn").disabled = false;
+            }
+        } else {
+            lastChangeElement.style.display = "none";
+            document.getElementById("save-schedule-btn").disabled = false;
+        }
+    }
+
+    function updateSchedule() {
+        const selectedSchedule = document.getElementById("selectedSchedule").value;
+        if (!selectedSchedule) {
+            alert("Por favor selecciona un horario.");
+            return;
+        }
+
+        const user = auth.currentUser;
+        db.collection("users").doc(user.email).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    const lastChange = userData.lastScheduleChange
+                        ? new Date(userData.lastScheduleChange.seconds * 1000)
+                        : null;
+                    const now = new Date();
+
+                    if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+                        alert(`Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.`);
+                        return; // Exit if already updated this month
+                    }
+
+                    // Update schedule and last change date
+                    db.collection("users").doc(user.email).update({
+                        selectedSchedule: selectedSchedule,
+                        lastScheduleChange: firebase.firestore.Timestamp.now(),
+                    }).then(() => {
+                        alert("Horario actualizado correctamente.");
+                        loadUserProfile(user.email); // Reload profile
+                    }).catch((error) => {
+                        console.error("Error updating schedule:", error);
+                    });
+                } else {
+                    console.error("User not found.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error verifying schedule:", error);
+            });
+    }
+
     function updateLoyaltyCard(userData) {
         const holes = document.querySelectorAll('.hole');
         const rewardStatusElements = document.querySelectorAll('.reward-status');
         const acRewards = document.getElementById('ac-rewards');
         const carwashRewards = document.getElementById('carwash-rewards');
         const reviewRewards = document.getElementById('review-rewards');
-        let progress = 1; // Registration is always completed
+        let progress = 1; // Start with registration as completed
 
-        // Calculate progress based on months paid
-        progress += userData.monthsPaid;
+        progress += userData.monthsPaid || 0;
 
-        // Adjust progress based on subscription plan limits
+        // Cap progress based on subscription plan
         switch (userData.subscriptionPlan) {
             case "3-month":
                 if (progress > 3) progress = 3;
@@ -384,11 +460,8 @@
             case "12-month":
                 if (progress > 8) progress = 8;
                 break;
-            default:
-                console.warn("Unknown subscription plan:", userData.subscriptionPlan);
         }
 
-        // Update loyalty card UI
         holes.forEach((hole, index) => {
             if (index < progress) {
                 hole.classList.add('completed');
@@ -397,13 +470,11 @@
             }
         });
 
-        // Update rewards multipliers
-        const rewardsMultiplier = userData.carsRegistered;
+        const rewardsMultiplier = userData.carsRegistered || 1;
         acRewards.textContent = `${rewardsMultiplier}x`;
         carwashRewards.textContent = `${rewardsMultiplier}x`;
         reviewRewards.textContent = `${rewardsMultiplier}x`;
 
-        // Unlock rewards if all steps are complete
         if (progress >= 8) {
             rewardStatusElements.forEach((status) => {
                 status.textContent = "Unlocked";
@@ -418,7 +489,6 @@
             });
         }
 
-        // Update progress description
         const progressDescription = document.querySelector('.description p strong');
         progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
     }
@@ -430,22 +500,17 @@
         const carwashRewards = document.getElementById('carwash-rewards');
         const reviewRewards = document.getElementById('review-rewards');
 
-        // Reset all holes
         holes.forEach((hole) => hole.classList.remove('completed'));
-
-        // Reset reward multipliers
         acRewards.textContent = `0x`;
         carwashRewards.textContent = `0x`;
         reviewRewards.textContent = `0x`;
 
-        // Lock all rewards
         rewardStatusElements.forEach((status) => {
             status.textContent = "Locked";
             status.classList.add("locked");
             status.classList.remove("unlocked");
         });
 
-        // Update progress description
         const progressDescription = document.querySelector('.description p strong');
         progressDescription.textContent = `Current Progress: 0 of 8 steps completed.`;
     }
