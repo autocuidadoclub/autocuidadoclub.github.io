@@ -96,6 +96,43 @@
     .description strong {
       font-weight: bold;
     }
+
+    /* Rewards Section */
+    .rewards {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .rewards h3 {
+      margin-bottom: 15px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .reward-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      color: #555;
+    }
+
+    .reward-list li {
+      margin-bottom: 10px;
+    }
+
+    .reward-status {
+      font-weight: bold;
+      color: #4caf50;
+    }
+
+    .reward-status.locked {
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
@@ -112,7 +149,7 @@
         <p>First Payment</p>
         <!-- Hole 3 -->
         <div class="hole completed" title="1st Month Subscription Progress">✔</div>
-         <p>1st Month</p>
+        <p>1st Month</p>
         <!-- Hole 4 -->
         <div class="hole" title="2nd Month Subscription Progress">○</div>
         <p>2nd Month</p>
@@ -129,16 +166,21 @@
         <div class="hole star" title="Upgrade Plan Reward">★</div>
         <p>Upgrade Plan</p>
       </div>
-      <!-- Legends for Each Hole -->
-      <div class="legends">
-       
-        
-       
-      </div>
       <div class="description">
         <p><strong>Current Progress:</strong> 3 of 8 steps completed.</p>
         <p>Complete all steps to unlock the final reward!</p>
       </div>
+    </div>
+
+    <!-- Rewards Section -->
+    <div class="rewards">
+      <h3>Available Rewards</h3>
+      <ul class="reward-list">
+        <li><span id="ac-rewards">0x</span> Recarga de A/C</li>
+        <li><span id="carwash-rewards">0x</span> Carwash gratis</li>
+        <li><span id="review-rewards">0x</span> Revisión extra del mes en curso</li>
+      </ul>
+      <p class="reward-status locked">Locked - Complete all 8 steps to unlock!</p>
     </div>
   </div>
 
@@ -146,15 +188,32 @@
     // Example user progress
     const userData = {
       hasRegistered: true,
-      monthsPaid: 3, // Number of months paid
+      subscriptionPlan: "6-month", // Options: "3-month", "6-month", "12-month"
+      carsRegistered: 2, // Number of cars registered by the user
     };
 
     function updateLoyaltyCard(userData) {
       const holes = document.querySelectorAll('.hole');
+      const rewardStatus = document.querySelector('.reward-status');
+      const acRewards = document.getElementById('ac-rewards');
+      const carwashRewards = document.getElementById('carwash-rewards');
+      const reviewRewards = document.getElementById('review-rewards');
       let progress = 1; // Start with registration reward filled
 
-      // Increment progress for paid months
-      progress += userData.monthsPaid;
+      // Calculate progress based on the subscription plan
+      switch (userData.subscriptionPlan) {
+        case "3-month":
+          progress += 3; // Registration + First Payment + 3 months
+          break;
+        case "6-month":
+          progress += 6; // Registration + First Payment + 6 months
+          break;
+        case "12-month":
+          progress += 8; // All milestones completed
+          break;
+        default:
+          break;
+      }
 
       // Update holes dynamically
       holes.forEach((hole, index) => {
@@ -162,6 +221,21 @@
           hole.classList.add('completed');
         }
       });
+
+      // Calculate rewards based on the number of cars
+      const rewardsMultiplier = userData.carsRegistered;
+      acRewards.textContent = `${rewardsMultiplier}x`;
+      carwashRewards.textContent = `${rewardsMultiplier}x`;
+      reviewRewards.textContent = `${rewardsMultiplier}x`;
+
+      // Unlock rewards if all 8 steps are completed
+      if (progress >= 8) {
+        rewardStatus.textContent = `Unlocked - Enjoy your rewards!`;
+        rewardStatus.classList.remove('locked');
+      } else {
+        rewardStatus.textContent = "Locked - Complete all 8 steps to unlock!";
+        rewardStatus.classList.add('locked');
+      }
 
       // Update progress description
       const description = document.querySelector('.description p strong');
