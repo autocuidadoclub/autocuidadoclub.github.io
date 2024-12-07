@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loyalty Progress</title>
+  <title>Loyalty Progress with Timeline</title>
   <style>
     /* General Styling */
     body {
@@ -85,6 +85,47 @@
       text-align: center;
       margin-top: 5px;
     }
+
+    /* Timeline Styling */
+    .timeline {
+      margin: 30px auto;
+      max-width: 600px;
+      padding: 0 20px;
+      text-align: left;
+    }
+
+    .timeline-event {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .timeline-marker {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #ccc;
+      flex-shrink: 0;
+    }
+
+    .timeline-marker.filled {
+      background-color: #4caf50;
+    }
+
+    .timeline-content {
+      margin-left: 15px;
+    }
+
+    .timeline-content p {
+      margin: 0;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .timeline-content .highlight {
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -96,8 +137,8 @@
       <div class="hole filled" title="Welcome Reward!">✔</div>
       <span class="label">Register Reward</span>
 
-      <div class="hole" title="First Payment Reward">○</div>
-      <span class="label">First Payment</span>
+      <div class="hole" title="First Payment or AC Check">○</div>
+      <span class="label">First Payment / AC Check</span>
 
       <div class="hole" title="1st Month Paid">○</div>
       <span class="label">Month 1</span>
@@ -119,18 +160,37 @@
     </div>
   </div>
 
+  <!-- Timeline -->
+  <div class="timeline">
+    <!-- Dynamic Timeline Events -->
+  </div>
+
   <script>
     // Example user data (replace with dynamic data from your backend)
     const userData = {
-      hasRegistered: true,         // User has registered
-      monthsPaid: 3,               // Number of months paid (or a 3-month plan)
-      isUpgraded: false,           // If the user upgraded their plan
+      hasRegistered: true,          // User has registered
+      monthsPaid: 3,                // Number of months paid (or a 3-month plan)
+      isSixMonthSubscriber: false,  // If user registered for a 6-month subscription
+      isUpgraded: false,            // If the user upgraded their plan
     };
+
+    // Timeline messages
+    const timelineMessages = [
+      "Thank you for registering! Your loyalty journey begins here.",
+      "First payment received! You're on your way to rewards.",
+      "Great job completing your 1st month! Keep going for more rewards.",
+      "Amazing! You’ve completed your 2nd month of loyalty.",
+      "You’re halfway there! 3rd month completed successfully.",
+      "4th month milestone unlocked. Keep up the great work!",
+      "Almost there! 5 months down, 1 to go!",
+      "Upgrade your plan now to unlock exclusive rewards!",
+    ];
 
     // Update the loyalty card dynamically
     function updateLoyaltyCard(userData) {
       const holes = document.querySelectorAll('.hole');
       const labels = document.querySelectorAll('.label');
+      const timeline = document.querySelector('.timeline');
 
       // Hole 1: Registration Reward
       if (userData.hasRegistered) {
@@ -138,8 +198,11 @@
         labels[0].textContent = "Welcome Reward";
       }
 
-      // Hole 2: First Payment
-      if (userData.monthsPaid >= 1) {
+      // Hole 2: First Payment or AC Check
+      if (userData.isSixMonthSubscriber) {
+        holes[1].classList.add('filled');
+        labels[1].textContent = "Free AC System Check";
+      } else if (userData.monthsPaid >= 1) {
         holes[1].classList.add('filled');
         labels[1].textContent = "First Payment";
       }
@@ -156,13 +219,30 @@
       if (userData.isUpgraded) {
         holes[7].classList.add('filled');
         labels[7].textContent = "Upgrade Reward";
-      } else {
-        labels[7].textContent = "Upgrade Plan";
-        holes[7].title = "Upgrade your plan to unlock this reward!";
       }
+
+      // Populate Timeline
+      timelineMessages.forEach((message, index) => {
+        const event = document.createElement('div');
+        event.classList.add('timeline-event');
+
+        const marker = document.createElement('div');
+        marker.classList.add('timeline-marker');
+        if (index <= userData.monthsPaid || (index === 1 && userData.hasRegistered)) {
+          marker.classList.add('filled');
+        }
+
+        const content = document.createElement('div');
+        content.classList.add('timeline-content');
+        content.innerHTML = `<p><span class="highlight">Step ${index + 1}:</span> ${message}</p>`;
+
+        event.appendChild(marker);
+        event.appendChild(content);
+        timeline.appendChild(event);
+      });
     }
 
-    // Initialize the loyalty card with example data
+    // Initialize the loyalty card and timeline
     updateLoyaltyCard(userData);
   </script>
 </body>
