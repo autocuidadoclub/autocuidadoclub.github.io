@@ -12,6 +12,115 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+  <style>
+        /* Styles for Loyalty Card */
+        .loyalty-card {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .holes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            justify-items: center;
+            margin-bottom: 20px;
+        }
+
+        .hole {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease-in-out;
+            border: 2px dashed #ccc;
+            background-color: #fff;
+            color: #ccc;
+        }
+
+        .hole.completed {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+        }
+
+        .hole.star {
+            font-size: 24px;
+            color: gold;
+        }
+
+        .hole.star.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .rewards {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .reward-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .reward-card:hover {
+            background-color: #e6f7e6;
+        }
+
+        .reward-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .reward-info h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .reward-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .reward-status {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .reward-status.locked {
+            background-color: #ccc;
+            color: white;
+        }
+
+        .reward-status.unlocked {
+            background-color: #4caf50;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -123,69 +232,65 @@
 
 
     <!-- Loyalty Rewards Section -->
-    <div class="card">
-        <h3><i class="fas fa-star"></i> Loyalty Progress</h3>
-        <div class="loyalty-card">
-            <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
-            <div class="holes">
-                <div class="hole completed" title="Registration Complete">✔</div>
-                <p>Registration</p>
-                <div class="hole completed" title="First Payment Complete">✔</div>
-                <p>First Payment</p>
-                <div class="hole completed" title="1st Month Subscription Progress">✔</div>
-                <p>1st Month</p>
-                <div class="hole" title="2nd Month Subscription Progress">○</div>
-                <p>2nd Month</p>
-                <div class="hole" title="3rd Month Subscription Progress">○</div>
-                <p>3rd Month</p>
-                <div class="hole" title="4th Month Subscription Progress">○</div>
-                <p>4th Month</p>
-                <div class="hole" title="5th Month Subscription Progress">○</div>
-                <p>5th Month</p>
-                <div class="hole star" title="Upgrade Plan Reward">★</div>
-                <p>Upgrade Plan</p>
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Loyalty Progress</h3>
+            <div class="loyalty-card">
+                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+                <div class="holes">
+                    <div class="hole completed">✔</div>
+                    <p>Registration</p>
+                    <div class="hole completed">✔</div>
+                    <p>First Payment</p>
+                    <div class="hole">○</div>
+                    <p>1st Month</p>
+                    <div class="hole">○</div>
+                    <p>2nd Month</p>
+                    <div class="hole">○</div>
+                    <p>3rd Month</p>
+                    <div class="hole">○</div>
+                    <p>4th Month</p>
+                    <div class="hole">○</div>
+                    <p>5th Month</p>
+                    <div class="hole star">★</div>
+                    <p>Upgrade Plan</p>
+                </div>
+                <div class="description">
+                    <p><strong>Current Progress:</strong> 2 of 8 steps completed.</p>
+                </div>
             </div>
-            <div class="description">
-                <p><strong>Current Progress:</strong> 3 of 8 steps completed.</p>
-                <p>Complete all steps to unlock the final reward!</p>
+
+            <!-- Rewards -->
+            <div class="rewards">
+                <h3>Available Rewards</h3>
+                <div class="reward-card">
+                    <div class="reward-icon">🎐</div>
+                    <div class="reward-info">
+                        <h4>Recarga de A/C</h4>
+                        <p><span id="ac-rewards">0x</span> for your registered cars</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">🚗</div>
+                    <div class="reward-info">
+                        <h4>Carwash gratis</h4>
+                        <p><span id="carwash-rewards">0x</span> for your registered cars</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">📝</div>
+                    <div class="reward-info">
+                        <h4>Revisión extra del mes en curso</h4>
+                        <p><span id="review-rewards">0x</span> for your registered cars</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
             </div>
         </div>
+    </section>
 
-        <!-- Rewards Section -->
-        <div class="rewards">
-            <h3>Available Rewards</h3>
-            <div class="reward-card">
-                <div class="reward-icon">🎐</div>
-                <div class="reward-info">
-                    <h4>Recarga de A/C</h4>
-                    <p><span id="ac-rewards">0x</span> for your registered cars</p>
-                </div>
-                <span class="reward-status locked">Locked</span>
-            </div>
-            <div class="reward-card">
-                <div class="reward-icon">🚗</div>
-                <div class="reward-info">
-                    <h4>Carwash gratis</h4>
-                    <p><span id="carwash-rewards">0x</span> for your registered cars</p>
-                </div>
-                <span class="reward-status locked">Locked</span>
-            </div>
-            <div class="reward-card">
-                <div class="reward-icon">📝</div>
-                <div class="reward-info">
-                    <h4>Revisión extra del mes en curso</h4>
-                    <p><span id="review-rewards">0x</span> for your registered cars</p>
-                </div>
-                <span class="reward-status locked">Locked</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-    
-</section>
-
-   
+      
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -437,60 +542,91 @@ function updateSchedule() {
 }
 
 
- // Example user data from Firebase
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            db.collection("users").doc(user.email).get().then((doc) => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    updateLoyaltyCard({
-                        hasRegistered: true,
-                        subscriptionPlan: userData.planType, // E.g., "6-month", "3-month"
-                        carsRegistered: userData.vehicles.length || 1, // Number of vehicles
-                    });
-                }
-            });
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // Fetch user data from Firestore
+        db.collection("users").doc(user.email).get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                
+                // Pass relevant data to the loyalty card function
+                updateLoyaltyCard({
+                    hasRegistered: true,
+                    subscriptionPlan: userData.planType || "N/A", // Plan type: 3-month, 6-month, 12-month
+                    carsRegistered: userData.vehicles ? userData.vehicles.length : 1, // Number of vehicles
+                    monthsPaid: userData.monthsPaid || 0, // Track months paid from user data
+                });
+            }
+        }).catch((error) => {
+            console.error("Error fetching user data:", error);
+        });
+    } else {
+        console.log("No user logged in.");
+    }
+});
+
+function updateLoyaltyCard(userData) {
+    const holes = document.querySelectorAll('.hole');
+    const rewardStatusElements = document.querySelectorAll('.reward-status');
+    const acRewards = document.getElementById('ac-rewards');
+    const carwashRewards = document.getElementById('carwash-rewards');
+    const reviewRewards = document.getElementById('review-rewards');
+    let progress = 1; // Always start with registration as completed
+
+    // Calculate progress based on months paid
+    if (userData.monthsPaid) {
+        progress += userData.monthsPaid; // Add progress for paid months
+    }
+
+    // Increment progress based on subscription plan
+    switch (userData.subscriptionPlan) {
+        case "3-month":
+            if (progress > 3) progress = 3; // Cap progress for 3-month plans
+            break;
+        case "6-month":
+            if (progress > 6) progress = 6; // Cap progress for 6-month plans
+            break;
+        case "12-month":
+            if (progress > 8) progress = 8; // Cap progress for 12-month plans
+            break;
+        default:
+            console.warn("Unknown subscription plan:", userData.subscriptionPlan);
+            break;
+    }
+
+    // Update progress on the loyalty card
+    holes.forEach((hole, index) => {
+        if (index < progress) {
+            hole.classList.add('completed');
         }
     });
 
-    function updateLoyaltyCard(userData) {
-        const holes = document.querySelectorAll('.hole');
-        const rewardStatusElements = document.querySelectorAll('.reward-status');
-        const acRewards = document.getElementById('ac-rewards');
-        const carwashRewards = document.getElementById('carwash-rewards');
-        const reviewRewards = document.getElementById('review-rewards');
-        let progress = 1;
+    // Update rewards multiplier based on the number of registered cars
+    const rewardsMultiplier = userData.carsRegistered;
+    acRewards.textContent = `${rewardsMultiplier}x`;
+    carwashRewards.textContent = `${rewardsMultiplier}x`;
+    reviewRewards.textContent = `${rewardsMultiplier}x`;
 
-        // Calculate progress based on subscription plan
-        switch (userData.subscriptionPlan) {
-            case "3-month":
-                progress += 3;
-                break;
-            case "6-month":
-                progress += 6;
-                break;
-            case "12-month":
-                progress += 8;
-                break;
-        }
-
-        holes.forEach((hole, index) => {
-            if (index < progress) hole.classList.add('completed');
+    // Unlock rewards if all progress is complete
+    if (progress >= 8) {
+        rewardStatusElements.forEach((status) => {
+            status.textContent = "Unlocked";
+            status.classList.add("unlocked");
+            status.classList.remove("locked");
         });
-
-        const rewardsMultiplier = userData.carsRegistered;
-        acRewards.textContent = `${rewardsMultiplier}x`;
-        carwashRewards.textContent = `${rewardsMultiplier}x`;
-        reviewRewards.textContent = `${rewardsMultiplier}x`;
-
-        if (progress >= 8) {
-            rewardStatusElements.forEach((status) => {
-                status.textContent = "Unlocked";
-                status.classList.add("unlocked");
-                status.classList.remove("locked");
-            });
-        }
+    } else {
+        rewardStatusElements.forEach((status) => {
+            status.textContent = "Locked";
+            status.classList.add("locked");
+            status.classList.remove("unlocked");
+        });
     }
+
+    // Update progress description dynamically
+    const progressDescription = document.querySelector('.description p strong');
+    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+}
+
 
         // Highlight selected schedule box and capture day and time block
 window.selectScheduleBox = function (cell) {
