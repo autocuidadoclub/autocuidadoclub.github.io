@@ -72,31 +72,32 @@
 
     <!-- Inspection Section -->
     <section id="explore-checks">
-        <h2>¿Te gustaria saber que revisamos en tu vehículo? Explora Nuestras Revisiones Detalladas</h2>
-        <p>Haz clic en los botones de abajo para tener una idea de todas las inspecciones que realizamos en cada área.</p>
-        
-        <!-- Car Icon and Buttons -->
-        <div class="inspection-container">
-            <img src="caricon.jpg" alt="Car Icon" class="car-image">
-            <div class="inspection-tabs">
-                <button onclick="showInspection('motor')">Motor</button>
-                <button onclick="showInspection('interior')">Interior</button>
-                <button onclick="showInspection('exterior')">Exterior</button>
-            </div>
+    <h2>¿Te gustaria saber que revisamos en tu vehículo? Explora Nuestras Revisiones Detalladas</h2>
+    <p>Haz clic en los botones de abajo para tener una idea de todas las inspecciones que realizamos en cada área.</p>
+    
+    <!-- Centered Car Icon and Buttons -->
+    <div class="inspection-container">
+        <img src="caricon.jpg" alt="Car Icon" class="car-image">
+        <div class="inspection-tabs">
+            <button onclick="showInspection('motor')">Motor</button>
+            <button onclick="showInspection('interior')">Interior</button>
+            <button onclick="showInspection('exterior')">Exterior</button>
         </div>
+    </div>
 
-        <!-- Inspection Content -->
-        <div id="inspection-content">
-            <h3>Revisiones del Motor</h3>
-            <ul id="inspection-list">
+    <!-- Inspection Content -->
+    <div id="inspection-content">
+        <h3>Revisiones del Motor</h3>
+        <ul id="inspection-list">
             <li>Análisis del rendimiento de lubricantes mediante pruebas de viscosidad y degradación.</li>
             <li>Inspección de integridad en los sistemas de combustión y encendido para maximizar la eficiencia térmica.</li>
             <li>Monitoreo de parámetros críticos del sistema de refrigeración para evitar sobrecalentamiento.</li>
             <li>Evaluación de la sinergia entre inyectores y componentes de ignición.</li>
             <li>Diagnóstico computarizado de sistemas eléctricos relacionados con el motor.</li>
-            </ul>
-        </div>
-    </section>
+        </ul>
+    </div>
+</section>
+
 
     <!-- JavaScript for Content Switching -->
     <script>
