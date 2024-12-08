@@ -315,27 +315,29 @@
     );
 
     auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-            loadUserProfile(user.email);
-        } else {
-            window.location.href = 'login.html';
-        }
-    });
+    if (user) {
+        console.log("Authenticated user:", user);
+        loadUserProfile(user.email); // Ensure this email matches Firestore document ID
+    } else {
+        console.error("No user authenticated. Redirecting to login.");
+        window.location.href = 'login.html';
+    }
+});
 
     // Load user profile data
-    function loadUserProfile(email) {
-        db.collection("users").doc(email).get()
-            .then(doc => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    populateDashboard(userData);
-                } else {
-                    console.error("User profile not found in database.");
-                }
-            })
-            .catch(error => console.error("Error loading user profile:", error));
-    }
+  function loadUserProfile(email) {
+    db.collection("users").doc(email).get()
+        .then(doc => {
+            if (doc.exists) {
+                console.log("User data found:", doc.data());
+                populateDashboard(doc.data());
+            } else {
+                console.error(`No user profile found for email: ${email}`);
+            }
+        })
+        .catch(error => console.error("Error loading user profile:", error));
+}
+
 
     // Populate dashboard with user data
     function populateDashboard(data) {
