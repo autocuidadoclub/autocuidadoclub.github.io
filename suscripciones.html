@@ -145,9 +145,11 @@ window.selectScheduleBox = function (cell) {
                 planType,
                 vehicles,
                 selectedSchedule: document.getElementById("selectedSchedule").value,
-                subscriptionStatus: "active",
-                registrationDate: firebase.firestore.Timestamp.now()
-            };
+                subscriptionStatus: "inactive", // Default status
+                registrationDate: firebase.firestore.Timestamp.now(),
+                paymentStatus: "Pendiente", // Default payment status
+                nextPaymentDate: null // Placeholder for next payment
+                    };
 
             const usersRef = db.collection("users");
 
