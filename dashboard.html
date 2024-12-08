@@ -375,20 +375,44 @@
     }
 
     // Load vehicles into dashboard
-    function loadVehicles(vehicles) {
-        const vehiclesList = document.getElementById("vehicles-list");
-        vehiclesList.innerHTML = vehicles.length 
-            ? vehicles.map(vehicle => `
-                <div class="vehicle-card">
-                    <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                    <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                    <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-                    <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                    <hr>
-                </div>
-            `).join("")
-            : "<p>No hay vehículos registrados.</p>";
+    // Load vehicles and generate loyalty cards dynamically
+function loadVehicles(vehicles) {
+    const loyaltyCardsContainer = document.getElementById("loyalty-cards-container");
+    loyaltyCardsContainer.innerHTML = ""; // Clear existing content
+
+    if (vehicles.length === 0) {
+        loyaltyCardsContainer.innerHTML = "<p>No hay vehículos registrados.</p>";
+        return;
     }
+
+    vehicles.forEach(vehicle => {
+        const vehicleRewards = `
+            <div class="loyalty-card">
+                <h4>Vehículo: ${vehicle.plate || "N/A"}</h4>
+                <p>Manten tu suscripción activa y completa los 8 espacios para desbloquear los premios</p>
+                <div class="holes">
+                    ${generateHoles(vehicle.rewards || 0)}
+                </div>
+                <div class="description">
+                    <p><strong>Progreso actual:</strong> ${vehicle.rewards || 0} de 8 pasos completados.</p>
+                </div>
+            </div>`;
+        loyaltyCardsContainer.innerHTML += vehicleRewards;
+    });
+}
+
+// Generate holes dynamically based on progress
+function generateHoles(progress) {
+    let holesHTML = "";
+    for (let i = 0; i < 8; i++) {
+        if (i < progress) {
+            holesHTML += `<div class="hole completed">✔</div>`;
+        } else {
+            holesHTML += `<div class="hole">○</div>`;
+        }
+    }
+    return holesHTML;
+}
 
     // Handle schedule restriction logic
     function handleScheduleRestriction(lastScheduleChange) {
