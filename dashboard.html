@@ -305,7 +305,13 @@
     };
 
     // Initialize Firebase
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+    console.log("Firebase initialized successfully.");
+} else {
+    console.log("Firebase app already initialized.");
+}
+
 
     const auth = firebase.auth();
     const db = firebase.firestore();
