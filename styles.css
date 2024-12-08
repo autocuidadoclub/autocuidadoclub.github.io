@@ -1119,6 +1119,20 @@ button:hover {
 }
 </style>
 
+.subscription-plans {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.subscription-plan {
+  flex: 1 1 calc(100% - 32px); /* Makes each card full-width */
+  max-width: 300px;
+  margin: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
