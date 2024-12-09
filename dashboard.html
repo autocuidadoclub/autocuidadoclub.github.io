@@ -346,8 +346,7 @@
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
-                     // Load vehicle data
-                        const vehiclesList = document.getElementById("vehicles-list");
+                   document.getElementById("vehicles-list");
                         vehiclesList.innerHTML = "";
                         if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
                             userData.vehicles.forEach(vehicle => {
