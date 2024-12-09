@@ -124,6 +124,66 @@
     </div>
 </section>
 
+<!-- Loyalty Rewards Section -->
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Loyalty Progress</h3>
+            <div class="loyalty-card">
+                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+                <div class="holes">
+                    <div class="hole completed">✔</div>
+                    <p>Registration</p>
+                    <div class="hole completed">✔</div>
+                    <p>First Payment</p>
+                    <div class="hole">○</div>
+                    <p>1st Month</p>
+                    <div class="hole">○</div>
+                    <p>2nd Month</p>
+                    <div class="hole">○</div>
+                    <p>3rd Month</p>
+                    <div class="hole">○</div>
+                    <p>4th Month</p>
+                    <div class="hole">○</div>
+                    <p>5th Month</p>
+                    <div class="hole star">★</div>
+                    <p>Upgrade Plan</p>
+                </div>
+                <div class="description">
+                    <p><strong>Current Progress:</strong> 2 of 8 steps completed.</p>
+                </div>
+            </div>
+
+            <!-- Rewards -->
+            <div class="rewards">
+                <h3>Available Rewards</h3>
+                <div class="reward-card">
+                    <div class="reward-icon">🎐</div>
+                    <div class="reward-info">
+                        <h4>Recarga de A/C</h4>
+                        <p><span id="ac-rewards">0x</span> for your registered cars</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">🚗</div>
+                    <div class="reward-info">
+                        <h4>Carwash gratis</h4>
+                        <p><span id="carwash-rewards">0x</span> for your registered cars</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">📝</div>
+                    <div class="reward-info">
+                        <h4>Revisión extra del mes en curso</h4>
+                        <p><span id="review-rewards">0x</span> for your registered cars</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+	
 <button onclick="checkLoginState()">Check Login State</button>
 <script>
     function checkLoginState() {
@@ -207,7 +267,32 @@ function loginUser() {
                         document.getElementById("phone").innerText = userData.phone || "N/A";
                         document.getElementById("planType").innerText = userData.planType || "N/A";
                         document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+			document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
+	                document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
+	                document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
+
+			    // Dynamically update loyalty card based on subscription status
+                    if (userData.subscriptionStatus === "active") {
+                        updateLoyaltyCard({
+                            hasRegistered: true,
+                            subscriptionPlan: userData.planType || "N/A",
+                            carsRegistered: userData.vehicles ? userData.vehicles.length : 1,
+                            monthsPaid: userData.monthsPaid || 0
+                        });
+                    } else {
+                        resetLoyaltyCard(); // Reset progress if subscription is inactive
+                    }
+                } else {
+                    console.error("User profile not found.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error loading user profile:", error);
+            });
+    }
+
+			    
                         // Load vehicle data
                         const vehiclesList = document.getElementById("vehicles-list");
                         vehiclesList.innerHTML = "";
