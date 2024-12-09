@@ -159,7 +159,7 @@
     <!-- Vehicle Info -->
         <div class="card">
             <h3><i class="fas fa-car"></i> Vehículos</h3>
-            <div id="vehicles">Cargando información de vehículos...</div>
+           <div id="vehicles-list">Cargando información de vehículos...</div>
         </div>
 
 
@@ -388,6 +388,71 @@ function loadVehicles(vehicles) {
         vehiclesList.innerHTML += vehicleHTML;
     });
 }
+
+        function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    if (!selectedCell) {
+        alert("Por favor selecciona un horario.");
+        return;
+    }
+    const user = auth.currentUser;
+    const newSchedule = selectedCell.innerText.trim();
+
+    db.collection("users").doc(user.email).update({
+        selectedSchedule: newSchedule
+    }).then(() => {
+        alert("Horario actualizado correctamente.");
+        loadUserProfile(user.email); // Reload profile info
+    }).catch((error) => {
+        console.error("Error al actualizar el horario:", error);
+    });
+}
+
+// Add CSS for selected schedule cells
+document.addEventListener("DOMContentLoaded", function () {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .schedule-table tbody td.selected-box {
+            background-color: #FF6600 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+});
+
 
 // Format Firestore timestamp
 function formatTimestamp(timestamp) {
