@@ -362,6 +362,40 @@
             });
     }
 
+function loadVehicles(vehicles) {
+    const vehiclesList = document.getElementById("vehicles-list");
+    vehiclesList.innerHTML = ""; // Clear existing content
+
+    if (vehicles.length === 0) {
+        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+        return;
+    }
+
+    vehicles.forEach((vehicle, index) => {
+        const vehicleHTML = `
+            <div class="vehicle-card">
+                <h4>Vehículo ${index + 1}</h4>
+                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+            </div>
+        `;
+        vehiclesList.innerHTML += vehicleHTML;
+    });
+}
+
+// Format Firestore timestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+        
     function updateLoyaltyCard(userData) {
         const holes = document.querySelectorAll('.hole');
         const rewardStatusElements = document.querySelectorAll('.reward-status');
