@@ -345,6 +345,17 @@
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
+ // Load vehicles data
+                loadVehicles(userData.vehicles || []);
+            } else {
+                console.error("No user document found in Firestore.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error loading user data:", error);
+        });
+}
+                    
                     // Dynamically update loyalty card based on subscription status
                     if (userData.subscriptionStatus === "active") {
                         updateLoyaltyCard({
