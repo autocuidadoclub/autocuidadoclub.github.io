@@ -1,0 +1,389 @@
+	<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header with User Info -->
+    <header>
+        <div class="header-container">
+            <h2 id="user-info">Cargando usuario...</h2>
+            <button onclick="logoutUser()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+   <section class="dashboard-section">
+    <h2>Panel de Usuario</h2>
+    <p>Bienvenido a tu panel, aquí podrás ver tu información y gestionar tus datos.</p>
+
+    <!-- User Profile Card -->
+    <div class="card">
+        <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+        <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+        <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+        <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+    </div>
+
+    <!-- Vehicles Card -->
+    <div class="card">
+        <h3><i class="fas fa-car"></i> Vehículos</h3>
+        <div id="vehicles-list">Cargando información de vehículos...</div>
+    </div>
+
+    <!-- Current Schedule Card -->
+    <div class="card">
+        <h3><i class="fas fa-calendar-alt"></i> Horario Actual</h3>
+        <p id="current-schedule">Cargando...</p>
+    </div>
+
+    <!-- Reprogram Schedule Card -->
+    <div class="card">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>Seleccione un nuevo horario para su plan:</p>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ya cambiaste tu horario este mes. Solo puedes cambiarlo una vez al mes.
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+        <button onclick="updateSchedule()">Guardar Nuevo Horario</button>
+    </div>
+</section>
+
+<button onclick="checkLoginState()">Check Login State</button>
+<script>
+    function checkLoginState() {
+        const user = auth.currentUser;
+        if (user) {
+            alert(`Logged in as: ${user.email}`);
+        } else {
+            alert("No user is logged in.");
+        }
+    }
+</script>
+
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+    authDomain: "auto-cuidadoclub.firebaseapp.com",
+    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+    projectId: "auto-cuidadoclub",
+    storageBucket: "auto-cuidadoclub.appspot.com",
+    messagingSenderId: "986704701191",
+    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+    measurementId: "G-LBBGXV2YX5"
+  };
+
+        if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+        
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error);
+    });
+
+        // Check if user is logged in and load profile info
+       auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("User is logged in:", user.email);
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+        loadUserProfile(user.email); // Load user data
+    } else {
+        console.log("No authenticated user. Redirecting to login.");
+        window.location.href = 'login.html';
+    }
+});
+
+
+function loginUser() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log("Login successful:", userCredential.user.email);
+            window.location.href = 'dashboard.html';
+        })
+        .catch((error) => {
+            console.error("Login error:", error.code, error.message);
+        });
+}
+
+
+        // Load user profile data
+        function loadUserProfile(email) {
+            db.collection("users").doc(email).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById("name").innerText = userData.name || "N/A";
+                        document.getElementById("phone").innerText = userData.phone || "N/A";
+                        document.getElementById("planType").innerText = userData.planType || "N/A";
+                        document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+
+                        // Load vehicle data
+                        const vehiclesList = document.getElementById("vehicles-list");
+                        vehiclesList.innerHTML = "";
+                        if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
+                            userData.vehicles.forEach(vehicle => {
+                                vehiclesList.innerHTML += `
+                                    <div>
+                                        <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
+                                        <strong>Modelo:</strong> ${vehicle.model || "N/A"}<br>
+                                        <strong>Año:</strong> ${vehicle.year || "N/A"}<br>
+                                        <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
+                                        <hr>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            vehiclesList.innerHTML = "No hay vehículos registrados.";
+                        }
+                    } else {
+                        console.error("Perfil de usuario no encontrado.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al cargar el perfil del usuario:", error);
+                });
+        }
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error.message);
+    });
+
+        
+        // Logout function
+        function logoutUser() {
+            auth.signOut()
+                .then(() => {
+                    window.location.href = 'login.html';
+                })
+                .catch((error) => {
+                    console.error("Error al cerrar sesión:", error);
+                });
+        }
+
+        // Schedule selection logic
+        // Highlight selected schedule box and capture day and time block
+function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
+// Add CSS for selected box
+document.addEventListener("DOMContentLoaded", function () {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .schedule-table tbody td.selected-box {
+            background-color: #FF6600 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Attach the click event to schedule table cells
+    const scheduleCells = document.querySelectorAll(".schedule-table tbody td");
+    scheduleCells.forEach((cell) => {
+        cell.addEventListener("click", () => selectScheduleBox(cell));
+    });
+});
+
+        // Update schedule
+        function updateSchedule() {
+            const selectedCell = document.querySelector(".schedule-table td.selected");
+            if (!selectedCell) {
+                alert("Por favor selecciona un horario.");
+                return;
+            }
+            const user = auth.currentUser;
+            const newSchedule = selectedCell.innerText.trim();
+
+            db.collection("users").doc(user.email).update({
+                selectedSchedule: newSchedule
+            }).then(() => {
+                alert("Horario actualizado correctamente.");
+                loadUserProfile(user.email); // Reload profile info
+            }).catch((error) => {
+                console.error("Error al actualizar el horario:", error);
+            });
+        }
+
+        // Highlight selected schedule box and capture day and time block
+window.selectScheduleBox = function (cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    const timeBlock = cell.innerText.trim();
+
+    // Check if the cell contains a valid time
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText : "Desconocido";
+
+    // Store the selected day and time block in a hidden input field
+    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
+    console.log(`Selected Schedule: ${day} - ${timeBlock}`);
+};
+
+// Add CSS for selected box
+document.addEventListener("DOMContentLoaded", function () {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .schedule-table tbody td.selected-box {
+            background-color: #FF6600 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+        
+    </script>
+
+     <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+   
+    <div class="social-container">
+        <p>Síguenos en nuestras redes sociales</p>
+        <div class="social-buttons">
+            <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button twitter">
+                <!-- Alternative icon for X (Twitter) if not available in Font Awesome -->
+                <i class="fab fa-twitter"></i> <!-- Replace with fa-x-twitter if supported -->
+            </a>
+        </div>
+    </div>
+    
+    </footer>
+</body>
+</html>
+
