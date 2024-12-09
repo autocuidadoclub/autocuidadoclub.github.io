@@ -348,8 +348,7 @@
 
 
  // Load vehicle data
-                        const vehiclesList = document.getElementById("vehicles-list");
-                        vehiclesList.innerHTML = "";
+                       document.getElementById("vehicles-list");vehiclesList.innerHTML = "";
                         if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
                             userData.vehicles.forEach(vehicle => {
                                 vehiclesList.innerHTML += `
@@ -365,14 +364,8 @@
                         } else {
                             vehiclesList.innerHTML = "No hay vehículos registrados.";
                         }
-                    } else {
-                        console.error("Perfil de usuario no encontrado.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error al cargar el perfil del usuario:", error);
-                });
-        }
+                    } 
+            }
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
