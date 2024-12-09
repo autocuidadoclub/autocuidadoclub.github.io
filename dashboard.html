@@ -375,9 +375,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         console.error("Error setting authentication persistence:", error.message);
     });
 
-
-                    
-                    
+            
                     // Dynamically update loyalty card based on subscription status
                     if (userData.subscriptionStatus === "active") {
                         updateLoyaltyCard({
@@ -489,7 +487,7 @@ function updateSchedule() {
 
                     // Block if already rescheduled in the same month and year
                     if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                        alert("Solo puedes reprogramar una vez al mes.");
+                        alert("Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.");
                         return;
                     }
                 }
