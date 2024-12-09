@@ -427,17 +427,58 @@ function updateSchedule() {
         alert("Por favor selecciona un horario.");
         return;
     }
-    const user = auth.currentUser;
-    const newSchedule = selectedCell.innerText.trim();
 
-    db.collection("users").doc(user.email).update({
-        selectedSchedule: newSchedule
-    }).then(() => {
-        alert("Horario actualizado correctamente.");
-        loadUserProfile(user.email); // Reload profile info
-    }).catch((error) => {
-        console.error("Error al actualizar el horario:", error);
-    });
+    const timeBlock = selectedCell.innerText.trim();
+    const dayIndex = selectedCell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
+        alert("Por favor selecciona un horario válido.");
+        return;
+    }
+
+    const user = auth.currentUser;
+    const newSchedule = `${day} - ${timeBlock}`;
+
+    // Check if the user already rescheduled this month
+    db.collection("users").doc(user.email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+                const currentDate = new Date();
+
+                if (lastReschedule) {
+                    const rescheduleMonth = lastReschedule.getMonth();
+                    const currentMonth = currentDate.getMonth();
+                    const rescheduleYear = lastReschedule.getFullYear();
+                    const currentYear = currentDate.getFullYear();
+
+                    // Block if already rescheduled in the same month and year
+                    if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                        alert("Solo puedes reprogramar una vez al mes.");
+                        return;
+                    }
+                }
+
+                // Proceed to update schedule
+                db.collection("users").doc(user.email).update({
+                    selectedSchedule: newSchedule,
+                    lastReschedule: firebase.firestore.Timestamp.now()
+                }).then(() => {
+                    alert("Horario actualizado correctamente.");
+                    loadUserProfile(user.email); // Reload profile info
+                }).catch((error) => {
+                    console.error("Error al actualizar el horario:", error);
+                });
+            } else {
+                console.error("Usuario no encontrado en la base de datos.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al verificar reprogramaciones previas:", error);
+        });
 }
 
 // Add CSS for selected schedule cells
