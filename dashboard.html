@@ -345,10 +345,7 @@
                 document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-
-
- // Load vehicle data
-                       document.getElementById("vehicles-list");vehiclesList.innerHTML = "";
+                document.getElementById("vehicles-list");vehiclesList.innerHTML = "";
                         if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
                             userData.vehicles.forEach(vehicle => {
                                 vehiclesList.innerHTML += `
@@ -365,7 +362,7 @@
                             vehiclesList.innerHTML = "No hay vehículos registrados.";
                         }
                     } 
-            }
+            
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
