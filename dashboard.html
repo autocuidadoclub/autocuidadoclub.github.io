@@ -346,6 +346,44 @@
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
+
+ // Load vehicle data
+                        const vehiclesList = document.getElementById("vehicles-list");
+                        vehiclesList.innerHTML = "";
+                        if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
+                            userData.vehicles.forEach(vehicle => {
+                                vehiclesList.innerHTML += `
+                                    <div>
+                                        <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
+                                        <strong>Modelo:</strong> ${vehicle.model || "N/A"}<br>
+                                        <strong>Año:</strong> ${vehicle.year || "N/A"}<br>
+                                        <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
+                                        <hr>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            vehiclesList.innerHTML = "No hay vehículos registrados.";
+                        }
+                    } else {
+                        console.error("Perfil de usuario no encontrado.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al cargar el perfil del usuario:", error);
+                });
+        }
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error.message);
+    });
+
+
+                    
                     
                     // Dynamically update loyalty card based on subscription status
                     if (userData.subscriptionStatus === "active") {
