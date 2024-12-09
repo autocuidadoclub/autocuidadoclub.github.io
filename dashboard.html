@@ -333,45 +333,43 @@
     });
 
     // Load user profile data
-    function loadUserProfile(email) {
-        db.collection("users").doc(email).get()
-            .then((doc) => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                      document.getElementById("name").innerText = userData.name || "N/A";
+   function loadUserProfile(email) {
+    db.collection("users").doc(email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById("name").innerText = userData.name || "N/A";
                 document.getElementById("phone").innerText = userData.phone || "N/A";
                 document.getElementById("planType").innerText = userData.planType || "N/A";
                 document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
-                document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
-                document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
-                document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
-                   document.getElementById("vehicles-list");
-                        vehiclesList.innerHTML = "";
-                        if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
-                            userData.vehicles.forEach(vehicle => {
-                                vehiclesList.innerHTML += `
-                                    <div>
-                                        <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
-                                        <strong>Modelo:</strong> ${vehicle.model || "N/A"}<br>
-                                        <strong>Año:</strong> ${vehicle.year || "N/A"}<br>
-                                        <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
-                                        <hr>
-                                    </div>
-                                `;
-                            });
-                        } else {
-                            vehiclesList.innerHTML = "No hay vehículos registrados.";
-                        }
-                    } else {
-                        console.error("Perfil de usuario no encontrado.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error al cargar el perfil del usuario:", error);
-                });
-        }
-            
+                // Load vehicle data
+                const vehiclesList = document.getElementById("vehicles-list");
+                vehiclesList.innerHTML = ""; // Clear existing content
+                if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
+                    userData.vehicles.forEach(vehicle => {
+                        vehiclesList.innerHTML += `
+                            <div>
+                                <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
+                                <strong>Modelo:</strong> ${vehicle.model || "N/A"}<br>
+                                <strong>Año:</strong> ${vehicle.year || "N/A"}<br>
+                                <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
+                                <hr>
+                            </div>
+                        `;
+                    });
+                } else {
+                    vehiclesList.innerHTML = "No hay vehículos registrados.";
+                }
+            } else {
+                console.error("Perfil de usuario no encontrado.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al cargar el perfil del usuario:", error);
+        });
+}
+
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
