@@ -345,7 +345,10 @@
                 document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-                document.getElementById("vehicles-list");if(vehiclesList){vehiclesList.innerHTML = "";
+
+                     // Load vehicle data
+                        const vehiclesList = document.getElementById("vehicles-list");
+                        vehiclesList.innerHTML = "";
                         if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
                             userData.vehicles.forEach(vehicle => {
                                 vehiclesList.innerHTML += `
@@ -361,10 +364,14 @@
                         } else {
                             vehiclesList.innerHTML = "No hay vehículos registrados.";
                         }
-                    } 
-                    else {
-    console.error("Element with id 'vehicles-list' not found.");
-}
+                    } else {
+                        console.error("Perfil de usuario no encontrado.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al cargar el perfil del usuario:", error);
+                });
+        }
             
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -396,28 +403,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             });
     }
 
-function loadVehicles(vehicles) {
-    const vehiclesList = document.getElementById("vehicles-list");
-    vehiclesList.innerHTML = ""; // Clear existing content
 
-    if (vehicles.length === 0) {
-        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
-        return;
-    }
-
-    vehicles.forEach((vehicle, index) => {
-        const vehicleHTML = `
-            <div class="vehicle-card">
-                <h4>Vehículo ${index + 1}</h4>
-                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-            </div>
-        `;
-        vehiclesList.innerHTML += vehicleHTML;
-    });
-}
 
         function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
