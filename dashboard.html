@@ -333,42 +333,38 @@
     });
 
     // Load user profile data
-   // Load user profile data
-function loadUserProfile(email) {
-    db.collection("users").doc(email).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                document.getElementById("name").innerText = userData.name || "N/A";
+    function loadUserProfile(email) {
+        db.collection("users").doc(email).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                      document.getElementById("name").innerText = userData.name || "N/A";
                 document.getElementById("phone").innerText = userData.phone || "N/A";
                 document.getElementById("planType").innerText = userData.planType || "N/A";
-
-                // Update Horario Actual with last reschedule information
-                const currentScheduleElement = document.getElementById("current-schedule");
-                const lastReschedule = userData.lastReschedule
-                    ? new Date(userData.lastReschedule.seconds * 1000).toLocaleString("es-ES", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                      })
-                    : null;
-                const scheduleMessage = lastReschedule
-                    ? `Horario Actual: ${userData.selectedSchedule || "No asignado"}<br><small>Tu última reprogramación fue el ${lastReschedule}.</small>`
-                    : `Horario Actual: ${userData.selectedSchedule || "No asignado"}`;
-                currentScheduleElement.innerHTML = scheduleMessage;
-
-                // Additional updates...
-            } else {
-                console.error("Perfil de usuario no encontrado.");
-            }
-        })
-        .catch((error) => {
-            console.error("Error al cargar el perfil del usuario:", error);
-        });
+                document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+                document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
+                document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
+                document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+                document.getElementById("vehicles-list");if(vehiclesList){vehiclesList.innerHTML = "";
+                        if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
+                            userData.vehicles.forEach(vehicle => {
+                                vehiclesList.innerHTML += `
+                                    <div>
+                                        <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
+                                        <strong>Modelo:</strong> ${vehicle.model || "N/A"}<br>
+                                        <strong>Año:</strong> ${vehicle.year || "N/A"}<br>
+                                        <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
+                                        <hr>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            vehiclesList.innerHTML = "No hay vehículos registrados.";
+                        }
+                    } 
+                    else {
+    console.error("Element with id 'vehicles-list' not found.");
 }
-
             
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
