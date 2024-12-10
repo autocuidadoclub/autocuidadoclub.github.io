@@ -55,24 +55,11 @@
         <div id="vehicles-list">Cargando información de vehículos...</div>
     </div>
 
-<div class="card">
-            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-            <p><strong>Estado:</strong> <span id="paymentStatus">Cargando...</span></p>
-            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-        </div>
-
-	   
     <!-- Current Schedule Card -->
     <div class="card">
         <h3><i class="fas fa-calendar-alt"></i> Horario Actual</h3>
         <p id="current-schedule">Cargando...</p>
     </div>
-
-	   <div class="card">
-    <h3><i class="fas fa-calendar-check"></i> Miembro Desde</h3>
-    <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-</div>
-
 
     <!-- Reprogram Schedule Card -->
     <div class="card">
@@ -206,10 +193,7 @@ function loginUser() {
                         document.getElementById("phone").innerText = userData.phone || "N/A";
                         document.getElementById("planType").innerText = userData.planType || "N/A";
                         document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
-			document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
-                	document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
-                	document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-                
+
                         // Load vehicle data
                         const vehiclesList = document.getElementById("vehicles-list");
                         vehiclesList.innerHTML = "";
@@ -402,4 +386,3 @@ document.addEventListener("DOMContentLoaded", function () {
     </footer>
 </body>
 </html>
-
