@@ -156,30 +156,32 @@
             <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
         </div>
 
-        <div class="card">
-    <h3><i class="fas fa-calendar-check"></i> Miembro Desde</h3>
-    <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-</div>
-        
-   
-<div class="two-column">
-        <div class="card">
-            <h3><i class="fas fa-calendar-alt"></i> Horario Actual</h3>
-            <p id="current-schedule">Cargando...</p>
-        </div>
 
      <div class="card">
             <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
             <p><strong>Estado:</strong> <span id="paymentStatus">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
         </div>
-</div>
 
-     <!-- Vehicle Info -->
+<div class="two-column">
+        <div class="card">
+            <h3><i class="fas fa-calendar-alt"></i> Horario Actual</h3>
+            <p id="current-schedule">Cargando...</p>
+        </div>
+
+
+<!-- Vehicle Info -->
         <div class="card">
             <h3><i class="fas fa-car"></i> Vehículos</h3>
            <div id="vehicles-list">Cargando información de vehículos...</div>
         </div>
+
+</div>
+
+    <div class="card">
+    <h3><i class="fas fa-calendar-check"></i> Miembro Desde</h3>
+    <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+</div>
 
         
     <!-- Reschedule Section -->
@@ -349,9 +351,7 @@
                 document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-                                        // Load vehicle data
-                        const vehiclesList = document.getElementById("vehicles-list");
-                        vehiclesList.innerHTML = "";
+                document.getElementById("vehicles-list");if(vehiclesList){vehiclesList.innerHTML = "";
                         if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
                             userData.vehicles.forEach(vehicle => {
                                 vehiclesList.innerHTML += `
@@ -367,10 +367,10 @@
                         } else {
                             vehiclesList.innerHTML = "No hay vehículos registrados.";
                         }
-                    } else {
-                        console.error("Perfil de usuario no encontrado.");
-                    }
-                })
+                    } 
+                    else {
+    console.error("Element with id 'vehicles-list' not found.");
+}
             
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
