@@ -323,14 +323,13 @@
     });
 
     // Load user profile data
-   function loadUserProfile(email) {
+    function loadUserProfile(email) {
     db.collection("users").doc(email).get()
         .then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
-                console.log("Fetched User Data:", userData);
 
-                // Populate fields only if they exist in the DOM
+                // Safely update user info fields
                 const nameElement = document.getElementById("name");
                 if (nameElement) nameElement.innerText = userData.name || "N/A";
 
@@ -340,17 +339,15 @@
                 const planTypeElement = document.getElementById("planType");
                 if (planTypeElement) planTypeElement.innerText = userData.planType || "N/A";
 
-                const scheduleElement = document.getElementById("current-schedule");
-                if (scheduleElement) scheduleElement.innerText = userData.selectedSchedule || "No asignado";
+                const currentScheduleElement = document.getElementById("current-schedule");
+                if (currentScheduleElement) currentScheduleElement.innerText = userData.selectedSchedule || "No asignado";
 
                 const memberSinceElement = document.getElementById("memberSince");
-                if (memberSinceElement) {
-                    memberSinceElement.innerText = userData.registrationDate
-                        ? formatTimestamp(userData.registrationDate)
-                        : "Desconocido";
-                }
+                if (memberSinceElement) memberSinceElement.innerText = userData.registrationDate
+                    ? formatTimestamp(userData.registrationDate)
+                    : "Desconocido";
 
-                // Vehicles section
+                // Load vehicle data
                 const vehiclesList = document.getElementById("vehicles-list");
                 if (vehiclesList) {
                     vehiclesList.innerHTML = "";
@@ -371,11 +368,11 @@
                     }
                 }
             } else {
-                console.error("No user document found for:", email);
+                console.error("Perfil de usuario no encontrado.");
             }
         })
         .catch((error) => {
-            console.error("Error fetching user profile:", error);
+            console.error("Error al cargar el perfil del usuario:", error);
         });
 }
 
