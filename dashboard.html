@@ -335,24 +335,7 @@
                 document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-                document.getElementById("vehicles-list");if(vehiclesList){vehiclesList.innerHTML = "";
-                        if (Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
-                            userData.vehicles.forEach(vehicle => {
-                                vehiclesList.innerHTML += `
-                                    <div>
-                                        <strong>Marca:</strong> ${vehicle.brand || "N/A"}<br>
-                                        <strong>Placa:</strong> ${vehicle.plate || "N/A"}<br>
-                                        <hr>
-                                    </div>
-                                `;
-                            });
-                        } else {
-                            vehiclesList.innerHTML = "No hay vehículos registrados.";
-                        }
-                    } 
-                    else {
-    console.error("Element with id 'vehicles-list' not found.");
-}
+              document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
             
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
