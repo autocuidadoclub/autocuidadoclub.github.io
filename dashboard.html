@@ -156,6 +156,9 @@
             <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
             <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
             <P><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
+            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
+            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+
         </div>
 
 
@@ -332,6 +335,8 @@
                 document.getElementById("phone").innerText = userData.phone || "N/A";
                 document.getElementById("planType").innerText = userData.planType || "N/A";
                 document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+                document.getElementById("user-department").innerText = userData.department || "Desconocido";
+                document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
                 document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
