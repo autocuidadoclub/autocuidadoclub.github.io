@@ -119,6 +119,9 @@ window.selectScheduleBox = function (cell) {
             const phone = document.getElementById("phone").value;
             const planType = document.getElementById("planType").value;
             const password = document.getElementById("password").value;
+            const department = document.getElementById("department").value;
+            const municipality = document.getElementById("municipality").value;
+
 
             const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
                 brand: vehicleSection.querySelector('.vehicleBrand').value,
@@ -127,10 +130,11 @@ window.selectScheduleBox = function (cell) {
                 plate: vehicleSection.querySelector('.vehiclePlate').value,
             }));
 
-            if (!name || !email || !phone || !password) {
-                alert("Por favor, complete todos los campos.");
-                return;
-            }
+            // Validate required fields
+    if (!name || !email || !phone || !password || !department || !municipality) {
+        alert("Por favor, complete todos los campos obligatorios.");
+        return;
+    }
 
             const selectedSchedule = document.querySelector(".schedule-table tbody td.selected-box");
             if (!selectedSchedule) {
@@ -144,13 +148,14 @@ window.selectScheduleBox = function (cell) {
                 phone,
                 planType,
                 vehicles,
+                department, // Add department
+                municipality, // Add municipality
                 selectedSchedule: document.getElementById("selectedSchedule").value,
                 subscriptionStatus: "inactive", // Default status
                 registrationDate: firebase.firestore.Timestamp.now(),
                 paymentStatus: "Pendiente", // Default payment status
                 nextPaymentDate: null // Placeholder for next payment
-                    };
-
+            };
             const usersRef = db.collection("users");
 
             firebase.auth().createUserWithEmailAndPassword(email, password)
