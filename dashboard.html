@@ -524,67 +524,71 @@ function formatTimestamp(timestamp) {
     });
 }
         
-    function updateLoyaltyCard(userData) {
-        const holes = document.querySelectorAll('.hole');
-        const rewardStatusElements = document.querySelectorAll('.reward-status');
-        const acRewards = document.getElementById('ac-rewards');
-        const carwashRewards = document.getElementById('carwash-rewards');
-        const reviewRewards = document.getElementById('review-rewards');
-        let progress = 1; // Registration is always completed
+function updateLoyaltyCard(userData) {
+    const holes = document.querySelectorAll('.hole');
+    const rewardStatusElements = document.querySelectorAll('.reward-status');
+    const acRewards = document.getElementById('ac-rewards');
+    const carwashRewards = document.getElementById('carwash-rewards');
+    const reviewRewards = document.getElementById('review-rewards');
 
-        // Calculate progress based on months paid
-        progress += userData.monthsPaid;
+    let progress = 1; // First star is always completed upon registration.
 
-        // Adjust progress based on subscription plan limits
-        switch (userData.subscriptionPlan) {
-            case "3-month":
-                if (progress > 3) progress = 3;
-                break;
-            case "6-month":
-                if (progress > 6) progress = 6;
-                break;
-            case "12-month":
-                if (progress > 8) progress = 8;
-                break;
-            default:
-                console.warn("Unknown subscription plan:", userData.subscriptionPlan);
-        }
-
-        // Update loyalty card UI
-        holes.forEach((hole, index) => {
-            if (index < progress) {
-                hole.classList.add('completed');
-            } else {
-                hole.classList.remove('completed');
-            }
-        });
-
-        // Update rewards multipliers
-        const rewardsMultiplier = userData.carsRegistered;
-        acRewards.textContent = `${rewardsMultiplier}x`;
-        carwashRewards.textContent = `${rewardsMultiplier}x`;
-        reviewRewards.textContent = `${rewardsMultiplier}x`;
-
-        // Unlock rewards if all steps are complete
-        if (progress >= 8) {
-            rewardStatusElements.forEach((status) => {
-                status.textContent = "Unlocked";
-                status.classList.add("unlocked");
-                status.classList.remove("locked");
-            });
-        } else {
-            rewardStatusElements.forEach((status) => {
-                status.textContent = "Locked";
-                status.classList.add("locked");
-                status.classList.remove("unlocked");
-            });
-        }
-
-        // Update progress description
-        const progressDescription = document.querySelector('.description p strong');
-        progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+    // Confirm payment for first subscription (Second star).
+    if (userData.paymentConfirmed) {
+        progress++;
     }
 
+    // Fill stars based on active subscription months.
+    if (userData.subscriptionStatus === "active") {
+        progress += userData.monthsPaid || 0;
+    }
+
+    // Automatically fill the 8th star if the user paid for 12 months upfront.
+    if (userData.planType === "basic12m" || userData.planType === "plus12m") {
+        progress = 8;
+    } else if (progress >= 6) {
+        // Fill the 8th star if payment for the 7th month is confirmed.
+        progress = Math.min(progress + 1, 8); // Cap progress to 8.
+    }
+
+    // Update UI for holes
+    holes.forEach((hole, index) => {
+        if (index < progress) {
+            hole.classList.add('completed');
+            hole.textContent = index === 7 ? '★' : '✔'; // 8th step shows star.
+        } else {
+            hole.classList.remove('completed');
+            hole.textContent = index === 7 ? '★' : '○'; // Keep star for the 8th step.
+        }
+    });
+
+    // Update rewards
+    const rewardsMultiplier = userData.carsRegistered || 1;
+    acRewards.textContent = `${rewardsMultiplier}x`;
+    carwashRewards.textContent = `${rewardsMultiplier}x`;
+    reviewRewards.textContent = `${rewardsMultiplier}x`;
+
+    // Unlock rewards if progress is complete
+    if (progress === 8) {
+        rewardStatusElements.forEach((status) => {
+            status.textContent = "Unlocked";
+            status.classList.add("unlocked");
+            status.classList.remove("locked");
+        });
+    } else {
+        rewardStatusElements.forEach((status) => {
+            status.textContent = "Locked";
+            status.classList.add("locked");
+            status.classList.remove("unlocked");
+        });
+    }
+
+    // Update progress description
+    const progressDescription = document.querySelector('.description p strong');
+    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+}
+
+        
     function resetLoyaltyCard() {
         const holes = document.querySelectorAll('.hole');
         const rewardStatusElements = document.querySelectorAll('.reward-status');
