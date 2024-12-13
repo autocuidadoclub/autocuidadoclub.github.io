@@ -320,6 +320,8 @@
 
     // Check if user is logged in and load profile info
    auth.onAuthStateChanged((user) => {
+
+auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("User is logged in:", user.email);
         document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
@@ -331,10 +333,10 @@
                     const userData = doc.data();
                     console.log("User profile data:", userData);
 
-                    // Update user info first
+                    // Update user information
                     updateUserInfo(userData);
 
-                    // Then update the loyalty card
+                    // Update loyalty card
                     updateLoyaltyCard(userData);
                 } else {
                     console.error("User profile not found.");
@@ -356,16 +358,40 @@ function updateUserInfo(userData) {
     document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-    document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
-    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
-        ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
+
+    // Format and display registration date
+    const registrationDate = userData.registrationDate
+        ? formatTimestamp(userData.registrationDate)
         : "No asignado";
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    document.getElementById("memberSince").innerText = registrationDate;
+
+    // Format and display payment dates
+    document.getElementById("paymentDate").innerText = userData.paymentDate
+        ? formatTimestamp(userData.paymentDate)
+        : "No asignado";
+    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
+        ? formatTimestamp(userData.nextPaymentDate)
+        : "No asignado";
+
+    // Display vehicles' plates
     document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
         ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
         : "No hay vehículos registrados.";
 }
 
+// Helper function to format Firestore timestamps
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+
+       
+       
     // Load user profile data
     function loadUserProfile(email) {
         db.collection("users").doc(email).get()
