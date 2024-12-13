@@ -554,6 +554,88 @@ document.addEventListener("DOMContentLoaded", function () {
     document.head.appendChild(style);
 });
 
+function updatePaymentDate() {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("No estás autenticado.");
+        return;
+    }
+
+    const paymentDateInput = document.getElementById("paymentDate").value;
+    if (!paymentDateInput) {
+        alert("Por favor, selecciona una fecha de pago.");
+        return;
+    }
+
+    const paymentDate = new Date(paymentDateInput);
+    const nextPaymentDate = calculateNextPaymentDate(paymentDate);
+
+    // Fetch existing user data to merge updates
+    db.collection("users").doc(user.email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const existingData = doc.data();
+
+                // Update only payment-related fields, retain others
+                db.collection("users").doc(user.email).update({
+                    ...existingData, // Spread existing data
+                    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                }).then(() => {
+                    alert("Fecha de pago actualizada correctamente.");
+                    loadUserProfile(user.email); // Reload user details
+                }).catch((error) => {
+                    console.error("Error al actualizar la fecha de pago:", error);
+                });
+            } else {
+                console.error("Usuario no encontrado.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al recuperar datos del usuario:", error);
+        });
+}
+
+// Function to calculate the next payment date
+function calculateNextPaymentDate(paymentDate) {
+    const nextDate = new Date(paymentDate);
+    nextDate.setMonth(nextDate.getMonth() + 1); // Add one month
+    return nextDate;
+}
+
+// Function to reload and display user profile
+function loadUserProfile(email) {
+    db.collection("users").doc(email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                updateUserInfo(userData);
+            } else {
+                console.error("Usuario no encontrado.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al cargar el perfil del usuario:", error);
+        });
+}
+
+// Function to update user details in the UI
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+    document.getElementById("paymentDate").innerText = userData.paymentDate
+        ? new Date(userData.paymentDate.seconds * 1000).toLocaleDateString("es-ES")
+        : "No asignado";
+    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
+        ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
+        : "No asignado";
+}
+
+        
 function calculateNextPaymentDate(initialPaymentDate) {
     const date = initialPaymentDate.toDate(); // Firestore Timestamp to Date
     const currentDate = new Date();
