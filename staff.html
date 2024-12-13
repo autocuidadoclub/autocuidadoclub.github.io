@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="logout.html">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>Gestión de Clientes</h1>
+    </header>
+
+<section>
+    <h2>Buscar Cliente</h2>
+    <form id="searchForm">
+        <label for="searchBy">Buscar Por:</label>
+        <select id="searchBy" required>
+            <option value="email">Email</option>
+            <option value="name">Nombre</option>
+            <option value="phone">Teléfono</option>
+        </select>
+        <input type="text" id="searchValue" placeholder="Ingrese el valor de búsqueda" required>
+        <button type="submit">Buscar</button>
+    </form>
+</section>
+
+<section id="user-details" style="display:none;">
+    <h2>Detalles del Cliente</h2>
+    <p><strong>Nombre:</strong> <span id="userName"></span></p>
+    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+    <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
+    <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
+    <label for="paymentDate">Actualizar Fecha de Pago:</label>
+    <input type="date" id="paymentDate">
+    <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
+</section>
+
+<script>
+    const db = firebase.firestore();
+
+    // Handle search form submission
+    document.getElementById("searchForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const searchBy = document.getElementById("searchBy").value;
+        const searchValue = document.getElementById("searchValue").value.trim();
+
+        if (!searchValue) {
+            alert("Por favor, ingrese un valor de búsqueda.");
+            return;
+        }
+
+        searchCustomer(searchBy, searchValue);
+    });
+
+    // Search customer by field
+    function searchCustomer(field, value) {
+        let query;
+
+        if (field === "email") {
+            query = db.collection("users").where("email", "==", value);
+        } else if (field === "name") {
+            query = db.collection("users").where("name", "==", value);
+        } else if (field === "phone") {
+            query = db.collection("users").where("phone", "==", value);
+        }
+
+        query.get().then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                alert("No se encontraron clientes con ese criterio de búsqueda.");
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const userData = doc.data();
+                displayCustomerDetails(userData);
+            });
+        }).catch((error) => {
+            console.error("Error al buscar el cliente:", error);
+        });
+    }
+
+    // Display customer details
+    function displayCustomerDetails(userData) {
+        document.getElementById("userName").textContent = userData.name || "N/A";
+        document.getElementById("userEmail").textContent = userData.email || "N/A";
+        document.getElementById("userPhone").textContent = userData.phone || "N/A";
+        document.getElementById("currentPaymentDate").textContent = userData.paymentDate
+            ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
+            : "Sin fecha registrada";
+        document.getElementById("user-details").style.display = "block";
+    }
+
+    // Update payment date
+    function updatePaymentDate() {
+        const email = document.getElementById("userEmail").textContent;
+        const paymentDateInput = document.getElementById("paymentDate").value;
+
+        if (!paymentDateInput) {
+            alert("Por favor, selecciona una fecha de pago.");
+            return;
+        }
+
+        const paymentDate = new Date(paymentDateInput);
+        const nextPaymentDate = calculateNextPaymentDate(paymentDate);
+
+        db.collection("users").doc(email).update({
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+        }).then(() => {
+            alert("Fecha de pago actualizada correctamente.");
+            fetchUserDetails(email); // Reload user details
+        }).catch((error) => {
+            console.error("Error al actualizar la fecha de pago:", error);
+        });
+    }
+
+    // Calculate the next payment date
+    function calculateNextPaymentDate(paymentDate) {
+        const nextDate = new Date(paymentDate);
+        nextDate.setMonth(nextDate.getMonth() + 1); // Add one month
+        return nextDate;
+    }
+</script>
+
+
+    <section id="user-details" style="display:none;">
+        <h2>Detalles del Usuario</h2>
+        <p><strong>Nombre:</strong> <span id="userName"></span></p>
+        <p><strong>Email:</strong> <span id="userEmail"></span></p>
+        <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
+        <label for="paymentDate">Actualizar Fecha de Pago:</label>
+        <input type="date" id="paymentDate">
+        <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
+
+        <h3>Gestionar Calendario de Inspecciones</h3>
+        <label for="inspectionDate">Próxima Inspección:</label>
+        <input type="date" id="inspectionDate">
+        <button onclick="updateInspectionDate()">Actualizar Inspección</button>
+    </section>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const db = firebase.firestore();
+
+        // Search for a user
+        document.getElementById("searchForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const email = document.getElementById("email").value;
+            fetchUserDetails(email);
+        });
+
+        function fetchUserDetails(email) {
+            db.collection("users").doc(email).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById("userName").textContent = userData.name || "N/A";
+                        document.getElementById("userEmail").textContent = email;
+                        document.getElementById("currentPaymentDate").textContent = userData.paymentDate 
+                            ? userData.paymentDate.toDate().toLocaleDateString("es-ES") 
+                            : "Sin fecha registrada";
+                        document.getElementById("user-details").style.display = "block";
+                    } else {
+                        alert("Usuario no encontrado.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al buscar el usuario:", error);
+                });
+        }
+
+        // Update Payment Date
+        function updatePaymentDate() {
+            const email = document.getElementById("email").value;
+            const paymentDateInput = document.getElementById("paymentDate").value;
+
+            if (!paymentDateInput) {
+                alert("Por favor, selecciona una fecha de pago.");
+                return;
+            }
+
+            const paymentDate = new Date(paymentDateInput);
+            const nextPaymentDate = calculateNextPaymentDate(paymentDate);
+
+            db.collection("users").doc(email).update({
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            }).then(() => {
+                alert("Fecha de pago actualizada correctamente.");
+                fetchUserDetails(email); // Reload user details
+            }).catch((error) => {
+                console.error("Error al actualizar la fecha de pago:", error);
+            });
+        }
+
+        // Update Inspection Date
+        function updateInspectionDate() {
+            const email = document.getElementById("email").value;
+            const inspectionDateInput = document.getElementById("inspectionDate").value;
+
+            if (!inspectionDateInput) {
+                alert("Por favor, selecciona una fecha de inspección.");
+                return;
+            }
+
+            const inspectionDate = new Date(inspectionDateInput);
+
+            db.collection("users").doc(email).update({
+                inspectionDate: firebase.firestore.Timestamp.fromDate(inspectionDate),
+            }).then(() => {
+                alert("Fecha de inspección actualizada correctamente.");
+            }).catch((error) => {
+                console.error("Error al actualizar la fecha de inspección:", error);
+            });
+        }
+
+        function calculateNextPaymentDate(paymentDate) {
+            const nextDate = new Date(paymentDate);
+            nextDate.setMonth(nextDate.getMonth() + 1); // Add one month
+            return nextDate;
+        }
+    </script>
+</body>
+</html>
