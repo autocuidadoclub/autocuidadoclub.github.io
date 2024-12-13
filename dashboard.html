@@ -675,7 +675,7 @@ function updateLoyaltyCard(userData) {
     const carwashRewards = document.getElementById('carwash-rewards');
     const reviewRewards = document.getElementById('review-rewards');
 
-    let progress = 1; // Registration step is always completed.
+    let progress = 1; // First star (registration) is always completed.
 
     // Check if the payment date is valid and before or equal to today
     const currentDate = new Date();
@@ -689,10 +689,10 @@ function updateLoyaltyCard(userData) {
         holes[1].classList.remove('completed');
     }
 
-    // Fill stars based on active subscription months
+    // Fill stars for active subscription months (from 3rd star onwards)
     const monthsPaid = userData.monthsPaid || 0;
     for (let i = 0; i < monthsPaid; i++) {
-        if (i + 2 < holes.length - 1) { // Prevent overriding the final star logic
+        if (i + 2 < holes.length - 1) { // Skip registration and last star
             holes[i + 2].classList.add('completed');
             progress++;
         }
