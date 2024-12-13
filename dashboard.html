@@ -376,7 +376,19 @@ function updateUserInfo(userData) {
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
               document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
-            
+
+                    // Calculate and display next payment date
+                if (userData.initialPaymentDate) {
+                    const nextPaymentDate = calculateNextPaymentDate(userData.initialPaymentDate);
+                    document.getElementById("nextPaymentDate").innerText = nextPaymentDate.toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                    });
+                } else {
+                    document.getElementById("nextPaymentDate").innerText = "No asignado";
+                }
+
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
@@ -430,6 +442,54 @@ function loadVehicles(vehicles) {
     });
 }
 
+// Function to update payment status and set initialPaymentDate
+function updatePaymentStatus(email, newStatus) {
+    const userRef = db.collection("users").doc(email);
+
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const updates = { paymentStatus: newStatus };
+
+            if (newStatus === "activo" && !userData.initialPaymentDate) {
+                // Set initialPaymentDate only if it's not already set
+                updates.initialPaymentDate = firebase.firestore.Timestamp.now();
+            }
+
+            userRef.update(updates).then(() => {
+                console.log(`Payment status updated to ${newStatus}`);
+                if (updates.initialPaymentDate) {
+                    console.log(`Initial payment date set to ${updates.initialPaymentDate}`);
+                }
+            }).catch((error) => {
+                console.error("Error updating payment status:", error);
+            });
+        } else {
+            console.error("User not found in Firestore.");
+        }
+    }).catch((error) => {
+        console.error("Error fetching user data:", error);
+    });
+}
+
+function calculateNextPaymentDate(initialPaymentDate) {
+    const date = initialPaymentDate.toDate(); // Firestore Timestamp to Date
+    const currentDate = new Date();
+
+    // Calculate the months difference
+    const diffMonths =
+        currentDate.getFullYear() * 12 +
+        currentDate.getMonth() -
+        (date.getFullYear() * 12 + date.getMonth());
+
+    // Set the next payment date to the first day of the next month
+    const nextPaymentDate = new Date(date);
+    nextPaymentDate.setMonth(date.getMonth() + diffMonths + 1);
+
+    return nextPaymentDate;
+}
+
+        
         function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
 
@@ -562,61 +622,41 @@ function formatTimestamp(timestamp) {
         
 function updateLoyaltyCard(userData) {
     const holes = document.querySelectorAll('.hole');
-    const rewardStatusElements = document.querySelectorAll('.reward-status');
-    const acRewards = document.getElementById('ac-rewards');
-    const carwashRewards = document.getElementById('carwash-rewards');
-    const reviewRewards = document.getElementById('review-rewards');
-
     let progress = 1; // First star is always completed upon registration.
 
-    // Update the first star based on registration date
+    // First star: Registration
     if (userData.registrationDate) {
         holes[0].classList.add('completed');
     } else {
         holes[0].classList.remove('completed');
     }
 
-    // Update the second star based on paymentStatus being "activo"
+    // Second star: Payment Status
     if (userData.paymentStatus === "activo") {
         holes[1].classList.add('completed');
     } else {
         holes[1].classList.remove('completed');
     }
 
-    // Fill stars based on active subscription months
-    const monthsPaid = userData.monthsPaid || 0;
-    for (let i = 0; i < monthsPaid; i++) {
-        if (i + 2 < holes.length - 1) { // Prevents overriding the final star logic
+    // Calculate subscription months based on initialPaymentDate
+    if (userData.initialPaymentDate) {
+        const initialDate = userData.initialPaymentDate.toDate(); // Convert Firestore Timestamp to JS Date
+        const currentDate = new Date();
+        const diffMonths =
+            currentDate.getFullYear() * 12 +
+            currentDate.getMonth() -
+            (initialDate.getFullYear() * 12 + initialDate.getMonth());
+
+        // Fill stars for each completed subscription month
+        for (let i = 0; i < diffMonths && i + 2 < holes.length - 1; i++) {
             holes[i + 2].classList.add('completed');
         }
     }
 
-    // Automatically fill the 8th star if the user paid for 12 months upfront
+    // Eighth star logic for 12-month plans
     if (userData.planType === "basic12m" || userData.planType === "plus12m") {
         holes[7].classList.add('completed');
-    } else {
-        holes[7].classList.remove('completed');
     }
-
-    // Update rewards
-    const rewardsMultiplier = userData.carsRegistered || 1;
-    acRewards.textContent = `${rewardsMultiplier}x`;
-    carwashRewards.textContent = `${rewardsMultiplier}x`;
-    reviewRewards.textContent = `${rewardsMultiplier}x`;
-
-    // Unlock rewards if all steps are complete
-    const isFullyCompleted = Array.from(holes).every((hole) => hole.classList.contains('completed'));
-    rewardStatusElements.forEach((status) => {
-        if (isFullyCompleted) {
-            status.textContent = "Unlocked";
-            status.classList.add("unlocked");
-            status.classList.remove("locked");
-        } else {
-            status.textContent = "Locked";
-            status.classList.add("locked");
-            status.classList.remove("unlocked");
-        }
-    });
 
     // Update progress description
     const completedSteps = Array.from(holes).filter((hole) => hole.classList.contains('completed')).length;
