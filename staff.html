@@ -74,40 +74,30 @@
 
         // Check if user is logged in
         auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log("User logged in:", user.email);
-
-                // Fetch user role
-                db.collection("users").doc(user.email).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            const userData = doc.data();
-
-                            if (userData.role === "staff") {
-                                console.log("Access granted. Welcome, staff member!");
-                                document.getElementById("staff-section").style.display = "block"; // Show staff section
-                            } else if (userData.role === "customer") {
-                                console.log("Redirecting to customer dashboard...");
-                                window.location.href = "dashboard.html"; // Redirect customers
-                            } else {
-                                alert("Acceso no autorizado.");
-                                auth.signOut();
-                                window.location.href = "login.html"; // Redirect unauthorized users
-                            }
-                        } else {
-                            alert("No se encontró información de usuario.");
-                            auth.signOut();
-                            window.location.href = "login.html";
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching user role:", error);
-                    });
-            } else {
-                console.log("No user logged in. Redirecting to login...");
-                window.location.href = "login.html";
-            }
-        });
+  if (user) {
+    const email = user.email;
+    db.collection("users").doc(email).get()
+      .then((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          if (userData.role === "staff" || userData.role === "CEO") {
+            window.location.href = "staff.html";
+          } else {
+            window.location.href = "dashboard.html";
+          }
+        } else {
+          console.error("User data not found.");
+          alert("Access denied. User data not found.");
+          auth.signOut();
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+      });
+  } else {
+    window.location.href = "login.html";
+  }
+});
 
         // Handle search form submission
         document.getElementById("searchForm").addEventListener("submit", function (event) {
