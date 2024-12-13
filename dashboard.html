@@ -363,8 +363,9 @@ function updateUserInfo(userData) {
         : "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
     document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
-        ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
-        : "No hay vehículos registrados.";
+    ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
+    : "No hay vehículos registrados.";
+
 }
 
     // Load user profile data
@@ -665,6 +666,7 @@ function formatTimestamp(timestamp) {
         year: "numeric",
     });
 }
+
         
 function updateLoyaltyCard(userData) {
     const holes = document.querySelectorAll('.hole');
