@@ -707,10 +707,22 @@ function updateLoyaltyCard(userData) {
     }
 
     // Update rewards
-    const rewardsMultiplier = userData.carsRegistered || 1;
-    acRewards.textContent = `${rewardsMultiplier}x`;
-    carwashRewards.textContent = `${rewardsMultiplier}x`;
-    reviewRewards.textContent = `${rewardsMultiplier}x`;
+    const monthsPaid = userData.monthsPaid || 0;
+
+    if (monthsPaid >= 4) {
+        console.log('User unlocked rewards for 4th month');
+        // Add specific logic for rewards here
+    }
+
+    if (monthsPaid >= 5) {
+        console.log('User unlocked rewards for 5th month');
+        // Add specific logic for rewards here
+    }
+
+    if (monthsPaid >= 6) {
+        console.log('User unlocked rewards for 6th month');
+        // Add specific logic for rewards here
+    }
 
     // Unlock rewards if all steps are complete
     const isFullyCompleted = Array.from(holes).every((hole) => hole.classList.contains('completed'));
