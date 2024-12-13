@@ -548,6 +548,23 @@ document.addEventListener("DOMContentLoaded", function () {
     document.head.appendChild(style);
 });
 
+function calculateNextPaymentDate(initialPaymentDate) {
+    const date = initialPaymentDate.toDate(); // Firestore Timestamp to Date
+    const currentDate = new Date();
+
+    // Calculate the months difference
+    const diffMonths =
+        currentDate.getFullYear() * 12 +
+        currentDate.getMonth() -
+        (date.getFullYear() * 12 + date.getMonth());
+
+    // Set the next payment date to the first day of the next month
+    const nextPaymentDate = new Date(date);
+    nextPaymentDate.setMonth(date.getMonth() + diffMonths + 1);
+
+    return nextPaymentDate;
+}
+
 
 // Format Firestore timestamp
 function formatTimestamp(timestamp) {
@@ -570,11 +587,17 @@ function updateLoyaltyCard(userData) {
     let progress = 1; // First star is always completed upon registration.
 
     // Update the first star based on registration date
-    if (userData.registrationDate) {
-        holes[0].classList.add('completed');
-    } else {
-        holes[0].classList.remove('completed');
-    }
+    if (userData.initialPaymentDate) {
+    const nextPaymentDate = calculateNextPaymentDate(userData.initialPaymentDate);
+    document.getElementById("nextPaymentDate").innerText = nextPaymentDate.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    });
+} else {
+    document.getElementById("nextPaymentDate").innerText = "No asignado";
+}
+
 
     // Update the second star based on paymentStatus being "activo"
     if (userData.paymentStatus === "activo") {
