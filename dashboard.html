@@ -360,8 +360,8 @@ function updateUserInfo(userData) {
     document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
         ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
         : "No asignado";
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-    document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
+    document.getElementById("registrationDate").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    document.getElementById("vehicles-plate").innerText = userData.vehicles && userData.vehicles.length > 0
         ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
         : "No hay vehículos registrados.";
 }
