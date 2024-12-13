@@ -675,24 +675,16 @@ function updateLoyaltyCard(userData) {
     const carwashRewards = document.getElementById('carwash-rewards');
     const reviewRewards = document.getElementById('review-rewards');
 
-    let progress = 1; // First star is always completed upon registration.
+    let progress = 1; // Registration step is always completed.
 
-    // Update the first star based on registration date
-    if (userData.initialPaymentDate) {
-    const nextPaymentDate = calculateNextPaymentDate(userData.initialPaymentDate);
-    document.getElementById("nextPaymentDate").innerText = nextPaymentDate.toLocaleDateString("es-ES", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-    });
-} else {
-    document.getElementById("nextPaymentDate").innerText = "No asignado";
-}
+    // Check if the payment date is valid and before or equal to today
+    const currentDate = new Date();
+    const paymentDate = userData.paymentDate ? userData.paymentDate.toDate() : null;
 
-
-    // Update the second star based on paymentStatus being "activo"
-    if (userData.paymentStatus === "activo") {
+    if (paymentDate && paymentDate <= currentDate) {
+        // Payment is valid, activate the second step
         holes[1].classList.add('completed');
+        progress++;
     } else {
         holes[1].classList.remove('completed');
     }
@@ -700,14 +692,16 @@ function updateLoyaltyCard(userData) {
     // Fill stars based on active subscription months
     const monthsPaid = userData.monthsPaid || 0;
     for (let i = 0; i < monthsPaid; i++) {
-        if (i + 2 < holes.length - 1) { // Prevents overriding the final star logic
+        if (i + 2 < holes.length - 1) { // Prevent overriding the final star logic
             holes[i + 2].classList.add('completed');
+            progress++;
         }
     }
 
-    // Automatically fill the 8th star if the user paid for 12 months upfront
+    // Automatically fill the last star if the user paid for 12 months upfront
     if (userData.planType === "basic12m" || userData.planType === "plus12m") {
         holes[7].classList.add('completed');
+        progress++;
     } else {
         holes[7].classList.remove('completed');
     }
