@@ -154,11 +154,12 @@
             <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
             <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
             <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
-            <p><strong>Miembro Desde:</strong> <span id="registrationDate">Cargando...</span></p>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
             <P><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
             <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
             <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
-            <p><strong>Vehiculos: </strong> <span id="vehicles-plate">Cargando...</span></p>
+            <p><strong>Vehiculos: </strong> <span id="vehicles-list">Cargando...</span></p>
+
         </div>
 
 
@@ -360,8 +361,8 @@ function updateUserInfo(userData) {
     document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
         ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
         : "No asignado";
-    document.getElementById("registrationDate").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-    document.getElementById("vehicles-plate").innerText = userData.vehicles && userData.vehicles.length > 0
+    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
         ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
         : "No hay vehículos registrados.";
 }
