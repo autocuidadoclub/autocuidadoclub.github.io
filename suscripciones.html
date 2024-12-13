@@ -151,9 +151,8 @@ window.selectScheduleBox = function (cell) {
                 department, // Add department
                 municipality, // Add municipality
                 selectedSchedule: document.getElementById("selectedSchedule").value,
-                subscriptionStatus: "inactive", // Default status
                 registrationDate: firebase.firestore.Timestamp.now(),
-                paymentStatus: "Pendiente", // Default payment status
+                paymentDate: null, // Initialize paymentDate as null 
                 nextPaymentDate: null // Placeholder for next payment
             };
             const usersRef = db.collection("users");
