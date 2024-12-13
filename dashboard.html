@@ -322,8 +322,8 @@
         db.collection("users").doc(user.email).onSnapshot((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
-                updateUserProfile(userData);
-                updateLoyaltyCard(userData); // Dynamically update loyalty card
+                updateUserProfile(userData); // Updates the user profile
+                updateLoyaltyCard(userData); // Updates the loyalty card
             } else {
                 console.error("User profile not found.");
             }
@@ -546,7 +546,7 @@ function updateLoyaltyCard(userData) {
     }
 
     // Check if the payment status is active
-    if (userData.paymentStatus === "activo") {
+    if (userData.paymentStatus && userData.paymentStatus.toLowerCase() === "activo") {
         holes[1].classList.add('completed');
         progress++;
     }
@@ -559,9 +559,9 @@ function updateLoyaltyCard(userData) {
     }
 
     // Automatically mark the 8th hole if the user has prepaid for 12 months
-    if (userData.planType === "plus12m") {
+    if (userData.planType === "plus12m" && monthsPaid >= 6) {
         holes[7].classList.add('completed');
-        progress = 8; // Ensure progress shows all completed
+        progress = Math.max(progress, 8); // Ensure progress shows all completed
     }
 
     // Update the progress text
@@ -569,13 +569,14 @@ function updateLoyaltyCard(userData) {
     progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
 }
 
+
         
-    function resetLoyaltyCard() {
-        const holes = document.querySelectorAll('.hole');
-        const rewardStatusElements = document.querySelectorAll('.reward-status');
-        const acRewards = document.getElementById('ac-rewards');
-        const carwashRewards = document.getElementById('carwash-rewards');
-        const reviewRewards = document.getElementById('review-rewards');
+   function resetLoyaltyCard() {
+    const holes = document.querySelectorAll('.hole');
+    holes.forEach((hole) => hole.classList.remove('completed'));
+    const progressDescription = document.querySelector('.description p strong');
+    progressDescription.textContent = `Current Progress: 0 of 8 steps completed.`;
+}
 
         // Reset all holes
         holes.forEach((hole) => hole.classList.remove('completed'));
