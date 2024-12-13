@@ -561,57 +561,67 @@ function formatTimestamp(timestamp) {
 }
         
 function updateLoyaltyCard(userData) {
-    console.log("Updating loyalty card with data:", userData);
-
     const holes = document.querySelectorAll('.hole');
-    let progress = 1; // Registration is always step 1.
+    const rewardStatusElements = document.querySelectorAll('.reward-status');
+    const acRewards = document.getElementById('ac-rewards');
+    const carwashRewards = document.getElementById('carwash-rewards');
+    const reviewRewards = document.getElementById('review-rewards');
 
-    // Check if registration is complete
+    let progress = 1; // First star is always completed upon registration.
+
+    // Update the first star based on registration date
     if (userData.registrationDate) {
-        console.log("Registration complete.");
         holes[0].classList.add('completed');
-        progress++;
+    } else {
+        holes[0].classList.remove('completed');
     }
 
-    // Check if payment is confirmed
-    if (userData.paymentConfirmed || userData.paymentStatus === "activo") {
-        console.log("Payment confirmed.");
+    // Update the second star based on paymentStatus being "activo"
+    if (userData.paymentStatus === "activo") {
         holes[1].classList.add('completed');
-        progress++;
+    } else {
+        holes[1].classList.remove('completed');
     }
 
-    // Calculate progress based on subscription months
-    if (userData.subscriptionStatus === "active") {
-        console.log("Subscription active. Months paid:", userData.monthsPaid);
-        progress += userData.monthsPaid || 0;
+    // Fill stars based on active subscription months
+    const monthsPaid = userData.monthsPaid || 0;
+    for (let i = 0; i < monthsPaid; i++) {
+        if (i + 2 < holes.length - 1) { // Prevents overriding the final star logic
+            holes[i + 2].classList.add('completed');
+        }
     }
 
-    // Check for prepaid 12-month subscription
+    // Automatically fill the 8th star if the user paid for 12 months upfront
     if (userData.planType === "basic12m" || userData.planType === "plus12m") {
-        console.log("12-month subscription detected.");
-        progress = 8;
-    } else if (progress >= 6 && userData.monthsPaid >= 6) {
-        console.log("7th month paid; filling 8th hole.");
-        progress = Math.min(progress + 1, 8);
+        holes[7].classList.add('completed');
+    } else {
+        holes[7].classList.remove('completed');
     }
 
-    console.log("Calculated progress:", progress);
+    // Update rewards
+    const rewardsMultiplier = userData.carsRegistered || 1;
+    acRewards.textContent = `${rewardsMultiplier}x`;
+    carwashRewards.textContent = `${rewardsMultiplier}x`;
+    reviewRewards.textContent = `${rewardsMultiplier}x`;
 
-    // Update UI holes
-    holes.forEach((hole, index) => {
-        if (index < progress) {
-            console.log(`Filling hole ${index + 1}`);
-            hole.classList.add('completed');
+    // Unlock rewards if all steps are complete
+    const isFullyCompleted = Array.from(holes).every((hole) => hole.classList.contains('completed'));
+    rewardStatusElements.forEach((status) => {
+        if (isFullyCompleted) {
+            status.textContent = "Unlocked";
+            status.classList.add("unlocked");
+            status.classList.remove("locked");
         } else {
-            hole.classList.remove('completed');
+            status.textContent = "Locked";
+            status.classList.add("locked");
+            status.classList.remove("unlocked");
         }
     });
 
     // Update progress description
+    const completedSteps = Array.from(holes).filter((hole) => hole.classList.contains('completed')).length;
     const progressDescription = document.querySelector('.description p strong');
-    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
-
-    console.log("Loyalty card UI updated.");
+    progressDescription.textContent = `Current Progress: ${completedSteps} of 8 steps completed.`;
 }
 
         
