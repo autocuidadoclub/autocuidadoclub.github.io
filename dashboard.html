@@ -357,8 +357,13 @@ function updateUserInfo(userData) {
 
     // Display next payment date
     document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
-        ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
+        ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+          })
         : "No asignado";
+}
 
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
     document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
@@ -449,37 +454,6 @@ function loadVehicles(vehicles) {
     });
 }
 
-// Function to update payment status and set initialPaymentDate
-function updatePaymentStatus(email, newStatus) {
-    const userRef = db.collection("users").doc(email);
-
-    userRef.get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            const updates = { paymentStatus: newStatus };
-
-            if (newStatus === "activo" && !userData.initialPaymentDate) {
-                // Set initialPaymentDate only if it's not already set
-                updates.initialPaymentDate = firebase.firestore.Timestamp.now();
-            }
-
-            userRef.update(updates).then(() => {
-                console.log(`Payment status updated to ${newStatus}`);
-                if (updates.initialPaymentDate) {
-                    console.log(`Initial payment date set to ${updates.initialPaymentDate}`);
-                }
-            }).catch((error) => {
-                console.error("Error updating payment status:", error);
-            });
-        } else {
-            console.error("User not found in Firestore.");
-        }
-    }).catch((error) => {
-        console.error("Error fetching user data:", error);
-    });
-}
-
-
 function calculateNextPaymentDate(initialPaymentDate) {
     const date = initialPaymentDate.toDate(); // Firestore Timestamp to Date
     const currentDate = new Date();
@@ -496,6 +470,54 @@ function calculateNextPaymentDate(initialPaymentDate) {
 
     return nextPaymentDate;
 }
+
+        
+// Function to update payment status and set initialPaymentDate
+function updatePaymentStatus(email, newStatus) {
+    const userRef = db.collection("users").doc(email);
+
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const updates = { paymentStatus: newStatus };
+
+            if (newStatus === "activo") {
+                const currentTimestamp = firebase.firestore.Timestamp.now();
+
+                if (!userData.initialPaymentDate) {
+                    // If initialPaymentDate is not set, initialize it
+                    updates.initialPaymentDate = currentTimestamp;
+                }
+
+                // Calculate the next payment date based on the initial payment date
+                const initialPaymentDate = userData.initialPaymentDate
+                    ? userData.initialPaymentDate
+                    : currentTimestamp;
+
+                updates.nextPaymentDate = firebase.firestore.Timestamp.fromDate(
+                    calculateNextPaymentDate(initialPaymentDate)
+                );
+            } else {
+                // If payment is inactive, clear the nextPaymentDate
+                updates.nextPaymentDate = null;
+            }
+
+            // Update Firestore document
+            userRef.update(updates)
+                .then(() => {
+                    console.log(`Payment status updated to ${newStatus}`);
+                })
+                .catch((error) => {
+                    console.error("Error updating payment status:", error);
+                });
+        } else {
+            console.error("User not found in Firestore.");
+        }
+    }).catch((error) => {
+        console.error("Error fetching user data:", error);
+    });
+}
+
 
         
         function selectScheduleBox(cell) {
