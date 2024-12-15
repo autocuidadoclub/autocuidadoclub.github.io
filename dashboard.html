@@ -350,8 +350,8 @@ function updateUserInfo(userData) {
     document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-    document.getElementById("paymentDate").innerText = userData.paymentDate || "Pendiente";
-    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate)
         ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
         : "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
