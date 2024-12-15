@@ -594,48 +594,43 @@ function updateLoyaltyCard(userData) {
     console.log("Updating loyalty card with data:", userData);
 
     const holes = document.querySelectorAll('.hole');
-    let progress = 1; // Registration is always step 1.
+    let progress = 1; // Step 1: Registration is always completed.
 
-    // Check if registration is complete
-    if (userData.registrationDate) {
-        console.log("Registration complete.");
-        holes[0].classList.add('completed');
-        progress++;
-    }
+    // Step 2: Check if payment is confirmed
+    if (userData.paymentDate) {
+        const paymentDate = userData.paymentDate.toDate 
+            ? userData.paymentDate.toDate() 
+            : new Date(userData.paymentDate.seconds * 1000);
 
-   // Check if payment is confirmed
-if (userData.paymentDate) {
-    const paymentDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
-
-    if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
-        console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
-        holes[1].classList.add('completed');
-        progress++;
+        if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
+            console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
+            holes[1].classList.add('completed');
+            progress++;
+        } else {
+            console.error("Invalid paymentDate found:", userData.paymentDate);
+        }
     } else {
-        console.error("Invalid paymentDate found:", userData.paymentDate);
+        console.log("Payment not completed. Cannot proceed to the next steps.");
     }
-} else {
-    console.log("Payment date not available.");
-}
-    
-    // Calculate progress based on subscription months
-    if (userData.subscriptionStatus === "active") {
+
+    // Step 3: Calculate progress based on subscription status and months paid
+    if (userData.subscriptionStatus === "active" && userData.monthsPaid) {
         console.log("Subscription active. Months paid:", userData.monthsPaid);
         progress += userData.monthsPaid || 0;
     }
 
-    // Check for prepaid 12-month subscription
+    // Step 4: Check for prepaid 12-month subscription, but only if payment is confirmed
     if (userData.planType === "basic12m" || userData.planType === "plus12m") {
-        console.log("12-month subscription detected.");
-        progress = 8;
-    } else if (progress >= 6 && userData.monthsPaid >= 6) {
-        console.log("7th month paid; filling 8th hole.");
-        progress = Math.min(progress + 1, 8);
+        if (userData.paymentDate) { // Validate that paymentDate exists
+            console.log("12-month subscription confirmed with payment.");
+            progress = 8; // Mark all 8 steps complete
+        } else {
+            console.log("12-month plan detected, but no payment found. Progress unchanged.");
+        }
     }
 
+    // Step 5: Update UI holes
     console.log("Calculated progress:", progress);
-
-    // Update UI holes
     holes.forEach((hole, index) => {
         if (index < progress) {
             console.log(`Filling hole ${index + 1}`);
