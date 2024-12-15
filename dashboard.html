@@ -494,15 +494,13 @@ function updateSchedule() {
 
     const user = auth.currentUser;
     const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date();
-
-    // Format the current date for immediate feedback
-    const formattedDate = currentDate.toLocaleString("es-ES", {
-        day: "numeric",
+    const currentDate = new Date().toLocaleString("es-ES", {
+        day: "2-digit",
         month: "long",
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
+        second: "2-digit",
     });
 
     db.collection("users").doc(user.email).get()
@@ -510,16 +508,17 @@ function updateSchedule() {
             if (doc.exists) {
                 const userData = doc.data();
                 const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+                const currentDateObj = new Date();
 
                 if (lastReschedule) {
                     const rescheduleMonth = lastReschedule.getMonth();
-                    const currentMonth = currentDate.getMonth();
+                    const currentMonth = currentDateObj.getMonth();
                     const rescheduleYear = lastReschedule.getFullYear();
-                    const currentYear = currentDate.getFullYear();
+                    const currentYear = currentDateObj.getFullYear();
 
                     if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
                         const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
-                            day: "numeric",
+                            day: "2-digit",
                             month: "long",
                             year: "numeric",
                             hour: "2-digit",
@@ -530,19 +529,14 @@ function updateSchedule() {
                     }
                 }
 
-                // Display immediate confirmation message
-                alert(`Reprogramación exitosa. Nuevo horario: ${newSchedule}. Fecha y hora de cambio: ${formattedDate}.`);
-
-                // Update Firestore with the new schedule and timestamp
                 db.collection("users").doc(user.email).update({
                     selectedSchedule: newSchedule,
                     lastReschedule: firebase.firestore.Timestamp.now(),
                 }).then(() => {
-                    console.log("Horario actualizado correctamente en Firestore.");
-                    // Reload the profile info to reflect changes
-                    loadUserProfile(user.email);
+                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
+                    loadUserProfile(user.email); // Reload profile info
                 }).catch((error) => {
-                    console.error("Error al actualizar el horario en Firestore:", error);
+                    console.error("Error al actualizar el horario:", error);
                 });
             } else {
                 console.error("Usuario no encontrado en la base de datos.");
@@ -552,6 +546,7 @@ function updateSchedule() {
             console.error("Error al verificar reprogramaciones previas:", error);
         });
 }
+
 
 
 
