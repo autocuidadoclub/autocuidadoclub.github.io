@@ -485,6 +485,15 @@ function updateSchedule() {
     const newSchedule = `${day} - ${timeBlock}`;
     const currentDate = new Date();
 
+    // Format the current date for immediate feedback
+    const formattedDate = currentDate.toLocaleString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+
     db.collection("users").doc(user.email).get()
         .then((doc) => {
             if (doc.exists) {
@@ -510,22 +519,17 @@ function updateSchedule() {
                     }
                 }
 
-                // Show confirmation message immediately
-                const formattedDate = currentDate.toLocaleString("es-ES", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
+                // Display immediate confirmation message
                 alert(`Reprogramación exitosa. Nuevo horario: ${newSchedule}. Fecha y hora de cambio: ${formattedDate}.`);
 
                 // Update Firestore with the new schedule and timestamp
                 db.collection("users").doc(user.email).update({
                     selectedSchedule: newSchedule,
-                    lastReschedule: firebase.firestore.Timestamp.fromDate(currentDate),
+                    lastReschedule: firebase.firestore.Timestamp.now(),
                 }).then(() => {
-                    loadUserProfile(user.email); // Reload profile info
+                    console.log("Horario actualizado correctamente en Firestore.");
+                    // Reload the profile info to reflect changes
+                    loadUserProfile(user.email);
                 }).catch((error) => {
                     console.error("Error al actualizar el horario en Firestore:", error);
                 });
@@ -537,6 +541,7 @@ function updateSchedule() {
             console.error("Error al verificar reprogramaciones previas:", error);
         });
 }
+
 
 
 
