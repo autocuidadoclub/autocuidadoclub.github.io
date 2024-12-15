@@ -24,11 +24,11 @@
     </header>
 
     <!-- Staff Section -->
-    <section id="staff-section" style="display:none;">
+    <section id="staff-section">
         <h2>Panel de Gestión para el Staff</h2>
         <p>Bienvenido, este panel es solo para personal autorizado.</p>
+
         <!-- Search Section -->
-        <h2>Buscar Cliente</h2>
         <form id="searchForm">
             <label for="searchBy">Buscar Por:</label>
             <select id="searchBy" required>
@@ -72,33 +72,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Check if user is logged in
-        auth.onAuthStateChanged((user) => {
-  if (user) {
-    const email = user.email;
-    db.collection("users").doc(email).get()
-      .then((doc) => {
-        if (doc.exists) {
-          const userData = doc.data();
-          if (userData.role === "staff" || userData.role === "CEO") {
-            window.location.href = "staff.html";
-          } else {
-            window.location.href = "dashboard.html";
-          }
-        } else {
-          console.error("User data not found.");
-          alert("Access denied. User data not found.");
-          auth.signOut();
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      });
-  } else {
-    window.location.href = "login.html";
-  }
-});
-
         // Handle search form submission
         document.getElementById("searchForm").addEventListener("submit", function (event) {
             event.preventDefault();
@@ -116,7 +89,6 @@
         // Search customer by field
         function searchCustomer(field, value) {
             let query;
-
             if (field === "email") {
                 query = db.collection("users").where("email", "==", value);
             } else if (field === "name") {
@@ -151,7 +123,7 @@
             document.getElementById("user-details").style.display = "block";
         }
 
-        // Update payment date
+        // Update payment date and calculate next payment date
         function updatePaymentDate() {
             const email = document.getElementById("userEmail").textContent;
             const paymentDateInput = document.getElementById("paymentDate").value;
@@ -162,23 +134,42 @@
             }
 
             const paymentDate = new Date(paymentDateInput);
-            const nextPaymentDate = calculateNextPaymentDate(paymentDate);
 
-            db.collection("users").doc(email).update({
-                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-            }).then(() => {
-                alert("Fecha de pago actualizada correctamente.");
-                searchCustomer("email", email); // Reload user details
-            }).catch((error) => {
-                console.error("Error al actualizar la fecha de pago:", error);
+            // Fetch user plan to calculate nextPaymentDate
+            db.collection("users").doc(email).get().then((doc) => {
+                if (!doc.exists) {
+                    alert("Usuario no encontrado.");
+                    return;
+                }
+
+                const userData = doc.data();
+                const nextPaymentDate = calculateNextPaymentDate(paymentDate, userData.planType);
+
+                db.collection("users").doc(email).update({
+                    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+                }).then(() => {
+                    alert("Fecha de pago actualizada correctamente.");
+                    searchCustomer("email", email); // Reload user details
+                }).catch((error) => {
+                    console.error("Error al actualizar la fecha de pago:", error);
+                });
             });
         }
 
-        // Calculate the next payment date
-        function calculateNextPaymentDate(paymentDate) {
+        // Calculate the next payment date based on plan type
+        function calculateNextPaymentDate(paymentDate, planType) {
             const nextDate = new Date(paymentDate);
-            nextDate.setMonth(nextDate.getMonth() + 1); // Add one month
+            if (planType.includes("3m")) {
+                nextDate.setMonth(nextDate.getMonth() + 3);
+            } else if (planType.includes("6m")) {
+                nextDate.setMonth(nextDate.getMonth() + 6);
+            } else if (planType.includes("12m")) {
+                nextDate.setFullYear(nextDate.getFullYear() + 1);
+            } else {
+                console.warn("Tipo de plan no reconocido, estableciendo 1 mes por defecto.");
+                nextDate.setMonth(nextDate.getMonth() + 1);
+            }
             return nextDate;
         }
     </script>
