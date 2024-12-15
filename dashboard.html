@@ -500,38 +500,65 @@ function updateSchedule() {
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
-    if (!timeBlock || timeBlock === "-" || day === "Día desconocido") {
+    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
         alert("Por favor selecciona un horario válido.");
         return;
     }
 
     const user = auth.currentUser;
     const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date();
-
-    // Immediate feedback to user
-    alert(`Tu nuevo horario "${newSchedule}" ha sido guardado localmente.`);
-    document.getElementById("current-schedule").innerText = newSchedule;
-    document.getElementById("last-reschedule").innerText = currentDate.toLocaleString("es-ES", {
+    const currentDate = new Date().toLocaleString("es-ES", {
         day: "2-digit",
         month: "long",
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
+        second: "2-digit",
     });
 
-    // Update Firestore asynchronously
-    db.collection("users").doc(user.email).update({
-        selectedSchedule: newSchedule,
-        lastReschedule: firebase.firestore.Timestamp.now()
-    }).then(() => {
-        console.log("Firestore actualizado correctamente.");
-    }).catch((error) => {
-        console.error("Error al actualizar Firestore:", error);
-        alert("Error al guardar el horario. Por favor, intenta de nuevo.");
-    });
+    db.collection("users").doc(user.email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+                const currentDateObj = new Date();
+
+                if (lastReschedule) {
+                    const rescheduleMonth = lastReschedule.getMonth();
+                    const currentMonth = currentDateObj.getMonth();
+                    const rescheduleYear = lastReschedule.getFullYear();
+                    const currentYear = currentDateObj.getFullYear();
+
+                    if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                        const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        });
+                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
+                        return;
+                    }
+                }
+
+                db.collection("users").doc(user.email).update({
+                    selectedSchedule: newSchedule,
+                    lastReschedule: firebase.firestore.Timestamp.now(),
+                }).then(() => {
+                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
+                    loadUserProfile(user.email); // Reload profile info
+                }).catch((error) => {
+                    console.error("Error al actualizar el horario:", error);
+                });
+            } else {
+                console.error("Usuario no encontrado en la base de datos.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al verificar reprogramaciones previas:", error);
+        });
 }
-
 
 
 
