@@ -178,6 +178,7 @@
         <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
         <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
             Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+    <p><strong>Última Reprogramación:</strong> <span id="last-reschedule">Cargando...</span></p>
         </div>
         <table class="schedule-table">
             <thead>
@@ -388,6 +389,7 @@ function updateUserInfo(userData) {
               document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
             
 
+                 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
         console.log("Authentication persistence set to LOCAL.");
@@ -395,6 +397,19 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .catch((error) => {
         console.error("Error setting authentication persistence:", error.message);
     });
+
+                    if (userData.lastReschedule) {
+                    const lastRescheduleDate = userData.lastReschedule.toDate().toLocaleString("es-ES", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+                    document.getElementById("last-reschedule").innerText = lastRescheduleDate;
+                } else {
+                    document.getElementById("last-reschedule").innerText = "No hay reprogramación previa.";
+                }
 
             
                     // Dynamically update loyalty card based on subscription status
@@ -485,64 +500,36 @@ function updateSchedule() {
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
-    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
+    if (!timeBlock || timeBlock === "-" || day === "Día desconocido") {
         alert("Por favor selecciona un horario válido.");
         return;
     }
 
     const user = auth.currentUser;
     const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date().toLocaleString("es-ES", {
+    const currentDate = new Date();
+
+    // Immediate feedback to user
+    alert(`Tu nuevo horario "${newSchedule}" ha sido guardado localmente.`);
+    document.getElementById("current-schedule").innerText = newSchedule;
+    document.getElementById("last-reschedule").innerText = currentDate.toLocaleString("es-ES", {
         day: "2-digit",
         month: "long",
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-        second: "2-digit",
     });
 
-    db.collection("users").doc(user.email).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
-                const currentDateObj = new Date();
-
-                if (lastReschedule) {
-                    const rescheduleMonth = lastReschedule.getMonth();
-                    const currentMonth = currentDateObj.getMonth();
-                    const rescheduleYear = lastReschedule.getFullYear();
-                    const currentYear = currentDateObj.getFullYear();
-
-                    if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                        const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        });
-                        alert(`Ya ejecutastes la re-programación de este mes`);
-                        return;
-                    }
-                }
-
-                db.collection("users").doc(user.email).update({
-                    selectedSchedule: newSchedule,
-                    lastReschedule: firebase.firestore.Timestamp.now(),
-                }).then(() => {
-                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
-                    loadUserProfile(user.email); // Reload profile info
-                }).catch((error) => {
-                    console.error("Error al actualizar el horario:", error);
-                });
-            } else {
-                console.error("Usuario no encontrado en la base de datos.");
-            }
-        })
-        .catch((error) => {
-            console.error("Error al verificar reprogramaciones previas:", error);
-        });
+    // Update Firestore asynchronously
+    db.collection("users").doc(user.email).update({
+        selectedSchedule: newSchedule,
+        lastReschedule: firebase.firestore.Timestamp.now()
+    }).then(() => {
+        console.log("Firestore actualizado correctamente.");
+    }).catch((error) => {
+        console.error("Error al actualizar Firestore:", error);
+        alert("Error al guardar el horario. Por favor, intenta de nuevo.");
+    });
 }
 
 
