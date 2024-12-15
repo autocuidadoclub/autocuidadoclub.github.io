@@ -353,8 +353,8 @@ function updateUserInfo(userData) {
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
     document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate)
-        ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
+    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
+        ? formatTimestamp(userData.nextPaymentDate)
         : "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
     document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
