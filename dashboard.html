@@ -159,13 +159,12 @@
             <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
             <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
             <p><strong>Vehiculos: </strong> <span id="vehicles-list">Cargando...</span></p>
-
         </div>
 
 
      <div class="card">
             <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-            <p><strong>Fecha de pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Estado:</strong> <span id="paymentStatus">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
             </div>
 
@@ -174,7 +173,7 @@
     <!-- Reschedule Section -->
     <div class="card reschedule-section">
         <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
-        <p>En caso usted lo desee puede cambiar el dia y la hora en que le gustaria realicemos la inspección. Seleccione el nuevo horario para su plan:</p>
+        <p>Seleccione un nuevo horario para su plan:</p>
         <p style="color: red;><strong> Solo puedes reprogramar una vez al mes.</p></strong>
         <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
             Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
@@ -226,38 +225,32 @@
     <p></p>
     
     <!-- Loyalty Rewards Section -->
-       <div class="card">
-    <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
-    <div class="loyalty-card">
-        <p>¡Mantén tu suscripción activa y llena los 8 pasos para desbloquear recompensas!</p>
-        <!-- Mensaje de advertencia para planes de 12 meses -->
-        <div id="reward-warning" style="color: #4caf50; font-weight: bold; margin-top: 10px; display: none;">
-            <i class="fas fa-info-circle"></i> ¡Por haber elegido el plan de 12 meses, desbloqueas automáticamente todas las recompensas!
-        </div>
-        <div class="holes">
-            <div class="hole completed">✔</div>
-            <p>Proceso de registro completo</p>
-            <div class="hole completed">✔</div>
-            <p>Pago procesado en tu suscripción</p>
-            <div class="hole">○</div>
-            <p>1er Mes de suscripción activo</p>
-            <div class="hole">○</div>
-            <p>2do Mes de suscripción activo</p>
-            <div class="hole">○</div>
-            <p>4to Mes de suscripción activo</p>
-            <div class="hole">○</div>
-            <p>5to Mes de suscripción activo</p>
-            <div class="hole">○</div>
-            <p>6to Mes de suscripción activo</p>
-            <div class="hole star">★</div>
-            <p>7to Mes de suscripción activo</p>
-        </div>
-        <div class="description">
-            <p><strong>Current Progress:</strong> 2 of 8 steps completed.</p>
-        </div>
-    </div>
-</div>
-
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
+            <div class="loyalty-card">
+                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+                <div class="holes">
+                    <div class="hole completed">✔</div>
+                    <p>Proceso de registro completo</p>
+                    <div class="hole completed">✔</div>
+                    <p>Pago procesado en tu suscripción</p>
+                    <div class="hole">○</div>
+                    <p>1er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>2do Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>4to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>5to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>6to Mes de suscripción activo</p>
+                    <div class="hole star">★</div>
+                    <p>7to Mes de suscripción activo</p>
+                </div>
+                <div class="description">
+                    <p><strong>Current Progress:</strong> 2 of 8 steps completed.</p>
+                </div>
+            </div>
 
             <!-- Rewards -->
             <div class="rewards">
@@ -363,9 +356,8 @@ function updateUserInfo(userData) {
         : "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
     document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
-    ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
-    : "No hay vehículos registrados.";
-
+        ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
+        : "No hay vehículos registrados.";
 }
 
     // Load user profile data
@@ -556,105 +548,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.head.appendChild(style);
 });
 
-function updatePaymentDate() {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("No estás autenticado.");
-        return;
-    }
-
-    const paymentDateInput = document.getElementById("paymentDate").value;
-    if (!paymentDateInput) {
-        alert("Por favor, selecciona una fecha de pago.");
-        return;
-    }
-
-    const paymentDate = new Date(paymentDateInput);
-    const nextPaymentDate = calculateNextPaymentDate(paymentDate);
-
-    // Fetch existing user data to merge updates
-    db.collection("users").doc(user.email).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const existingData = doc.data();
-
-                // Update only payment-related fields, retain others
-                db.collection("users").doc(user.email).update({
-                    ...existingData, // Spread existing data
-                    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                }).then(() => {
-                    alert("Fecha de pago actualizada correctamente.");
-                    loadUserProfile(user.email); // Reload user details
-                }).catch((error) => {
-                    console.error("Error al actualizar la fecha de pago:", error);
-                });
-            } else {
-                console.error("Usuario no encontrado.");
-            }
-        })
-        .catch((error) => {
-            console.error("Error al recuperar datos del usuario:", error);
-        });
-}
-
-// Function to calculate the next payment date
-function calculateNextPaymentDate(paymentDate) {
-    const nextDate = new Date(paymentDate);
-    nextDate.setMonth(nextDate.getMonth() + 1); // Add one month
-    return nextDate;
-}
-
-// Function to reload and display user profile
-function loadUserProfile(email) {
-    db.collection("users").doc(email).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                updateUserInfo(userData);
-            } else {
-                console.error("Usuario no encontrado.");
-            }
-        })
-        .catch((error) => {
-            console.error("Error al cargar el perfil del usuario:", error);
-        });
-}
-
-// Function to update user details in the UI
-function updateUserInfo(userData) {
-    document.getElementById("name").innerText = userData.name || "N/A";
-    document.getElementById("phone").innerText = userData.phone || "N/A";
-    document.getElementById("planType").innerText = userData.planType || "N/A";
-    document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
-    document.getElementById("user-department").innerText = userData.department || "Desconocido";
-    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-    document.getElementById("paymentDate").innerText = userData.paymentDate
-        ? new Date(userData.paymentDate.seconds * 1000).toLocaleDateString("es-ES")
-        : "No asignado";
-    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
-        ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
-        : "No asignado";
-}
-
-        
-function calculateNextPaymentDate(initialPaymentDate) {
-    const date = initialPaymentDate.toDate(); // Firestore Timestamp to Date
-    const currentDate = new Date();
-
-    // Calculate the months difference
-    const diffMonths =
-        currentDate.getFullYear() * 12 +
-        currentDate.getMonth() -
-        (date.getFullYear() * 12 + date.getMonth());
-
-    // Set the next payment date to the first day of the next month
-    const nextPaymentDate = new Date(date);
-    nextPaymentDate.setMonth(date.getMonth() + diffMonths + 1);
-
-    return nextPaymentDate;
-}
-
 
 // Format Firestore timestamp
 function formatTimestamp(timestamp) {
@@ -666,84 +559,60 @@ function formatTimestamp(timestamp) {
         year: "numeric",
     });
 }
-
         
 function updateLoyaltyCard(userData) {
+    console.log("Updating loyalty card with data:", userData);
+
     const holes = document.querySelectorAll('.hole');
-    const rewardStatusElements = document.querySelectorAll('.reward-status');
-    const acRewards = document.getElementById('ac-rewards');
-    const carwashRewards = document.getElementById('carwash-rewards');
-    const reviewRewards = document.getElementById('review-rewards');
+    let progress = 1; // Registration is always step 1.
 
-    let progress = 1; // First star (registration) is always completed.
+    // Check if registration is complete
+    if (userData.registrationDate) {
+        console.log("Registration complete.");
+        holes[0].classList.add('completed');
+        progress++;
+    }
 
-    // Check if the payment date is valid and before or equal to today
-    const currentDate = new Date();
-    const paymentDate = userData.paymentDate ? userData.paymentDate.toDate() : null;
-
-    if (paymentDate && paymentDate <= currentDate) {
-        // Payment is valid, activate the second step
+    // Check if payment is confirmed
+    if (userData.paymentConfirmed || userData.paymentStatus === "activo") {
+        console.log("Payment confirmed.");
         holes[1].classList.add('completed');
         progress++;
-    } else {
-        holes[1].classList.remove('completed');
     }
 
-    // Fill stars for active subscription months (from 3rd star onwards)
-    const monthsPaid = userData.monthsPaid || 0;
-    for (let i = 0; i < monthsPaid; i++) {
-        if (i + 2 < holes.length - 1) { // Skip registration and last star
-            holes[i + 2].classList.add('completed');
-            progress++;
-        }
+    // Calculate progress based on subscription months
+    if (userData.subscriptionStatus === "active") {
+        console.log("Subscription active. Months paid:", userData.monthsPaid);
+        progress += userData.monthsPaid || 0;
     }
 
-    // Automatically fill the last star if the user paid for 12 months upfront
+    // Check for prepaid 12-month subscription
     if (userData.planType === "basic12m" || userData.planType === "plus12m") {
-        holes[7].classList.add('completed');
-        progress++;
-    } else {
-        holes[7].classList.remove('completed');
+        console.log("12-month subscription detected.");
+        progress = 8;
+    } else if (progress >= 6 && userData.monthsPaid >= 6) {
+        console.log("7th month paid; filling 8th hole.");
+        progress = Math.min(progress + 1, 8);
     }
 
-    // Update rewards
-    const monthsPaid = userData.monthsPaid || 0;
+    console.log("Calculated progress:", progress);
 
-    if (monthsPaid >= 4) {
-        console.log('User unlocked rewards for 4th month');
-        // Add specific logic for rewards here
-    }
-
-    if (monthsPaid >= 5) {
-        console.log('User unlocked rewards for 5th month');
-        // Add specific logic for rewards here
-    }
-
-    if (monthsPaid >= 6) {
-        console.log('User unlocked rewards for 6th month');
-        // Add specific logic for rewards here
-    }
-
-    // Unlock rewards if all steps are complete
-    const isFullyCompleted = Array.from(holes).every((hole) => hole.classList.contains('completed'));
-    rewardStatusElements.forEach((status) => {
-        if (isFullyCompleted) {
-            status.textContent = "Unlocked";
-            status.classList.add("unlocked");
-            status.classList.remove("locked");
+    // Update UI holes
+    holes.forEach((hole, index) => {
+        if (index < progress) {
+            console.log(`Filling hole ${index + 1}`);
+            hole.classList.add('completed');
         } else {
-            status.textContent = "Locked";
-            status.classList.add("locked");
-            status.classList.remove("unlocked");
+            hole.classList.remove('completed');
         }
     });
 
     // Update progress description
-    const completedSteps = Array.from(holes).filter((hole) => hole.classList.contains('completed')).length;
     const progressDescription = document.querySelector('.description p strong');
-    progressDescription.textContent = `Current Progress: ${completedSteps} of 8 steps completed.`;
-}
+    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
 
+    console.log("Loyalty card UI updated.");
+}
 
         
     function resetLoyaltyCard() {
