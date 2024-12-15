@@ -152,6 +152,7 @@ window.selectScheduleBox = function (cell) {
                 municipality, // Add municipality
                 selectedSchedule: document.getElementById("selectedSchedule").value,
                 registrationDate: firebase.firestore.Timestamp.now(),
+                lastReschedule: null, // Set to null
                 paymentDate: null, // Initialize paymentDate as null 
                 nextPaymentDate: null // Placeholder for next payment
             };
