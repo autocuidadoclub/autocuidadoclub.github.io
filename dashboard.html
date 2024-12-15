@@ -483,46 +483,38 @@ function updateSchedule() {
 
     const user = auth.currentUser;
     const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date().toLocaleString("es-ES", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
+    const currentDate = new Date();
 
     db.collection("users").doc(user.email).get()
         .then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
                 const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
-                const currentDateObj = new Date();
 
                 if (lastReschedule) {
                     const rescheduleMonth = lastReschedule.getMonth();
-                    const currentMonth = currentDateObj.getMonth();
+                    const currentMonth = currentDate.getMonth();
                     const rescheduleYear = lastReschedule.getFullYear();
-                    const currentYear = currentDateObj.getFullYear();
+                    const currentYear = currentDate.getFullYear();
 
                     if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                        const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
-                            day: "2-digit",
+                        const lastRescheduleDate = lastReschedule.toLocaleDateString("es-ES", {
+                            day: "numeric",
                             month: "long",
                             year: "numeric",
                             hour: "2-digit",
                             minute: "2-digit",
                         });
-                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
+                        alert(`Ya reprogramaste tu cita este mes. Última reprogramación fue el ${lastRescheduleDate}.`);
                         return;
                     }
                 }
 
                 db.collection("users").doc(user.email).update({
                     selectedSchedule: newSchedule,
-                    lastReschedule: firebase.firestore.Timestamp.now(),
+                    lastReschedule: firebase.firestore.Timestamp.fromDate(currentDate),
                 }).then(() => {
-                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
+                    alert(`Horario actualizado correctamente a: ${newSchedule}`);
                     loadUserProfile(user.email); // Reload profile info
                 }).catch((error) => {
                     console.error("Error al actualizar el horario:", error);
@@ -535,6 +527,7 @@ function updateSchedule() {
             console.error("Error al verificar reprogramaciones previas:", error);
         });
 }
+
 
 
 // Add CSS for selected schedule cells
