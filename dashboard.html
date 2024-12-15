@@ -510,51 +510,47 @@ function updateSchedule() {
         return;
     }
 
-    const user = auth.currentUser;
+    const user = firebase.auth().currentUser;
     const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date().toLocaleString("es-ES", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
+    const currentDate = new Date();
+    const currentTimestamp = firebase.firestore.Timestamp.now();
 
     db.collection("users").doc(user.email).get()
         .then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
                 const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
-                const currentDateObj = new Date();
 
+                // Validate if user already rescheduled this month
                 if (lastReschedule) {
                     const rescheduleMonth = lastReschedule.getMonth();
-                    const currentMonth = currentDateObj.getMonth();
+                    const currentMonth = currentDate.getMonth();
                     const rescheduleYear = lastReschedule.getFullYear();
-                    const currentYear = currentDateObj.getFullYear();
+                    const currentYear = currentDate.getFullYear();
 
                     if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                        const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
+                        const formattedLastReschedule = lastReschedule.toLocaleDateString("es-ES", {
                             day: "2-digit",
                             month: "long",
                             year: "numeric",
                             hour: "2-digit",
                             minute: "2-digit",
                         });
-                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
+                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${formattedLastReschedule}.`);
                         return;
                     }
                 }
 
+                // Update schedule and lastReschedule timestamp
                 db.collection("users").doc(user.email).update({
                     selectedSchedule: newSchedule,
-                    lastReschedule: firebase.firestore.Timestamp.now(),
+                    lastReschedule: currentTimestamp
                 }).then(() => {
-                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
-                    loadUserProfile(user.email); // Reload profile info
+                    alert(`Horario reprogramado con éxito: ${day} - ${timeBlock}`);
+                    window.location.reload();
                 }).catch((error) => {
                     console.error("Error al actualizar el horario:", error);
+                    alert("Hubo un error al reprogramar el horario.");
                 });
             } else {
                 console.error("Usuario no encontrado en la base de datos.");
@@ -564,6 +560,7 @@ function updateSchedule() {
             console.error("Error al verificar reprogramaciones previas:", error);
         });
 }
+
 
 
 
