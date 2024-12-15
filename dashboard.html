@@ -164,7 +164,7 @@
 
      <div class="card">
             <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-            <p><strong>Estado:</strong> <span id="paymentStatus">Cargando...</span></p>
+            <p><strong>Fecha del último pago de su suscripción:</strong> <span id="paymentDate">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
             </div>
 
@@ -173,8 +173,8 @@
     <!-- Reschedule Section -->
     <div class="card reschedule-section">
         <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
-        <p>Seleccione un nuevo horario para su plan:</p>
-        <p style="color: red;><strong> Solo puedes reprogramar una vez al mes.</p></strong>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
+        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
         <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
             Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
         </div>
@@ -350,7 +350,7 @@ function updateUserInfo(userData) {
     document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-    document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
+    document.getElementById("paymentDate").innerText = userData.paymentDate || "Pendiente";
     document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
         ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
         : "No asignado";
@@ -372,7 +372,7 @@ function updateUserInfo(userData) {
                 document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
                 document.getElementById("user-department").innerText = userData.department || "Desconocido";
                 document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-                document.getElementById("paymentStatus").innerText = userData.paymentStatus || "Pendiente";
+                document.getElementById("paymentDate").innerText = userData.paymentDate || "Pendiente";
                 document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
               document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
@@ -573,13 +573,21 @@ function updateLoyaltyCard(userData) {
         progress++;
     }
 
-    // Check if payment is confirmed
-    if (userData.paymentConfirmed || userData.paymentStatus === "activo") {
-        console.log("Payment confirmed.");
+   // Check if payment is confirmed
+if (userData.paymentDate) {
+    const paymentDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
+
+    if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
+        console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
         holes[1].classList.add('completed');
         progress++;
+    } else {
+        console.error("Invalid paymentDate found:", userData.paymentDate);
     }
-
+} else {
+    console.log("Payment date not available.");
+}
+    
     // Calculate progress based on subscription months
     if (userData.subscriptionStatus === "active") {
         console.log("Subscription active. Months paid:", userData.monthsPaid);
