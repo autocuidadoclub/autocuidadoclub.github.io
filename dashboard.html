@@ -372,8 +372,8 @@ function updateUserInfo(userData) {
                 document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
                 document.getElementById("user-department").innerText = userData.department || "Desconocido";
                 document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-                document.getElementById("paymentDate").innerText = userData.paymentDate || "Pendiente";
-                document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
+                document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+                document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
                 document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
               document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
             
