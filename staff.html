@@ -42,56 +42,73 @@
         </form>
 
         <!-- Customer Details Section -->
-        <section id="user-details" style="display: none;">
-            <h2>Detalles del Cliente</h2>
-            <form id="updateForm">
-                <label>UID:</label>
-                <input type="text" id="uid" disabled><br>
+       <section id="user-details" style="display: none;">
+    <h2>Detalles del Cliente</h2>
+    <!-- General Details Section -->
+    <form id="updateGeneralForm">
+        <label>UID:</label>
+        <input type="text" id="uid" disabled><br>
 
-                <label>Email:</label>
-                <input type="email" id="email" disabled><br>
+        <label>Email:</label>
+        <input type="email" id="email" disabled><br>
 
-                <label>Departamento:</label>
-                <input type="text" id="department"><br>
+        <label>Departamento:</label>
+        <input type="text" id="department"><br>
 
-                <label>Municipio:</label>
-                <input type="text" id="municipality"><br>
+        <label>Municipio:</label>
+        <input type="text" id="municipality"><br>
 
-                <label>Teléfono:</label>
-                <input type="text" id="phone"><br>
+        <label>Teléfono:</label>
+        <input type="text" id="phone"><br>
 
-                <label>Tipo de Plan:</label>
-                <select id="planType">
-                    <option value="basic12m">Básico 12 meses</option>
-                    <option value="basic6m">Básico 6 meses</option>
-                    <option value="plus12m">Plus 12 meses</option>
-                    <option value="plus6m">Plus 6 meses</option>
-                </select><br>
+        <label>Tipo de Plan:</label>
+        <select id="planType">
+            <option value="basic12m">Básico 12 meses</option>
+            <option value="basic6m">Básico 6 meses</option>
+            <option value="plus12m">Plus 12 meses</option>
+            <option value="plus6m">Plus 6 meses</option>
+        </select><br>
 
-                <label>Fecha de Registro:</label>
-                <input type="text" id="registrationDate" disabled><br>
+        <label>Fecha de Pago Actual:</label>
+        <input type="date" id="paymentDate"><br>
 
-                <label>Último Reagendado:</label>
-                <input type="text" id="lastReschedule" disabled><br>
+        <button type="button" onclick="updateGeneralDetails()">Actualizar Datos Generales</button>
+    </form>
 
-                <label>Fecha de Pago Actual:</label>
-                <input type="date" id="paymentDate"><br>
+    <!-- Vehicle Details Section -->
+    <h3>Detalles del Vehículo</h3>
 
-                <label>Próxima Fecha de Pago:</label>
-                <input type="text" id="nextPaymentDate" disabled><br>
+<div>
+    <h4>Vehículo 1</h4>
+    <label>Placa:</label><input type="text" id="vehiclePlate1"><br>
+    <label>Marca:</label><input type="text" id="vehicleBrand1"><br>
+    <label>Modelo:</label><input type="text" id="vehicleModel1"><br>
+    <label>Año:</label><input type="text" id="vehicleYear1"><br>
+</div>
 
-                <!-- Vehicle Details -->
-               <h3>Detalles del Vehículo</h3>
-<p>Placa: <input type="text" id="vehiclePlate" placeholder="Placa"></p>
-<p>Marca: <input type="text" id="vehicleBrand" placeholder="Marca"></p>
-<p>Modelo: <input type="text" id="vehicleModel" placeholder="Modelo"></p>
-<p>Año: <input type="text" id="vehicleYear" placeholder="Año"></p>
-<button onclick="updateVehicleDetails()">Actualizar Datos</button>
+<div>
+    <h4>Vehículo 2</h4>
+    <label>Placa:</label><input type="text" id="vehiclePlate2"><br>
+    <label>Marca:</label><input type="text" id="vehicleBrand2"><br>
+    <label>Modelo:</label><input type="text" id="vehicleModel2"><br>
+    <label>Año:</label><input type="text" id="vehicleYear2"><br>
+</div>
 
-                <button onclick="updateVehicleDetails()">Actualizar Datos</button>
-            </form>
-        </section>
-    </section>
+<div>
+    <h4>Vehículo 3</h4>
+    <label>Placa:</label><input type="text" id="vehiclePlate3"><br>
+    <label>Marca:</label><input type="text" id="vehicleBrand3"><br>
+    <label>Modelo:</label><input type="text" id="vehicleModel3"><br>
+    <label>Año:</label><input type="text" id="vehicleYear3"><br>
+</div>
+
+<button type="button" onclick="updateVehicleDetails()">Actualizar Datos de los Vehículos</button>
+
+
+        <button type="button" onclick="updateVehicleDetails()">Actualizar Datos del Vehículo</button>
+    </form>
+</section>
+
 
     <script>
         // Firebase Initialization
@@ -163,71 +180,86 @@
         }
 
         // Update User Data
-        function updateUserData() {
-            const email = document.getElementById("email").value;
+       function updateGeneralDetails() {
+    const email = document.getElementById("email").value;
 
-            const updatedData = {
-                department: document.getElementById("department").value,
-                municipality: document.getElementById("municipality").value,
-                phone: document.getElementById("phone").value,
-                planType: document.getElementById("planType").value,
-                paymentDate: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById("paymentDate").value)),
-            };
+    const updatedData = {
+        department: document.getElementById("department").value,
+        municipality: document.getElementById("municipality").value,
+        phone: document.getElementById("phone").value,
+        planType: document.getElementById("planType").value,
+        paymentDate: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById("paymentDate").value)),
+    };
 
-            db.collection("users").doc(email).update(updatedData)
-                .then(() => alert("Datos actualizados correctamente"))
-                .catch(err => console.error("Error: ", err));
-        }
+    db.collection("users").doc(email).update(updatedData)
+        .then(() => alert("Datos generales actualizados correctamente."))
+        .catch(err => console.error("Error al actualizar los datos generales:", err));
+}
 
       function updateVehicleDetails() {
-    const email = document.getElementById("userEmail").textContent; // User's email
-    const newPlate = document.getElementById("vehiclePlate").value.trim();
-    const newBrand = document.getElementById("vehicleBrand").value.trim();
-    const newModel = document.getElementById("vehicleModel").value.trim();
-    const newYear = document.getElementById("vehicleYear").value.trim();
-
-    if (!newPlate || !newBrand || !newModel || !newYear) {
-        alert("Por favor, completa todos los campos del vehículo.");
+    const email = document.getElementById("email").value.trim(); // User's email
+    if (!email) {
+        alert("El email del usuario no está disponible.");
         return;
     }
 
-    db.collection("users").doc(email).get().then((doc) => {
+    // Retrieve inputs for all vehicles
+    const vehicleDetails = [
+        {
+            plate: document.getElementById("vehiclePlate1").value.trim(),
+            brand: document.getElementById("vehicleBrand1").value.trim(),
+            model: document.getElementById("vehicleModel1").value.trim(),
+            year: document.getElementById("vehicleYear1").value.trim(),
+        },
+        {
+            plate: document.getElementById("vehiclePlate2").value.trim(),
+            brand: document.getElementById("vehicleBrand2").value.trim(),
+            model: document.getElementById("vehicleModel2").value.trim(),
+            year: document.getElementById("vehicleYear2").value.trim(),
+        },
+        {
+            plate: document.getElementById("vehiclePlate3").value.trim(),
+            brand: document.getElementById("vehicleBrand3").value.trim(),
+            model: document.getElementById("vehicleModel3").value.trim(),
+            year: document.getElementById("vehicleYear3").value.trim(),
+        },
+    ];
+
+    // Filter vehicles to update (only those with complete data)
+    const updatedVehicles = vehicleDetails.filter(vehicle => 
+        vehicle.plate && vehicle.brand && vehicle.model && vehicle.year
+    );
+
+    if (updatedVehicles.length === 0) {
+        alert("Por favor, completa los datos de al menos un vehículo.");
+        return;
+    }
+
+    db.collection("users").doc(email).get().then(doc => {
         if (doc.exists) {
             const userData = doc.data();
-            let updatedVehicles = [...(userData.vehicles || [])];
+            let existingVehicles = userData.vehicles || [];
 
-            // Update the first vehicle (extend this logic for multiple vehicles if needed)
-            if (updatedVehicles.length > 0) {
-                updatedVehicles[0] = {
-                    plate: newPlate,
-                    brand: newBrand,
-                    model: newModel,
-                    year: newYear
-                };
-            } else {
-                updatedVehicles.push({
-                    plate: newPlate,
-                    brand: newBrand,
-                    model: newModel,
-                    year: newYear
-                });
-            }
-
-            // Replace the vehicles array in Firestore
-            db.collection("users").doc(email).update({
-                vehicles: updatedVehicles
-            }).then(() => {
-                alert("Detalles del vehículo actualizados correctamente.");
-                searchCustomer("email", email); // Refresh data on the page
-            }).catch((error) => {
-                console.error("Error al actualizar los detalles del vehículo:", error);
+            // Replace or add vehicles based on the provided input
+            updatedVehicles.forEach((newVehicle, index) => {
+                if (index < existingVehicles.length) {
+                    existingVehicles[index] = newVehicle; // Update existing vehicle
+                } else {
+                    existingVehicles.push(newVehicle); // Add new vehicle
+                }
             });
+
+            // Update the vehicles array in Firestore
+            db.collection("users").doc(email).update({ vehicles: existingVehicles })
+                .then(() => {
+                    alert("Detalles del vehículo actualizados correctamente.");
+                    searchCustomer("email", email); // Refresh data on the page
+                })
+                .catch(err => console.error("Error al actualizar los detalles del vehículo:", err));
         } else {
             alert("Usuario no encontrado.");
         }
-    }).catch((error) => {
-        console.error("Error al obtener detalles del usuario:", error);
-    });
+    }).catch(err => console.error("Error al obtener detalles del usuario:", err));
 }
 
         
