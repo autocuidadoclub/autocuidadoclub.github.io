@@ -81,18 +81,12 @@
                 <input type="text" id="nextPaymentDate" disabled><br>
 
                 <!-- Vehicle Details -->
-                <h3>Detalles del Vehículo</h3>
-                <label>Placa:</label>
-                <input type="text" id="vehiclePlate"><br>
-
-                <label>Marca:</label>
-                <input type="text" id="vehicleBrand"><br>
-
-                <label>Modelo:</label>
-                <input type="text" id="vehicleModel"><br>
-
-                <label>Año:</label>
-                <input type="text" id="vehicleYear"><br>
+               <h3>Detalles del Vehículo</h3>
+<p>Placa: <input type="text" id="vehiclePlate" placeholder="Placa"></p>
+<p>Marca: <input type="text" id="vehicleBrand" placeholder="Marca"></p>
+<p>Modelo: <input type="text" id="vehicleModel" placeholder="Modelo"></p>
+<p>Año: <input type="text" id="vehicleYear" placeholder="Año"></p>
+<button onclick="updateVehicleDetails()">Actualizar Datos</button>
 
                 <button onclick="updateVehicleDetails()">Actualizar Datos</button>
             </form>
@@ -185,37 +179,46 @@
                 .catch(err => console.error("Error: ", err));
         }
 
-        function updateVehicleDetails() {
-    const email = document.getElementById("userEmail").textContent; // Fetch user's email
+      function updateVehicleDetails() {
+    const email = document.getElementById("userEmail").textContent; // User's email
     const newPlate = document.getElementById("vehiclePlate").value.trim();
     const newBrand = document.getElementById("vehicleBrand").value.trim();
     const newModel = document.getElementById("vehicleModel").value.trim();
     const newYear = document.getElementById("vehicleYear").value.trim();
 
     if (!newPlate || !newBrand || !newModel || !newYear) {
-        alert("Por favor, llena todos los campos del vehículo.");
+        alert("Por favor, completa todos los campos del vehículo.");
         return;
     }
 
     db.collection("users").doc(email).get().then((doc) => {
         if (doc.exists) {
             const userData = doc.data();
-            let updatedVehicles = userData.vehicles || [];
+            let updatedVehicles = [...(userData.vehicles || [])];
 
-            // Update the first vehicle object (extend logic for multiple vehicles if needed)
-            updatedVehicles[0] = {
-                plate: newPlate,
-                brand: newBrand,
-                model: newModel,
-                year: newYear
-            };
+            // Update the first vehicle (extend this logic for multiple vehicles if needed)
+            if (updatedVehicles.length > 0) {
+                updatedVehicles[0] = {
+                    plate: newPlate,
+                    brand: newBrand,
+                    model: newModel,
+                    year: newYear
+                };
+            } else {
+                updatedVehicles.push({
+                    plate: newPlate,
+                    brand: newBrand,
+                    model: newModel,
+                    year: newYear
+                });
+            }
 
-            // Update the vehicles array in Firestore
+            // Replace the vehicles array in Firestore
             db.collection("users").doc(email).update({
                 vehicles: updatedVehicles
             }).then(() => {
                 alert("Detalles del vehículo actualizados correctamente.");
-                searchCustomer("email", email); // Refresh the user data on the page
+                searchCustomer("email", email); // Refresh data on the page
             }).catch((error) => {
                 console.error("Error al actualizar los detalles del vehículo:", error);
             });
