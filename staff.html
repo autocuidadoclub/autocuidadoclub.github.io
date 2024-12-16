@@ -35,6 +35,7 @@
                 <option value="email">Email</option>
                 <option value="name">Nombre</option>
                 <option value="phone">Teléfono</option>
+                <option value="licensePlate">Placa del Vehículo</option>
             </select>
             <input type="text" id="searchValue" placeholder="Ingrese el valor de búsqueda" required>
             <button type="submit">Buscar</button>
@@ -69,7 +70,6 @@
             firebase.initializeApp(firebaseConfig);
         }
 
-        const auth = firebase.auth();
         const db = firebase.firestore();
 
         // Handle search form submission
@@ -89,12 +89,18 @@
         // Search customer by field
         function searchCustomer(field, value) {
             let query;
+
             if (field === "email") {
                 query = db.collection("users").where("email", "==", value);
             } else if (field === "name") {
                 query = db.collection("users").where("name", "==", value);
             } else if (field === "phone") {
                 query = db.collection("users").where("phone", "==", value);
+            } else if (field === "licensePlate") {
+                // Query for nested array in 'vehicles'
+                query = db.collection("users").where("vehicles", "array-contains-any", [
+                    { plate: value }
+                ]);
             }
 
             query.get().then((querySnapshot) => {
@@ -123,42 +129,28 @@
             document.getElementById("user-details").style.display = "block";
         }
 
-        db.collection("users").doc(email).set({
-    firstPaymentDate: firebase.firestore.Timestamp.fromDate(paymentDate)
-}, { merge: true });
+        // Update payment date
+        function updatePaymentDate() {
+            const email = document.getElementById("userEmail").textContent;
+            const paymentDateInput = document.getElementById("paymentDate").value;
 
-        // Update payment date and calculate next payment date
-// Update payment date and enforce monthly next payment date
-function updatePaymentDate() {
-    const email = document.getElementById("userEmail").textContent;
-    const paymentDateInput = document.getElementById("paymentDate").value;
+            if (!paymentDateInput) {
+                alert("Por favor, selecciona una fecha de pago.");
+                return;
+            }
 
-    if (!paymentDateInput) {
-        alert("Por favor, selecciona una fecha de pago.");
-        return;
-    }
+            const paymentDate = new Date(paymentDateInput);
 
-    const paymentDate = new Date(paymentDateInput);
-
-    // Calculate next payment date (always 1 month ahead)
-    const nextPaymentDate = new Date(paymentDate);
-    nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1); // Add 1 month
-
-    // Update Firestore with new paymentDate and nextPaymentDate
-    db.collection("users").doc(email).update({
-        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-    }).then(() => {
-        alert("Fecha de pago y próxima fecha de pago actualizadas correctamente.");
-        searchCustomer("email", email); // Reload user details
-    }).catch((error) => {
-        console.error("Error al actualizar la fecha de pago:", error);
-        alert("Hubo un error al actualizar la fecha.");
-    });
-}
-
-        
-        
+            db.collection("users").doc(email).update({
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 1)))
+            }).then(() => {
+                alert("Fecha de pago actualizada correctamente.");
+                searchCustomer("email", email);
+            }).catch((error) => {
+                console.error("Error al actualizar la fecha de pago:", error);
+            });
+        }
     </script>
 </body>
 </html>
