@@ -1223,6 +1223,38 @@ hr.separator {
     margin: 40px 0;
 }
 
+.referral-code {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    color: #333;
+}
+
+.referral-code button {
+    background-color: #FF6600;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.referral-code button:hover {
+    background-color: #e55b00;
+}
+
+.referral-status {
+    background-color: #e6f7e6;
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    color: #155724;
+}
+
 
 /* Adjust Layout for Mobile Devices */
 @media (max-width: 768px) {
