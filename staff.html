@@ -76,19 +76,37 @@
     </form>
 
     <!-- Vehicle Details Section -->
+    <h3>Detalles del Vehículo</h3>
+
+<div>
     <h4>Vehículo 1</h4>
-<label>Placa:</label><input type="text" id="vehiclePlate1"><br>
-<label>Marca:</label><input type="text" id="vehicleBrand1"><br>
-<label>Modelo:</label><input type="text" id="vehicleModel1"><br>
-<label>Año:</label><input type="text" id="vehicleYear1"><br>
+    <label>Placa:</label><input type="text" id="vehiclePlate1"><br>
+    <label>Marca:</label><input type="text" id="vehicleBrand1"><br>
+    <label>Modelo:</label><input type="text" id="vehicleModel1"><br>
+    <label>Año:</label><input type="text" id="vehicleYear1"><br>
+</div>
 
-<h3>Detalles del Vehículo</h3>
-<div id="vehicleContainer"></div>
+<div>
+    <h4>Vehículo 2</h4>
+    <label>Placa:</label><input type="text" id="vehiclePlate2"><br>
+    <label>Marca:</label><input type="text" id="vehicleBrand2"><br>
+    <label>Modelo:</label><input type="text" id="vehicleModel2"><br>
+    <label>Año:</label><input type="text" id="vehicleYear2"><br>
+</div>
+
+<div>
+    <h4>Vehículo 3</h4>
+    <label>Placa:</label><input type="text" id="vehiclePlate3"><br>
+    <label>Marca:</label><input type="text" id="vehicleBrand3"><br>
+    <label>Modelo:</label><input type="text" id="vehicleModel3"><br>
+    <label>Año:</label><input type="text" id="vehicleYear3"><br>
+</div>
+
 <button type="button" onclick="updateVehicleDetails()">Actualizar Datos de los Vehículos</button>
 
 
-<button type="button" onclick="updateVehicleDetails()">Actualizar Datos de los Vehículos</button>
-          </form>
+        <button type="button" onclick="updateVehicleDetails()">Actualizar Datos del Vehículo</button>
+    </form>
 </section>
 
 
@@ -140,41 +158,26 @@
         });
 
         // Display User Details
-function displayDetails(user) {
-    document.getElementById("uid").value = user.uid || "";
-    document.getElementById("email").value = user.email || "";
-    document.getElementById("department").value = user.department || "";
-    document.getElementById("municipality").value = user.municipality || "";
-    document.getElementById("phone").value = user.phone || "";
-    document.getElementById("planType").value = user.planType || "";
-    document.getElementById("registrationDate").value = user.registrationDate?.toDate().toLocaleString() || "";
-    document.getElementById("lastReschedule").value = user.lastReschedule?.toDate().toLocaleString() || "";
-    document.getElementById("paymentDate").value = user.paymentDate?.toDate().toISOString().split("T")[0] || "";
-    document.getElementById("nextPaymentDate").value = user.nextPaymentDate?.toDate().toLocaleString() || "";
+        function displayDetails(user) {
+            document.getElementById("uid").value = user.uid || "";
+            document.getElementById("email").value = user.email || "";
+            document.getElementById("department").value = user.department || "";
+            document.getElementById("municipality").value = user.municipality || "";
+            document.getElementById("phone").value = user.phone || "";
+            document.getElementById("planType").value = user.planType || "";
+            document.getElementById("registrationDate").value = user.registrationDate.toDate().toLocaleString() || "";
+            document.getElementById("lastReschedule").value = user.lastReschedule.toDate().toLocaleString() || "";
+            document.getElementById("paymentDate").value = user.paymentDate.toDate().toISOString().split("T")[0] || "";
+            document.getElementById("nextPaymentDate").value = user.nextPaymentDate.toDate().toLocaleString() || "";
 
-    // Dynamic Vehicle Section
-    const vehicles = user.vehicles || [];
-    const vehicleContainer = document.getElementById("vehicleContainer");
-    vehicleContainer.innerHTML = ""; // Clear previous vehicle data
+            const vehicle = user.vehicles ? user.vehicles[0] : {};
+            document.getElementById("vehiclePlate").value = vehicle.plate || "";
+            document.getElementById("vehicleBrand").value = vehicle.brand || "";
+            document.getElementById("vehicleModel").value = vehicle.model || "";
+            document.getElementById("vehicleYear").value = vehicle.year || "";
 
-     vehicles.forEach((vehicle, index) => {
-        vehicleContainer.innerHTML += `
-            <h4>Vehículo ${index + 1}</h4>
-            <label>Placa:</label>
-            <input type="text" id="vehiclePlate${index}" value="${vehicle.plate || ''}"><br>
-            <label>Marca:</label>
-            <input type="text" id="vehicleBrand${index}" value="${vehicle.brand || ''}"><br>
-            <label>Modelo:</label>
-            <input type="text" id="vehicleModel${index}" value="${vehicle.model || ''}"><br>
-            <label>Año:</label>
-            <input type="text" id="vehicleYear${index}" value="${vehicle.year || ''}"><br>
-        `;
-    });
-
-    // Make sure the section is visible
-    document.getElementById("user-details").style.display = "block";
-}
-
+            document.getElementById("user-details").style.display = "block";
+        }
 
         // Update User Data
        function updateGeneralDetails() {
@@ -193,43 +196,71 @@ function displayDetails(user) {
         .catch(err => console.error("Error al actualizar los datos generales:", err));
 }
 
-function updateVehicleDetails() {
-    const email = document.getElementById("email").value.trim();
+      function updateVehicleDetails() {
+    const email = document.getElementById("email").value.trim(); // User's email
     if (!email) {
         alert("El email del usuario no está disponible.");
         return;
     }
 
-    // Collect vehicle data dynamically
-    const vehicleContainer = document.getElementById("vehicleContainer");
-    const vehicleInputs = vehicleContainer.querySelectorAll("input");
-    const updatedVehicles = [];
+    // Retrieve inputs for all vehicles
+    const vehicleDetails = [
+        {
+            plate: document.getElementById("vehiclePlate1").value.trim(),
+            brand: document.getElementById("vehicleBrand1").value.trim(),
+            model: document.getElementById("vehicleModel1").value.trim(),
+            year: document.getElementById("vehicleYear1").value.trim(),
+        },
+        {
+            plate: document.getElementById("vehiclePlate2").value.trim(),
+            brand: document.getElementById("vehicleBrand2").value.trim(),
+            model: document.getElementById("vehicleModel2").value.trim(),
+            year: document.getElementById("vehicleYear2").value.trim(),
+        },
+        {
+            plate: document.getElementById("vehiclePlate3").value.trim(),
+            brand: document.getElementById("vehicleBrand3").value.trim(),
+            model: document.getElementById("vehicleModel3").value.trim(),
+            year: document.getElementById("vehicleYear3").value.trim(),
+        },
+    ];
 
-    for (let i = 0; i < vehicleInputs.length; i += 4) {
-        const plate = vehicleInputs[i].value.trim();
-        const brand = vehicleInputs[i + 1].value.trim();
-        const model = vehicleInputs[i + 2].value.trim();
-        const year = vehicleInputs[i + 3].value.trim();
-
-        if (plate && brand && model && year) {
-            updatedVehicles.push({ plate, brand, model, year });
-        }
-    }
+    // Filter vehicles to update (only those with complete data)
+    const updatedVehicles = vehicleDetails.filter(vehicle => 
+        vehicle.plate && vehicle.brand && vehicle.model && vehicle.year
+    );
 
     if (updatedVehicles.length === 0) {
-        alert("Por favor, completa al menos un vehículo.");
+        alert("Por favor, completa los datos de al menos un vehículo.");
         return;
     }
 
-    // Update vehicles in Firestore
-    db.collection("users").doc(email).update({ vehicles: updatedVehicles })
-        .then(() => {
-            alert("Detalles de los vehículos actualizados correctamente.");
-            searchCustomer("email", email); // Refresh data
-        })
-        .catch(err => console.error("Error al actualizar los vehículos:", err));
-}
+    db.collection("users").doc(email).get().then(doc => {
+        if (doc.exists) {
+            const userData = doc.data();
+            let existingVehicles = userData.vehicles || [];
 
+            // Replace or add vehicles based on the provided input
+            updatedVehicles.forEach((newVehicle, index) => {
+                if (index < existingVehicles.length) {
+                    existingVehicles[index] = newVehicle; // Update existing vehicle
+                } else {
+                    existingVehicles.push(newVehicle); // Add new vehicle
+                }
+            });
+
+            // Update the vehicles array in Firestore
+            db.collection("users").doc(email).update({ vehicles: existingVehicles })
+                .then(() => {
+                    alert("Detalles del vehículo actualizados correctamente.");
+                    searchCustomer("email", email); // Refresh data on the page
+                })
+                .catch(err => console.error("Error al actualizar los detalles del vehículo:", err));
+        } else {
+            alert("Usuario no encontrado.");
+        }
+    }).catch(err => console.error("Error al obtener detalles del usuario:", err));
+}
 
         
         function logout() {
