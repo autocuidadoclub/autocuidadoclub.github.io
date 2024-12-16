@@ -123,55 +123,44 @@
             document.getElementById("user-details").style.display = "block";
         }
 
+        db.collection("users").doc(email).set({
+    firstPaymentDate: firebase.firestore.Timestamp.fromDate(paymentDate)
+}, { merge: true });
+
         // Update payment date and calculate next payment date
-        function updatePaymentDate() {
-            const email = document.getElementById("userEmail").textContent;
-            const paymentDateInput = document.getElementById("paymentDate").value;
+function updatePaymentDate() {
+    const email = document.getElementById("userEmail").textContent;
+    const paymentDateInput = document.getElementById("paymentDate").value;
 
-            if (!paymentDateInput) {
-                alert("Por favor, selecciona una fecha de pago.");
-                return;
-            }
+    if (!paymentDateInput) {
+        alert("Por favor, selecciona una fecha de pago.");
+        return;
+    }
 
-            const paymentDate = new Date(paymentDateInput);
+    const paymentDate = new Date(paymentDateInput);
+    const nextPaymentDate = calculateNextPaymentDate(paymentDate);
 
-            // Fetch user plan to calculate nextPaymentDate
-            db.collection("users").doc(email).get().then((doc) => {
-                if (!doc.exists) {
-                    alert("Usuario no encontrado.");
-                    return;
-                }
+    // Update Firestore with new paymentDate and nextPaymentDate
+    db.collection("users").doc(email).update({
+        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+    }).then(() => {
+        alert("Fecha de pago y próxima fecha de pago actualizadas correctamente.");
+        searchCustomer("email", email); // Reload user details
+    }).catch((error) => {
+        console.error("Error al actualizar la fecha de pago:", error);
+    });
+}
 
-                const userData = doc.data();
-                const nextPaymentDate = calculateNextPaymentDate(paymentDate, userData.planType);
 
-                db.collection("users").doc(email).update({
-                    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-                }).then(() => {
-                    alert("Fecha de pago actualizada correctamente.");
-                    searchCustomer("email", email); // Reload user details
-                }).catch((error) => {
-                    console.error("Error al actualizar la fecha de pago:", error);
-                });
-            });
-        }
+        
+       // Calculate the next payment date (always monthly)
+function calculateNextPaymentDate(paymentDate) {
+    const nextDate = new Date(paymentDate);
+    nextDate.setMonth(nextDate.getMonth() + 1); // Always add 1 month
+    return nextDate;
+}
 
-        // Calculate the next payment date based on plan type
-        function calculateNextPaymentDate(paymentDate, planType) {
-            const nextDate = new Date(paymentDate);
-            if (planType.includes("3m")) {
-                nextDate.setMonth(nextDate.getMonth() + 3);
-            } else if (planType.includes("6m")) {
-                nextDate.setMonth(nextDate.getMonth() + 6);
-            } else if (planType.includes("12m")) {
-                nextDate.setFullYear(nextDate.getFullYear() + 1);
-            } else {
-                console.warn("Tipo de plan no reconocido, estableciendo 1 mes por defecto.");
-                nextDate.setMonth(nextDate.getMonth() + 1);
-            }
-            return nextDate;
-        }
     </script>
 </body>
 </html>
