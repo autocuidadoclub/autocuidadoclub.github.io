@@ -178,8 +178,9 @@
         <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
         <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
         <p style="color: red;><strong>Última Reprogramación:</strong> <span id="lastReschedule">Cargando...</span></p>
-       <p>Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${formattedLastReschedule}.</p>
-        </div>
+       <p id="reschedule-alert" style="color: red; font-weight: bold;"></p>
+       </div>
+       
         <table class="schedule-table">
             <thead>
                 <tr>
@@ -494,6 +495,8 @@ function loadVehicles(vehicles) {
 
 function updateSchedule() {
     const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    const rescheduleAlert = document.getElementById("reschedule-alert");
+
     if (!selectedCell) {
         alert("Por favor selecciona un horario.");
         return;
@@ -520,7 +523,7 @@ function updateSchedule() {
                 const userData = doc.data();
                 const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
 
-                // Validate if user already rescheduled this month
+                // Check if rescheduled this month
                 if (lastReschedule) {
                     const rescheduleMonth = lastReschedule.getMonth();
                     const currentMonth = currentDate.getMonth();
@@ -535,17 +538,20 @@ function updateSchedule() {
                             hour: "2-digit",
                             minute: "2-digit",
                         });
-                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${formattedLastReschedule}.`);
+
+                        // Display the message in the UI instead of an alert
+                        rescheduleAlert.textContent = `Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${formattedLastReschedule}.`;
                         return;
                     }
                 }
 
-                // Update schedule and lastReschedule timestamp
+                // Proceed with updating the reschedule data
                 db.collection("users").doc(user.email).update({
                     selectedSchedule: newSchedule,
                     lastReschedule: currentTimestamp
                 }).then(() => {
                     alert(`Horario reprogramado con éxito: ${day} - ${timeBlock}`);
+                    rescheduleAlert.textContent = "";
                     window.location.reload();
                 }).catch((error) => {
                     console.error("Error al actualizar el horario:", error);
@@ -559,7 +565,6 @@ function updateSchedule() {
             console.error("Error al verificar reprogramaciones previas:", error);
         });
 }
-
 
 
 
