@@ -246,6 +246,23 @@ nav ul li a:hover {
     background-color: #8B4513; /* Brown */
 }
 
+/* Specific style for the 6th box */
+.reason-item:nth-child(6) {
+    background-color: #d3d3d3; /* Light gray background */
+    color: #555; /* Darker gray for better readability */
+    font-weight: bold;
+    opacity: 1; /* Ensure full visibility */
+    text-shadow: none; /* Remove any shadow that makes text hard to read */
+    border: 1px solid #bbb; /* Optional border for more definition */
+    transition: all 0.3s ease;
+}
+
+.reason-item:nth-child(6):hover {
+    transform: scale(1.05);
+    background-color: #c0c0c0; /* Slightly darker gray on hover */
+}
+
+
 /* Responsive Design: Adjust to fewer columns on smaller screens */
 @media (max-width: 768px) {
     .reasons-container {
