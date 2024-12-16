@@ -77,8 +77,7 @@
 
     <!-- Vehicle Details Section -->
     <h3>Detalles del Vehículo</h3>
-
-<div>
+<div id="vehicleContainer"></div>
     <h4>Vehículo 1</h4>
     <label>Placa:</label><input type="text" id="vehiclePlate1"><br>
     <label>Marca:</label><input type="text" id="vehicleBrand1"><br>
@@ -103,10 +102,7 @@
 </div>
 
 <button type="button" onclick="updateVehicleDetails()">Actualizar Datos de los Vehículos</button>
-
-
-        <button type="button" onclick="updateVehicleDetails()">Actualizar Datos del Vehículo</button>
-    </form>
+          </form>
 </section>
 
 
@@ -158,26 +154,41 @@
         });
 
         // Display User Details
-        function displayDetails(user) {
-            document.getElementById("uid").value = user.uid || "";
-            document.getElementById("email").value = user.email || "";
-            document.getElementById("department").value = user.department || "";
-            document.getElementById("municipality").value = user.municipality || "";
-            document.getElementById("phone").value = user.phone || "";
-            document.getElementById("planType").value = user.planType || "";
-            document.getElementById("registrationDate").value = user.registrationDate.toDate().toLocaleString() || "";
-            document.getElementById("lastReschedule").value = user.lastReschedule.toDate().toLocaleString() || "";
-            document.getElementById("paymentDate").value = user.paymentDate.toDate().toISOString().split("T")[0] || "";
-            document.getElementById("nextPaymentDate").value = user.nextPaymentDate.toDate().toLocaleString() || "";
+function displayDetails(user) {
+    document.getElementById("uid").value = user.uid || "";
+    document.getElementById("email").value = user.email || "";
+    document.getElementById("department").value = user.department || "";
+    document.getElementById("municipality").value = user.municipality || "";
+    document.getElementById("phone").value = user.phone || "";
+    document.getElementById("planType").value = user.planType || "";
+    document.getElementById("registrationDate").value = user.registrationDate?.toDate().toLocaleString() || "";
+    document.getElementById("lastReschedule").value = user.lastReschedule?.toDate().toLocaleString() || "";
+    document.getElementById("paymentDate").value = user.paymentDate?.toDate().toISOString().split("T")[0] || "";
+    document.getElementById("nextPaymentDate").value = user.nextPaymentDate?.toDate().toLocaleString() || "";
 
-            const vehicle = user.vehicles ? user.vehicles[0] : {};
-            document.getElementById("vehiclePlate").value = vehicle.plate || "";
-            document.getElementById("vehicleBrand").value = vehicle.brand || "";
-            document.getElementById("vehicleModel").value = vehicle.model || "";
-            document.getElementById("vehicleYear").value = vehicle.year || "";
+    // Dynamic Vehicle Section
+    const vehicles = user.vehicles || [];
+    const vehicleContainer = document.getElementById("vehicleContainer");
+    vehicleContainer.innerHTML = ""; // Clear previous vehicle data
 
-            document.getElementById("user-details").style.display = "block";
-        }
+    vehicles.forEach((vehicle, index) => {
+        vehicleContainer.innerHTML += `
+            <h4>Vehículo ${index + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" id="vehiclePlate${index}" value="${vehicle.plate || ''}"><br>
+            <label>Marca:</label>
+            <input type="text" id="vehicleBrand${index}" value="${vehicle.brand || ''}"><br>
+            <label>Modelo:</label>
+            <input type="text" id="vehicleModel${index}" value="${vehicle.model || ''}"><br>
+            <label>Año:</label>
+            <input type="text" id="vehicleYear${index}" value="${vehicle.year || ''}"><br>
+        `;
+    });
+
+    // Make sure the section is visible
+    document.getElementById("user-details").style.display = "block";
+}
+
 
         // Update User Data
        function updateGeneralDetails() {
