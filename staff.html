@@ -24,7 +24,7 @@
     </header>
 
     <!-- Staff Section -->
-    <section id="staff-section">
+     <section id="restricted-content" style="display: none;">
         <h2>Panel de Gestión para el Staff</h2>
         <p>Bienvenido, este panel es solo para personal autorizado.</p>
 
@@ -70,8 +70,34 @@
             firebase.initializeApp(firebaseConfig);
         }
 
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
+          // Check User Authorization
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const userEmail = user.email;
+                db.collection("users").doc(userEmail).get()
+                    .then((doc) => {
+                        if (doc.exists && doc.data().role === "staff") {
+                            // User is authorized, show restricted content
+                            document.getElementById("restricted-content").style.display = "block";
+                        } else {
+                            // Unauthorized user, redirect to login page
+                            alert("Acceso denegado. No tienes permisos para esta página.");
+                            window.location.href = "login.html";
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error al verificar permisos:", error);
+                        window.location.href = "login.html";
+                    });
+            } else {
+                // Not logged in, redirect to login page
+                window.location.href = "login.html";
+            }
+        });
+        
         // Handle search form submission
         document.getElementById("searchForm").addEventListener("submit", function (event) {
             event.preventDefault();
@@ -149,6 +175,15 @@
                 searchCustomer("email", email);
             }).catch((error) => {
                 console.error("Error al actualizar la fecha de pago:", error);
+            });
+        }
+
+         // Logout Functionality
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => {
+                console.error("Error al cerrar sesión:", error);
             });
         }
     </script>
