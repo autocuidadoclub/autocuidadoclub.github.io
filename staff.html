@@ -207,71 +207,43 @@ function displayDetails(user) {
         .catch(err => console.error("Error al actualizar los datos generales:", err));
 }
 
-      function updateVehicleDetails() {
-    const email = document.getElementById("email").value.trim(); // User's email
+function updateVehicleDetails() {
+    const email = document.getElementById("email").value.trim();
     if (!email) {
         alert("El email del usuario no está disponible.");
         return;
     }
 
-    // Retrieve inputs for all vehicles
-    const vehicleDetails = [
-        {
-            plate: document.getElementById("vehiclePlate1").value.trim(),
-            brand: document.getElementById("vehicleBrand1").value.trim(),
-            model: document.getElementById("vehicleModel1").value.trim(),
-            year: document.getElementById("vehicleYear1").value.trim(),
-        },
-        {
-            plate: document.getElementById("vehiclePlate2").value.trim(),
-            brand: document.getElementById("vehicleBrand2").value.trim(),
-            model: document.getElementById("vehicleModel2").value.trim(),
-            year: document.getElementById("vehicleYear2").value.trim(),
-        },
-        {
-            plate: document.getElementById("vehiclePlate3").value.trim(),
-            brand: document.getElementById("vehicleBrand3").value.trim(),
-            model: document.getElementById("vehicleModel3").value.trim(),
-            year: document.getElementById("vehicleYear3").value.trim(),
-        },
-    ];
+    // Collect vehicle data dynamically
+    const vehicleContainer = document.getElementById("vehicleContainer");
+    const vehicleInputs = vehicleContainer.querySelectorAll("input");
+    const updatedVehicles = [];
 
-    // Filter vehicles to update (only those with complete data)
-    const updatedVehicles = vehicleDetails.filter(vehicle => 
-        vehicle.plate && vehicle.brand && vehicle.model && vehicle.year
-    );
+    for (let i = 0; i < vehicleInputs.length; i += 4) {
+        const plate = vehicleInputs[i].value.trim();
+        const brand = vehicleInputs[i + 1].value.trim();
+        const model = vehicleInputs[i + 2].value.trim();
+        const year = vehicleInputs[i + 3].value.trim();
+
+        if (plate && brand && model && year) {
+            updatedVehicles.push({ plate, brand, model, year });
+        }
+    }
 
     if (updatedVehicles.length === 0) {
-        alert("Por favor, completa los datos de al menos un vehículo.");
+        alert("Por favor, completa al menos un vehículo.");
         return;
     }
 
-    db.collection("users").doc(email).get().then(doc => {
-        if (doc.exists) {
-            const userData = doc.data();
-            let existingVehicles = userData.vehicles || [];
-
-            // Replace or add vehicles based on the provided input
-            updatedVehicles.forEach((newVehicle, index) => {
-                if (index < existingVehicles.length) {
-                    existingVehicles[index] = newVehicle; // Update existing vehicle
-                } else {
-                    existingVehicles.push(newVehicle); // Add new vehicle
-                }
-            });
-
-            // Update the vehicles array in Firestore
-            db.collection("users").doc(email).update({ vehicles: existingVehicles })
-                .then(() => {
-                    alert("Detalles del vehículo actualizados correctamente.");
-                    searchCustomer("email", email); // Refresh data on the page
-                })
-                .catch(err => console.error("Error al actualizar los detalles del vehículo:", err));
-        } else {
-            alert("Usuario no encontrado.");
-        }
-    }).catch(err => console.error("Error al obtener detalles del usuario:", err));
+    // Update vehicles in Firestore
+    db.collection("users").doc(email).update({ vehicles: updatedVehicles })
+        .then(() => {
+            alert("Detalles de los vehículos actualizados correctamente.");
+            searchCustomer("email", email); // Refresh data
+        })
+        .catch(err => console.error("Error al actualizar los vehículos:", err));
 }
+
 
         
         function logout() {
