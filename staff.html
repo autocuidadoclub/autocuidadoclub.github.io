@@ -94,7 +94,7 @@
                 <label>Año:</label>
                 <input type="text" id="vehicleYear"><br>
 
-                <button type="button" onclick="updateUserData()">Actualizar Datos</button>
+                <button onclick="updateVehicleDetails()">Actualizar Datos</button>
             </form>
         </section>
     </section>
@@ -185,6 +185,49 @@
                 .catch(err => console.error("Error: ", err));
         }
 
+        function updateVehicleDetails() {
+    const email = document.getElementById("userEmail").textContent; // Fetch user's email
+    const newPlate = document.getElementById("vehiclePlate").value.trim();
+    const newBrand = document.getElementById("vehicleBrand").value.trim();
+    const newModel = document.getElementById("vehicleModel").value.trim();
+    const newYear = document.getElementById("vehicleYear").value.trim();
+
+    if (!newPlate || !newBrand || !newModel || !newYear) {
+        alert("Por favor, llena todos los campos del vehículo.");
+        return;
+    }
+
+    db.collection("users").doc(email).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            let updatedVehicles = userData.vehicles || [];
+
+            // Update the first vehicle object (extend logic for multiple vehicles if needed)
+            updatedVehicles[0] = {
+                plate: newPlate,
+                brand: newBrand,
+                model: newModel,
+                year: newYear
+            };
+
+            // Update the vehicles array in Firestore
+            db.collection("users").doc(email).update({
+                vehicles: updatedVehicles
+            }).then(() => {
+                alert("Detalles del vehículo actualizados correctamente.");
+                searchCustomer("email", email); // Refresh the user data on the page
+            }).catch((error) => {
+                console.error("Error al actualizar los detalles del vehículo:", error);
+            });
+        } else {
+            alert("Usuario no encontrado.");
+        }
+    }).catch((error) => {
+        console.error("Error al obtener detalles del usuario:", error);
+    });
+}
+
+        
         function logout() {
             auth.signOut().then(() => window.location.href = "login.html");
         }
