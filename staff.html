@@ -15,7 +15,7 @@
         <ul class="nav-links">
             <li><a href="dashboard.html">Dashboard</a></li>
             <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="logout.html" onclick="logout()">Cerrar Sesión</a></li>
+            <li><a href="logout.html">Cerrar Sesión</a></li>
         </ul>
     </nav>
 
@@ -24,7 +24,7 @@
     </header>
 
     <!-- Staff Section -->
-    <section id="restricted-content" style="display: none;">
+    <section id="staff-section">
         <h2>Panel de Gestión para el Staff</h2>
         <p>Bienvenido, este panel es solo para personal autorizado.</p>
 
@@ -41,195 +41,115 @@
             <button type="submit">Buscar</button>
         </form>
 
-        <!-- Customer Details Section -->
-        <section id="user-details" style="display: none;">
+        <!-- Customer Details -->
+        <section id="user-details" style="display:none;">
             <h2>Detalles del Cliente</h2>
-            <form id="updateForm">
-                <label>UID:</label>
-                <input type="text" id="uid" disabled><br>
-
-                <label>Email:</label>
-                <input type="email" id="email" disabled><br>
-
-                <label>Departamento:</label>
-                <input type="text" id="department"><br>
-
-                <label>Municipio:</label>
-                <input type="text" id="municipality"><br>
-
-                <label>Teléfono:</label>
-                <input type="text" id="phone"><br>
-
-                <label>Tipo de Plan:</label>
-                <select id="planType">
-                    <option value="basic12m">Básico 12 meses</option>
-                    <option value="basic6m">Básico 6 meses</option>
-                    <option value="plus12m">Plus 12 meses</option>
-                    <option value="plus6m">Plus 6 meses</option>
-                </select><br>
-
-                <label>Fecha de Registro:</label>
-                <input type="text" id="registrationDate" disabled><br>
-
-                <label>Último Reagendado:</label>
-                <input type="text" id="lastReschedule" disabled><br>
-
-                <label>Fecha de Pago Actual:</label>
-                <input type="date" id="paymentDate"><br>
-
-                <label>Próxima Fecha de Pago:</label>
-                <input type="text" id="nextPaymentDate" disabled><br>
-
-                <!-- Vehicle Details -->
-                <h3>Detalles del Vehículo</h3>
-                <label>Placa:</label>
-                <input type="text" id="vehiclePlate"><br>
-
-                <label>Marca:</label>
-                <input type="text" id="vehicleBrand"><br>
-
-                <label>Modelo:</label>
-                <input type="text" id="vehicleModel"><br>
-
-                <label>Año:</label>
-                <input type="text" id="vehicleYear"><br>
-
-                <button onclick="updateVehicleDetails()">Actualizar Datos</button>
-            </form>
+            <p><strong>Nombre:</strong> <span id="userName"></span></p>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
+            <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
+            <label for="paymentDate">Actualizar Fecha de Pago:</label>
+            <input type="date" id="paymentDate">
+            <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
         </section>
     </section>
 
     <script>
-        // Firebase Initialization
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
             authDomain: "auto-cuidadoclub.firebaseapp.com",
             projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
         };
 
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
 
-        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Authorization Check
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                db.collection("users").doc(user.email).get().then((doc) => {
-                    if (doc.exists && doc.data().role === "staff") {
-                        document.getElementById("restricted-content").style.display = "block";
-                    } else {
-                        alert("Acceso denegado.");
-                        window.location.href = "login.html";
-                    }
-                });
-            } else {
-                window.location.href = "login.html";
-            }
-        });
-
-        // Search Functionality
-        document.getElementById("searchForm").addEventListener("submit", function (e) {
-            e.preventDefault();
+        // Handle search form submission
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
+            event.preventDefault();
             const searchBy = document.getElementById("searchBy").value;
             const searchValue = document.getElementById("searchValue").value.trim();
-            let query;
 
-            if (searchBy === "email") query = db.collection("users").where("email", "==", searchValue);
-            if (searchBy === "licensePlate") query = db.collection("users").where("vehicles", "array-contains", { plate: searchValue });
-            if (searchBy === "phone") query = db.collection("users").where("phone", "==", searchValue);
+            if (!searchValue) {
+                alert("Por favor, ingrese un valor de búsqueda.");
+                return;
+            }
 
-            query.get().then(snapshot => {
-                snapshot.forEach(doc => displayDetails(doc.data()));
-            }).catch(err => alert("Error: " + err));
+            searchCustomer(searchBy, searchValue);
         });
 
-        // Display User Details
-        function displayDetails(user) {
-            document.getElementById("uid").value = user.uid || "";
-            document.getElementById("email").value = user.email || "";
-            document.getElementById("department").value = user.department || "";
-            document.getElementById("municipality").value = user.municipality || "";
-            document.getElementById("phone").value = user.phone || "";
-            document.getElementById("planType").value = user.planType || "";
-            document.getElementById("registrationDate").value = user.registrationDate.toDate().toLocaleString() || "";
-            document.getElementById("lastReschedule").value = user.lastReschedule.toDate().toLocaleString() || "";
-            document.getElementById("paymentDate").value = user.paymentDate.toDate().toISOString().split("T")[0] || "";
-            document.getElementById("nextPaymentDate").value = user.nextPaymentDate.toDate().toLocaleString() || "";
+        // Search customer by field
+        function searchCustomer(field, value) {
+            let query;
 
-            const vehicle = user.vehicles ? user.vehicles[0] : {};
-            document.getElementById("vehiclePlate").value = vehicle.plate || "";
-            document.getElementById("vehicleBrand").value = vehicle.brand || "";
-            document.getElementById("vehicleModel").value = vehicle.model || "";
-            document.getElementById("vehicleYear").value = vehicle.year || "";
+            if (field === "email") {
+                query = db.collection("users").where("email", "==", value);
+            } else if (field === "name") {
+                query = db.collection("users").where("name", "==", value);
+            } else if (field === "phone") {
+                query = db.collection("users").where("phone", "==", value);
+            } else if (field === "licensePlate") {
+                // Query for nested array in 'vehicles'
+                query = db.collection("users").where("vehicles", "array-contains-any", [
+                    { plate: value }
+                ]);
+            }
 
+            query.get().then((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    alert("No se encontraron clientes con ese criterio de búsqueda.");
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    displayCustomerDetails(userData);
+                });
+            }).catch((error) => {
+                console.error("Error al buscar el cliente:", error);
+            });
+        }
+
+        // Display customer details
+        function displayCustomerDetails(userData) {
+            document.getElementById("userName").textContent = userData.name || "N/A";
+            document.getElementById("userEmail").textContent = userData.email || "N/A";
+            document.getElementById("userPhone").textContent = userData.phone || "N/A";
+            document.getElementById("currentPaymentDate").textContent = userData.paymentDate
+                ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
+                : "Sin fecha registrada";
             document.getElementById("user-details").style.display = "block";
         }
 
-        // Update User Data
-        function updateUserData() {
-            const email = document.getElementById("email").value;
+        // Update payment date
+        function updatePaymentDate() {
+            const email = document.getElementById("userEmail").textContent;
+            const paymentDateInput = document.getElementById("paymentDate").value;
 
-            const updatedData = {
-                department: document.getElementById("department").value,
-                municipality: document.getElementById("municipality").value,
-                phone: document.getElementById("phone").value,
-                planType: document.getElementById("planType").value,
-                paymentDate: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById("paymentDate").value)),
-            };
+            if (!paymentDateInput) {
+                alert("Por favor, selecciona una fecha de pago.");
+                return;
+            }
 
-            db.collection("users").doc(email).update(updatedData)
-                .then(() => alert("Datos actualizados correctamente"))
-                .catch(err => console.error("Error: ", err));
-        }
+            const paymentDate = new Date(paymentDateInput);
 
-        function updateVehicleDetails() {
-    const email = document.getElementById("userEmail").textContent; // Fetch user's email
-    const newPlate = document.getElementById("vehiclePlate").value.trim();
-    const newBrand = document.getElementById("vehicleBrand").value.trim();
-    const newModel = document.getElementById("vehicleModel").value.trim();
-    const newYear = document.getElementById("vehicleYear").value.trim();
-
-    if (!newPlate || !newBrand || !newModel || !newYear) {
-        alert("Por favor, llena todos los campos del vehículo.");
-        return;
-    }
-
-    db.collection("users").doc(email).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            let updatedVehicles = userData.vehicles || [];
-
-            // Update the first vehicle object (extend logic for multiple vehicles if needed)
-            updatedVehicles[0] = {
-                plate: newPlate,
-                brand: newBrand,
-                model: newModel,
-                year: newYear
-            };
-
-            // Update the vehicles array in Firestore
             db.collection("users").doc(email).update({
-                vehicles: updatedVehicles
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 1)))
             }).then(() => {
-                alert("Detalles del vehículo actualizados correctamente.");
-                searchCustomer("email", email); // Refresh the user data on the page
+                alert("Fecha de pago actualizada correctamente.");
+                searchCustomer("email", email);
             }).catch((error) => {
-                console.error("Error al actualizar los detalles del vehículo:", error);
+                console.error("Error al actualizar la fecha de pago:", error);
             });
-        } else {
-            alert("Usuario no encontrado.");
-        }
-    }).catch((error) => {
-        console.error("Error al obtener detalles del usuario:", error);
-    });
-}
-
-        
-        function logout() {
-            auth.signOut().then(() => window.location.href = "login.html");
         }
     </script>
 </body>
