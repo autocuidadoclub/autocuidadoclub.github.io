@@ -128,6 +128,7 @@
 }, { merge: true });
 
         // Update payment date and calculate next payment date
+// Update payment date and enforce monthly next payment date
 function updatePaymentDate() {
     const email = document.getElementById("userEmail").textContent;
     const paymentDateInput = document.getElementById("paymentDate").value;
@@ -138,7 +139,10 @@ function updatePaymentDate() {
     }
 
     const paymentDate = new Date(paymentDateInput);
-    const nextPaymentDate = calculateNextPaymentDate(paymentDate);
+
+    // Calculate next payment date (always 1 month ahead)
+    const nextPaymentDate = new Date(paymentDate);
+    nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1); // Add 1 month
 
     // Update Firestore with new paymentDate and nextPaymentDate
     db.collection("users").doc(email).update({
@@ -149,18 +153,12 @@ function updatePaymentDate() {
         searchCustomer("email", email); // Reload user details
     }).catch((error) => {
         console.error("Error al actualizar la fecha de pago:", error);
+        alert("Hubo un error al actualizar la fecha.");
     });
 }
 
-
         
-       // Calculate the next payment date (always monthly)
-function calculateNextPaymentDate(paymentDate) {
-    const nextDate = new Date(paymentDate);
-    nextDate.setMonth(nextDate.getMonth() + 1); // Always add 1 month
-    return nextDate;
-}
-
+        
     </script>
 </body>
 </html>
