@@ -621,43 +621,67 @@ function formatTimestamp(timestamp) {
     });
 }
 
-function savePotentialReferral() {
+function savePotentialReferrals() {
     const user = firebase.auth().currentUser;
-    const potentialReferralEmail = document.getElementById("potentialReferralEmail").value;
+    const referralsInput = document.getElementById("potentialReferralEmails").value;
 
     if (!user) {
         alert("Debes iniciar sesión para enviar referidos.");
         return;
     }
 
-    if (!potentialReferralEmail) {
-        alert("Por favor, ingresa un correo electrónico.");
+    if (!referralsInput) {
+        alert("Por favor, ingresa al menos un correo electrónico.");
         return;
     }
 
-    // Validate email format
-    if (!/^\S+@\S+\.\S+$/.test(potentialReferralEmail)) {
-        alert("Por favor, ingresa un correo electrónico válido.");
-        return;
-    }
+    // Split the input into an array of emails
+    const emailList = referralsInput
+        .split(/[\n,]+/) // Split by commas or new lines
+        .map(email => email.trim()) // Trim whitespace
+        .filter(email => email); // Remove empty entries
 
-    // Save referral email to Firestore
-    const referralsRef = db.collection("referrals");
-    referralsRef.add({
-        referredBy: user.email,
-        referredEmail: potentialReferralEmail,
-        dateAdded: firebase.firestore.Timestamp.now(),
-        contacted: false // Initial state
-    })
-    .then(() => {
-        alert("¡Gracias! Hemos recibido la información del referido. Nuestro equipo se pondrá en contacto con ellos.");
-        document.getElementById("potentialReferralEmail").value = ""; // Clear input
-    })
-    .catch((error) => {
-        console.error("Error al enviar el referido:", error);
-        alert("Hubo un error al enviar la información. Intenta de nuevo.");
+    // Validate each email and prepare them for saving
+    const validEmails = [];
+    emailList.forEach(email => {
+        if (/^\S+@\S+\.\S+$/.test(email)) {
+            validEmails.push(email);
+        } else {
+            console.warn(`Correo inválido ignorado: ${email}`);
+        }
     });
+
+    if (validEmails.length === 0) {
+        alert("Ninguno de los correos proporcionados es válido. Verifícalos e intenta de nuevo.");
+        return;
+    }
+
+    // Save each valid email to Firestore
+    const referralsRef = db.collection("referrals");
+    const batch = db.batch();
+
+    validEmails.forEach(email => {
+        const docRef = referralsRef.doc(); // Create a new document reference
+        batch.set(docRef, {
+            referredBy: user.email,
+            referredEmail: email,
+            dateAdded: firebase.firestore.Timestamp.now(),
+            contacted: false
+        });
+    });
+
+    // Commit the batch operation
+    batch.commit()
+        .then(() => {
+            alert(`¡Gracias! Hemos recibido ${validEmails.length} referido(s). Nuestro equipo los contactará pronto.`);
+            document.getElementById("potentialReferralEmails").value = ""; // Clear textarea
+        })
+        .catch(error => {
+            console.error("Error al guardar los referidos:", error);
+            alert("Hubo un error al enviar la información. Intenta de nuevo.");
+        });
 }
+
 
         
 function updateLoyaltyCard(userData) {
