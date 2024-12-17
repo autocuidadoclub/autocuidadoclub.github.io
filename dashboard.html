@@ -638,27 +638,36 @@ function submitReferrer() {
     const currentUserDoc = db.collection("users").doc(currentUser.email);
     const referrerDoc = db.collection("users").doc(referrerEmail);
 
-    // Check both users
+    // Initialize fields for both users if missing
     Promise.all([referrerDoc.get(), currentUserDoc.get()])
         .then(([referrerSnapshot, currentUserSnapshot]) => {
-            if (!referrerSnapshot.exists) {
-                alert("El correo ingresado no pertenece a un usuario registrado.");
-                throw new Error("Referrer does not exist.");
+            if (!referrerSnapshot.exists) throw new Error("Referrer does not exist.");
+            if (!currentUserSnapshot.exists) throw new Error("Current user not found.");
+
+            const referrerData = referrerSnapshot.data() || {};
+            const currentUserData = currentUserSnapshot.data() || {};
+
+            // Initialize fields for missing values
+            const referrerUpdates = {
+                subscriptionStatus: referrerData.subscriptionStatus || "inactive",
+                paymentDate: referrerData.paymentDate || null,
+                completedReferrals: referrerData.completedReferrals || 0,
+                rewards: referrerData.rewards || 0,
+            };
+
+            const currentUserUpdates = {
+                referredBy: currentUserData.referredBy || null,
+                subscriptionStatus: currentUserData.subscriptionStatus || "inactive",
+                paymentDate: currentUserData.paymentDate || null,
+            };
+
+            // Validate subscriptions
+            if (referrerUpdates.subscriptionStatus !== "active" || !referrerUpdates.paymentDate) {
+                throw new Error("El usuario referido no tiene una suscripción activa y pagada.");
             }
 
-            const referrerData = referrerSnapshot.data();
-            const currentUserData = currentUserSnapshot.data();
-
-            // Validate referrer's active subscription
-            if (referrerData.subscriptionStatus !== "active" || !referrerData.paymentDate) {
-                alert("El usuario referido no tiene una suscripción activa y pagada.");
-                throw new Error("Referrer does not have an active subscription.");
-            }
-
-            // Check if current user has paid
-            if (!currentUserData.paymentDate || currentUserData.subscriptionStatus !== "active") {
-                alert("Debes pagar tu suscripción antes de registrar una referencia.");
-                throw new Error("Current user has not paid for subscription.");
+            if (currentUserUpdates.subscriptionStatus !== "active" || !currentUserUpdates.paymentDate) {
+                throw new Error("Debes pagar tu suscripción antes de registrar una referencia.");
             }
 
             // Update rewards for both users
@@ -677,6 +686,7 @@ function submitReferrer() {
         })
         .catch((error) => {
             console.error("Error registrando la referencia:", error.message);
+            alert(error.message);
         });
 }
 
