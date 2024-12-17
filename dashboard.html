@@ -242,25 +242,17 @@
 
 <!-- Referral Program Section -->
 <div class="card">
-    <h3><i class="fas fa-user-friends"></i> Gana una Inspección Gratis con Referencias</h3>
+    <h3><i class="fas fa-user-friends"></i> ¿Conoces a alguien que necesite nuestra ayuda?</h3>
     <p>
-        Invita a tus amigos a unirse a <strong>AutoCuidado Club</strong>. Si ellos adquieren cualquier plan de suscripción,
-        ¡te regalamos <strong>1 inspección mensual gratuita</strong> al finalizar tu plan!
+        Si conoces a alguien que necesite los beneficios de <strong>AutoCuidado Club</strong>, 
+        ¡compártenos su correo electrónico! Nuestro equipo se pondrá en contacto con ellos 
+        para brindarles más información.
     </p>
-    <p>Comparte tu correo electrónico como código de referencia:</p>
-    <div class="referral-code">
-        <span id="referral-email" style="font-weight: bold; color: #333;">Cargando...</span>
-        <button onclick="copyReferralCode()" style="margin-left: 10px; cursor: pointer;">
-            <i class="fas fa-copy"></i> Copiar Código
-        </button>
-    </div>
-    <p style="margin-top: 10px; color: #555; font-size: 0.9em;">
-        Puedes ver el estado de tus referencias completadas a continuación:
-    </p>
-    <div class="referral-status">
-        <p><strong>Referencias completadas:</strong> <span id="completed-referrals">0</span></p>
-    </div>
+    <label for="referralEmail">Correo electrónico de la persona referida:</label>
+    <input type="email" id="referralEmail" placeholder="Ejemplo: persona@email.com">
+    <button onclick="submitReferralEmail()">Enviar Referencia</button>
 </div>
+
 
 
 <p></p>
@@ -629,12 +621,41 @@ function formatTimestamp(timestamp) {
     });
 }
 
-function copyReferralCode() {
-    const referralEmail = document.getElementById("referral-email").innerText;
-    navigator.clipboard.writeText(referralEmail).then(() => {
-        alert("¡Código copiado al portapapeles! Compártelo con tus amigos.");
-    }).catch(err => {
-        console.error("Error al copiar el código:", err);
+function savePotentialReferral() {
+    const user = firebase.auth().currentUser;
+    const potentialReferralEmail = document.getElementById("potentialReferralEmail").value;
+
+    if (!user) {
+        alert("Debes iniciar sesión para enviar referidos.");
+        return;
+    }
+
+    if (!potentialReferralEmail) {
+        alert("Por favor, ingresa un correo electrónico.");
+        return;
+    }
+
+    // Validate email format
+    if (!/^\S+@\S+\.\S+$/.test(potentialReferralEmail)) {
+        alert("Por favor, ingresa un correo electrónico válido.");
+        return;
+    }
+
+    // Save referral email to Firestore
+    const referralsRef = db.collection("referrals");
+    referralsRef.add({
+        referredBy: user.email,
+        referredEmail: potentialReferralEmail,
+        dateAdded: firebase.firestore.Timestamp.now(),
+        contacted: false // Initial state
+    })
+    .then(() => {
+        alert("¡Gracias! Hemos recibido la información del referido. Nuestro equipo se pondrá en contacto con ellos.");
+        document.getElementById("potentialReferralEmail").value = ""; // Clear input
+    })
+    .catch((error) => {
+        console.error("Error al enviar el referido:", error);
+        alert("Hubo un error al enviar la información. Intenta de nuevo.");
     });
 }
 
