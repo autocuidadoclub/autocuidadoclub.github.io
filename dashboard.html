@@ -248,9 +248,83 @@
         ¡compártenos su correo electrónico! Nuestro equipo se pondrá en contacto con ellos 
         para brindarles más información.
     </p>
-    <label for="referralEmail">Correo electrónico de la persona referida:</label>
-    <input type="email" id="referralEmail" placeholder="Ejemplo: persona@email.com">
-    <button onclick="submitReferralEmail()">Enviar Referencia</button>
+<form id="contactForm">
+    <label for="referralEmails">Correos electrónicos (separados por comas o saltos de línea):</label>
+    <textarea id="referralEmails" name="referralEmails" rows="4" 
+              placeholder="ejemplo1@correo.com, ejemplo2@correo.com" required></textarea>
+    <button type="submit">Enviar</button>
+</form>
+
+<!-- Loader -->
+<div id="loader" style="display: none; justify-content: center; align-items: center;">
+    <img src="loading.gif" alt="Cargando..." style="width: 50px; height: 50px;">
+    <p>Enviando...</p>
+</div>
+
+    
+    <!-- Success Message -->
+    <div id="successMessage" style="display: none; color: green; margin-top: 15px;">
+        ¡Gracias! Nuestro equipo contactará a las personas que proporcionaste.
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" style="display: none; color: red; margin-top: 15px;">
+        Ocurrió un error al enviar la información. Por favor, intenta nuevamente.
+    </div>
+</div>
+
+<!-- JavaScript for Form Submission -->
+<script>
+    document.getElementById('contactForm').onsubmit = function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex'; // Show loader
+        
+        const referralEmails = document.getElementById('referralEmails').value;
+
+        // Split and validate emails
+        const emailList = referralEmails
+            .split(/[\n,]+/) // Split by commas or new lines
+            .map(email => email.trim()) // Trim spaces
+            .filter(email => /^\S+@\S+\.\S+$/.test(email)); // Validate email format
+        
+        if (emailList.length === 0) {
+            loader.style.display = 'none';
+            alert("Por favor ingresa al menos un correo electrónico válido.");
+            return;
+        }
+
+        // Prepare the message body
+        const messageBody = `Se enviaron las siguientes referencias:\n${emailList.join(", ")}`;
+        const formData = new FormData();
+        formData.append('email', 'info@autocuidadoclub.com'); // The target email
+        formData.append('subject', 'Nuevas Referencias de Clientes');
+        formData.append('message', messageBody);
+
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loader.style.display = 'none'; // Hide loader
+            if (data.success) {
+                alert('Gracias, hemos recibido las referencias correctamente.');
+                document.getElementById('contactForm').reset();
+            } else {
+                alert('Hubo un error al enviar las referencias. Por favor, inténtelo nuevamente.');
+            }
+        })
+        .catch(error => {
+            loader.style.display = 'none'; // Hide loader
+            console.error('Error:', error);
+            alert('Hubo un error al enviar las referencias.');
+        });
+    };
+</script>
+
+
 </div>
 
 
