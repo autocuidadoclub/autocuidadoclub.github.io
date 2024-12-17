@@ -242,18 +242,27 @@
 
 <!-- Referral Program Section -->
 <div class="card">
-    <h3><i class="fas fa-user-friends"></i> ¿Te han referido?</h3>
+    <h3><i class="fas fa-user-friends"></i> Gana una Inspección Gratis con Referencias</h3>
     <p>
-        Ingresa el correo electrónico de la persona que te refirió para que ambos puedan recibir
-        <strong>1 inspección gratuita</strong> al pagar sus planes de suscripción.
+        Invita a tus amigos a unirse a <strong>AutoCuidado Club</strong>. Si ellos adquieren cualquier plan de suscripción,
+        ¡te regalamos <strong>1 inspección mensual gratuita</strong> al finalizar tu plan!
     </p>
-    <label for="referrerEmail">Correo electrónico de quien te refirió:</label>
-    <input type="email" id="referrerEmail" placeholder="Correo electrónico del referido">
-    <button onclick="submitReferrer()">Enviar</button>
-    <p id="referral-status-message" style="color: green; font-weight: bold; display: none;"></p>
+    <p>Comparte tu correo electrónico como código de referencia:</p>
+    <div class="referral-code">
+        <span id="referral-email" style="font-weight: bold; color: #333;">Cargando...</span>
+        <button onclick="copyReferralCode()" style="margin-left: 10px; cursor: pointer;">
+            <i class="fas fa-copy"></i> Copiar Código
+        </button>
+    </div>
+    <p style="margin-top: 10px; color: #555; font-size: 0.9em;">
+        Puedes ver el estado de tus referencias completadas a continuación:
+    </p>
+    <div class="referral-status">
+        <p><strong>Referencias completadas:</strong> <span id="completed-referrals">0</span></p>
+    </div>
 </div>
 
- 
+
 <p></p>
     <p></p>
     <p></p>
@@ -620,64 +629,13 @@ function formatTimestamp(timestamp) {
     });
 }
 
-function submitReferrer() {
-    const referrerEmail = document.getElementById("referrerEmail").value;
-    const referralStatusMessage = document.getElementById("referral-status-message");
-
-    if (!referrerEmail) {
-        alert("Por favor, ingresa el correo electrónico del referido.");
-        return;
-    }
-
-    const currentUser = firebase.auth().currentUser;
-    if (!currentUser) {
-        alert("Debes iniciar sesión para registrar una referencia.");
-        return;
-    }
-
-    const currentUserDoc = db.collection("users").doc(currentUser.email);
-    const referrerDoc = db.collection("users").doc(referrerEmail);
-
-    // Check both users
-    Promise.all([referrerDoc.get(), currentUserDoc.get()])
-        .then(([referrerSnapshot, currentUserSnapshot]) => {
-            if (!referrerSnapshot.exists) {
-                alert("El correo ingresado no pertenece a un usuario registrado.");
-                throw new Error("Referrer does not exist.");
-            }
-
-            const referrerData = referrerSnapshot.data();
-            const currentUserData = currentUserSnapshot.data();
-
-            // Validate referrer's active subscription
-            if (referrerData.subscriptionStatus !== "active" || !referrerData.paymentDate) {
-                alert("El usuario referido no tiene una suscripción activa y pagada.");
-                throw new Error("Referrer does not have an active subscription.");
-            }
-
-            // Check if current user has paid
-            if (!currentUserData.paymentDate || currentUserData.subscriptionStatus !== "active") {
-                alert("Debes pagar tu suscripción antes de registrar una referencia.");
-                throw new Error("Current user has not paid for subscription.");
-            }
-
-            // Update rewards for both users
-            return Promise.all([
-                referrerDoc.update({
-                    completedReferrals: firebase.firestore.FieldValue.increment(1),
-                    rewards: firebase.firestore.FieldValue.increment(1),
-                }),
-                currentUserDoc.update({ referredBy: referrerEmail }),
-            ]);
-        })
-        .then(() => {
-            referralStatusMessage.style.display = "block";
-            referralStatusMessage.textContent =
-                "¡Referencia exitosa! Ambos recibirán 1 inspección gratuita al finalizar el plan.";
-        })
-        .catch((error) => {
-            console.error("Error registrando la referencia:", error.message);
-        });
+function copyReferralCode() {
+    const referralEmail = document.getElementById("referral-email").innerText;
+    navigator.clipboard.writeText(referralEmail).then(() => {
+        alert("¡Código copiado al portapapeles! Compártelo con tus amigos.");
+    }).catch(err => {
+        console.error("Error al copiar el código:", err);
+    });
 }
 
         
