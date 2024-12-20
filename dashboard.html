@@ -240,29 +240,6 @@
     <p></p>
     <p></p>
 
-<!-- Referral Program Section -->
-<div class="card">
-    <h3><i class="fas fa-user-friends"></i> Gana una Inspección Gratis con Referencias</h3>
-    <p>
-        Invita a tus amigos a unirse a <strong>AutoCuidado Club</strong>. Si ellos adquieren cualquier plan de suscripción,
-        ¡te regalamos <strong>1 inspección mensual gratuita</strong> al finalizar tu plan!
-    </p>
-    
-    </div>
-    <p style="margin-top: 10px; color: #555; font-size: 0.9em;">
-        Puedes ver el estado de tus referencias completadas a continuación:
-    </p>
-    <div class="referral-status">
-        <p><strong>Referencias completadas:</strong> <span id="completed-referrals">0</span></p>
-    </div>
-</div>
-
-
-<p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    
     <!-- Loyalty Rewards Section -->
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
@@ -357,9 +334,6 @@ auth.onAuthStateChanged((user) => {
         console.log("User is logged in:", user.email);
         document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
 
-        // Mostrar el correo como código de referencia
-        document.getElementById("referral-email").innerText = user.email || "N/A";
-
         // Obtener datos del perfil del usuario desde Firestore
         db.collection("users").doc(user.email).get()
             .then((doc) => {
@@ -373,8 +347,7 @@ auth.onAuthStateChanged((user) => {
                     // Actualizar programa de lealtad
                     updateLoyaltyCard(userData);
 
-                    // Mostrar el número de referencias completadas
-                    document.getElementById("completed-referrals").innerText = userData.completedReferrals || "0";
+                    
                 } else {
                     console.error("User profile not found in Firestore.");
                 }
@@ -621,15 +594,6 @@ function formatTimestamp(timestamp) {
         day: "numeric",
         month: "long",
         year: "numeric",
-    });
-}
-
-function copyReferralCode() {
-    const referralEmail = document.getElementById("referral-email").innerText;
-    navigator.clipboard.writeText(referralEmail).then(() => {
-        alert("¡Código copiado al portapapeles! Compártelo con tus amigos.");
-    }).catch(err => {
-        console.error("Error al copiar el código:", err);
     });
 }
 
