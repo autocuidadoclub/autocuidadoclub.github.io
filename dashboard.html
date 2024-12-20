@@ -154,6 +154,7 @@
             <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
             <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
             <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
             <P><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
             <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
             <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
@@ -163,24 +164,22 @@
 
      <div class="card">
             <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-            <p><strong>Miembro desde:</strong> </p>
-            <p></p><span id="memberSince">Cargando...</span></p>   
             <p><strong>Fecha del último pago de su suscripción:</strong> </p>
             <p></p><span id="paymentDate">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong></p>
             <p></p><span id="nextPaymentDate">Cargando...</span></p>
             </div>
 
-       
-            
+
+           
     <!-- Reschedule Section -->
     <div class="card reschedule-section">
         <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
         <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
-        <p style="color: red; font-weight:bold;">Ten en cuenta que solo puedes reprogramar 1 vez al mes</p>
-        <p id="reschedule-alert" style="color: red; font-weight: bold;"></p>
-       </div>
-       
+        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        </div>
         <table class="schedule-table">
             <thead>
                 <tr>
@@ -226,20 +225,7 @@
     <p></p>
     <p></p>
     <p></p>
-
- <div class="card contact-staff-section">
-    <h3><i class="fas fa-envelope"></i> ¿Necesitas contactar con nosotros?</h3>
-    <p>Si necesitas ayudao o conoces a alguien que necesite nuestro apoyo. Por favor <a href="contacto.html" class="contact-link">contacta con nuestro equipo</a>.</p>
-    <p>También puedes enviarnos un correo a: <strong>info@autocuidadoclub.com</strong></p>
-    <p>O contactáctanos al teléfono: <strong>+503 XXXX-XXXX</strong></p>
-</div>
-
-
-<p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-
+    
     <!-- Loyalty Rewards Section -->
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
@@ -264,7 +250,7 @@
                     <p>7to Mes de suscripción activo</p>
                 </div>
                 <div class="description">
-                    <p><strong>Current Progress:</strong></p>
+                    <p><strong>Current Progress:</strong> 2 of 8 steps completed.</p>
                 </div>
             </div>
 
@@ -275,7 +261,7 @@
                     <div class="reward-icon">🎐</div>
                     <div class="reward-info">
                         <h4>Recarga de A/C</h4>
-                        <p><span id="ac-rewards">1x</span> por cada vehículo registrado.</p>
+                        <p><span id="ac-rewards">1x</span> for your registered cars</p>
                     </div>
                     <span class="reward-status locked">Locked</span>
                 </div>
@@ -283,7 +269,7 @@
                     <div class="reward-icon">🚗</div>
                     <div class="reward-info">
                         <h4>Carwash gratis</h4>
-                        <p><span id="carwash-rewards">1x</span> por cada vehículo registrado.</p>
+                        <p><span id="carwash-rewards">1x</span> for your registered cars</p>
                     </div>
                     <span class="reward-status locked">Locked</span>
                 </div>
@@ -291,14 +277,14 @@
                     <div class="reward-icon">📝</div>
                     <div class="reward-info">
                         <h4>Revisión extra del mes en curso</h4>
-                        <p><span id="review-rewards">1x</span> por cada vehículo registrado.</p>
+                        <p><span id="review-rewards">1x</span> for your registered cars</p>
                     </div>
                     <span class="reward-status locked">Locked</span>
                 </div>
             </div>
         </div>
+    </section>
 
-       </section>
       
     <script>
     // Firebase configuration
@@ -329,37 +315,35 @@
         });
 
     // Check if user is logged in and load profile info
-
-auth.onAuthStateChanged((user) => {
+   auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("User is logged in:", user.email);
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
 
-        // Fetch user data from Firestore
+        // Fetch user profile
         db.collection("users").doc(user.email).get()
             .then((doc) => {
                 if (doc.exists) {
                     const userData = doc.data();
                     console.log("User profile data:", userData);
 
-                    // Update user information on the page
+                    // Update user info first
                     updateUserInfo(userData);
 
-                    // Update loyalty card based on user data
+                    // Then update the loyalty card
                     updateLoyaltyCard(userData);
-
                 } else {
-                    console.error("User profile not found in Firestore.");
+                    console.error("User profile not found.");
                 }
             })
             .catch((error) => {
-                console.error("Error fetching user profile from Firestore:", error);
+                console.error("Error fetching user profile:", error);
             });
     } else {
         console.log("No authenticated user. Redirecting to login.");
         window.location.href = 'login.html';
     }
 });
-
 
 function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
@@ -369,8 +353,8 @@ function updateUserInfo(userData) {
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
     document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
-        ? formatTimestamp(userData.nextPaymentDate)
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate)
+        ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString("es-ES")
         : "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
     document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
@@ -396,7 +380,6 @@ function updateUserInfo(userData) {
               document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
             
 
-                 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
         console.log("Authentication persistence set to LOCAL.");
@@ -404,19 +387,6 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .catch((error) => {
         console.error("Error setting authentication persistence:", error.message);
     });
-
-                    if (userData.lastReschedule) {
-                    const lastRescheduleDate = userData.lastReschedule.toDate().toLocaleString("es-ES", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    });
-                    document.getElementById("last-reschedule").innerText = lastRescheduleDate;
-                } else {
-                    document.getElementById("last-reschedule").innerText = "No hay reprogramación previa.";
-                }
 
             
                     // Dynamically update loyalty card based on subscription status
@@ -462,7 +432,7 @@ function loadVehicles(vehicles) {
     });
 }
 
-       function selectScheduleBox(cell) {
+        function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
 
     // Get the clicked cell's text
@@ -494,11 +464,8 @@ function loadVehicles(vehicles) {
     console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
 }
 
-
 function updateSchedule() {
     const selectedCell = document.querySelector(".schedule-table td.selected-box");
-    const rescheduleAlert = document.getElementById("reschedule-alert");
-
     if (!selectedCell) {
         alert("Por favor selecciona un horario.");
         return;
@@ -514,50 +481,51 @@ function updateSchedule() {
         return;
     }
 
-    const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
     const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date();
-    const currentTimestamp = firebase.firestore.Timestamp.now();
+    const currentDate = new Date().toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
 
     db.collection("users").doc(user.email).get()
         .then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
                 const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+                const currentDateObj = new Date();
 
-                // Check if rescheduled this month
                 if (lastReschedule) {
                     const rescheduleMonth = lastReschedule.getMonth();
-                    const currentMonth = currentDate.getMonth();
+                    const currentMonth = currentDateObj.getMonth();
                     const rescheduleYear = lastReschedule.getFullYear();
-                    const currentYear = currentDate.getFullYear();
+                    const currentYear = currentDateObj.getFullYear();
 
                     if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                        const formattedLastReschedule = lastReschedule.toLocaleDateString("es-ES", {
+                        const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
                             day: "2-digit",
                             month: "long",
                             year: "numeric",
                             hour: "2-digit",
                             minute: "2-digit",
                         });
-
-                        // Display the message in the UI instead of an alert
-                        rescheduleAlert.textContent = `Tu última reprogramación fue el ${formattedLastReschedule}.`;
+                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
                         return;
                     }
                 }
 
-                // Proceed with updating the reschedule data
                 db.collection("users").doc(user.email).update({
                     selectedSchedule: newSchedule,
-                    lastReschedule: currentTimestamp
+                    lastReschedule: firebase.firestore.Timestamp.now(),
                 }).then(() => {
-                    alert(`Horario reprogramado con éxito: ${day} - ${timeBlock}`);
-                    rescheduleAlert.textContent = "";
-                    window.location.reload();
+                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
+                    loadUserProfile(user.email); // Reload profile info
                 }).catch((error) => {
                     console.error("Error al actualizar el horario:", error);
-                    alert("Hubo un error al reprogramar el horario.");
                 });
             } else {
                 console.error("Usuario no encontrado en la base de datos.");
@@ -567,8 +535,6 @@ function updateSchedule() {
             console.error("Error al verificar reprogramaciones previas:", error);
         });
 }
-
-
 
 
 // Add CSS for selected schedule cells
@@ -595,49 +561,53 @@ function formatTimestamp(timestamp) {
         year: "numeric",
     });
 }
-
         
 function updateLoyaltyCard(userData) {
-    console.log("Starting loyalty card update with user data:", userData);
+    console.log("Updating loyalty card with data:", userData);
 
     const holes = document.querySelectorAll('.hole');
+    let progress = 1; // Registration is always step 1.
 
-    // Parse registration and payment dates
-    const registrationDate = userData.registrationDate.toDate 
-        ? userData.registrationDate.toDate() 
-        : new Date(userData.registrationDate.seconds * 1000); // Handle Firestore Timestamp
-    const paymentDate = userData.paymentDate.toDate 
-        ? userData.paymentDate.toDate() 
-        : new Date(userData.paymentDate.seconds * 1000);
-
-    // Validate parsed dates
-    console.log("Parsed registration date:", registrationDate);
-    console.log("Parsed payment date:", paymentDate);
-
-    if (isNaN(registrationDate.getTime()) || isNaN(paymentDate.getTime())) {
-        console.error("Invalid registration or payment date detected.");
-        return; // Exit function if dates are invalid
+    // Check if registration is complete
+    if (userData.registrationDate) {
+        console.log("Registration complete.");
+        holes[0].classList.add('completed');
+        progress++;
     }
 
-    let progress = 1; // Step 1: Registration is always completed
+   // Check if payment is confirmed
+if (userData.paymentDate) {
+    const paymentDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
 
-    // Calculate months paid
-    const monthsPaid = Math.max(
-        0,
-        (paymentDate.getFullYear() - registrationDate.getFullYear()) * 12 +
-        (paymentDate.getMonth() - registrationDate.getMonth())
-    );
+    if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
+        console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
+        holes[1].classList.add('completed');
+        progress++;
+    } else {
+        console.error("Invalid paymentDate found:", userData.paymentDate);
+    }
+} else {
+    console.log("Payment date not available.");
+}
+    
+    // Calculate progress based on subscription months
+    if (userData.subscriptionStatus === "active") {
+        console.log("Subscription active. Months paid:", userData.monthsPaid);
+        progress += userData.monthsPaid || 0;
+    }
 
-    console.log("Months paid calculated:", monthsPaid);
+    // Check for prepaid 12-month subscription
+    if (userData.planType === "basic12m" || userData.planType === "plus12m") {
+        console.log("12-month subscription detected.");
+        progress = 8;
+    } else if (progress >= 6 && userData.monthsPaid >= 6) {
+        console.log("7th month paid; filling 8th hole.");
+        progress = Math.min(progress + 1, 8);
+    }
 
-    // Update progress based on months paid
-    progress += monthsPaid;
+    console.log("Calculated progress:", progress);
 
-    // Ensure progress does not exceed 8 steps
-    progress = Math.min(progress, 8);
-    console.log("Final calculated progress:", progress);
-
-    // Update the loyalty card UI
+    // Update UI holes
     holes.forEach((hole, index) => {
         if (index < progress) {
             console.log(`Filling hole ${index + 1}`);
@@ -650,59 +620,9 @@ function updateLoyaltyCard(userData) {
     // Update progress description
     const progressDescription = document.querySelector('.description p strong');
     progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+
+    console.log("Loyalty card UI updated.");
 }
-
-
-function updatePaymentDate(newDate) {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
-
-    const paymentDate = new Date(newDate);
-
-    // Validate the new date
-    console.log("Attempting to update payment date to:", paymentDate);
-    if (isNaN(paymentDate.getTime())) {
-        console.error("Invalid payment date:", newDate);
-        return;
-    }
-
-    // Update Firestore with the new payment date
-    db.collection("users").doc(user.email).update({
-        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate)
-    }).then(() => {
-        console.log("Payment date updated successfully.");
-        // Reload user data to reflect changes
-        auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log("User is logged in:", user.email);
-
-        db.collection("users").doc(user.email).get()
-            .then((doc) => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    console.log("User data fetched from Firestore:", userData);
-
-                    // Check for missing or invalid data
-                    if (!userData.registrationDate || !userData.paymentDate) {
-                        console.error("Missing registration or payment date in user data.");
-                        return;
-                    }
-
-                    // Update UI
-                    updateUserInfo(userData);
-                    updateLoyaltyCard(userData);
-                } else {
-                    console.error("No Firestore document found for user:", user.email);
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching user data from Firestore:", error);
-            });
-    } else {
-        console.warn("No authenticated user. Redirecting to login.");
-        window.location.href = 'login.html';
-    }
-});
 
         
     function resetLoyaltyCard() {
@@ -754,24 +674,23 @@ function updatePaymentDate(newDate) {
              <li><a href="tac.html">Términos y Condiciones</a></li>
         </ul>
    
- <div class="social-container" style="text-align: center; margin-top: 20px;">
-    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+ <div class="social-container">
+    <p>Síguenos en nuestras redes sociales</p>
     <div class="social-buttons">
-        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-            <i class="fab fa-instagram fa-3x"></i>
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button instagram">
+            <i class="fab fa-instagram"></i>
         </a>
-        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
-            <i class="fab fa-facebook-f fa-3x"></i>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button facebook">
+            <i class="fab fa-facebook-f"></i>
         </a>
-        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-            <i class="fab fa-twitter fa-3x"></i>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button twitter">
+            <i class="fab fa-twitter"></i> <!-- Replace with fa-x-twitter if using Font Awesome 6 -->
         </a>
     </div>
 </div>
 
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
+    
     </footer>
 </body>
 </html>
