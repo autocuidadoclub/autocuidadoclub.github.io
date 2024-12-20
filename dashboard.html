@@ -329,25 +329,24 @@
         });
 
     // Check if user is logged in and load profile info
+
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("User is logged in:", user.email);
-        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
 
-        // Obtener datos del perfil del usuario desde Firestore
+        // Fetch user data from Firestore
         db.collection("users").doc(user.email).get()
             .then((doc) => {
                 if (doc.exists) {
                     const userData = doc.data();
                     console.log("User profile data:", userData);
 
-                    // Actualizar información del usuario
+                    // Update user information on the page
                     updateUserInfo(userData);
 
-                    // Actualizar programa de lealtad
+                    // Update loyalty card based on user data
                     updateLoyaltyCard(userData);
 
-                    
                 } else {
                     console.error("User profile not found in Firestore.");
                 }
@@ -599,46 +598,46 @@ function formatTimestamp(timestamp) {
 
         
 function updateLoyaltyCard(userData) {
-    console.log("Updating loyalty card with data:", userData);
+    console.log("Starting loyalty card update with user data:", userData);
 
     const holes = document.querySelectorAll('.hole');
-    let progress = 1; // Step 1: Registration is always completed.
 
-    // Step 2: Check if payment is confirmed
-    if (userData.paymentDate) {
-        const paymentDate = userData.paymentDate.toDate 
-            ? userData.paymentDate.toDate() 
-            : new Date(userData.paymentDate.seconds * 1000);
+    // Parse registration and payment dates
+    const registrationDate = userData.registrationDate.toDate 
+        ? userData.registrationDate.toDate() 
+        : new Date(userData.registrationDate.seconds * 1000); // Handle Firestore Timestamp
+    const paymentDate = userData.paymentDate.toDate 
+        ? userData.paymentDate.toDate() 
+        : new Date(userData.paymentDate.seconds * 1000);
 
-        if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
-            console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
-            holes[1].classList.add('completed');
-            progress++;
-        } else {
-            console.error("Invalid paymentDate found:", userData.paymentDate);
-        }
-    } else {
-        console.log("Payment not completed. Cannot proceed to the next steps.");
+    // Validate parsed dates
+    console.log("Parsed registration date:", registrationDate);
+    console.log("Parsed payment date:", paymentDate);
+
+    if (isNaN(registrationDate.getTime()) || isNaN(paymentDate.getTime())) {
+        console.error("Invalid registration or payment date detected.");
+        return; // Exit function if dates are invalid
     }
 
-    // Step 3: Calculate progress based on subscription status and months paid
-    if (userData.subscriptionStatus === "active" && userData.monthsPaid) {
-        console.log("Subscription active. Months paid:", userData.monthsPaid);
-        progress += userData.monthsPaid || 0;
-    }
+    let progress = 1; // Step 1: Registration is always completed
 
-    // Step 4: Check for prepaid 12-month subscription, but only if payment is confirmed
-    if (userData.planType === "basic12m" || userData.planType === "plus12m") {
-        if (userData.paymentDate) { // Validate that paymentDate exists
-            console.log("12-month subscription confirmed with payment.");
-            progress = 8; // Mark all 8 steps complete
-        } else {
-            console.log("12-month plan detected, but no payment found. Progress unchanged.");
-        }
-    }
+    // Calculate months paid
+    const monthsPaid = Math.max(
+        0,
+        (paymentDate.getFullYear() - registrationDate.getFullYear()) * 12 +
+        (paymentDate.getMonth() - registrationDate.getMonth())
+    );
 
-    // Step 5: Update UI holes
-    console.log("Calculated progress:", progress);
+    console.log("Months paid calculated:", monthsPaid);
+
+    // Update progress based on months paid
+    progress += monthsPaid;
+
+    // Ensure progress does not exceed 8 steps
+    progress = Math.min(progress, 8);
+    console.log("Final calculated progress:", progress);
+
+    // Update the loyalty card UI
     holes.forEach((hole, index) => {
         if (index < progress) {
             console.log(`Filling hole ${index + 1}`);
@@ -651,9 +650,59 @@ function updateLoyaltyCard(userData) {
     // Update progress description
     const progressDescription = document.querySelector('.description p strong');
     progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
-
-    console.log("Loyalty card UI updated.");
 }
+
+
+function updatePaymentDate(newDate) {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const paymentDate = new Date(newDate);
+
+    // Validate the new date
+    console.log("Attempting to update payment date to:", paymentDate);
+    if (isNaN(paymentDate.getTime())) {
+        console.error("Invalid payment date:", newDate);
+        return;
+    }
+
+    // Update Firestore with the new payment date
+    db.collection("users").doc(user.email).update({
+        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate)
+    }).then(() => {
+        console.log("Payment date updated successfully.");
+        // Reload user data to reflect changes
+        auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("User is logged in:", user.email);
+
+        db.collection("users").doc(user.email).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    console.log("User data fetched from Firestore:", userData);
+
+                    // Check for missing or invalid data
+                    if (!userData.registrationDate || !userData.paymentDate) {
+                        console.error("Missing registration or payment date in user data.");
+                        return;
+                    }
+
+                    // Update UI
+                    updateUserInfo(userData);
+                    updateLoyaltyCard(userData);
+                } else {
+                    console.error("No Firestore document found for user:", user.email);
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching user data from Firestore:", error);
+            });
+    } else {
+        console.warn("No authenticated user. Redirecting to login.");
+        window.location.href = 'login.html';
+    }
+});
 
         
     function resetLoyaltyCard() {
