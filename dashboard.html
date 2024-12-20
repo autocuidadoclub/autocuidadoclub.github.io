@@ -406,32 +406,44 @@
 
 <!-- JavaScript for Form Submission -->
 <script>
-    document.getElementById('contactForm').onsubmit = function(event) {
-        event.preventDefault(); // Prevent default form submission
-        
-        const loader = document.getElementById('loader');
-        loader.style.display = 'flex'; // Show loader
+    // Handle form submission for referrals
+document.getElementById('contactForm').onsubmit = function (event) {
+    event.preventDefault(); // Prevent default form submission behavior
 
-        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-            method: 'POST',
-            body: new FormData(document.getElementById('contactForm'))
-        })
+    const loader = document.getElementById('loader');
+    loader.style.display = 'flex'; // Show the loader animation
+
+    const formData = new FormData(document.getElementById('contactForm'));
+    const referralMessage = formData.get('message'); // Get the message content
+
+    if (!referralMessage) {
+        alert("Por favor, ingresa un mensaje antes de enviar.");
+        loader.style.display = 'none'; // Hide the loader
+        return;
+    }
+
+    // Send the referral message via email using FormSubmit
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: 'POST',
+        body: formData
+    })
         .then(response => response.json())
         .then(data => {
-            loader.style.display = 'none'; // Hide loader
+            loader.style.display = 'none'; // Hide the loader
             if (data.success) {
-                alert('Gracias, su mensaje ha sido enviado.');
-                document.getElementById('contactForm').reset();
+                alert('Gracias, tu mensaje ha sido enviado exitosamente.');
+                document.getElementById('contactForm').reset(); // Reset the form fields
             } else {
-                alert('Hubo un error al enviar su mensaje. Por favor, inténtelo nuevamente.');
+                alert('Hubo un error al enviar tu mensaje. Inténtalo nuevamente.');
             }
         })
         .catch(error => {
-            loader.style.display = 'none'; // Hide loader
-            console.error('Error:', error);
-            alert('Hubo un error al enviar su mensaje.');
+            console.error('Error al enviar el mensaje:', error);
+            loader.style.display = 'none'; // Hide the loader
+            alert('Ocurrió un error al enviar el mensaje. Por favor, inténtalo más tarde.');
         });
-    };
+};
+
 </script>
 
   
