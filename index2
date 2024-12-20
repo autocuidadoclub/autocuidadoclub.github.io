@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado Club - Inicio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Intro Section -->
+    <section id="intro">
+        <h2>Cuidamos de tu vehículo para que tú no tengas que hacerlo</h2>
+        <p>Ofrecemos mantenimiento preventivo y revisiones completas a domicilio, utilizando tecnología avanzada y profesionales calificados.</p>
+    </section>
+
+    <!-- Why Different Section -->
+    <section class="why-different-section">
+        <h2>¿Por qué AutoCuidado Club es diferente?</h2>
+        <div class="description-text">
+            En AutoCuidado Club entendemos que muchos propietarios de vehículos en El Salvador ven el mantenimiento automotriz como costoso y que consume mucho tiempo. Estamos aquí para cambiar esa percepción ofreciendo conveniencia, precios accesibles, y mantenimiento preventivo.
+        </div>
+    </section>
+
+    <!-- Transformando la Cultura Automotriz -->
+    <section class="transform-culture-section">
+        <h2>Transformando la Cultura Automotriz en El Salvador</h2>
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="tab1">Nuestra Visión</button>
+                <button class="tab-button" data-tab="tab2">Ventajas</button>
+                <button class="tab-button" data-tab="tab3">Cómo Funciona</button>
+            </div>
+            <div class="tab-content" id="tab1">
+                <p>AutoCuidado Club busca transformar la percepción del mantenimiento vehicular en El Salvador, ofreciendo un servicio transparente y confiable que prioriza la tranquilidad de nuestros clientes.</p>
+            </div>
+            <div class="tab-content" id="tab2" style="display: none;">
+                <ul>
+                    <li><strong>Pagos anticipados:</strong> Eliminan incentivos para prácticas deshonestas.</li>
+                    <li><strong>Recursos optimizados:</strong> Cambiamos solo las piezas necesarias.</li>
+                    <li><strong>Repuestos transparentes:</strong> Ofrecemos descuentos exclusivos.</li>
+                </ul>
+            </div>
+            <div class="tab-content" id="tab3" style="display: none;">
+                <p>Con una suscripción mensual, accedes a un plan de mantenimiento personalizado que asegura la longevidad de tu vehículo y la tranquilidad de tu inversión.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disclaimer Section -->
+    <section class="disclaimer-section">
+        <p><strong>Nota importante:</strong> Los servicios de AutoCuidado Club están disponibles exclusivamente para motores de gasolina, reflejando nuestro compromiso con la movilidad de la huella de carbono más baja.</p>
+    </section>
+
+    <!-- Schedule Section -->
+    <section class="schedule-section">
+        <h2>Nuestros Horarios</h2>
+        <p>Definimos bloques de tiempo para brindar comodidad y eficiencia a nuestros clientes.</p>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td>9:00 AM – 11:00 AM</td>
+                    <td>10:00 AM – 12:00 PM</td>
+                    <td>01:00 PM – 03:00 PM</td>
+                    <td>08:00 AM – 10:00 AM</td>
+                    <td>09:00 AM – 11:00 AM</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td>12:00 PM – 02:00 PM</td>
+                    <td>01:00 PM – 03:00 PM</td>
+                    <td>04:00 PM – 06:00 PM</td>
+                    <td>11:00 AM – 01:00 PM</td>
+                    <td>12:00 PM – 02:00 PM</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td>03:00 PM – 05:00 PM</td>
+                    <td>04:00 PM – 06:00 PM</td>
+                    <td>-</td>
+                    <td>02:00 PM – 04:00 PM</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Call to Action -->
+    <section id="cta">
+        <h2>¿Listo para unirte?</h2>
+        <button class="cta-button" onclick="window.location.href='suscripciones.html';">Conoce nuestros servicios</button>
+        <button class="cta-button" onclick="window.location.href='contacto.html';">Contáctanos</button>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- JavaScript for Tabs -->
+    <script>
+        const tabs = document.querySelectorAll(".tab-button");
+        const contents = document.querySelectorAll(".tab-content");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(btn => btn.classList.remove("active"));
+                contents.forEach(content => content.style.display = "none");
+
+                tab.classList.add("active");
+                document.getElementById(tab.dataset.tab).style.display = "block";
+            });
+        });
+    </script>
+
+    <!-- CSS -->
+    <style>
+        .tabs { display: flex; justify-content: center; margin: 20px 0; }
+        .tab-button { padding: 10px 20px; cursor: pointer; border: 1px solid #007bff; }
+        .tab-button.active { background-color: #007bff; color: #fff; }
+        .tab-content { text-align: center; }
+        .cta-button { padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        .cta-button:hover { background-color: #0056b3; }
+    </style>
+</body>
+</html>
