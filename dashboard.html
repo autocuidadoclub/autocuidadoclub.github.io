@@ -12,7 +12,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <style>
+  <style>
         /* Styles for Loyalty Card */
         .loyalty-card {
             text-align: center;
@@ -160,6 +160,7 @@
             <p><strong>Vehiculos: </strong> <span id="vehicles-list">Cargando...</span></p>
         </div>
 
+
      <div class="card">
             <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
             <p><strong>Miembro desde:</strong> </p>
@@ -168,55 +169,57 @@
             <p></p><span id="paymentDate">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong></p>
             <p></p><span id="nextPaymentDate">Cargando...</span></p>
-    </div>
+            </div>
 
+       
+            
     <!-- Reschedule Section -->
     <div class="card reschedule-section">
         <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
-        <p>En caso sea necesario y desees cambiar el día y la hora para tu inspección mensual puedes seleccionar el nuevo:</p>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
         <p style="color: red; font-weight:bold;">Ten en cuenta que solo puedes reprogramar 1 vez al mes</p>
         <p id="reschedule-alert" style="color: red; font-weight: bold;"></p>
-    </div>
-
-    <table class="schedule-table">
-        <thead>
-            <tr>
-                <th>Horario</th>
-                <th>Lunes</th>
-                <th>Miércoles</th>
-                <th>Viernes</th>
-                <th>Sábado</th>
-                <th>Domingo</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Bloque 1</td>
-                <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-            </tr>
-            <tr>
-                <td>Bloque 2</td>
-                <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-            </tr>
-            <tr>
-                <td>Bloque 3</td>
-                <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                <td onclick="selectScheduleBox(this)">-</td>
-                <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                <td onclick="selectScheduleBox(this)">-</td>
-            </tr>
-        </tbody>
-    </table>
-    <button id="save-schedule-btn" onclick="updateSchedule()"><p><strong>Guardar Nuevo Horario</strong></p>Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.</button>
+       </div>
+       
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="save-schedule-btn" onclick="updateSchedule()"><p><strong>Guardar Nuevo Horario</strong></p>Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.</button>
     </div>
 
 <p></p>
@@ -231,12 +234,41 @@
     <p>O llámanos directamente al: <strong>+503 XXXX-XXXX</strong></p>
 </div>
 
+
 <p></p>
     <p></p>
     <p></p>
     <p></p>
 
-<!-- Loyalty Rewards Section -->
+<!-- Referral Program Section -->
+<div class="card">
+    <h3><i class="fas fa-user-friends"></i> Gana una Inspección Gratis con Referencias</h3>
+    <p>
+        Invita a tus amigos a unirse a <strong>AutoCuidado Club</strong>. Si ellos adquieren cualquier plan de suscripción,
+        ¡te regalamos <strong>1 inspección mensual gratuita</strong> al finalizar tu plan!
+    </p>
+    <p>Comparte tu correo electrónico como código de referencia:</p>
+    <div class="referral-code">
+        <span id="referral-email" style="font-weight: bold; color: #333;">Cargando...</span>
+        <button onclick="copyReferralCode()" style="margin-left: 10px; cursor: pointer;">
+            <i class="fas fa-copy"></i> Copiar Código
+        </button>
+    </div>
+    <p style="margin-top: 10px; color: #555; font-size: 0.9em;">
+        Puedes ver el estado de tus referencias completadas a continuación:
+    </p>
+    <div class="referral-status">
+        <p><strong>Referencias completadas:</strong> <span id="completed-referrals">0</span></p>
+    </div>
+</div>
+
+
+<p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    
+    <!-- Loyalty Rewards Section -->
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
             <div class="loyalty-card">
@@ -324,49 +356,414 @@
             console.error("Error setting authentication persistence:", error.message);
         });
 
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log("User is logged in:", user.email);
-            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+    // Check if user is logged in and load profile info
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("User is logged in:", user.email);
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
 
-            db.collection("users").doc(user.email).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        console.log("User profile data:", userData);
-                        updateUserInfo(userData);
-                        updateLoyaltyCard(userData);
+        // Mostrar el correo como código de referencia
+        document.getElementById("referral-email").innerText = user.email || "N/A";
+
+        // Obtener datos del perfil del usuario desde Firestore
+        db.collection("users").doc(user.email).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    console.log("User profile data:", userData);
+
+                    // Actualizar información del usuario
+                    updateUserInfo(userData);
+
+                    // Actualizar programa de lealtad
+                    updateLoyaltyCard(userData);
+
+                    // Mostrar el número de referencias completadas
+                    document.getElementById("completed-referrals").innerText = userData.completedReferrals || "0";
+                } else {
+                    console.error("User profile not found in Firestore.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching user profile from Firestore:", error);
+            });
+    } else {
+        console.log("No authenticated user. Redirecting to login.");
+        window.location.href = 'login.html';
+    }
+});
+
+
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
+        ? formatTimestamp(userData.nextPaymentDate)
+        : "No asignado";
+    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
+        ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
+        : "No hay vehículos registrados.";
+}
+
+    // Load user profile data
+    function loadUserProfile(email) {
+        db.collection("users").doc(email).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                      document.getElementById("name").innerText = userData.name || "N/A";
+                document.getElementById("phone").innerText = userData.phone || "N/A";
+                document.getElementById("planType").innerText = userData.planType || "N/A";
+                document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+                document.getElementById("user-department").innerText = userData.department || "Desconocido";
+                document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+                document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+                document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+                document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+              document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
+            
+
+                 
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error.message);
+    });
+
+                    if (userData.lastReschedule) {
+                    const lastRescheduleDate = userData.lastReschedule.toDate().toLocaleString("es-ES", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+                    document.getElementById("last-reschedule").innerText = lastRescheduleDate;
+                } else {
+                    document.getElementById("last-reschedule").innerText = "No hay reprogramación previa.";
+                }
+
+            
+                    // Dynamically update loyalty card based on subscription status
+                    if (userData.subscriptionStatus === "active") {
+                        updateLoyaltyCard({
+                            hasRegistered: true,
+                            subscriptionPlan: userData.planType || "N/A",
+                            carsRegistered: userData.vehicles ? userData.vehicles.length : 1,
+                            monthsPaid: userData.monthsPaid || 0
+                        });
                     } else {
-                        console.error("User profile not found in Firestore.");
+                        resetLoyaltyCard(); // Reset progress if subscription is inactive
                     }
-                })
-                .catch((error) => {
-                    console.error("Error fetching user profile from Firestore:", error);
+                } else {
+                    console.error("User profile not found.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error loading user profile:", error);
+            });
+    }
+
+function loadVehicles(vehicles) {
+    const vehiclesList = document.getElementById("vehicles-list");
+    vehiclesList.innerHTML = ""; // Clear existing content
+
+    if (vehicles.length === 0) {
+        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+        return;
+    }
+
+    vehicles.forEach((vehicle, index) => {
+        const vehicleHTML = `
+            <div class="vehicle-card">
+                <h4>Vehículo ${index + 1}</h4>
+                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+            </div>
+        `;
+        vehiclesList.innerHTML += vehicleHTML;
+    });
+}
+
+       function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
+
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    const rescheduleAlert = document.getElementById("reschedule-alert");
+
+    if (!selectedCell) {
+        alert("Por favor selecciona un horario.");
+        return;
+    }
+
+    const timeBlock = selectedCell.innerText.trim();
+    const dayIndex = selectedCell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
+        alert("Por favor selecciona un horario válido.");
+        return;
+    }
+
+    const user = firebase.auth().currentUser;
+    const newSchedule = `${day} - ${timeBlock}`;
+    const currentDate = new Date();
+    const currentTimestamp = firebase.firestore.Timestamp.now();
+
+    db.collection("users").doc(user.email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+
+                // Check if rescheduled this month
+                if (lastReschedule) {
+                    const rescheduleMonth = lastReschedule.getMonth();
+                    const currentMonth = currentDate.getMonth();
+                    const rescheduleYear = lastReschedule.getFullYear();
+                    const currentYear = currentDate.getFullYear();
+
+                    if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                        const formattedLastReschedule = lastReschedule.toLocaleDateString("es-ES", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        });
+
+                        // Display the message in the UI instead of an alert
+                        rescheduleAlert.textContent = `Tu última reprogramación fue el ${formattedLastReschedule}.`;
+                        return;
+                    }
+                }
+
+                // Proceed with updating the reschedule data
+                db.collection("users").doc(user.email).update({
+                    selectedSchedule: newSchedule,
+                    lastReschedule: currentTimestamp
+                }).then(() => {
+                    alert(`Horario reprogramado con éxito: ${day} - ${timeBlock}`);
+                    rescheduleAlert.textContent = "";
+                    window.location.reload();
+                }).catch((error) => {
+                    console.error("Error al actualizar el horario:", error);
+                    alert("Hubo un error al reprogramar el horario.");
                 });
+            } else {
+                console.error("Usuario no encontrado en la base de datos.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al verificar reprogramaciones previas:", error);
+        });
+}
+
+
+
+
+// Add CSS for selected schedule cells
+document.addEventListener("DOMContentLoaded", function () {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .schedule-table tbody td.selected-box {
+            background-color: #FF6600 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+
+// Format Firestore timestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+
+function copyReferralCode() {
+    const referralEmail = document.getElementById("referral-email").innerText;
+    navigator.clipboard.writeText(referralEmail).then(() => {
+        alert("¡Código copiado al portapapeles! Compártelo con tus amigos.");
+    }).catch(err => {
+        console.error("Error al copiar el código:", err);
+    });
+}
+
+        
+function updateLoyaltyCard(userData) {
+    console.log("Updating loyalty card with data:", userData);
+
+    const holes = document.querySelectorAll('.hole');
+    let progress = 1; // Step 1: Registration is always completed.
+
+    // Step 2: Check if payment is confirmed
+    if (userData.paymentDate) {
+        const paymentDate = userData.paymentDate.toDate 
+            ? userData.paymentDate.toDate() 
+            : new Date(userData.paymentDate.seconds * 1000);
+
+        if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
+            console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
+            holes[1].classList.add('completed');
+            progress++;
         } else {
-            console.log("No authenticated user. Redirecting to login.");
-            window.location.href = 'login.html';
+            console.error("Invalid paymentDate found:", userData.paymentDate);
+        }
+    } else {
+        console.log("Payment not completed. Cannot proceed to the next steps.");
+    }
+
+    // Step 3: Calculate progress based on subscription status and months paid
+    if (userData.subscriptionStatus === "active" && userData.monthsPaid) {
+        console.log("Subscription active. Months paid:", userData.monthsPaid);
+        progress += userData.monthsPaid || 0;
+    }
+
+    // Step 4: Check for prepaid 12-month subscription, but only if payment is confirmed
+    if (userData.planType === "basic12m" || userData.planType === "plus12m") {
+        if (userData.paymentDate) { // Validate that paymentDate exists
+            console.log("12-month subscription confirmed with payment.");
+            progress = 8; // Mark all 8 steps complete
+        } else {
+            console.log("12-month plan detected, but no payment found. Progress unchanged.");
+        }
+    }
+
+    // Step 5: Update UI holes
+    console.log("Calculated progress:", progress);
+    holes.forEach((hole, index) => {
+        if (index < progress) {
+            console.log(`Filling hole ${index + 1}`);
+            hole.classList.add('completed');
+        } else {
+            hole.classList.remove('completed');
         }
     });
 
-    function updateUserInfo(userData) {
-        document.getElementById("name").innerText = userData.name || "N/A";
-        document.getElementById("phone").innerText = userData.phone || "N/A";
-        document.getElementById("planType").innerText = userData.planType || "N/A";
-        document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
-        document.getElementById("user-department").innerText = userData.department || "Desconocido";
-        document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-        document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-        document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate
-            ? formatTimestamp(userData.nextPaymentDate)
-            : "No asignado";
-        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-        document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0
-            ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ")
-            : "No hay vehículos registrados.";
+    // Update progress description
+    const progressDescription = document.querySelector('.description p strong');
+    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+
+    console.log("Loyalty card UI updated.");
+}
+
+        
+    function resetLoyaltyCard() {
+        const holes = document.querySelectorAll('.hole');
+        const rewardStatusElements = document.querySelectorAll('.reward-status');
+        const acRewards = document.getElementById('ac-rewards');
+        const carwashRewards = document.getElementById('carwash-rewards');
+        const reviewRewards = document.getElementById('review-rewards');
+
+        // Reset all holes
+        holes.forEach((hole) => hole.classList.remove('completed'));
+
+        // Reset reward multipliers
+        acRewards.textContent = `0x`;
+        carwashRewards.textContent = `0x`;
+        reviewRewards.textContent = `0x`;
+
+        // Lock all rewards
+        rewardStatusElements.forEach((status) => {
+            status.textContent = "Locked";
+            status.classList.add("locked");
+            status.classList.remove("unlocked");
+        });
+
+        // Update progress description
+        const progressDescription = document.querySelector('.description p strong');
+        progressDescription.textContent = `Current Progress: 0 of 8 steps completed.`;
     }
 
-    function formatTimestamp(timestamp) {
-        if (!timestamp) return "N/A";
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-        return date.toLocaleDateString("es-ES", {
+    function logoutUser() {
+        auth.signOut()
+            .then(() => {
+                window.location.href = 'login.html';
+            })
+            .catch((error) => {
+                console.error("Error during logout:", error);
+            });
+    }
+</script>
+
+     <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
+   
+ <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+    </footer>
+</body>
+</html>
