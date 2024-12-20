@@ -229,7 +229,7 @@
 
  <div class="card contact-staff-section">
     <h3><i class="fas fa-envelope"></i> ¿Necesitas contactar con nosotros?</h3>
-    <p>Si necesitas ayuda, por favor <a href="contacto.html" class="contact-link">contacta con nuestro equipo</a>.</p>
+    <p>Si necesitas ayuda, o ¿Conoces a alguien que pueda beneficiarse de nuestros servicios? Comparte con nosotros su correo electrónico o número de contacto, y con gusto nos pondremos en comunicación para apoyarlos de la mejor manera posible. <a href="contacto.html" class="contact-link">contacta con nuestro equipo</a>.</p>
     <p>También puedes enviarnos un correo a: <strong>info@autocuidadoclub.com</strong></p>
     <p>O llámanos directamente al: <strong>+503 XXXX-XXXX</strong></p>
 </div>
@@ -240,34 +240,7 @@
     <p></p>
     <p></p>
 
-<!-- Referral Program Section -->
-<div class="card">
-    <h3><i class="fas fa-user-friends"></i> Gana una Inspección Gratis con Referencias</h3>
-    <p>
-        Invita a tus amigos a unirse a <strong>AutoCuidado Club</strong>. Si ellos adquieren cualquier plan de suscripción,
-        ¡te regalamos <strong>1 inspección mensual gratuita</strong> al finalizar tu plan!
-    </p>
-    <p>Comparte tu correo electrónico como código de referencia:</p>
-    <div class="referral-code">
-        <span id="referral-email" style="font-weight: bold; color: #333;">Cargando...</span>
-        <button onclick="copyReferralCode()" style="margin-left: 10px; cursor: pointer;">
-            <i class="fas fa-copy"></i> Copiar Código
-        </button>
-    </div>
-    <p style="margin-top: 10px; color: #555; font-size: 0.9em;">
-        Puedes ver el estado de tus referencias completadas a continuación:
-    </p>
-    <div class="referral-status">
-        <p><strong>Referencias completadas:</strong> <span id="completed-referrals">0</span></p>
-    </div>
-</div>
 
-
-<p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    
     <!-- Loyalty Rewards Section -->
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
@@ -629,14 +602,6 @@ function formatTimestamp(timestamp) {
     });
 }
 
-function copyReferralCode() {
-    const referralEmail = document.getElementById("referral-email").innerText;
-    navigator.clipboard.writeText(referralEmail).then(() => {
-        alert("¡Código copiado al portapapeles! Compártelo con tus amigos.");
-    }).catch(err => {
-        console.error("Error al copiar el código:", err);
-    });
-}
 
         
 function updateLoyaltyCard(userData) {
