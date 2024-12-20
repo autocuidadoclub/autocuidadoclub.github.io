@@ -317,65 +317,7 @@
     <p></p>
     <p></p>
 
-<!-- Contact Form -->
-<section class="contact-form-container">
-    <h2>Referidos</h2>
-    <p>¿Conoces a alguien que pueda beneficiarse de nuestros servicios? Comparte con nosotros su correo electrónico o número de contacto, y con gusto nos pondremos en comunicación para apoyarlos de la mejor manera posible.</p>
-    <form id="contactForm">
-              
-        <label for="message">Mensaje</label>
-        <textarea id="message" name="message" rows="4" required></textarea>
-        
-        <button type="submit">Enviar</button>
-    </form>
-
-    <div id="loader">
-        <img src="loading.gif" alt="Cargando...">
-    </div>
-
-    <div class="contact-info">
-        <h3>Teléfono: +503 XXX-XXXX</h3>
-        <h3><a href="https://wa.me/+14155238886" target="_blank" class="whatsapp-button">Contácta con nosotros en WhatsApp</a></h3>
-        <h3>Email: info@autocuidadoclub.com</h3>
-    </div>
-</section>
-
-<!-- JavaScript for Form Submission -->
-<script>
-    document.getElementById('contactForm').onsubmit = function(event) {
-        event.preventDefault(); // Prevent default form submission
-        
-        const loader = document.getElementById('loader');
-        loader.style.display = 'flex'; // Show loader
-
-        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-            method: 'POST',
-            body: new FormData(document.getElementById('contactForm'))
-        })
-        .then(response => response.json())
-        .then(data => {
-            loader.style.display = 'none'; // Hide loader
-            if (data.success) {
-                alert('Gracias, su mensaje ha sido enviado.');
-                document.getElementById('contactForm').reset();
-            } else {
-                alert('Hubo un error al enviar su mensaje. Por favor, inténtelo nuevamente.');
-            }
-        })
-        .catch(error => {
-            loader.style.display = 'none'; // Hide loader
-            console.error('Error:', error);
-            alert('Hubo un error al enviar su mensaje.');
-        });
-    };
-</script>
-
-  <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-
-    
+   
     <!-- Loyalty Rewards Section -->
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
@@ -434,6 +376,65 @@
             </div>
         </div>
 
+  <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    
+    <!-- Contact Form -->
+<section class="contact-form-container">
+    <h2>Referidos</h2>
+    <p>¿Conoces a alguien que pueda beneficiarse de nuestros servicios? Comparte con nosotros su correo electrónico o número de contacto, y con gusto nos pondremos en comunicación para apoyarlos de la mejor manera posible.</p>
+    <form id="contactForm">
+              
+        <label for="message">Mensaje</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+        
+        <button type="submit">Enviar</button>
+    </form>
+
+    <div id="loader">
+        <img src="loading.gif" alt="Cargando...">
+    </div>
+
+    <div class="contact-info">
+        <h3>Teléfono: +503 XXX-XXXX</h3>
+        <h3><a href="https://wa.me/+14155238886" target="_blank" class="whatsapp-button">Contácta con nosotros en WhatsApp</a></h3>
+        <h3>Email: info@autocuidadoclub.com</h3>
+    </div>
+</section>
+
+<!-- JavaScript for Form Submission -->
+<script>
+    document.getElementById('contactForm').onsubmit = function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex'; // Show loader
+
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: 'POST',
+            body: new FormData(document.getElementById('contactForm'))
+        })
+        .then(response => response.json())
+        .then(data => {
+            loader.style.display = 'none'; // Hide loader
+            if (data.success) {
+                alert('Gracias, su mensaje ha sido enviado.');
+                document.getElementById('contactForm').reset();
+            } else {
+                alert('Hubo un error al enviar su mensaje. Por favor, inténtelo nuevamente.');
+            }
+        })
+        .catch(error => {
+            loader.style.display = 'none'; // Hide loader
+            console.error('Error:', error);
+            alert('Hubo un error al enviar su mensaje.');
+        });
+    };
+</script>
+
+  
        </section>
       
     <script>
