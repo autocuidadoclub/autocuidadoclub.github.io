@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado Club - Servicios</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <style>
+        /* General Section Styling */
+        .section-container {
+            padding: 20px;
+            margin: 20px auto;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 15px;
+        }
+
+        .flowchart {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .flow-step {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .step-number {
+            font-size: 24px;
+            color: #003366;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .inspection-tabs button {
+            padding: 10px 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .inspection-tabs button:hover {
+            background-color: #FF6600;
+        }
+
+        .cta-button {
+            padding: 10px 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background-color: #FF6600;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="nosotros.html">Quiénes Somos</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+    </ul>
+    <div class="logo-container">
+        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+    </div>
+</nav>
+
+<!-- Header -->
+<header>
+    <div class="header-container">
+        <div class="header-text">
+            <h1>Servicios de AutoCuidado Club</h1>
+            <p>Cuidamos de tu vehículo con innovación, confianza y eficiencia.</p>
+        </div>
+    </div>
+</header>
+
+<!-- Disclaimer Section -->
+<section class="disclaimer-section">
+    <p><strong>Nota importante:</strong> Nuestros servicios están disponibles exclusivamente para motores de gasolina, reforzando nuestro compromiso con una movilidad más limpia y responsable.</p>
+</section>
+
+<!-- Services Process Section -->
+<section class="process-section section-container">
+    <h2 class="section-title">Nuestro Proceso</h2>
+    <div class="flowchart">
+        <div class="flow-step">
+            <div class="step-number">1</div>
+            <p><strong>Elige tu plan:</strong> Selecciona el plan que mejor se adapte a tus necesidades.</p>
+        </div>
+        <div class="flow-step">
+            <div class="step-number">2</div>
+            <p><strong>Registra tu información:</strong> Proporciona tus datos y los de tu vehículo.</p>
+        </div>
+        <div class="flow-step">
+            <div class="step-number">3</div>
+            <p><strong>Agendar tu cita:</strong> Escoge el día y bloque horario que prefieras.</p>
+        </div>
+        <div class="flow-step">
+            <div class="step-number">4</div>
+            <p><strong>Confirma tu suscripción:</strong> Nuestro equipo te contactará para confirmar.</p>
+        </div>
+        <div class="flow-step">
+            <div class="step-number">5</div>
+            <p><strong>Primera revisión:</strong> Realizamos un diagnóstico completo de tu vehículo.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Inspection Section -->
+<section id="explore-checks" class="section-container">
+    <h2 class="section-title">¿Qué Revisamos en tu Vehículo?</h2>
+    <p>Explora nuestras revisiones detalladas en las áreas de motor, interior y exterior.</p>
+    <div class="inspection-container">
+        <div class="inspection-tabs">
+            <button onclick="showInspection('motor')">Motor</button>
+            <button onclick="showInspection('interior')">Interior</button>
+            <button onclick="showInspection('exterior')">Exterior</button>
+        </div>
+        <div id="inspection-content">
+            <h3>Revisiones del Motor</h3>
+            <ul id="inspection-list">
+                <li>Análisis de rendimiento de lubricantes.</li>
+                <li>Inspección del sistema de combustión y encendido.</li>
+                <li>Monitoreo del sistema de refrigeración.</li>
+                <li>Diagnóstico de sistemas eléctricos.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Loyalty Program Section -->
+<section id="loyalty-program" class="section-container">
+    <h2 class="section-title">⭐ Programa de Lealtad</h2>
+    <p>¡Recibe recompensas por mantener tu suscripción activa durante 8 meses consecutivos!</p>
+    <div>
+        <h3>Recompensas:</h3>
+        <ul>
+            <li>1 Recarga de A/C gratis.</li>
+            <li>1 Carwash gratis.</li>
+            <li>1 Revisión adicional.</li>
+        </ul>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="section-container">
+    <h2 class="section-title">Confía en Nosotros</h2>
+    <p>En AutoCuidado Club, nos encargamos de todo para que tú solo disfrutes del camino.</p>
+    <div>
+        <button class="cta-button" onclick="window.location.href='suscripciones.html';">Conoce nuestros planes</button>
+        <button class="cta-button" onclick="window.location.href='contacto.html';">Contáctanos</button>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+</footer>
+
+<script>
+    function showInspection(section) {
+        const content = document.getElementById("inspection-content");
+        const list = document.getElementById("inspection-list");
+        const titles = {
+            motor: "Revisiones del Motor",
+            interior: "Revisiones del Interior",
+            exterior: "Revisiones del Exterior"
+        };
+        const items = {
+            motor: `
+                <li>Análisis de rendimiento de lubricantes.</li>
+                <li>Inspección del sistema de combustión y encendido.</li>
+                <li>Monitoreo del sistema de refrigeración.</li>
+                <li>Diagnóstico de sistemas eléctricos.</li>`,
+            interior: `
+                <li>Validación de sistemas de seguridad.</li>
+                <li>Verificación de sensores de confort.</li>
+                <li>Pruebas en módulos electrónicos.</li>
+                <li>Inspección de controles multimedia.</li>`,
+            exterior: `
+                <li>Análisis de desgaste de neumáticos.</li>
+                <li>Revisión del sistema de frenos.</li>
+                <li>Inspección de iluminación.</li>
+                <li>Evaluación de elementos aerodinámicos.</li>`
+        };
+        content.querySelector("h3").textContent = titles[section];
+        list.innerHTML = items[section];
+    }
+</script>
+</body>
+</html>
