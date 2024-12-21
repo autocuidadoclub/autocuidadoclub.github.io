@@ -137,7 +137,7 @@
 <!-- Inspection Section -->
 <section id="explore-checks" class="section-container">
     <h2 class="section-title">¿Qué Revisamos en tu Vehículo?</h2>
-    <p>Explora nuestras revisiones detalladas en las áreas de motor, interior y exterior.</p>
+    <p>Explora de forma breve el enfoque de nuestras revisiones detalladas en las áreas de motor, interior y exterior.</p>
     <div class="inspection-container">
         <div class="inspection-tabs">
             <button onclick="showInspection('motor')">Motor</button>
@@ -147,10 +147,10 @@
         <div id="inspection-content">
             <h3>Revisiones del Motor</h3>
             <ul id="inspection-list">
-                <li>Análisis de rendimiento de lubricantes.</li>
-                <li>Inspección del sistema de combustión y encendido.</li>
-                <li>Monitoreo del sistema de refrigeración.</li>
-                <li>Diagnóstico de sistemas eléctricos.</li>
+                <li>Análisis del rendimiento de lubricantes.</li>
+                <li>Inspección a los del sistema de combustión y encendido.</li>
+                <li>Monitoreo de todos los sistemas de apoyo  (Frenos, AC, Refrigeración, computadoras, etc).</li>
+                <li>Diagnóstico en todo el sistema eléctrico.</li>
             </ul>
         </div>
     </div>
@@ -294,20 +294,20 @@
         };
         const items = {
             motor: `
-                <li>Análisis de rendimiento de lubricantes.</li>
-                <li>Inspección del sistema de combustión y encendido.</li>
-                <li>Monitoreo del sistema de refrigeración.</li>
-                <li>Diagnóstico de sistemas eléctricos.</li>`,
+               <li>Análisis del rendimiento de lubricantes.</li>
+                <li>Inspección a los del sistema de combustión y encendido.</li>
+                <li>Monitoreo de todos los sistemas de apoyo  (Frenos, AC, Refrigeración, computadoras, etc).</li>
+                <li>Diagnóstico en todo el sistema eléctrico.</li>,
             interior: `
-                <li>Validación de sistemas de seguridad.</li>
-                <li>Verificación de sensores de confort.</li>
+                <li>Inspección a los sistemas de seguridad activa.</li>
+                <li>Evaluamos el desempeño a los sistemas de comfort.</li>
                 <li>Pruebas en módulos electrónicos.</li>
                 <li>Inspección de controles multimedia.</li>`,
             exterior: `
                 <li>Análisis de desgaste de neumáticos.</li>
-                <li>Revisión del sistema de frenos.</li>
-                <li>Inspección de iluminación.</li>
-                <li>Evaluación de elementos aerodinámicos.</li>`
+                <li>Revisiones del sistema de frenos.</li>
+                <li>Inspección a los sistemas de iluminación.</li>
+                <li>Evaluación a los elementos aerodinámicos.</li>`
         };
         content.querySelector("h3").textContent = titles[section];
         list.innerHTML = items[section];
