@@ -62,14 +62,83 @@
                 <button class="tab-button" data-tab="tab2">Nuestro sistema innovador</button>
                 <button class="tab-button" data-tab="tab3">Cómo Funciona</button>
             </div>
-            <div class="tab-content" id="tab1">
-                <li><strong></strong>Queremos transformar el mantenimiento automotriz.</strong></li>
-                <li>Ofrecer <strong>tranquilidad, confianza y un servicio profesional.</strong></li>
-                <li>Nos enfocamos en nuestros socios y sus necesidades mediante un sistema innovador.</li>
-                <li>¿Te ha pasado cuando llevas el auto al taller? Trabajos costosos, invertir tiempo libre en reparaciones, soportar trafico para llegar, ¿temas complicados?, ¿prácticas poco éticas? como el uso indebido de sus vehículos o el intercambio de piezas sin autorización.</li>
-                <li>Nuestro deber mantenerte libre de estrés, cuidar de tu auto y por ende de ti y tu familia, ayudar en tu productividad y mantener en movimiento</li>
-                
-            </div>
+<div class="tab-content" id="tab1">
+    <ul class="styled-list">
+        <li>
+            <i class="fas fa-check-circle"></i> 
+            <strong>Queremos transformar el mantenimiento automotriz.</strong>
+        </li>
+        <li>
+            <i class="fas fa-shield-alt"></i> 
+            Ofrecer <strong>tranquilidad, confianza y un servicio profesional.</strong>
+        </li>
+        <li>
+            <i class="fas fa-cogs"></i> 
+            Nos enfocamos en nuestros socios y sus necesidades mediante un sistema innovador.
+        </li>
+        <li>
+            <i class="fas fa-exclamation-triangle"></i> 
+            ¿Te ha pasado cuando llevas el auto al taller?
+            <ul class="nested-list">
+                <li><i class="fas fa-angle-right"></i> Trabajos costosos.</li>
+                <li><i class="fas fa-angle-right"></i> Invertir tiempo libre en reparaciones.</li>
+                <li><i class="fas fa-angle-right"></i> Soportar tráfico para llegar al taller.</li>
+                <li><i class="fas fa-angle-right"></i> Prácticas poco éticas como el uso indebido de vehículos.</li>
+                <li><i class="fas fa-angle-right"></i> Intercambio de piezas sin autorización.</li>
+            </ul>
+        </li>
+        <li>
+            <i class="fas fa-heart"></i> 
+            Nuestro deber es mantenerte libre de estrés, cuidar de tu auto, y por ende de ti y tu familia, ayudando a tu productividad y manteniéndote en movimiento.
+        </li>
+    </ul>
+</div>
+
+<style>
+    .styled-list {
+        list-style: none; /* Remove default bullets */
+        padding: 0;
+    }
+
+    .styled-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px; /* Add spacing between items */
+        font-size: 1.1em;
+    }
+
+    .styled-list i {
+        color: #007bff; /* Icon color */
+        margin-right: 10px; /* Space between icon and text */
+        font-size: 1.5em; /* Make icons larger */
+    }
+
+    .styled-list strong {
+        color: #0056b3; /* Emphasize important text */
+    }
+
+    .nested-list {
+        list-style: none; /* Remove bullets for nested list */
+        margin-left: 30px; /* Indent nested items */
+        padding: 0;
+    }
+
+    .nested-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+
+    .nested-list i {
+        color: #FF6600; /* Icon color for nested items */
+        margin-right: 8px;
+        font-size: 1.2em; /* Slightly smaller icons */
+    }
+</style>
+
+
+            
             <div class="tab-content" id="tab2" style="display: none;">
                 <ul>
                     <li><strong>Suscripcion autromotriz accesible:</strong> Eliminan incentivos para prácticas deshonestas.</li>
