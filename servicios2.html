@@ -113,22 +113,27 @@
 <section class="process-section section-container">
     <h2 class="section-title">Nuestro Proceso</h2>
     <div class="flowchart">
+        <!-- Step 1 -->
         <div class="flow-step">
             <div class="step-number">1</div>
             <p><strong>Elige tu plan:</strong> Selecciona el plan que mejor se adapte a tus necesidades.</p>
         </div>
+        <!-- Step 2 -->
         <div class="flow-step">
             <div class="step-number">2</div>
             <p><strong>Registra tu información:</strong> Proporciona tus datos y los de tu vehículo.</p>
         </div>
+        <!-- Step 3 -->
         <div class="flow-step">
             <div class="step-number">3</div>
             <p><strong>Agendar tu cita:</strong> Escoge el día y bloque horario que prefieras.</p>
         </div>
+        <!-- Step 4 -->
         <div class="flow-step">
             <div class="step-number">4</div>
             <p><strong>Confirma tu suscripción:</strong> Nuestro equipo te contactará para confirmar.</p>
         </div>
+        <!-- Step 5 -->
         <div class="flow-step">
             <div class="step-number">5</div>
             <p><strong>Primera revisión:</strong> Realizamos un diagnóstico completo de tu vehículo.</p>
@@ -136,6 +141,74 @@
     </div>
 </section>
 
+<style>
+    /* General Section Styling */
+    .section-container {
+        padding: 20px;
+        margin: 20px auto;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        text-align: center;
+        max-width: 900px;
+    }
+
+    .section-title {
+        color: #003366;
+        margin-bottom: 20px;
+        font-size: 1.8em;
+    }
+
+    .flowchart {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    /* Flow Step Box Styling */
+    .flow-step {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 250px;
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .flow-step:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Step Number Styling */
+    .step-number {
+        background: #ff6600;
+        color: white;
+        font-size: 1.5em;
+        font-weight: bold;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+    }
+
+    /* Text Styling */
+    .flow-step p {
+        font-size: 1em;
+        color: #555;
+        margin: 0;
+    }
+
+    .flow-step strong {
+        color: #003366;
+    }
+</style>
+
+
+    
 <!-- Inspection Section -->
 <section id="explore-checks" class="section-container">
     <h2 class="section-title">¿Qué Revisamos en tu Vehículo?</h2>
