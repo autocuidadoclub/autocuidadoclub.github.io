@@ -183,38 +183,133 @@
          <p>¡Cada mantenimiento te acerca más a tus recompensas!</p>
       
     </div>
+</section>
 
-    <!-- Services Process Section -->
-<section class="process-section section-container">
+   <section class="process-section section-container">
     <h2 class="section-title">Nuestro Proceso</h2>
-    <div class="flowchart">
-        <!-- Step 1 -->
-        <div class="flow-step">
-            <div class="step-number">1</div>
-            <p><strong>Elige tu plan:</strong> Selecciona el plan que mejor se adapte a tus necesidades.</p>
+    <p class="section-description">Descubre cómo funciona nuestro servicio paso a paso para brindarte tranquilidad y confianza en el cuidado de tu vehículo.</p>
+    
+    <!-- Steps Container -->
+    <div class="steps-container">
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-map-marker-alt step-icon"></i>
+                <h3>1. Elige tu plan</h3>
+            </div>
+            <p>Selecciona el plan que mejor se adapte a tus necesidades.</p>
         </div>
-        <!-- Step 2 -->
-        <div class="flow-step">
-            <div class="step-number">2</div>
-            <p><strong>Registra tu información:</strong> Proporciona tus datos y los de tu vehículo.</p>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-user-circle step-icon"></i>
+                <h3>2. Registra tu información</h3>
+            </div>
+            <p>Proporciona tus datos y los de tu vehículo.</p>
         </div>
-        <!-- Step 3 -->
-        <div class="flow-step">
-            <div class="step-number">3</div>
-            <p><strong>Agendar tu cita:</strong> Escoge el día y bloque horario que prefieras.</p>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-calendar-check step-icon"></i>
+                <h3>3. Agenda tu cita</h3>
+            </div>
+            <p>Escoge el día y bloque horario que prefieras.</p>
         </div>
-        <!-- Step 4 -->
-        <div class="flow-step">
-            <div class="step-number">4</div>
-            <p><strong>Confirma tu suscripción:</strong> Nuestro equipo te contactará para confirmar.</p>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-check-circle step-icon"></i>
+                <h3>4. Confirma tu suscripción</h3>
+            </div>
+            <p>Nuestro equipo te contactará para confirmar.</p>
         </div>
-        <!-- Step 5 -->
-        <div class="flow-step">
-            <div class="step-number">5</div>
-            <p><strong>Primera revisión:</strong> Realizamos un diagnóstico completo de tu vehículo.</p>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-search-plus step-icon"></i>
+                <h3>5. Primera revisión</h3>
+            </div>
+            <p>Realizamos un diagnóstico completo de tu vehículo.</p>
         </div>
     </div>
 </section>
+
+<style>
+/* General Section Styling */
+.section-container {
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 900px;
+}
+
+.section-title {
+    color: #003366;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.section-description {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Steps Container Styling */
+.steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .steps-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+}
+
+/* Step Box Styling */
+.step-box {
+    flex: 1;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 250px;
+    margin: auto;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.step-icon {
+    font-size: 1.5em;
+    color: #FF6600;
+}
+
+.step-box h3 {
+    font-size: 1.2em;
+    color: #003366;
+    margin: 0;
+}
+
+.step-box p {
+    font-size: 0.95em;
+    color: #555;
+    margin: 0;
+}
+</style>
+
 
 <style>
     /* General Section Styling */
