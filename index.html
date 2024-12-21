@@ -198,17 +198,116 @@
     </section>
 
 <!-- Comparación de Planes de Suscripción Section -->
-<section id="suscripciones-comparacion">
+<section id="suscripciones-comparacion" class="subscription-section">
     <h2>Comparación de Planes de Suscripción</h2>
     <p>Para ayudarte a mantener tu vehículo en óptimas condiciones, hemos diseñado planes de suscripción flexibles que se adaptan a tus necesidades. Además, ofrecemos descuentos especiales en planes semestrales y ¡aún mayores ahorros en planes anuales!</p>
-    <p>Nuestros planes se dividen en dos categorías:</p>
-    <ul>
-        <li><strong>Suscripción Básica:</strong> Ideal para quienes desean cubrir el mantenimiento de un único vehículo.</li>
-        <li><strong>Suscripción Plus:</strong> Perfecta para familias o negocios, ya que cubre hasta 3 vehículos al mismo precio, sin importar si usas 2 o 3.</li>
-    </ul>
-    <p>Con nuestra Suscripción Plus, incentivamos la cobertura de varios vehículos, ofreciendo la mejor relación entre calidad, precio y conveniencia. Tú eliges el plan que mejor se adapte a tus necesidades y nosotros nos encargamos del resto.</p>
+    
+    <div class="subscription-cards">
+        <!-- Basic Plan Card -->
+        <div class="subscription-card basic-plan">
+            <h3>Suscripción Básica</h3>
+            <p>Ideal para quienes desean cubrir el mantenimiento de un único vehículo.</p>
+            <ul>
+                <li>✔ Mantenimiento para 1 vehículo</li>
+                <li>✔ Descuentos en repuestos</li>
+                <li>✔ Soporte personalizado</li>
+            </ul>
+        </div>
+        
+        <!-- Plus Plan Card -->
+        <div class="subscription-card plus-plan">
+            <h3>Suscripción Plus</h3>
+            <p>Perfecta para familias o negocios, ya que cubre hasta 3 vehículos al mismo precio, sin importar si usas 2 o 3.</p>
+            <ul>
+                <li>✔ Mantenimiento para hasta 3 vehículos</li>
+                <li>✔ Descuentos exclusivos en repuestos</li>
+                <li>✔ Prioridad en citas y soporte</li>
+            </ul>
+        </div>
+    </div>
+
+    <p class="cta-text">Con nuestra Suscripción Plus, incentivamos la cobertura de varios vehículos, ofreciendo la mejor relación entre calidad, precio y conveniencia.</p>
     <p><strong>¿Cuál es el plan ideal para ti? Descúbrelo hoy y mantén tu tranquilidad al volante.</strong></p>
 </section>
+
+<style>
+/* General Section Styling */
+.subscription-section {
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 900px;
+}
+
+.subscription-section h2 {
+    color: #003366;
+    margin-bottom: 15px;
+}
+
+.subscription-section p {
+    color: #555;
+    font-size: 1.1em;
+}
+
+/* Subscription Cards Styling */
+.subscription-cards {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.subscription-card {
+    flex: 1;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.subscription-card h3 {
+    color: #0056b3;
+    margin-bottom: 10px;
+}
+
+.subscription-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.subscription-card ul li {
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.subscription-card ul li:before {
+    content: "✔";
+    color: #007bff;
+    margin-right: 8px;
+}
+
+/* Highlight Plans */
+.basic-plan {
+    border-top: 5px solid #007bff;
+}
+
+.plus-plan {
+    border-top: 5px solid #ff6600;
+}
+
+/* CTA Text */
+.cta-text {
+    margin-top: 20px;
+    color: #333;
+    font-size: 1.1em;
+}
+</style>
 
     
     <!-- Call to Action -->
