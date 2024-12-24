@@ -3,41 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Calendar - AutoCuidado Club</title>
+    <title>AutoCuidado Club - Booking System</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
         #menu {
-            width: 200px;
-            padding: 10px;
+            width: 300px;
+            padding: 15px;
             background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin: 20px auto;
         }
-        #menu .menu-item {
+
+        #menu select, #menu button {
+            width: 100%;
             padding: 10px;
-            margin: 5px 0;
-            background: #007bff;
-            color: white;
-            text-align: center;
-            cursor: grab;
-            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 16px;
         }
+
         #calendar-container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 20px auto;
         }
     </style>
 </head>
 <body>
-    <h1>Booking Calendar - AutoCuidado Club</h1>
+    <h1>Booking System - AutoCuidado Club</h1>
 
     <div id="menu">
-        <h3>Available Blocks</h3>
-        <div class="menu-item" draggable="true" data-title="Morning Inspection">Morning Inspection</div>
-        <div class="menu-item" draggable="true" data-title="Afternoon Slot">Afternoon Slot</div>
-        <div class="menu-item" draggable="true" data-title="Evening Service">Evening Service</div>
+        <h3>Create a Booking</h3>
+        <label for="customerName">Select Customer:</label>
+        <select id="customerName">
+            <option value="Cesar Stanley Canas">Cesar Stanley Canas</option>
+            <option value="John Doe">John Doe</option>
+            <!-- Add more customers dynamically from Firebase -->
+        </select>
+
+        <label for="preferredDate">Preferred Date:</label>
+        <input type="date" id="preferredDate" required>
+
+        <label for="timeBlock">Select Time Block:</label>
+        <select id="timeBlock">
+            <option value="Morning Inspection">Morning Inspection</option>
+            <option value="Afternoon Slot">Afternoon Slot</option>
+            <option value="Evening Service">Evening Service</option>
+        </select>
+
+        <button id="scheduleBooking">Schedule Booking</button>
     </div>
 
     <div id="calendar-container">
@@ -47,43 +70,72 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
-            const draggableItems = document.querySelectorAll('.menu-item');
+            const scheduleButton = document.getElementById('scheduleBooking');
 
-            // Make menu items draggable
-            draggableItems.forEach(item => {
-                item.addEventListener('dragstart', function (event) {
-                    event.dataTransfer.setData('text/plain', event.target.dataset.title);
-                });
-            });
-
-            // Initialize FullCalendar with interaction plugin
+            // Initialize FullCalendar
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
-                editable: true,
-                droppable: true, // Enables drop functionality
+                editable: false,
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'timeGridWeek,timeGridDay'
                 },
-                drop: function (info) {
-                    // Extract event title from the dragged element
-                    const eventTitle = info.draggedEl.dataset.title;
-
-                    // Add event to the calendar
-                    calendar.addEvent({
-                        title: eventTitle,
-                        start: info.date,
-                        allDay: info.allDay
-                    });
-
-                    alert(`Event "${eventTitle}" added on ${info.date}`);
-                }
+                events: [], // Initialize with no events
             });
 
             calendar.render();
 
-            console.log("Calendar initialized.");
+            // Function to find the next available slot
+            function findNextAvailableSlot(preferredDate, blockTitle) {
+                const events = calendar.getEvents();
+                const preferredDateTime = new Date(preferredDate);
+
+                // Time block mappings
+                const timeBlocks = {
+                    "Morning Inspection": "09:00",
+                    "Afternoon Slot": "13:00",
+                    "Evening Service": "17:00"
+                };
+
+                const blockTime = timeBlocks[blockTitle];
+                const desiredSlot = new Date(
+                    `${preferredDateTime.toISOString().split('T')[0]}T${blockTime}:00`
+                );
+
+                let nextSlot = desiredSlot;
+
+                // Check if desired slot is taken
+                while (events.some(event => new Date(event.start).getTime() === nextSlot.getTime())) {
+                    // Increment by 1 day
+                    nextSlot.setDate(nextSlot.getDate() + 1);
+                }
+
+                return nextSlot;
+            }
+
+            // Handle scheduling button
+            scheduleButton.addEventListener('click', () => {
+                const customerName = document.getElementById('customerName').value;
+                const preferredDate = document.getElementById('preferredDate').value;
+                const timeBlock = document.getElementById('timeBlock').value;
+
+                if (!preferredDate) {
+                    alert("Please select a preferred date.");
+                    return;
+                }
+
+                const nextSlot = findNextAvailableSlot(preferredDate, timeBlock);
+
+                // Add event to calendar
+                calendar.addEvent({
+                    title: `${timeBlock} - ${customerName}`,
+                    start: nextSlot.toISOString(),
+                    allDay: false
+                });
+
+                alert(`Booking scheduled for ${customerName} on ${nextSlot}`);
+            });
         });
     </script>
 </body>
