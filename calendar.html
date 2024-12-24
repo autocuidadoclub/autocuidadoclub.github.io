@@ -68,7 +68,7 @@
     <div id="booking-form">
         <h3>Crear una Reserva</h3>
         <label for="client-select">Seleccionar Cliente:</label>
-        <select id="client-select">
+        <select id="customerSelect"></select>
             <option value="">Cargando clientes...</option>
         </select>
 
@@ -199,6 +199,35 @@
                 return;
             }
 
+            // Reference to Firebase Firestore
+    const db = firebase.firestore();
+
+    // Function to populate the customer dropdown
+    function loadCustomerEmails() {
+        const customerDropdown = document.getElementById("customerSelect");
+        customerDropdown.innerHTML = '<option>Cargando clientes...</option>'; // Loading message
+
+        db.collection("users")
+            .get()
+            .then((querySnapshot) => {
+                customerDropdown.innerHTML = '<option value="">Seleccionar cliente...</option>'; // Reset dropdown
+                querySnapshot.forEach((doc) => {
+                    const customerData = doc.data();
+                    const option = document.createElement("option");
+                    option.value = customerData.email; // Set email as the value
+                    option.textContent = customerData.email; // Display email
+                    customerDropdown.appendChild(option);
+                });
+            })
+            .catch((error) => {
+                console.error("Error al cargar los correos electrónicos:", error);
+                customerDropdown.innerHTML = '<option>Error al cargar clientes</option>';
+            });
+    }
+
+    // Call the function when the page loads
+    document.addEventListener("DOMContentLoaded", loadCustomerEmails);
+
             // Find next available slot
             const dayToDate = {
                 Lunes: 1, Miércoles: 3, Viernes: 5, Sábado: 6, Domingo: 0
@@ -218,6 +247,7 @@
 
             alert(`Reserva programada para ${client} con ${vehicle} en ${day}, ${timeBlock}`);
         });
+
     </script>
 </body>
 </html>
