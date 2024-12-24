@@ -1,189 +1,140 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCuidado Club - Booking System</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        h1, h2 {
-            text-align: center;
-        }
-
-        .schedule-table {
-            width: 100%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-
-        .schedule-table th, .schedule-table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .schedule-table th {
-            background-color: #f4f4f4;
-        }
-
-        #vehicle-selection, #customer-info {
-            margin: 20px auto;
-            max-width: 600px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #f9f9f9;
-        }
-
-        #vehicle-selection select, #customer-info input, #customer-info button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-
-        #calendar-container {
-            max-width: 900px;
-            margin: 20px auto;
-        }
-    </style>
+    <title>Mechanic Booking System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.js"></script>
 </head>
 <body>
     <h1>Booking System - AutoCuidado Club</h1>
-    <h2>Select Day and Time Block</h2>
-
-    <!-- Schedule Table -->
-    <table class="schedule-table">
-        <thead>
-            <tr>
-                <th>Horario</th>
-                <th>Lunes</th>
-                <th>Miércoles</th>
-                <th>Viernes</th>
-                <th>Sábado</th>
-                <th>Domingo</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Bloque 1</td>
-                <td data-time="09:00" data-day="Lunes">9:00 AM – 11:00 AM</td>
-                <td data-time="10:00" data-day="Miércoles">10:00 AM – 12:00 PM</td>
-                <td data-time="13:00" data-day="Viernes">01:00 PM – 03:00 PM</td>
-                <td data-time="08:00" data-day="Sábado">08:00 AM – 10:00 AM</td>
-                <td data-time="09:00" data-day="Domingo">09:00 AM – 11:00 AM</td>
-            </tr>
-            <tr>
-                <td>Bloque 2</td>
-                <td data-time="12:00" data-day="Lunes">12:00 PM – 02:00 PM</td>
-                <td data-time="13:00" data-day="Miércoles">01:00 PM – 03:00 PM</td>
-                <td data-time="16:00" data-day="Viernes">04:00 PM – 06:00 PM</td>
-                <td data-time="11:00" data-day="Sábado">11:00 AM – 01:00 PM</td>
-                <td data-time="12:00" data-day="Domingo">12:00 PM – 02:00 PM</td>
-            </tr>
-            <tr>
-                <td>Bloque 3</td>
-                <td data-time="15:00" data-day="Lunes">03:00 PM – 05:00 PM</td>
-                <td data-time="16:00" data-day="Miércoles">04:00 PM – 06:00 PM</td>
-                <td data-time="-" data-day="Viernes">-</td>
-                <td data-time="14:00" data-day="Sábado">02:00 PM – 04:00 PM</td>
-                <td data-time="-" data-day="Domingo">-</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Vehicle Selection -->
-    <div id="vehicle-selection">
-        <h3>Assign a Vehicle</h3>
-        <select id="vehicleDropdown">
-            <option value="mitsubishi-nc700x-P783524-2014">Mitsubishi - NC700X - P783524 (2014)</option>
-            <option value="toyota-corolla-P123456-2018">Toyota - Corolla - P123456 (2018)</option>
-            <!-- Dynamically populated vehicles for the customer -->
-        </select>
+    <div>
+        <!-- Schedule Table -->
+        <table border="1" style="margin: 20px auto; width: 90%;">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td>9:00 AM – 11:00 AM</td>
+                    <td>10:00 AM – 12:00 PM</td>
+                    <td>01:00 PM – 03:00 PM</td>
+                    <td>08:00 AM – 10:00 AM</td>
+                    <td>09:00 AM – 11:00 AM</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td>12:00 PM – 02:00 PM</td>
+                    <td>01:00 PM – 03:00 PM</td>
+                    <td>04:00 PM – 06:00 PM</td>
+                    <td>11:00 AM – 01:00 PM</td>
+                    <td>12:00 PM – 02:00 PM</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td>03:00 PM – 05:00 PM</td>
+                    <td>04:00 PM – 06:00 PM</td>
+                    <td>-</td>
+                    <td>02:00 PM – 04:00 PM</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <!-- Customer Information -->
-    <div id="customer-info">
-        <h3>Customer Information</h3>
-        <input type="email" id="customerEmail" placeholder="Enter Customer Email" required>
-        <button id="confirmBooking">Confirm Booking</button>
-    </div>
-
-    <!-- Calendar -->
-    <div id="calendar-container">
+    <div>
+        <h2>Mechanic Calendar</h2>
+        <label for="mechanic">Select Mechanic:</label>
+        <select id="mechanic"></select>
         <div id="calendar"></div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const calendarEl = document.getElementById('calendar');
-            const confirmBookingBtn = document.getElementById('confirmBooking');
-            const selectedSlot = { day: null, time: null };
+    <h2>Booking Details</h2>
+    <form id="bookingForm">
+        <label for="block">Select Block:</label>
+        <select id="block">
+            <option value="Bloque 1">Bloque 1</option>
+            <option value="Bloque 2">Bloque 2</option>
+            <option value="Bloque 3">Bloque 3</option>
+        </select>
+        <br>
+        <label for="date">Select Date:</label>
+        <input type="date" id="date">
+        <br>
+        <label for="customerEmail">Customer Email:</label>
+        <input type="email" id="customerEmail">
+        <br>
+        <label for="vehicle">Vehicle:</label>
+        <input type="text" id="vehicle" placeholder="e.g., Toyota - Corolla - P123456">
+        <br>
+        <button type="button" onclick="scheduleBooking()">Confirm Booking</button>
+    </form>
 
-            // Initialize Calendar
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridWeek',
-                editable: false,
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'timeGridWeek,timeGridDay'
-                },
-                events: [] // No initial events
+                initialView: 'week',
+                events: [], // Fetch events from Firebase
+                editable: false
             });
 
             calendar.render();
 
-            // Select Slot from Table
-            document.querySelectorAll('.schedule-table td[data-time]').forEach(cell => {
-                cell.addEventListener('click', function () {
-                    // Highlight the selected cell
-                    document.querySelectorAll('.schedule-table td').forEach(td => td.style.backgroundColor = '');
-                    this.style.backgroundColor = '#ffcccb';
-
-                    // Save selection
-                    selectedSlot.day = this.dataset.day;
-                    selectedSlot.time = this.dataset.time;
-
-                    alert(`Selected Slot: ${selectedSlot.day} at ${selectedSlot.time}`);
+            // Fetch Mechanics from Firebase
+            const mechanicDropdown = document.getElementById('mechanic');
+            fetchMechanics().then(mechanics => {
+                mechanics.forEach(mechanic => {
+                    const option = document.createElement('option');
+                    option.value = mechanic.id;
+                    option.textContent = mechanic.name;
+                    mechanicDropdown.appendChild(option);
                 });
-            });
-
-            // Confirm Booking
-            confirmBookingBtn.addEventListener('click', () => {
-                const customerEmail = document.getElementById('customerEmail').value;
-                const vehicleInfo = document.getElementById('vehicleDropdown').value;
-
-                if (!selectedSlot.day || !selectedSlot.time) {
-                    alert("Please select a day and time block.");
-                    return;
-                }
-
-                if (!customerEmail) {
-                    alert("Please enter a customer email.");
-                    return;
-                }
-
-                // Add event to calendar
-                const eventStart = new Date();
-                eventStart.setHours(parseInt(selectedSlot.time.split(':')[0]));
-                eventStart.setMinutes(0, 0, 0);
-
-                calendar.addEvent({
-                    title: `Booking for ${customerEmail}\nVehicle: ${vehicleInfo}`,
-                    start: eventStart.toISOString(),
-                    allDay: false
-                });
-
-                alert(`Booking confirmed for ${customerEmail} with ${vehicleInfo}`);
             });
         });
+
+        async function fetchMechanics() {
+            // Replace with Firebase fetch logic
+            return [
+                { id: 'm1', name: 'Mechanic A' },
+                { id: 'm2', name: 'Mechanic B' }
+            ];
+        }
+
+        function scheduleBooking() {
+            const block = document.getElementById('block').value;
+            const date = document.getElementById('date').value;
+            const mechanicId = document.getElementById('mechanic').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            const vehicle = document.getElementById('vehicle').value;
+
+            if (!block || !date || !mechanicId || !customerEmail || !vehicle) {
+                alert('Please fill all fields.');
+                return;
+            }
+
+            // Save Booking to Firebase
+            const booking = {
+                block,
+                date,
+                mechanicId,
+                customerEmail,
+                vehicle
+            };
+
+            console.log('Booking Saved:', booking);
+            alert(`Booking confirmed for ${customerEmail} with ${vehicle}`);
+        }
     </script>
 </body>
 </html>
