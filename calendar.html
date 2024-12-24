@@ -66,12 +66,26 @@
     <h1>Gestión de Clientes y Calendario</h1>
 
     <div id="booking-form">
-        <h3>Crear una Reserva</h3>
-        <label for="customerSelect">Seleccionar Cliente:</label>
-        <select id="customerSelect">
-            <option value="">Cargando clientes...</option>
-        </select>
+        <h3>Buscar Cliente</h3>
+        <form id="searchForm">
+            <label for="searchBy">Buscar Por:</label>
+            <select id="searchBy" required>
+                <option value="email">Email</option>
+                <option value="name">Nombre</option>
+                <option value="phone">Teléfono</option>
+                <option value="licensePlate">Placa del Vehículo</option>
+            </select>
+            <input type="text" id="searchValue" placeholder="Ingrese el valor de búsqueda" required>
+            <button type="submit">Buscar</button>
+        </form>
 
+        <div id="customerDetails" style="display:none; margin-top: 20px;">
+            <p><strong>Cliente Seleccionado:</strong> <span id="selectedCustomer"></span></p>
+        </div>
+    </div>
+
+    <div id="booking-form">
+        <h3>Crear una Reserva</h3>
         <label for="day-select">Seleccionar Día:</label>
         <select id="day-select">
             <option value="Lunes">Lunes</option>
@@ -115,44 +129,70 @@
 
         const db = firebase.firestore();
 
-        // Populate clients from Firebase
-        const customerSelect = document.getElementById('customerSelect');
-        function loadCustomerEmails() {
-            db.collection('users').get().then(snapshot => {
-                customerSelect.innerHTML = '<option value="">Seleccionar Cliente...</option>';
-                snapshot.forEach(doc => {
-                    const userData = doc.data();
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = `${userData.name} (${userData.email})`;
-                    customerSelect.appendChild(option);
-                });
-            }).catch(error => {
-                console.error("Error fetching customer emails:", error);
-                customerSelect.innerHTML = '<option>Error al cargar clientes</option>';
-            });
-        }
-        loadCustomerEmails();
-
-        // Populate vehicles based on selected client
+        // Handle search form submission
+        const searchForm = document.getElementById('searchForm');
+        const customerDetails = document.getElementById('customerDetails');
+        const selectedCustomerSpan = document.getElementById('selectedCustomer');
         const vehicleSelect = document.getElementById('vehicle-select');
-        customerSelect.addEventListener('change', () => {
-            const clientId = customerSelect.value;
-            if (!clientId) return;
 
-            db.collection('users').doc(clientId).get().then(doc => {
-                const userData = doc.data();
-                vehicleSelect.innerHTML = '<option value="">Seleccionar Vehículo</option>';
-                if (userData.vehicles) {
-                    userData.vehicles.forEach(vehicle => {
-                        const option = document.createElement('option');
-                        option.value = `${vehicle.brand} ${vehicle.model} - ${vehicle.plate}`;
-                        option.textContent = `${vehicle.brand} ${vehicle.model} (${vehicle.year}) - ${vehicle.plate}`;
-                        vehicleSelect.appendChild(option);
-                    });
-                }
-            });
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const searchBy = document.getElementById('searchBy').value;
+            const searchValue = document.getElementById('searchValue').value.trim();
+
+            if (!searchValue) {
+                alert('Por favor, ingrese un valor de búsqueda.');
+                return;
+            }
+
+            searchCustomer(searchBy, searchValue);
         });
+
+        function searchCustomer(field, value) {
+            let query;
+
+            if (field === 'email') {
+                query = db.collection('users').where('email', '==', value);
+            } else if (field === 'name') {
+                query = db.collection('users').where('name', '==', value);
+            } else if (field === 'phone') {
+                query = db.collection('users').where('phone', '==', value);
+            } else if (field === 'licensePlate') {
+                query = db.collection('users').where('vehicles', 'array-contains', { plate: value });
+            }
+
+            query
+                .get()
+                .then(querySnapshot => {
+                    if (querySnapshot.empty) {
+                        alert('No se encontraron clientes con ese criterio de búsqueda.');
+                        return;
+                    }
+
+                    const doc = querySnapshot.docs[0];
+                    const userData = doc.data();
+                    selectedCustomerSpan.textContent = `${userData.name} (${userData.email})`;
+                    customerDetails.style.display = 'block';
+
+                    // Populate vehicles for the selected customer
+                    populateVehicles(userData);
+                })
+                .catch(error => {
+                    console.error('Error al buscar el cliente:', error);
+                });
+        }
+
+        function populateVehicles(userData) {
+            vehicleSelect.innerHTML = '<option value="">Seleccionar Vehículo</option>';
+            if (userData.vehicles) {
+                userData.vehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = `${vehicle.brand} ${vehicle.model} - ${vehicle.plate}`;
+                    option.textContent = `${vehicle.brand} ${vehicle.model} (${vehicle.year}) - ${vehicle.plate}`;
+                    vehicleSelect.appendChild(option);
+                });
+            }
+        }
 
         // Update time blocks based on selected day
         const timeBlockSelect = document.getElementById('time-block');
@@ -194,7 +234,7 @@
 
         // Schedule Booking
         document.getElementById('schedule-btn').addEventListener('click', () => {
-            const client = customerSelect.value;
+            const client = selectedCustomerSpan.textContent;
             const day = document.getElementById('day-select').value;
             const timeBlock = timeBlockSelect.value;
             const vehicle = vehicleSelect.value;
@@ -204,7 +244,6 @@
                 return;
             }
 
-            // Find next available slot
             const dayToDate = { Lunes: 1, Miércoles: 3, Viernes: 5, Sábado: 6, Domingo: 0 };
             const today = new Date();
             let targetDate = new Date();
