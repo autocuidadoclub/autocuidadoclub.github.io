@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Clientes - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,251 +37,154 @@
         #restricted-content {
             padding: 20px;
         }
-        #searchForm {
-            margin-bottom: 20px;
+        #calendar {
+            max-width: 900px;
+            margin: 20px auto;
         }
-        #searchForm label, #searchForm select, #searchForm input, #searchForm button {
-            margin-right: 10px;
-        }
-        #user-details {
-            margin-top: 20px;
-            padding: 20px;
+        #menu {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 15px;
+            background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 8px;
-            background-color: #f9f9f9;
         }
-        #vehicle-details .vehicle {
-            margin-bottom: 20px;
+        #menu select, #menu input, #menu button {
+            width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #fff;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
+            margin: 10px 0;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <ul>
             <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="calendar.html">Calendario</a></li>
             <li><a href="logout.html">Cerrar Sesión</a></li>
         </ul>
     </nav>
 
     <header>
-        <h1>Gestión de Clientes</h1>
+        <h1>Gestión de Clientes y Calendario</h1>
     </header>
 
-    <!-- Staff Section -->
-    <section id="restricted-content" style="display: none;">
-        <h2>Panel de Gestión para el Staff</h2>
-        <p>Bienvenido, este panel es solo para personal autorizado.</p>
+    <section id="restricted-content">
+        <h2>Panel de Gestión y Calendario</h2>
 
-        <!-- Search Section -->
-        <form id="searchForm">
-            <label for="searchBy">Buscar Por:</label>
-            <select id="searchBy" required>
-                <option value="email">Email</option>
-                <option value="name">Nombre</option>
-                <option value="phone">Teléfono</option>
-                <option value="licensePlate">Placa del Vehículo</option>
+        <div id="menu">
+            <h3>Crear una Reserva</h3>
+            <label for="customerEmail">Seleccionar Cliente:</label>
+            <select id="customerEmail"></select>
+
+            <label for="preferredDate">Fecha Preferida:</label>
+            <input type="date" id="preferredDate" required>
+
+            <label for="timeBlock">Seleccionar Bloque de Tiempo:</label>
+            <select id="timeBlock">
+                <option value="Bloque 1">Bloque 1 (9:00 AM - 11:00 AM)</option>
+                <option value="Bloque 2">Bloque 2 (12:00 PM - 2:00 PM)</option>
+                <option value="Bloque 3">Bloque 3 (3:00 PM - 5:00 PM)</option>
             </select>
-            <input type="text" id="searchValue" placeholder="Ingrese el valor de búsqueda" required>
-            <button type="submit">Buscar</button>
-        </form>
 
-        <!-- Customer Details -->
-        <section id="user-details" style="display: none;">
-            <h2>Detalles del Cliente</h2>
-            <p><strong>Nombre:</strong> <span id="userName"></span></p>
-            <p><strong>Email:</strong> <span id="userEmail"></span></p>
-            <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
-            <p><strong>Plan Seleccionado:</strong> <span id="userPlanType"></span></p>
-            <p><strong>Horario Actual:</strong> <span id="selectedSchedule"></span></p>
-            <p><strong>Fecha de Registro:</strong> <span id="registrationDate"></span></p>
-            <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
-            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate"></span></p>
-            <p><strong>Última Reprogramación:</strong> <span id="lastReschedule"></span></p>
+            <label for="vehicle">Seleccionar Vehículo:</label>
+            <select id="vehicle"></select>
 
-            <h3>Vehículos Registrados</h3>
-            <div id="vehicle-details"></div>
+            <button id="scheduleBooking">Programar Reserva</button>
+        </div>
 
-            <label for="paymentDate">Actualizar Fecha de Pago:</label>
-            <input type="date" id="paymentDate">
-            <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
-        </section>
+        <div id="calendar"></div>
     </section>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "986704701191",
-            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5"
-        };
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const scheduleButton = document.getElementById('scheduleBooking');
+            const customerEmailDropdown = document.getElementById('customerEmail');
+            const vehicleDropdown = document.getElementById('vehicle');
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+            // Initialize FullCalendar
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                editable: false,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'timeGridWeek,timeGridDay'
+                },
+                events: [] // Events will be fetched dynamically
+            });
 
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+            calendar.render();
 
-        // Check User Authorization
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                const userEmail = user.email;
-                db.collection("users").doc(userEmail).get()
-                    .then((doc) => {
-                        if (doc.exists && doc.data().role === "staff") {
-                            // User is authorized, show restricted content
-                            document.getElementById("restricted-content").style.display = "block";
-                        } else {
-                            // Unauthorized user, redirect to login page
-                            alert("Acceso denegado. No tienes permisos para esta página.");
-                            window.location.href = "login.html";
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error al verificar permisos:", error);
-                        window.location.href = "login.html";
+            // Fetch customers and populate dropdown
+            function fetchCustomers() {
+                db.collection('users').get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        const option = document.createElement('option');
+                        option.value = user.email;
+                        option.textContent = `${user.name} (${user.email})`;
+                        customerEmailDropdown.appendChild(option);
                     });
-            } else {
-                // Not logged in, redirect to login page
-                window.location.href = "login.html";
-            }
-        });
-
-        // Handle search form submission
-        document.getElementById("searchForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-            const searchBy = document.getElementById("searchBy").value;
-            const searchValue = document.getElementById("searchValue").value.trim();
-
-            if (!searchValue) {
-                alert("Por favor, ingrese un valor de búsqueda.");
-                return;
-            }
-
-            searchCustomer(searchBy, searchValue);
-        });
-
-        // Search customer by field
-        function searchCustomer(field, value) {
-            let query;
-
-            if (field === "email") {
-                query = db.collection("users").where("email", "==", value);
-            } else if (field === "name") {
-                query = db.collection("users").where("name", "==", value);
-            } else if (field === "phone") {
-                query = db.collection("users").where("phone", "==", value);
-            } else if (field === "licensePlate") {
-                query = db.collection("users").where("vehicles", "array-contains", { plate: value });
-            } else {
-                alert("Campo de búsqueda no válido.");
-                return;
-            }
-
-            query
-                .get()
-                .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        alert("No se encontraron clientes con ese criterio de búsqueda.");
-                        return;
-                    }
-
-                    // Show only the first result for simplicity
-                    const doc = querySnapshot.docs[0];
-                    const userData = doc.data();
-                    displayCustomerDetails(userData);
-                })
-                .catch((error) => {
-                    console.error("Error al buscar el cliente:", error);
-                    alert("Hubo un error en la búsqueda. Por favor, inténtalo de nuevo.");
                 });
-        }
+            }
 
-        // Display customer details
-        function displayCustomerDetails(userData) {
-            document.getElementById("userName").textContent = userData.name || "N/A";
-            document.getElementById("userEmail").textContent = userData.email || "N/A";
-            document.getElementById("userPhone").textContent = userData.phone || "N/A";
-            document.getElementById("userPlanType").textContent = userData.planType || "N/A";
-            document.getElementById("currentPaymentDate").textContent = userData.paymentDate
-                ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
-                : "Sin fecha registrada";
-            document.getElementById("selectedSchedule").textContent = userData.selectedSchedule || "No asignado";
+            // Fetch vehicles for selected customer
+            customerEmailDropdown.addEventListener('change', () => {
+                const selectedEmail = customerEmailDropdown.value;
+                vehicleDropdown.innerHTML = '';
 
-            const vehicleContainer = document.getElementById("vehicle-details");
-            vehicleContainer.innerHTML = "";
-
-            if (userData.vehicles && userData.vehicles.length > 0) {
-                userData.vehicles.forEach((vehicle, index) => {
-                    const vehicleHtml = `
-                        <div class="vehicle">
-                            <h3>Vehículo ${index + 1}</h3>
-                            <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                            <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                            <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-                            <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                        </div>`;
-                    vehicleContainer.innerHTML += vehicleHtml;
+                db.collection('users').where('email', '==', selectedEmail).get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        if (user.vehicles) {
+                            user.vehicles.forEach((vehicle, index) => {
+                                const option = document.createElement('option');
+                                option.value = `${vehicle.brand} - ${vehicle.model} - ${vehicle.plate}`;
+                                option.textContent = `Vehículo ${index + 1}: ${vehicle.brand} - ${vehicle.model} (${vehicle.year})`;
+                                vehicleDropdown.appendChild(option);
+                            });
+                        }
+                    });
                 });
-            } else {
-                vehicleContainer.innerHTML = "<p>No hay vehículos registrados.</p>";
-            }
-
-            document.getElementById("user-details").style.display = "block";
-        }
-
-        // Update payment date
-        function updatePaymentDate() {
-            const email = document.getElementById("userEmail").textContent;
-            const paymentDateInput = document.getElementById("paymentDate").value;
-
-            if (!paymentDateInput) {
-                alert("Por favor, selecciona una fecha de pago.");
-                return;
-            }
-
-            const paymentDate = new Date(paymentDateInput);
-
-            db.collection("users").doc(email).update({
-                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 1)))
-            }).then(() => {
-                alert("Fecha de pago actualizada correctamente.");
-                searchCustomer("email", email);
-            }).catch((error) => {
-                console.error("Error al actualizar la fecha de pago:", error);
             });
-        }
 
-        // Logout Functionality
-        function logout() {
-            auth.signOut().then(() => {
-                window.location.href = "login.html";
-            }).catch((error) => {
-                console.error("Error al cerrar sesión:", error);
+            // Schedule booking
+            scheduleButton.addEventListener('click', () => {
+                const customerEmail = customerEmailDropdown.value;
+                const preferredDate = document.getElementById('preferredDate').value;
+                const timeBlock = document.getElementById('timeBlock').value;
+                const vehicle = vehicleDropdown.value;
+
+                if (!customerEmail || !preferredDate || !timeBlock || !vehicle) {
+                    alert('Por favor, complete todos los campos.');
+                    return;
+                }
+
+                const bookingDate = new Date(preferredDate);
+                const timeBlocks = {
+                    "Bloque 1": "09:00",
+                    "Bloque 2": "12:00",
+                    "Bloque 3": "15:00"
+                };
+
+                bookingDate.setHours(parseInt(timeBlocks[timeBlock].split(':')[0]));
+                bookingDate.setMinutes(parseInt(timeBlocks[timeBlock].split(':')[1]));
+
+                calendar.addEvent({
+                    title: `${timeBlock} - ${customerEmail.split('@')[0]} - ${vehicle}`,
+                    start: bookingDate.toISOString(),
+                    allDay: false
+                });
+
+                alert(`Reserva confirmada para ${customerEmail} con ${vehicle} en ${timeBlock}`);
             });
-        }
+
+            // Initialize data fetch
+            fetchCustomers();
+        });
     </script>
 </body>
 </html>
