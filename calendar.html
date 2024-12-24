@@ -67,8 +67,8 @@
 
     <div id="booking-form">
         <h3>Crear una Reserva</h3>
-        <label for="client-select">Seleccionar Cliente:</label>
-        <select id="customerSelect"></select>
+        <label for="customerSelect">Seleccionar Cliente:</label>
+        <select id="customerSelect">
             <option value="">Cargando clientes...</option>
         </select>
 
@@ -101,13 +101,12 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "986704701191",
-            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
         };
 
         if (!firebase.apps.length) {
@@ -117,22 +116,28 @@
         const db = firebase.firestore();
 
         // Populate clients from Firebase
-        const clientSelect = document.getElementById('client-select');
-        db.collection('users').get().then(snapshot => {
-            clientSelect.innerHTML = '<option value="">Seleccionar Cliente</option>';
-            snapshot.forEach(doc => {
-                const userData = doc.data();
-                const option = document.createElement('option');
-                option.value = doc.id;
-                option.textContent = `${userData.name} (${userData.email})`;
-                clientSelect.appendChild(option);
+        const customerSelect = document.getElementById('customerSelect');
+        function loadCustomerEmails() {
+            db.collection('users').get().then(snapshot => {
+                customerSelect.innerHTML = '<option value="">Seleccionar Cliente...</option>';
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = `${userData.name} (${userData.email})`;
+                    customerSelect.appendChild(option);
+                });
+            }).catch(error => {
+                console.error("Error fetching customer emails:", error);
+                customerSelect.innerHTML = '<option>Error al cargar clientes</option>';
             });
-        });
+        }
+        loadCustomerEmails();
 
         // Populate vehicles based on selected client
         const vehicleSelect = document.getElementById('vehicle-select');
-        clientSelect.addEventListener('change', () => {
-            const clientId = clientSelect.value;
+        customerSelect.addEventListener('change', () => {
+            const clientId = customerSelect.value;
             if (!clientId) return;
 
             db.collection('users').doc(clientId).get().then(doc => {
@@ -172,15 +177,15 @@
             }
         });
 
-        // FullCalendar Initialization
+        // Initialize FullCalendar
         const calendarEl = document.getElementById('calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'timeGridWeek',
+            initialView: 'dayGridMonth',
             editable: false,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'timeGridWeek,timeGridDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             events: []
         });
@@ -189,7 +194,7 @@
 
         // Schedule Booking
         document.getElementById('schedule-btn').addEventListener('click', () => {
-            const client = clientSelect.value;
+            const client = customerSelect.value;
             const day = document.getElementById('day-select').value;
             const timeBlock = timeBlockSelect.value;
             const vehicle = vehicleSelect.value;
@@ -199,39 +204,8 @@
                 return;
             }
 
-            // Reference to Firebase Firestore
-    const db = firebase.firestore();
-
-    // Function to populate the customer dropdown
-    function loadCustomerEmails() {
-        const customerDropdown = document.getElementById("customerSelect");
-        customerDropdown.innerHTML = '<option>Cargando clientes...</option>'; // Loading message
-
-        db.collection("users")
-            .get()
-            .then((querySnapshot) => {
-                customerDropdown.innerHTML = '<option value="">Seleccionar cliente...</option>'; // Reset dropdown
-                querySnapshot.forEach((doc) => {
-                    const customerData = doc.data();
-                    const option = document.createElement("option");
-                    option.value = customerData.email; // Set email as the value
-                    option.textContent = customerData.email; // Display email
-                    customerDropdown.appendChild(option);
-                });
-            })
-            .catch((error) => {
-                console.error("Error al cargar los correos electrónicos:", error);
-                customerDropdown.innerHTML = '<option>Error al cargar clientes</option>';
-            });
-    }
-
-    // Call the function when the page loads
-    document.addEventListener("DOMContentLoaded", loadCustomerEmails);
-
             // Find next available slot
-            const dayToDate = {
-                Lunes: 1, Miércoles: 3, Viernes: 5, Sábado: 6, Domingo: 0
-            };
+            const dayToDate = { Lunes: 1, Miércoles: 3, Viernes: 5, Sábado: 6, Domingo: 0 };
             const today = new Date();
             let targetDate = new Date();
             targetDate.setDate(today.getDate() + ((7 + dayToDate[day] - today.getDay()) % 7));
@@ -247,7 +221,6 @@
 
             alert(`Reserva programada para ${client} con ${vehicle} en ${day}, ${timeBlock}`);
         });
-
     </script>
 </body>
 </html>
