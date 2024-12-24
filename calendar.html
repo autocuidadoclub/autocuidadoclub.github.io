@@ -21,7 +21,7 @@
             background: #007bff;
             color: white;
             text-align: center;
-            cursor: pointer;
+            cursor: grab;
             border-radius: 4px;
         }
         #calendar-container {
@@ -46,23 +46,40 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("Initializing calendar...");
             const calendarEl = document.getElementById('calendar');
+            const draggableItems = document.querySelectorAll('.menu-item');
 
-            if (!calendarEl) {
-                console.error("Calendar element not found.");
-                return;
-            }
+            // Make menu items draggable
+            draggableItems.forEach(item => {
+                item.addEventListener('dragstart', function (event) {
+                    event.dataTransfer.setData('text/plain', event.target.dataset.title);
+                });
+            });
 
+            // Initialize FullCalendar
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 editable: true,
                 droppable: true,
                 events: [],
+                drop: function (info) {
+                    // Get the dropped title
+                    const eventTitle = info.draggedEl.dataset.title;
+
+                    // Create an event at the drop location
+                    calendar.addEvent({
+                        title: eventTitle,
+                        start: info.date,
+                        allDay: info.allDay
+                    });
+
+                    console.log(`Event added: ${eventTitle} on ${info.date}`);
+                }
             });
 
             calendar.render();
-            console.log("Calendar rendered successfully.");
+
+            console.log("Calendar initialized.");
         });
     </script>
 </body>
