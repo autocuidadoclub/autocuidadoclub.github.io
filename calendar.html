@@ -1,139 +1,287 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechanic Booking System</title>
+    <title>Gestión de Clientes - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #007bff;
+            padding: 10px;
+        }
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        header {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+        #restricted-content {
+            padding: 20px;
+        }
+        #searchForm {
+            margin-bottom: 20px;
+        }
+        #searchForm label, #searchForm select, #searchForm input, #searchForm button {
+            margin-right: 10px;
+        }
+        #user-details {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        #vehicle-details .vehicle {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Booking System - AutoCuidado Club</h1>
-    <div>
-        <!-- Schedule Table -->
-        <table border="1" style="margin: 20px auto; width: 90%;">
-            <thead>
-                <tr>
-                    <th>Horario</th>
-                    <th>Lunes</th>
-                    <th>Miércoles</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Bloque 1</td>
-                    <td>9:00 AM – 11:00 AM</td>
-                    <td>10:00 AM – 12:00 PM</td>
-                    <td>01:00 PM – 03:00 PM</td>
-                    <td>08:00 AM – 10:00 AM</td>
-                    <td>09:00 AM – 11:00 AM</td>
-                </tr>
-                <tr>
-                    <td>Bloque 2</td>
-                    <td>12:00 PM – 02:00 PM</td>
-                    <td>01:00 PM – 03:00 PM</td>
-                    <td>04:00 PM – 06:00 PM</td>
-                    <td>11:00 AM – 01:00 PM</td>
-                    <td>12:00 PM – 02:00 PM</td>
-                </tr>
-                <tr>
-                    <td>Bloque 3</td>
-                    <td>03:00 PM – 05:00 PM</td>
-                    <td>04:00 PM – 06:00 PM</td>
-                    <td>-</td>
-                    <td>02:00 PM – 04:00 PM</td>
-                    <td>-</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="logout.html">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
 
-    <div>
-        <h2>Mechanic Calendar</h2>
-        <label for="mechanic">Select Mechanic:</label>
-        <select id="mechanic"></select>
-        <div id="calendar"></div>
-    </div>
+    <header>
+        <h1>Gestión de Clientes</h1>
+    </header>
 
-    <h2>Booking Details</h2>
-    <form id="bookingForm">
-        <label for="block">Select Block:</label>
-        <select id="block">
-            <option value="Bloque 1">Bloque 1</option>
-            <option value="Bloque 2">Bloque 2</option>
-            <option value="Bloque 3">Bloque 3</option>
-        </select>
-        <br>
-        <label for="date">Select Date:</label>
-        <input type="date" id="date">
-        <br>
-        <label for="customerEmail">Customer Email:</label>
-        <input type="email" id="customerEmail">
-        <br>
-        <label for="vehicle">Vehicle:</label>
-        <input type="text" id="vehicle" placeholder="e.g., Toyota - Corolla - P123456">
-        <br>
-        <button type="button" onclick="scheduleBooking()">Confirm Booking</button>
-    </form>
+    <!-- Staff Section -->
+    <section id="restricted-content" style="display: none;">
+        <h2>Panel de Gestión para el Staff</h2>
+        <p>Bienvenido, este panel es solo para personal autorizado.</p>
+
+        <!-- Search Section -->
+        <form id="searchForm">
+            <label for="searchBy">Buscar Por:</label>
+            <select id="searchBy" required>
+                <option value="email">Email</option>
+                <option value="name">Nombre</option>
+                <option value="phone">Teléfono</option>
+                <option value="licensePlate">Placa del Vehículo</option>
+            </select>
+            <input type="text" id="searchValue" placeholder="Ingrese el valor de búsqueda" required>
+            <button type="submit">Buscar</button>
+        </form>
+
+        <!-- Customer Details -->
+        <section id="user-details" style="display: none;">
+            <h2>Detalles del Cliente</h2>
+            <p><strong>Nombre:</strong> <span id="userName"></span></p>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
+            <p><strong>Plan Seleccionado:</strong> <span id="userPlanType"></span></p>
+            <p><strong>Horario Actual:</strong> <span id="selectedSchedule"></span></p>
+            <p><strong>Fecha de Registro:</strong> <span id="registrationDate"></span></p>
+            <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate"></span></p>
+            <p><strong>Última Reprogramación:</strong> <span id="lastReschedule"></span></p>
+
+            <h3>Vehículos Registrados</h3>
+            <div id="vehicle-details"></div>
+
+            <label for="paymentDate">Actualizar Fecha de Pago:</label>
+            <input type="date" id="paymentDate">
+            <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
+        </section>
+    </section>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const calendarEl = document.getElementById('calendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'week',
-                events: [], // Fetch events from Firebase
-                editable: false
-            });
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
+        };
 
-            calendar.render();
-
-            // Fetch Mechanics from Firebase
-            const mechanicDropdown = document.getElementById('mechanic');
-            fetchMechanics().then(mechanics => {
-                mechanics.forEach(mechanic => {
-                    const option = document.createElement('option');
-                    option.value = mechanic.id;
-                    option.textContent = mechanic.name;
-                    mechanicDropdown.appendChild(option);
-                });
-            });
-        });
-
-        async function fetchMechanics() {
-            // Replace with Firebase fetch logic
-            return [
-                { id: 'm1', name: 'Mechanic A' },
-                { id: 'm2', name: 'Mechanic B' }
-            ];
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
 
-        function scheduleBooking() {
-            const block = document.getElementById('block').value;
-            const date = document.getElementById('date').value;
-            const mechanicId = document.getElementById('mechanic').value;
-            const customerEmail = document.getElementById('customerEmail').value;
-            const vehicle = document.getElementById('vehicle').value;
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-            if (!block || !date || !mechanicId || !customerEmail || !vehicle) {
-                alert('Please fill all fields.');
+        // Check User Authorization
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const userEmail = user.email;
+                db.collection("users").doc(userEmail).get()
+                    .then((doc) => {
+                        if (doc.exists && doc.data().role === "staff") {
+                            // User is authorized, show restricted content
+                            document.getElementById("restricted-content").style.display = "block";
+                        } else {
+                            // Unauthorized user, redirect to login page
+                            alert("Acceso denegado. No tienes permisos para esta página.");
+                            window.location.href = "login.html";
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error al verificar permisos:", error);
+                        window.location.href = "login.html";
+                    });
+            } else {
+                // Not logged in, redirect to login page
+                window.location.href = "login.html";
+            }
+        });
+
+        // Handle search form submission
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const searchBy = document.getElementById("searchBy").value;
+            const searchValue = document.getElementById("searchValue").value.trim();
+
+            if (!searchValue) {
+                alert("Por favor, ingrese un valor de búsqueda.");
                 return;
             }
 
-            // Save Booking to Firebase
-            const booking = {
-                block,
-                date,
-                mechanicId,
-                customerEmail,
-                vehicle
-            };
+            searchCustomer(searchBy, searchValue);
+        });
 
-            console.log('Booking Saved:', booking);
-            alert(`Booking confirmed for ${customerEmail} with ${vehicle}`);
+        // Search customer by field
+        function searchCustomer(field, value) {
+            let query;
+
+            if (field === "email") {
+                query = db.collection("users").where("email", "==", value);
+            } else if (field === "name") {
+                query = db.collection("users").where("name", "==", value);
+            } else if (field === "phone") {
+                query = db.collection("users").where("phone", "==", value);
+            } else if (field === "licensePlate") {
+                query = db.collection("users").where("vehicles", "array-contains", { plate: value });
+            } else {
+                alert("Campo de búsqueda no válido.");
+                return;
+            }
+
+            query
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        alert("No se encontraron clientes con ese criterio de búsqueda.");
+                        return;
+                    }
+
+                    // Show only the first result for simplicity
+                    const doc = querySnapshot.docs[0];
+                    const userData = doc.data();
+                    displayCustomerDetails(userData);
+                })
+                .catch((error) => {
+                    console.error("Error al buscar el cliente:", error);
+                    alert("Hubo un error en la búsqueda. Por favor, inténtalo de nuevo.");
+                });
+        }
+
+        // Display customer details
+        function displayCustomerDetails(userData) {
+            document.getElementById("userName").textContent = userData.name || "N/A";
+            document.getElementById("userEmail").textContent = userData.email || "N/A";
+            document.getElementById("userPhone").textContent = userData.phone || "N/A";
+            document.getElementById("userPlanType").textContent = userData.planType || "N/A";
+            document.getElementById("currentPaymentDate").textContent = userData.paymentDate
+                ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
+                : "Sin fecha registrada";
+            document.getElementById("selectedSchedule").textContent = userData.selectedSchedule || "No asignado";
+
+            const vehicleContainer = document.getElementById("vehicle-details");
+            vehicleContainer.innerHTML = "";
+
+            if (userData.vehicles && userData.vehicles.length > 0) {
+                userData.vehicles.forEach((vehicle, index) => {
+                    const vehicleHtml = `
+                        <div class="vehicle">
+                            <h3>Vehículo ${index + 1}</h3>
+                            <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                            <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                            <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                            <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                        </div>`;
+                    vehicleContainer.innerHTML += vehicleHtml;
+                });
+            } else {
+                vehicleContainer.innerHTML = "<p>No hay vehículos registrados.</p>";
+            }
+
+            document.getElementById("user-details").style.display = "block";
+        }
+
+        // Update payment date
+        function updatePaymentDate() {
+            const email = document.getElementById("userEmail").textContent;
+            const paymentDateInput = document.getElementById("paymentDate").value;
+
+            if (!paymentDateInput) {
+                alert("Por favor, selecciona una fecha de pago.");
+                return;
+            }
+
+            const paymentDate = new Date(paymentDateInput);
+
+            db.collection("users").doc(email).update({
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 1)))
+            }).then(() => {
+                alert("Fecha de pago actualizada correctamente.");
+                searchCustomer("email", email);
+            }).catch((error) => {
+                console.error("Error al actualizar la fecha de pago:", error);
+            });
+        }
+
+        // Logout Functionality
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => {
+                console.error("Error al cerrar sesión:", error);
+            });
         }
     </script>
 </body>
