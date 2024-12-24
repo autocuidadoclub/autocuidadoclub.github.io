@@ -169,7 +169,7 @@
 
             db.collection("users").doc(email).update({
                 paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 2)))
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 1)))
             }).then(() => {
                 alert("Fecha de pago actualizada correctamente.");
                 searchCustomer("email", email);
