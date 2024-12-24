@@ -12,20 +12,36 @@
             margin: 20px;
         }
 
-        h1 {
+        h1, h2 {
             text-align: center;
         }
 
-        #menu {
-            width: 300px;
-            padding: 15px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+        .schedule-table {
+            width: 100%;
             margin: 20px auto;
+            border-collapse: collapse;
         }
 
-        #menu select, #menu button {
+        .schedule-table th, .schedule-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .schedule-table th {
+            background-color: #f4f4f4;
+        }
+
+        #vehicle-selection, #customer-info {
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        #vehicle-selection select, #customer-info input, #customer-info button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -40,29 +56,66 @@
 </head>
 <body>
     <h1>Booking System - AutoCuidado Club</h1>
+    <h2>Select Day and Time Block</h2>
 
-    <div id="menu">
-        <h3>Create a Booking</h3>
-        <label for="customerName">Select Customer:</label>
-        <select id="customerName">
-            <option value="Cesar Stanley Canas">Cesar Stanley Canas</option>
-            <option value="John Doe">John Doe</option>
-            <!-- Add more customers dynamically from Firebase -->
+    <!-- Schedule Table -->
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>Horario</th>
+                <th>Lunes</th>
+                <th>Miércoles</th>
+                <th>Viernes</th>
+                <th>Sábado</th>
+                <th>Domingo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Bloque 1</td>
+                <td data-time="09:00" data-day="Lunes">9:00 AM – 11:00 AM</td>
+                <td data-time="10:00" data-day="Miércoles">10:00 AM – 12:00 PM</td>
+                <td data-time="13:00" data-day="Viernes">01:00 PM – 03:00 PM</td>
+                <td data-time="08:00" data-day="Sábado">08:00 AM – 10:00 AM</td>
+                <td data-time="09:00" data-day="Domingo">09:00 AM – 11:00 AM</td>
+            </tr>
+            <tr>
+                <td>Bloque 2</td>
+                <td data-time="12:00" data-day="Lunes">12:00 PM – 02:00 PM</td>
+                <td data-time="13:00" data-day="Miércoles">01:00 PM – 03:00 PM</td>
+                <td data-time="16:00" data-day="Viernes">04:00 PM – 06:00 PM</td>
+                <td data-time="11:00" data-day="Sábado">11:00 AM – 01:00 PM</td>
+                <td data-time="12:00" data-day="Domingo">12:00 PM – 02:00 PM</td>
+            </tr>
+            <tr>
+                <td>Bloque 3</td>
+                <td data-time="15:00" data-day="Lunes">03:00 PM – 05:00 PM</td>
+                <td data-time="16:00" data-day="Miércoles">04:00 PM – 06:00 PM</td>
+                <td data-time="-" data-day="Viernes">-</td>
+                <td data-time="14:00" data-day="Sábado">02:00 PM – 04:00 PM</td>
+                <td data-time="-" data-day="Domingo">-</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Vehicle Selection -->
+    <div id="vehicle-selection">
+        <h3>Assign a Vehicle</h3>
+        <select id="vehicleDropdown">
+            <option value="mitsubishi-nc700x-P783524-2014">Mitsubishi - NC700X - P783524 (2014)</option>
+            <option value="toyota-corolla-P123456-2018">Toyota - Corolla - P123456 (2018)</option>
+            <!-- Dynamically populated vehicles for the customer -->
         </select>
-
-        <label for="preferredDate">Preferred Date:</label>
-        <input type="date" id="preferredDate" required>
-
-        <label for="timeBlock">Select Time Block:</label>
-        <select id="timeBlock">
-            <option value="Morning Inspection">Morning Inspection</option>
-            <option value="Afternoon Slot">Afternoon Slot</option>
-            <option value="Evening Service">Evening Service</option>
-        </select>
-
-        <button id="scheduleBooking">Schedule Booking</button>
     </div>
 
+    <!-- Customer Information -->
+    <div id="customer-info">
+        <h3>Customer Information</h3>
+        <input type="email" id="customerEmail" placeholder="Enter Customer Email" required>
+        <button id="confirmBooking">Confirm Booking</button>
+    </div>
+
+    <!-- Calendar -->
     <div id="calendar-container">
         <div id="calendar"></div>
     </div>
@@ -70,9 +123,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
-            const scheduleButton = document.getElementById('scheduleBooking');
+            const confirmBookingBtn = document.getElementById('confirmBooking');
+            const selectedSlot = { day: null, time: null };
 
-            // Initialize FullCalendar
+            // Initialize Calendar
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 editable: false,
@@ -81,60 +135,53 @@
                     center: 'title',
                     right: 'timeGridWeek,timeGridDay'
                 },
-                events: [], // Initialize with no events
+                events: [] // No initial events
             });
 
             calendar.render();
 
-            // Function to find the next available slot
-            function findNextAvailableSlot(preferredDate, blockTitle) {
-                const events = calendar.getEvents();
-                const preferredDateTime = new Date(preferredDate);
+            // Select Slot from Table
+            document.querySelectorAll('.schedule-table td[data-time]').forEach(cell => {
+                cell.addEventListener('click', function () {
+                    // Highlight the selected cell
+                    document.querySelectorAll('.schedule-table td').forEach(td => td.style.backgroundColor = '');
+                    this.style.backgroundColor = '#ffcccb';
 
-                // Time block mappings
-                const timeBlocks = {
-                    "Morning Inspection": "09:00",
-                    "Afternoon Slot": "13:00",
-                    "Evening Service": "17:00"
-                };
+                    // Save selection
+                    selectedSlot.day = this.dataset.day;
+                    selectedSlot.time = this.dataset.time;
 
-                const blockTime = timeBlocks[blockTitle];
-                const desiredSlot = new Date(
-                    `${preferredDateTime.toISOString().split('T')[0]}T${blockTime}:00`
-                );
+                    alert(`Selected Slot: ${selectedSlot.day} at ${selectedSlot.time}`);
+                });
+            });
 
-                let nextSlot = desiredSlot;
+            // Confirm Booking
+            confirmBookingBtn.addEventListener('click', () => {
+                const customerEmail = document.getElementById('customerEmail').value;
+                const vehicleInfo = document.getElementById('vehicleDropdown').value;
 
-                // Check if desired slot is taken
-                while (events.some(event => new Date(event.start).getTime() === nextSlot.getTime())) {
-                    // Increment by 1 day
-                    nextSlot.setDate(nextSlot.getDate() + 1);
-                }
-
-                return nextSlot;
-            }
-
-            // Handle scheduling button
-            scheduleButton.addEventListener('click', () => {
-                const customerName = document.getElementById('customerName').value;
-                const preferredDate = document.getElementById('preferredDate').value;
-                const timeBlock = document.getElementById('timeBlock').value;
-
-                if (!preferredDate) {
-                    alert("Please select a preferred date.");
+                if (!selectedSlot.day || !selectedSlot.time) {
+                    alert("Please select a day and time block.");
                     return;
                 }
 
-                const nextSlot = findNextAvailableSlot(preferredDate, timeBlock);
+                if (!customerEmail) {
+                    alert("Please enter a customer email.");
+                    return;
+                }
 
                 // Add event to calendar
+                const eventStart = new Date();
+                eventStart.setHours(parseInt(selectedSlot.time.split(':')[0]));
+                eventStart.setMinutes(0, 0, 0);
+
                 calendar.addEvent({
-                    title: `${timeBlock} - ${customerName}`,
-                    start: nextSlot.toISOString(),
+                    title: `Booking for ${customerEmail}\nVehicle: ${vehicleInfo}`,
+                    start: eventStart.toISOString(),
                     allDay: false
                 });
 
-                alert(`Booking scheduled for ${customerName} on ${nextSlot}`);
+                alert(`Booking confirmed for ${customerEmail} with ${vehicleInfo}`);
             });
         });
     </script>
