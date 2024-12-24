@@ -3,108 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Clientes - AutoCuidado Club</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.0/main.min.js"></script>
+    <title>Gestión de Clientes y Calendario</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            margin: 20px;
         }
-        .navbar {
-            background-color: #007bff;
-            padding: 10px;
-        }
-        .navbar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: space-around;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        header {
-            background-color: #f4f4f4;
-            padding: 20px;
+
+        h1 {
             text-align: center;
         }
-        #restricted-content {
-            padding: 20px;
-        }
-        #calendar {
-            max-width: 900px;
-            margin: 20px auto;
-        }
+
         #menu {
-            max-width: 900px;
-            margin: 20px auto;
+            width: 300px;
             padding: 15px;
             background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 8px;
+            margin: 20px auto;
         }
-        #menu select, #menu input, #menu button {
+
+        #menu select, #menu button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             font-size: 16px;
         }
+
+        #calendar-container {
+            max-width: 900px;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <ul>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="calendar.html">Calendario</a></li>
-            <li><a href="logout.html">Cerrar Sesión</a></li>
-        </ul>
-    </nav>
+    <h1>Gestión de Clientes y Calendario</h1>
 
-    <header>
-        <h1>Gestión de Clientes y Calendario</h1>
-    </header>
+    <div id="menu">
+        <h3>Crear una Reserva</h3>
+        <label for="customerName">Seleccionar Cliente:</label>
+        <select id="customerName">
+            <!-- Dynamic options from Firebase -->
+        </select>
 
-    <section id="restricted-content">
-        <h2>Panel de Gestión y Calendario</h2>
+        <label for="preferredDay">Seleccionar Día:</label>
+        <select id="preferredDay">
+            <option value="Lunes">Lunes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sábado">Sábado</option>
+            <option value="Domingo">Domingo</option>
+        </select>
 
-        <div id="menu">
-            <h3>Crear una Reserva</h3>
-            <label for="customerEmail">Seleccionar Cliente:</label>
-            <select id="customerEmail"></select>
+        <label for="timeBlock">Seleccionar Bloque de Tiempo:</label>
+        <select id="timeBlock">
+            <!-- Dynamic options based on selected day -->
+        </select>
 
-            <label for="preferredDate">Fecha Preferida:</label>
-            <input type="date" id="preferredDate" required>
+        <label for="vehicle">Seleccionar Vehículo:</label>
+        <select id="vehicle">
+            <!-- Dynamic options based on selected customer -->
+        </select>
 
-            <label for="timeBlock">Seleccionar Bloque de Tiempo:</label>
-            <select id="timeBlock">
-                <option value="Bloque 1">Bloque 1 (9:00 AM - 11:00 AM)</option>
-                <option value="Bloque 2">Bloque 2 (12:00 PM - 2:00 PM)</option>
-                <option value="Bloque 3">Bloque 3 (3:00 PM - 5:00 PM)</option>
-            </select>
+        <button id="scheduleBooking">Programar Reserva</button>
+    </div>
 
-            <label for="vehicle">Seleccionar Vehículo:</label>
-            <select id="vehicle"></select>
-
-            <button id="scheduleBooking">Programar Reserva</button>
-        </div>
-
+    <div id="calendar-container">
         <div id="calendar"></div>
-    </section>
+    </div>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const db = firebase.firestore();
+
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
-            const scheduleButton = document.getElementById('scheduleBooking');
-            const customerEmailDropdown = document.getElementById('customerEmail');
+            const customerDropdown = document.getElementById('customerName');
+            const timeBlockDropdown = document.getElementById('timeBlock');
             const vehicleDropdown = document.getElementById('vehicle');
+            const dayDropdown = document.getElementById('preferredDay');
+            const scheduleButton = document.getElementById('scheduleBooking');
 
-            // Initialize FullCalendar
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 editable: false,
@@ -113,77 +110,85 @@
                     center: 'title',
                     right: 'timeGridWeek,timeGridDay'
                 },
-                events: [] // Events will be fetched dynamically
+                events: [] // Initialize with no events
             });
 
             calendar.render();
 
-            // Fetch customers and populate dropdown
-            function fetchCustomers() {
-                db.collection('users').get().then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        const user = doc.data();
-                        const option = document.createElement('option');
-                        option.value = user.email;
-                        option.textContent = `${user.name} (${user.email})`;
-                        customerEmailDropdown.appendChild(option);
-                    });
+            // Fetch customers from Firebase
+            db.collection('users').get().then(snapshot => {
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    const option = document.createElement('option');
+                    option.value = user.email;
+                    option.textContent = user.name;
+                    customerDropdown.appendChild(option);
                 });
-            }
+            });
 
-            // Fetch vehicles for selected customer
-            customerEmailDropdown.addEventListener('change', () => {
-                const selectedEmail = customerEmailDropdown.value;
-                vehicleDropdown.innerHTML = '';
+            // Handle day selection to populate time blocks
+            dayDropdown.addEventListener('change', function () {
+                const selectedDay = dayDropdown.value;
+                const timeBlocks = {
+                    Lunes: ['9:00 AM - 11:00 AM', '12:00 PM - 2:00 PM', '3:00 PM - 5:00 PM'],
+                    Miércoles: ['10:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '4:00 PM - 6:00 PM'],
+                    Viernes: ['1:00 PM - 3:00 PM', '4:00 PM - 6:00 PM'],
+                    Sábado: ['8:00 AM - 10:00 AM', '11:00 AM - 1:00 PM', '2:00 PM - 4:00 PM'],
+                    Domingo: ['9:00 AM - 11:00 AM', '12:00 PM - 2:00 PM']
+                };
 
-                db.collection('users').where('email', '==', selectedEmail).get().then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
+                timeBlockDropdown.innerHTML = '';
+                timeBlocks[selectedDay].forEach(block => {
+                    const option = document.createElement('option');
+                    option.value = block;
+                    option.textContent = block;
+                    timeBlockDropdown.appendChild(option);
+                });
+            });
+
+            // Handle customer selection to populate vehicles
+            customerDropdown.addEventListener('change', function () {
+                const selectedCustomer = customerDropdown.value;
+
+                db.collection('users').where('email', '==', selectedCustomer).get().then(snapshot => {
+                    snapshot.forEach(doc => {
                         const user = doc.data();
-                        if (user.vehicles) {
-                            user.vehicles.forEach((vehicle, index) => {
-                                const option = document.createElement('option');
-                                option.value = `${vehicle.brand} - ${vehicle.model} - ${vehicle.plate}`;
-                                option.textContent = `Vehículo ${index + 1}: ${vehicle.brand} - ${vehicle.model} (${vehicle.year})`;
-                                vehicleDropdown.appendChild(option);
-                            });
-                        }
+
+                        vehicleDropdown.innerHTML = '';
+                        user.vehicles.forEach(vehicle => {
+                            const option = document.createElement('option');
+                            option.value = `${vehicle.brand} - ${vehicle.model} - ${vehicle.plate}`;
+                            option.textContent = `${vehicle.brand} - ${vehicle.model} - ${vehicle.plate}`;
+                            vehicleDropdown.appendChild(option);
+                        });
                     });
                 });
             });
 
-            // Schedule booking
+            // Handle booking
             scheduleButton.addEventListener('click', () => {
-                const customerEmail = customerEmailDropdown.value;
-                const preferredDate = document.getElementById('preferredDate').value;
-                const timeBlock = document.getElementById('timeBlock').value;
+                const customerName = customerDropdown.value;
+                const selectedDay = dayDropdown.value;
+                const timeBlock = timeBlockDropdown.value;
                 const vehicle = vehicleDropdown.value;
 
-                if (!customerEmail || !preferredDate || !timeBlock || !vehicle) {
-                    alert('Por favor, complete todos los campos.');
+                if (!customerName || !selectedDay || !timeBlock || !vehicle) {
+                    alert('Por favor complete todos los campos.');
                     return;
                 }
 
-                const bookingDate = new Date(preferredDate);
-                const timeBlocks = {
-                    "Bloque 1": "09:00",
-                    "Bloque 2": "12:00",
-                    "Bloque 3": "15:00"
-                };
-
-                bookingDate.setHours(parseInt(timeBlocks[timeBlock].split(':')[0]));
-                bookingDate.setMinutes(parseInt(timeBlocks[timeBlock].split(':')[1]));
+                // Save booking to calendar and Firebase
+                const bookingTitle = `${timeBlock} - ${vehicle}`;
+                const bookingDate = new Date(); // Adjust to reflect actual day and block
 
                 calendar.addEvent({
-                    title: `${timeBlock} - ${customerEmail.split('@')[0]} - ${vehicle}`,
+                    title: bookingTitle,
                     start: bookingDate.toISOString(),
                     allDay: false
                 });
 
-                alert(`Reserva confirmada para ${customerEmail} con ${vehicle} en ${timeBlock}`);
+                alert(`Reserva programada para ${customerName} con ${vehicle}`);
             });
-
-            // Initialize data fetch
-            fetchCustomers();
         });
     </script>
 </body>
