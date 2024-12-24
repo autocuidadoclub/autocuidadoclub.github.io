@@ -56,24 +56,28 @@
                 });
             });
 
-            // Initialize FullCalendar
+            // Initialize FullCalendar with interaction plugin
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 editable: true,
-                droppable: true,
-                events: [],
+                droppable: true, // Enables drop functionality
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'timeGridWeek,timeGridDay'
+                },
                 drop: function (info) {
-                    // Get the dropped title
+                    // Extract event title from the dragged element
                     const eventTitle = info.draggedEl.dataset.title;
 
-                    // Create an event at the drop location
+                    // Add event to the calendar
                     calendar.addEvent({
                         title: eventTitle,
                         start: info.date,
                         allDay: info.allDay
                     });
 
-                    console.log(`Event added: ${eventTitle} on ${info.date}`);
+                    alert(`Event "${eventTitle}" added on ${info.date}`);
                 }
             });
 
