@@ -8,14 +8,76 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #007bff;
+            padding: 10px;
+        }
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        header {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+        #restricted-content {
+            padding: 20px;
+        }
+        #searchForm {
+            margin-bottom: 20px;
+        }
+        #searchForm label, #searchForm select, #searchForm input, #searchForm button {
+            margin-right: 10px;
+        }
+        #user-details {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        #vehicle-details .vehicle {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <ul class="nav-links">
+        <ul>
             <li><a href="dashboard.html">Dashboard</a></li>
             <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="#" onclick="logout()">Cerrar Sesión</a></li>
+            <li><a href="logout.html">Cerrar Sesión</a></li>
         </ul>
     </nav>
 
@@ -42,25 +104,21 @@
         </form>
 
         <!-- Customer Details -->
-        <section id="user-details" style="display:none;">
+        <section id="user-details" style="display: none;">
             <h2>Detalles del Cliente</h2>
             <p><strong>Nombre:</strong> <span id="userName"></span></p>
             <p><strong>Email:</strong> <span id="userEmail"></span></p>
             <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
-            <p><strong>Departamento:</strong> <span id="userDepartment"></span></p>
-            <p><strong>Municipio:</strong> <span id="userMunicipality"></span></p>
-            <p><strong>Plan seleccionado:</strong> <span id="userPlanType"></span></p>
-            <p><strong>Horario Actual:</strong> <span id="userSchedule"></span></p>
+            <p><strong>Plan Seleccionado:</strong> <span id="userPlanType"></span></p>
+            <p><strong>Horario Actual:</strong> <span id="selectedSchedule"></span></p>
             <p><strong>Fecha de Registro:</strong> <span id="registrationDate"></span></p>
             <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
             <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate"></span></p>
             <p><strong>Última Reprogramación:</strong> <span id="lastReschedule"></span></p>
 
-            <!-- Vehicles Section -->
             <h3>Vehículos Registrados</h3>
-            <div id="vehicles-list"></div>
+            <div id="vehicle-details"></div>
 
-            <!-- Update Payment Date -->
             <label for="paymentDate">Actualizar Fecha de Pago:</label>
             <input type="date" id="paymentDate">
             <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
@@ -93,8 +151,10 @@
                 db.collection("users").doc(userEmail).get()
                     .then((doc) => {
                         if (doc.exists && doc.data().role === "staff") {
+                            // User is authorized, show restricted content
                             document.getElementById("restricted-content").style.display = "block";
                         } else {
+                            // Unauthorized user, redirect to login page
                             alert("Acceso denegado. No tienes permisos para esta página.");
                             window.location.href = "login.html";
                         }
@@ -104,6 +164,7 @@
                         window.location.href = "login.html";
                     });
             } else {
+                // Not logged in, redirect to login page
                 window.location.href = "login.html";
             }
         });
@@ -134,21 +195,28 @@
                 query = db.collection("users").where("phone", "==", value);
             } else if (field === "licensePlate") {
                 query = db.collection("users").where("vehicles", "array-contains", { plate: value });
+            } else {
+                alert("Campo de búsqueda no válido.");
+                return;
             }
 
-            query.get().then((querySnapshot) => {
-                if (querySnapshot.empty) {
-                    alert("No se encontraron clientes con ese criterio de búsqueda.");
-                    return;
-                }
+            query
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        alert("No se encontraron clientes con ese criterio de búsqueda.");
+                        return;
+                    }
 
-                querySnapshot.forEach((doc) => {
+                    // Show only the first result for simplicity
+                    const doc = querySnapshot.docs[0];
                     const userData = doc.data();
                     displayCustomerDetails(userData);
+                })
+                .catch((error) => {
+                    console.error("Error al buscar el cliente:", error);
+                    alert("Hubo un error en la búsqueda. Por favor, inténtalo de nuevo.");
                 });
-            }).catch((error) => {
-                console.error("Error al buscar el cliente:", error);
-            });
         }
 
         // Display customer details
@@ -156,42 +224,29 @@
             document.getElementById("userName").textContent = userData.name || "N/A";
             document.getElementById("userEmail").textContent = userData.email || "N/A";
             document.getElementById("userPhone").textContent = userData.phone || "N/A";
-            document.getElementById("userDepartment").textContent = userData.department || "N/A";
-            document.getElementById("userMunicipality").textContent = userData.municipality || "N/A";
             document.getElementById("userPlanType").textContent = userData.planType || "N/A";
-            document.getElementById("userSchedule").textContent = userData.selectedSchedule || "N/A";
-            document.getElementById("registrationDate").textContent = userData.registrationDate
-                ? userData.registrationDate.toDate().toLocaleDateString("es-ES")
-                : "N/A";
             document.getElementById("currentPaymentDate").textContent = userData.paymentDate
                 ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
-                : "N/A";
-            document.getElementById("nextPaymentDate").textContent = userData.nextPaymentDate
-                ? userData.nextPaymentDate.toDate().toLocaleDateString("es-ES")
-                : "N/A";
-            document.getElementById("lastReschedule").textContent = userData.lastReschedule
-                ? userData.lastReschedule.toDate().toLocaleDateString("es-ES")
-                : "N/A";
+                : "Sin fecha registrada";
+            document.getElementById("selectedSchedule").textContent = userData.selectedSchedule || "No asignado";
 
-            // Display vehicles
-            const vehiclesList = document.getElementById("vehicles-list");
-            vehiclesList.innerHTML = "";
+            const vehicleContainer = document.getElementById("vehicle-details");
+            vehicleContainer.innerHTML = "";
 
             if (userData.vehicles && userData.vehicles.length > 0) {
                 userData.vehicles.forEach((vehicle, index) => {
-                    const vehicleInfo = `
-                        <div class="vehicle-card">
-                            <p><strong>Vehículo ${index + 1}:</strong></p>
+                    const vehicleHtml = `
+                        <div class="vehicle">
+                            <h3>Vehículo ${index + 1}</h3>
                             <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
                             <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
                             <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
                             <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                        </div>
-                    `;
-                    vehiclesList.innerHTML += vehicleInfo;
+                        </div>`;
+                    vehicleContainer.innerHTML += vehicleHtml;
                 });
             } else {
-                vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+                vehicleContainer.innerHTML = "<p>No hay vehículos registrados.</p>";
             }
 
             document.getElementById("user-details").style.display = "block";
