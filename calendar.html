@@ -6,12 +6,7 @@
     <title>Booking Calendar - AutoCuidado Club</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.css">
     <style>
-        /* Styling the calendar and drag menu */
         #menu {
             width: 200px;
             padding: 10px;
@@ -50,88 +45,24 @@
     </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-  authDomain: "auto-cuidadoclub.firebaseapp.com",
-  databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-  projectId: "auto-cuidadoclub",
-  storageBucket: "auto-cuidadoclub.appspot.com",
-  messagingSenderId: "986704701191",
-  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-  measurementId: "G-LBBGXV2YX5"
-};
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
-
-        // Initialize FullCalendar
         document.addEventListener('DOMContentLoaded', function () {
+            console.log("Initializing calendar...");
             const calendarEl = document.getElementById('calendar');
+
+            if (!calendarEl) {
+                console.error("Calendar element not found.");
+                return;
+            }
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 editable: true,
                 droppable: true,
-                events: async function (fetchInfo, successCallback, failureCallback) {
-                    // Fetch events from Firebase
-                    const events = [];
-                    const snapshot = await db.collection("bookings").get();
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        events.push({
-                            id: doc.id,
-                            title: data.title,
-                            start: data.start.toDate(),
-                            end: data.end.toDate(),
-                        });
-                    });
-                    successCallback(events);
-                },
-                eventDrop: function (info) {
-                    // Update event in Firebase when dragged
-                    db.collection("bookings").doc(info.event.id).update({
-                        start: info.event.start,
-                        end: info.event.end
-                    });
-                }
+                events: [],
             });
 
             calendar.render();
-
-            // Dragula for drag-and-drop
-            const menuItems = document.querySelectorAll('.menu-item');
-            menuItems.forEach(item => {
-                item.addEventListener('dragstart', function (e) {
-                    e.dataTransfer.setData('text/plain', JSON.stringify({
-                        title: e.target.dataset.title
-                    }));
-                });
-            });
-
-            calendarEl.addEventListener('dragover', function (e) {
-                e.preventDefault();
-            });
-
-            calendarEl.addEventListener('drop', function (e) {
-                e.preventDefault();
-                const eventData = JSON.parse(e.dataTransfer.getData('text/plain'));
-                const date = calendar.getDate(); // Assume drop on current date for simplicity
-                const start = new Date(date);
-                const end = new Date(start);
-                end.setHours(start.getHours() + 2); // Example block duration: 2 hours
-
-                // Add event to Firebase
-                db.collection("bookings").add({
-                    title: eventData.title,
-                    start: start,
-                    end: end
-                }).then(() => {
-                    calendar.refetchEvents(); // Refresh calendar
-                });
-            });
+            console.log("Calendar rendered successfully.");
         });
     </script>
 </body>
