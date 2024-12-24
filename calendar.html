@@ -149,38 +149,35 @@
         });
 
         function searchCustomer(field, value) {
-            let query;
+    let query;
 
-            if (field === 'email') {
-                query = db.collection('users').where('email', '==', value);
-            } else if (field === 'name') {
-                query = db.collection('users').where('name', '==', value);
-            } else if (field === 'phone') {
-                query = db.collection('users').where('phone', '==', value);
-            } else if (field === 'licensePlate') {
-                query = db.collection('users').where('vehicles', 'array-contains', { plate: value });
+    if (field === "email") {
+        query = db.collection("users").where("email", "==", value.trim());
+    } else if (field === "name") {
+        query = db.collection("users").where("name", "==", value.trim());
+    } else if (field === "phone") {
+        query = db.collection("users").where("phone", "==", value.trim());
+    } else if (field === "licensePlate") {
+        query = db.collection("users").where("vehicles", "array-contains", { plate: value.trim() });
+    }
+
+    query
+        .get()
+        .then(querySnapshot => {
+            if (querySnapshot.empty) {
+                alert("No se encontraron clientes con ese criterio de búsqueda.");
+                return;
             }
 
-            query
-                .get()
-                .then(querySnapshot => {
-                    if (querySnapshot.empty) {
-                        alert('No se encontraron clientes con ese criterio de búsqueda.');
-                        return;
-                    }
+            const doc = querySnapshot.docs[0];
+            const userData = doc.data();
+            displayCustomerDetails(userData); // Call the function to display the details
+        })
+        .catch(error => {
+            console.error("Error al buscar el cliente:", error);
+        });
+}
 
-                    const doc = querySnapshot.docs[0];
-                    const userData = doc.data();
-                    selectedCustomerSpan.textContent = `${userData.name} (${userData.email})`;
-                    customerDetails.style.display = 'block';
-
-                    // Populate vehicles for the selected customer
-                    populateVehicles(userData);
-                })
-                .catch(error => {
-                    console.error('Error al buscar el cliente:', error);
-                });
-        }
 
         function populateVehicles(userData) {
             vehicleSelect.innerHTML = '<option value="">Seleccionar Vehículo</option>';
