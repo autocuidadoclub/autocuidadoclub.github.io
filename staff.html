@@ -15,7 +15,7 @@
         <ul class="nav-links">
             <li><a href="dashboard.html">Dashboard</a></li>
             <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="logout.html">Cerrar Sesión</a></li>
+            <li><a href="#" onclick="logout()">Cerrar Sesión</a></li>
         </ul>
     </nav>
 
@@ -24,7 +24,7 @@
     </header>
 
     <!-- Staff Section -->
-     <section id="restricted-content" style="display: none;">
+    <section id="restricted-content" style="display: none;">
         <h2>Panel de Gestión para el Staff</h2>
         <p>Bienvenido, este panel es solo para personal autorizado.</p>
 
@@ -47,7 +47,20 @@
             <p><strong>Nombre:</strong> <span id="userName"></span></p>
             <p><strong>Email:</strong> <span id="userEmail"></span></p>
             <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
+            <p><strong>Departamento:</strong> <span id="userDepartment"></span></p>
+            <p><strong>Municipio:</strong> <span id="userMunicipality"></span></p>
+            <p><strong>Plan seleccionado:</strong> <span id="userPlanType"></span></p>
+            <p><strong>Horario Actual:</strong> <span id="userSchedule"></span></p>
+            <p><strong>Fecha de Registro:</strong> <span id="registrationDate"></span></p>
             <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate"></span></p>
+            <p><strong>Última Reprogramación:</strong> <span id="lastReschedule"></span></p>
+
+            <!-- Vehicles Section -->
+            <h3>Vehículos Registrados</h3>
+            <div id="vehicles-list"></div>
+
+            <!-- Update Payment Date -->
             <label for="paymentDate">Actualizar Fecha de Pago:</label>
             <input type="date" id="paymentDate">
             <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
@@ -73,17 +86,15 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-          // Check User Authorization
+        // Check User Authorization
         auth.onAuthStateChanged((user) => {
             if (user) {
                 const userEmail = user.email;
                 db.collection("users").doc(userEmail).get()
                     .then((doc) => {
                         if (doc.exists && doc.data().role === "staff") {
-                            // User is authorized, show restricted content
                             document.getElementById("restricted-content").style.display = "block";
                         } else {
-                            // Unauthorized user, redirect to login page
                             alert("Acceso denegado. No tienes permisos para esta página.");
                             window.location.href = "login.html";
                         }
@@ -93,11 +104,10 @@
                         window.location.href = "login.html";
                     });
             } else {
-                // Not logged in, redirect to login page
                 window.location.href = "login.html";
             }
         });
-        
+
         // Handle search form submission
         document.getElementById("searchForm").addEventListener("submit", function (event) {
             event.preventDefault();
@@ -123,10 +133,7 @@
             } else if (field === "phone") {
                 query = db.collection("users").where("phone", "==", value);
             } else if (field === "licensePlate") {
-                // Query for nested array in 'vehicles'
-                query = db.collection("users").where("vehicles", "array-contains-any", [
-                    { plate: value }
-                ]);
+                query = db.collection("users").where("vehicles", "array-contains", { plate: value });
             }
 
             query.get().then((querySnapshot) => {
@@ -149,9 +156,44 @@
             document.getElementById("userName").textContent = userData.name || "N/A";
             document.getElementById("userEmail").textContent = userData.email || "N/A";
             document.getElementById("userPhone").textContent = userData.phone || "N/A";
+            document.getElementById("userDepartment").textContent = userData.department || "N/A";
+            document.getElementById("userMunicipality").textContent = userData.municipality || "N/A";
+            document.getElementById("userPlanType").textContent = userData.planType || "N/A";
+            document.getElementById("userSchedule").textContent = userData.selectedSchedule || "N/A";
+            document.getElementById("registrationDate").textContent = userData.registrationDate
+                ? userData.registrationDate.toDate().toLocaleDateString("es-ES")
+                : "N/A";
             document.getElementById("currentPaymentDate").textContent = userData.paymentDate
                 ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
-                : "Sin fecha registrada";
+                : "N/A";
+            document.getElementById("nextPaymentDate").textContent = userData.nextPaymentDate
+                ? userData.nextPaymentDate.toDate().toLocaleDateString("es-ES")
+                : "N/A";
+            document.getElementById("lastReschedule").textContent = userData.lastReschedule
+                ? userData.lastReschedule.toDate().toLocaleDateString("es-ES")
+                : "N/A";
+
+            // Display vehicles
+            const vehiclesList = document.getElementById("vehicles-list");
+            vehiclesList.innerHTML = "";
+
+            if (userData.vehicles && userData.vehicles.length > 0) {
+                userData.vehicles.forEach((vehicle, index) => {
+                    const vehicleInfo = `
+                        <div class="vehicle-card">
+                            <p><strong>Vehículo ${index + 1}:</strong></p>
+                            <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                            <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                            <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                            <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                        </div>
+                    `;
+                    vehiclesList.innerHTML += vehicleInfo;
+                });
+            } else {
+                vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+            }
+
             document.getElementById("user-details").style.display = "block";
         }
 
@@ -178,7 +220,7 @@
             });
         }
 
-         // Logout Functionality
+        // Logout Functionality
         function logout() {
             auth.signOut().then(() => {
                 window.location.href = "login.html";
