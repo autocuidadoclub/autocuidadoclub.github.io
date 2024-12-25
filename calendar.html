@@ -113,6 +113,10 @@
     </div>
 
     <script>
+        console.log("Initializing Firebase...");
+firebase.initializeApp(firebaseConfig);
+console.log("Firebase initialized:", firebase.app().name);
+
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
@@ -158,63 +162,81 @@
 
         // Search customer by field
         function searchCustomer(field, value) {
-            console.log("Searching for customers...");
-            console.log("Field:", field, "Value:", value);
+    let query;
 
-            let query;
+    if (field === "email") {
+        query = db.collection("users").where("email", "==", value);
+    } else if (field === "name") {
+        query = db.collection("users").where("name", "==", value);
+    } else if (field === "phone") {
+        query = db.collection("users").where("phone", "==", value);
+    } else if (field === "licensePlate") {
+        query = db.collection("users").where("vehicles", "array-contains", { plate: value });
+    } else {
+        alert("Campo de búsqueda no válido.");
+        return;
+    }
 
-            if (field === "email") {
-                query = db.collection("users").where("email", "==", value);
-            } else if (field === "name") {
-                query = db.collection("users").where("name", "==", value);
-            } else if (field === "phone") {
-                query = db.collection("users").where("phone", "==", value);
-            } else if (field === "licensePlate") {
-                query = db.collection("users").where("vehicles", "array-contains", { plate: value });
-            } else {
-                alert("Campo de búsqueda no válido.");
+    query
+        .get()
+        .then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                console.log("Query Snapshot is empty for:", { field, value });
+                alert("No se encontraron clientes con ese criterio de búsqueda.");
                 return;
             }
 
-            query
-                .get()
-                .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        console.warn("No clients found for the given query.");
-                        alert("No se encontraron clientes con ese criterio de búsqueda.");
-                        return;
-                    }
+            // Show the first result for simplicity
+            const doc = querySnapshot.docs[0];
+            const userData = doc.data();
+            console.log("User data retrieved:", userData);
+            displayCustomerDetails(userData);
+        })
+        .catch((error) => {
+            console.error("Error al buscar el cliente:", error.message, { field, value });
+            alert("Hubo un error en la búsqueda. Por favor, inténtalo de nuevo.");
+        });
+}
 
-                    console.log("Client documents found:", querySnapshot.docs.map(doc => doc.data()));
-                    const doc = querySnapshot.docs[0];
-                    const userData = doc.data();
-                    displayCustomerDetails(userData);
-                })
-                .catch((error) => {
-                    console.error("Error fetching customers:", error);
-                    alert("Hubo un error en la búsqueda. Por favor, inténtalo de nuevo.");
-                });
-        }
 
         // Display customer details
         function displayCustomerDetails(userData) {
-            document.getElementById("selectedCustomer").textContent = userData.email || "N/A";
-            document.getElementById("customerDetails").style.display = "block";
+    if (!userData) {
+        alert("Datos del cliente no disponibles.");
+        return;
+    }
 
-            console.log("Displaying customer details:", userData);
+    document.getElementById("userName").textContent = userData.name || "N/A";
+    document.getElementById("userEmail").textContent = userData.email || "N/A";
+    document.getElementById("userPhone").textContent = userData.phone || "N/A";
+    document.getElementById("userPlanType").textContent = userData.planType || "N/A";
+    document.getElementById("currentPaymentDate").textContent = userData.paymentDate
+        ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
+        : "Sin fecha registrada";
+    document.getElementById("selectedSchedule").textContent = userData.selectedSchedule || "No asignado";
 
-            // Populate vehicles
-            const vehicleSelect = document.getElementById("vehicle-select");
-            vehicleSelect.innerHTML = '<option value="">Seleccionar Vehículo</option>';
-            if (userData.vehicles) {
-                userData.vehicles.forEach(vehicle => {
-                    const option = document.createElement('option');
-                    option.value = `${vehicle.brand} ${vehicle.model} - ${vehicle.plate}`;
-                    option.textContent = `${vehicle.brand} ${vehicle.model} (${vehicle.year}) - ${vehicle.plate}`;
-                    vehicleSelect.appendChild(option);
-                });
-            }
-        }
+    const vehicleContainer = document.getElementById("vehicle-details");
+    vehicleContainer.innerHTML = "";
+
+    if (userData.vehicles && userData.vehicles.length > 0) {
+        userData.vehicles.forEach((vehicle, index) => {
+            const vehicleHtml = `
+                <div class="vehicle">
+                    <h3>Vehículo ${index + 1}</h3>
+                    <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                    <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                    <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                    <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                </div>`;
+            vehicleContainer.innerHTML += vehicleHtml;
+        });
+    } else {
+        vehicleContainer.innerHTML = "<p>No hay vehículos registrados.</p>";
+    }
+
+    document.getElementById("user-details").style.display = "block";
+}
+
 
         // Update time blocks based on selected day
         const timeBlockSelect = document.getElementById('time-block');
