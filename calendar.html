@@ -126,61 +126,87 @@
 
         };
 
-        if (!firebase.apps.length) {
+                if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
 
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Handle search form submission
-        const searchForm = document.getElementById('searchForm');
-        const customerDetails = document.getElementById('customerDetails');
-        const selectedCustomerSpan = document.getElementById('selectedCustomer');
-        const vehicleSelect = document.getElementById('vehicle-select');
+        // Check User Authorization
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const userEmail = user.email;
+                db.collection("users").doc(userEmail).get()
+                    .then((doc) => {
+                        if (doc.exists && doc.data().role === "staff") {
+                            // User is authorized, show restricted content
+                            document.getElementById("restricted-content").style.display = "block";
+                        } else {
+                            // Unauthorized user, redirect to login page
+                            alert("Acceso denegado. No tienes permisos para esta página.");
+                            window.location.href = "login.html";
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error al verificar permisos:", error);
+                        window.location.href = "login.html";
+                    });
+            } else {
+                // Not logged in, redirect to login page
+                window.location.href = "login.html";
+            }
+        });
 
-        searchForm.addEventListener('submit', function(event) {
+        // Handle search form submission
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
             event.preventDefault();
-            const searchBy = document.getElementById('searchBy').value;
-            const searchValue = document.getElementById('searchValue').value.trim();
+            const searchBy = document.getElementById("searchBy").value;
+            const searchValue = document.getElementById("searchValue").value.trim();
 
             if (!searchValue) {
-                alert('Por favor, ingrese un valor de búsqueda.');
+                alert("Por favor, ingrese un valor de búsqueda.");
                 return;
             }
 
             searchCustomer(searchBy, searchValue);
         });
 
+        // Search customer by field
         function searchCustomer(field, value) {
-    let query;
+            let query;
 
-    if (field === "email") {
-        query = db.collection("users").where("email", "==", value.trim());
-    } else if (field === "name") {
-        query = db.collection("users").where("name", "==", value.trim());
-    } else if (field === "phone") {
-        query = db.collection("users").where("phone", "==", value.trim());
-    } else if (field === "licensePlate") {
-        query = db.collection("users").where("vehicles", "array-contains", { plate: value.trim() });
-    }
-
-    query
-        .get()
-        .then(querySnapshot => {
-            if (querySnapshot.empty) {
-                alert("No se encontraron clientes con ese criterio de búsqueda.");
+            if (field === "email") {
+                query = db.collection("users").where("email", "==", value);
+            } else if (field === "name") {
+                query = db.collection("users").where("name", "==", value);
+            } else if (field === "phone") {
+                query = db.collection("users").where("phone", "==", value);
+            } else if (field === "licensePlate") {
+                query = db.collection("users").where("vehicles", "array-contains", { plate: value });
+            } else {
+                alert("Campo de búsqueda no válido.");
                 return;
             }
 
-            const doc = querySnapshot.docs[0];
-            const userData = doc.data();
-            displayCustomerDetails(userData); // Call the function to display the details
-        })
-        .catch(error => {
-            console.error("Error al buscar el cliente:", error);
-        });
-}
+            query
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        alert("No se encontraron clientes con ese criterio de búsqueda.");
+                        return;
+                    }
 
+                    // Show only the first result for simplicity
+                    const doc = querySnapshot.docs[0];
+                    const userData = doc.data();
+                    displayCustomerDetails(userData);
+                })
+                .catch((error) => {
+                    console.error("Error al buscar el cliente:", error);
+                    alert("Hubo un error en la búsqueda. Por favor, inténtalo de nuevo.");
+                });
+        }
 
         function populateVehicles(userData) {
             vehicleSelect.innerHTML = '<option value="">Seleccionar Vehículo</option>';
