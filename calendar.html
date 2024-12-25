@@ -157,44 +157,51 @@
         });
 
         // Schedule Booking
-        document.getElementById('schedule-btn').addEventListener('click', () => {
-            const email = document.getElementById('email-input').value;
-            const day = document.getElementById('day-select').value;
-            const timeBlock = timeBlockSelect.value;
+document.getElementById('schedule-btn').addEventListener('click', () => {
+    const clientEmail = document.getElementById("searchValue").value.trim();
+    const day = document.getElementById('day-select').value;
+    const timeBlock = document.getElementById('time-block').value;
+    const vehicle = document.getElementById('vehicle-select').value;
 
-            if (!email || !day || !timeBlock) {
-                alert('Por favor, completa todos los campos.');
-                return;
-            }
+    if (!clientEmail || !day || !timeBlock || !vehicle) {
+        alert('Por favor, completa todos los campos.');
+        return;
+    }
 
-            const dayToDate = { Lunes: 1, Miércoles: 3, Viernes: 5, Sábado: 6, Domingo: 0 };
-            const today = new Date();
-            let targetDate = new Date();
-            targetDate.setDate(today.getDate() + ((7 + dayToDate[day] - today.getDay()) % 7));
+    const dayToDate = { Lunes: 1, Miércoles: 3, Viernes: 5, Sábado: 6, Domingo: 0 };
+    const today = new Date();
+    let targetDate = new Date();
+    targetDate.setDate(today.getDate() + ((7 + dayToDate[day] - today.getDay()) % 7));
 
-            const [blockStart] = timeBlock.match(/\d{1,2}:\d{2} (AM|PM)/);
-            const startTime = new Date(`${targetDate.toDateString()} ${blockStart}`);
+    const [blockStart] = timeBlock.match(/\d{1,2}:\d{2} (AM|PM)/);
+    const startTime = new Date(`${targetDate.toDateString()} ${blockStart}`);
 
-            // Add event to calendar
+    const appointmentData = {
+        clientEmail,
+        day,
+        timeBlock,
+        vehicle,
+        startTime: firebase.firestore.Timestamp.fromDate(startTime),
+    };
+
+    // Write to Firestore
+    db.collection("appointments")
+        .add(appointmentData)
+        .then(() => {
             calendar.addEvent({
-                title: `${timeBlock} - ${email}`,
+                title: `${timeBlock} - ${vehicle}`,
                 start: startTime.toISOString(),
                 allDay: false
             });
 
-            // Save booking in Firebase and send alert
-            db.collection('bookings').add({
-                email: email,
-                day: day,
-                timeBlock: timeBlock,
-                scheduledTime: startTime
-            }).then(() => {
-                alert(`Reserva programada para ${email} el ${day} en ${timeBlock}.`);
-            }).catch(error => {
-                console.error("Error al guardar la reserva:", error);
-                alert("Hubo un error al guardar la reserva. Intenta nuevamente.");
-            });
+            alert(`Reserva programada para ${clientEmail} con ${vehicle} en ${day}, ${timeBlock}`);
+        })
+        .catch((error) => {
+            console.error("Error al guardar la reserva en Firebase:", error);
+            alert("Hubo un error al guardar la reserva. Intenta nuevamente.");
         });
+});
+
     </script>
 </body>
 </html>
