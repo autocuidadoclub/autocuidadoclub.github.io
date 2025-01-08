@@ -104,25 +104,24 @@
         </form>
 
         <!-- Customer Details -->
-        <section id="user-details" style="display: none;">
-            <h2>Detalles del Cliente</h2>
-            <p><strong>Nombre:</strong> <span id="userName"></span></p>
-            <p><strong>Email:</strong> <span id="userEmail"></span></p>
-            <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
-            <p><strong>Plan Seleccionado:</strong> <span id="userPlanType"></span></p>
-            <p><strong>Horario Actual:</strong> <span id="selectedSchedule"></span></p>
-            <p><strong>Fecha de Registro:</strong> <span id="registrationDate"></span></p>
-            <p><strong>Fecha de Pago Actual:</strong> <span id="currentPaymentDate"></span></p>
-            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate"></span></p>
-            <p><strong>Última Reprogramación:</strong> <span id="lastReschedule"></span></p>
+        <!-- Changes in the "Customer Details" Section -->
+    <section id="user-details" style="display: none;">
+    <h2>Detalles del Cliente</h2>
+    <p><strong>Nombre:</strong> <span id="userName"></span></p>
+    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+    <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
+    <p><strong>Plan Seleccionado:</strong> <span id="userPlanType"></span></p>
+    <p><strong>Horario Actual:</strong> <span id="selectedSchedule"></span></p>
+    <p><strong>Última Reprogramación:</strong> <span id="lastReschedule"></span></p>
 
-            <h3>Vehículos Registrados</h3>
-            <div id="vehicle-details"></div>
+    <h3>Vehículos Registrados</h3>
+    <div id="vehicle-details"></div>
 
-            <label for="paymentDate">Actualizar Fecha de Pago:</label>
-            <input type="date" id="paymentDate">
-            <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
-        </section>
+    <label for="paymentDate">Actualizar Fecha de Pago:</label>
+    <input type="date" id="paymentDate">
+    <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
+</section>
+
     </section>
 
     <script>
