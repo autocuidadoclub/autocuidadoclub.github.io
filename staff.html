@@ -38,25 +38,24 @@
         #restricted-content {
             padding: 20px;
         }
-        #searchForm {
-            margin-bottom: 20px;
-        }
-        #searchForm label, #searchForm select, #searchForm input, #searchForm button {
-            margin-right: 10px;
-        }
-        #user-details {
+        .section-title {
             margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
         }
-        #vehicle-details .vehicle {
-            margin-bottom: 20px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #fff;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
         }
         button {
             padding: 10px 15px;
@@ -68,6 +67,20 @@
         }
         button:hover {
             background-color: #0056b3;
+        }
+        .form-control {
+            margin-bottom: 15px;
+        }
+        .form-control label {
+            font-weight: bold;
+            display: block;
+        }
+        .form-control input, .form-control select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -85,47 +98,59 @@
         <h1>Gestión de Clientes</h1>
     </header>
 
-    <!-- Staff Section -->
     <section id="restricted-content" style="display: none;">
         <h2>Panel de Gestión para el Staff</h2>
-        <p>Bienvenido, este panel es solo para personal autorizado.</p>
 
-        <!-- Search Section -->
-        <form id="searchForm">
-            <label for="searchBy">Buscar Por:</label>
-            <select id="searchBy" required>
-                <option value="email">Email</option>
-                <option value="name">Nombre</option>
-                <option value="phone">Teléfono</option>
-                <option value="licensePlate">Placa del Vehículo</option>
-            </select>
-            <input type="text" id="searchValue" placeholder="Ingrese el valor de búsqueda" required>
-            <button type="submit">Buscar</button>
-        </form>
+        <!-- Finder Section -->
+        <div>
+            <h3 class="section-title">Buscar Usuarios por Fecha</h3>
+            <div class="form-control">
+                <label for="startDate">Desde:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-control">
+                <label for="endDate">Hasta:</label>
+                <input type="date" id="endDate">
+            </div>
+            <button onclick="findUsersByDate()">Buscar Usuarios</button>
+            <ul id="userResults"></ul>
+        </div>
 
-        <!-- Customer Details -->
-        <!-- Changes in the "Customer Details" Section -->
-    <section id="user-details" style="display: none;">
-    <h2>Detalles del Cliente</h2>
-    <p><strong>Nombre:</strong> <span id="userName"></span></p>
-    <p><strong>Email:</strong> <span id="userEmail"></span></p>
-    <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
-    <p><strong>Plan Seleccionado:</strong> <span id="userPlanType"></span></p>
-    <p><strong>Horario Actual:</strong> <span id="selectedSchedule"></span></p>
-    <p><strong>Última Reprogramación:</strong> <span id="lastReschedule"></span></p>
+        <!-- Payment Management -->
+        <div>
+            <h3 class="section-title">Control de Pagos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Estado del Pago</th>
+                        <th>Tipo de Pago</th>
+                        <th>Confirmar Pago</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTable"></tbody>
+            </table>
+        </div>
 
-    <h3>Vehículos Registrados</h3>
-    <div id="vehicle-details"></div>
-
-    <label for="paymentDate">Actualizar Fecha de Pago:</label>
-    <input type="date" id="paymentDate">
-    <button onclick="updatePaymentDate()">Actualizar Fecha de Pago</button>
-</section>
-
+        <!-- Calendar Management -->
+        <div>
+            <h3 class="section-title">Gestión de Calendario</h3>
+            <div class="form-control">
+                <label for="inspectionDate">Fecha de Inspección:</label>
+                <input type="date" id="inspectionDate">
+            </div>
+            <div class="form-control">
+                <label for="userEmail">Usuario (Email):</label>
+                <input type="email" id="userEmail">
+            </div>
+            <button onclick="bookInspection()">Agendar Inspección</button>
+            <h4>Inspecciones Agendadas</h4>
+            <ul id="inspectionList"></ul>
+        </div>
     </section>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
             authDomain: "auto-cuidadoclub.firebaseapp.com",
@@ -143,143 +168,70 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Check User Authorization
         auth.onAuthStateChanged((user) => {
             if (user) {
-                const userEmail = user.email;
-                db.collection("users").doc(userEmail).get()
-                    .then((doc) => {
-                        if (doc.exists && doc.data().role === "staff") {
-                            // User is authorized, show restricted content
-                            document.getElementById("restricted-content").style.display = "block";
-                        } else {
-                            // Unauthorized user, redirect to login page
-                            alert("Acceso denegado. No tienes permisos para esta página.");
-                            window.location.href = "login.html";
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error al verificar permisos:", error);
+                db.collection("users").doc(user.email).get().then((doc) => {
+                    if (doc.exists && doc.data().role === "staff") {
+                        document.getElementById("restricted-content").style.display = "block";
+                    } else {
+                        alert("No tienes permiso para acceder.");
                         window.location.href = "login.html";
-                    });
+                    }
+                });
             } else {
-                // Not logged in, redirect to login page
                 window.location.href = "login.html";
             }
         });
 
-        // Handle search form submission
-        document.getElementById("searchForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-            const searchBy = document.getElementById("searchBy").value;
-            const searchValue = document.getElementById("searchValue").value.trim();
+        function findUsersByDate() {
+            const startDate = new Date(document.getElementById("startDate").value);
+            const endDate = new Date(document.getElementById("endDate").value);
+            const userResults = document.getElementById("userResults");
 
-            if (!searchValue) {
-                alert("Por favor, ingrese un valor de búsqueda.");
-                return;
-            }
-
-            searchCustomer(searchBy, searchValue);
-        });
-
-        // Search customer by field
-        function searchCustomer(field, value) {
-            let query;
-
-            if (field === "email") {
-                query = db.collection("users").where("email", "==", value);
-            } else if (field === "name") {
-                query = db.collection("users").where("name", "==", value);
-            } else if (field === "phone") {
-                query = db.collection("users").where("phone", "==", value);
-            } else if (field === "licensePlate") {
-                query = db.collection("users").where("vehicles", "array-contains", { plate: value });
-            } else {
-                alert("Campo de búsqueda no válido.");
-                return;
-            }
-
-            query
+            userResults.innerHTML = "";
+            db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+                .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
                 .get()
                 .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        alert("No se encontraron clientes con ese criterio de búsqueda.");
-                        return;
-                    }
-
-                    // Show only the first result for simplicity
-                    const doc = querySnapshot.docs[0];
-                    const userData = doc.data();
-                    displayCustomerDetails(userData);
+                    querySnapshot.forEach((doc) => {
+                        userResults.innerHTML += `<li>${doc.data().name} - ${doc.data().email}</li>`;
+                    });
                 })
-                .catch((error) => {
-                    console.error("Error al buscar el cliente:", error);
-                    alert("Hubo un error en la búsqueda. Por favor, inténtalo de nuevo.");
-                });
+                .catch(console.error);
         }
 
-        // Display customer details
-        function displayCustomerDetails(userData) {
-            document.getElementById("userName").textContent = userData.name || "N/A";
-            document.getElementById("userEmail").textContent = userData.email || "N/A";
-            document.getElementById("userPhone").textContent = userData.phone || "N/A";
-            document.getElementById("userPlanType").textContent = userData.planType || "N/A";
-            document.getElementById("currentPaymentDate").textContent = userData.paymentDate
-                ? userData.paymentDate.toDate().toLocaleDateString("es-ES")
-                : "Sin fecha registrada";
-            document.getElementById("selectedSchedule").textContent = userData.selectedSchedule || "No asignado";
-
-            const vehicleContainer = document.getElementById("vehicle-details");
-            vehicleContainer.innerHTML = "";
-
-            if (userData.vehicles && userData.vehicles.length > 0) {
-                userData.vehicles.forEach((vehicle, index) => {
-                    const vehicleHtml = `
-                        <div class="vehicle">
-                            <h3>Vehículo ${index + 1}</h3>
-                            <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                            <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                            <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-                            <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                        </div>`;
-                    vehicleContainer.innerHTML += vehicleHtml;
+        function loadPaymentData() {
+            const paymentTable = document.getElementById("paymentTable");
+            db.collection("users").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    paymentTable.innerHTML += `
+                        <tr>
+                            <td>${data.name}</td>
+                            <td>${data.email}</td>
+                            <td><select>
+                                <option value="pending">Pendiente</option>
+                                <option value="confirmed">Confirmado</option>
+                            </select></td>
+                            <td><select>
+                                <option value="cash">Efectivo</option>
+                                <option value="credit_card">Tarjeta</option>
+                            </select></td>
+                            <td><button>Confirmar</button></td>
+                        </tr>`;
                 });
-            } else {
-                vehicleContainer.innerHTML = "<p>No hay vehículos registrados.</p>";
-            }
-
-            document.getElementById("user-details").style.display = "block";
-        }
-
-        // Update payment date
-        function updatePaymentDate() {
-            const email = document.getElementById("userEmail").textContent;
-            const paymentDateInput = document.getElementById("paymentDate").value;
-
-            if (!paymentDateInput) {
-                alert("Por favor, selecciona una fecha de pago.");
-                return;
-            }
-
-            const paymentDate = new Date(paymentDateInput);
-
-            db.collection("users").doc(email).update({
-                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 1)))
-            }).then(() => {
-                alert("Fecha de pago actualizada correctamente.");
-                searchCustomer("email", email);
-            }).catch((error) => {
-                console.error("Error al actualizar la fecha de pago:", error);
             });
         }
 
-        // Logout Functionality
-        function logout() {
-            auth.signOut().then(() => {
-                window.location.href = "login.html";
-            }).catch((error) => {
-                console.error("Error al cerrar sesión:", error);
+        function bookInspection() {
+            const email = document.getElementById("userEmail").value;
+            const date = new Date(document.getElementById("inspectionDate").value);
+
+            db.collection("inspections").add({
+                email,
+                date: firebase.firestore.Timestamp.fromDate(date)
+            }).then(() => {
+                alert("Inspección agendada.");
             });
         }
     </script>
