@@ -131,88 +131,113 @@
         </ul>
     </section>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-    authDomain: "auto-cuidadoclub.firebaseapp.com",
-    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-    projectId: "auto-cuidadoclub",
-    storageBucket: "auto-cuidadoclub.appspot.com",
-    messagingSenderId: "986704701191",
-    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-    measurementId: "G-LBBGXV2YX5"
-  };
-        const db = firebase.firestore();
+   <script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+        authDomain: "auto-cuidadoclub.firebaseapp.com",
+        databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+        projectId: "auto-cuidadoclub",
+        storageBucket: "auto-cuidadoclub.appspot.com",
+        messagingSenderId: "986704701191",
+        appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+        measurementId: "G-LBBGXV2YX5"
+    };
 
-        // Search users by date
-        document.getElementById("buscarUsuariosBtn").addEventListener("click", () => {
-            const startDate = document.getElementById("startDate").value;
-            const endDate = document.getElementById("endDate").value;
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-            if (!startDate || !endDate) {
-                alert("Por favor, selecciona ambas fechas.");
-                return;
-            }
+    // Function to search users by date range
+    function searchUsersByDate() {
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
 
-            db.collection("users")
-                .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(new Date(startDate)))
-                .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(new Date(endDate)))
-                .get()
-                .then(querySnapshot => {
-                    const resultsContainer = document.getElementById("resultsContainer");
-                    resultsContainer.innerHTML = "";
+        if (!startDate || !endDate) {
+            alert("Por favor, selecciona ambas fechas.");
+            return;
+        }
 
-                    querySnapshot.forEach(doc => {
-                        const user = doc.data();
-                        const row = `
-                            <tr>
-                                <td>${user.name || "N/A"}</td>
-                                <td>${user.email || "N/A"}</td>
-                                <td>${user.paymentStatus || "Sin estado"}</td>
-                                <td>${user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
-                                <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin próxima fecha"}</td>
-                                <td><button onclick="selectUser('${doc.id}')">Seleccionar</button></td>
-                            </tr>`;
-                        resultsContainer.insertAdjacentHTML("beforeend", row);
-                    });
-                })
-                .catch(error => console.error("Error al buscar usuarios:", error));
-        });
+        db.collection("users")
+            .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(new Date(startDate)))
+            .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(new Date(endDate)))
+            .get()
+            .then((querySnapshot) => {
+                const resultsContainer = document.getElementById("resultsContainer");
+                resultsContainer.innerHTML = "";
 
-        // Update payment date
-        document.getElementById("actualizarPagoBtn").addEventListener("click", () => {
-            const paymentDate = document.getElementById("paymentDate").value;
-            const selectedUserEmail = "user@example.com"; // Replace with selected user logic
+                if (querySnapshot.empty) {
+                    resultsContainer.innerHTML = "<tr><td colspan='6'>No se encontraron usuarios.</td></tr>";
+                    return;
+                }
 
-            if (!paymentDate) {
-                alert("Por favor, selecciona una fecha de pago.");
-                return;
-            }
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    const row = `
+                        <tr>
+                            <td>${user.name || "N/A"}</td>
+                            <td>${user.email || "N/A"}</td>
+                            <td>${user.paymentStatus || "Sin estado"}</td>
+                            <td>${user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
+                            <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin próxima fecha"}</td>
+                            <td><button type="button" onclick="populatePaymentFields('${user.email}')">Actualizar Pago</button></td>
+                        </tr>`;
+                    resultsContainer.insertAdjacentHTML("beforeend", row);
+                });
+            })
+            .catch((error) => console.error("Error al buscar usuarios:", error));
+    }
 
-            db.collection("users").doc(selectedUserEmail).update({
-                paymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate)),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(new Date(paymentDate).setMonth(new Date(paymentDate).getMonth() + 1)))
-            }).then(() => alert("Fecha de pago actualizada correctamente."))
-              .catch(error => console.error("Error al actualizar la fecha de pago:", error));
-        });
+    // Function to populate fields for payment update
+    function populatePaymentFields(email) {
+        document.getElementById("selectedUserEmail").value = email;
+    }
 
-        // Schedule inspection
-        document.getElementById("agendarInspeccionBtn").addEventListener("click", () => {
-            const inspectionDate = document.getElementById("inspectionDate").value;
-            const inspectionUser = document.getElementById("inspectionUser").value;
+    // Function to update payment date
+    function updatePaymentDate() {
+        const paymentDate = document.getElementById("paymentDate").value;
+        const selectedUserEmail = document.getElementById("selectedUserEmail").value;
 
-            if (!inspectionDate || !inspectionUser) {
-                alert("Por favor, completa todos los campos.");
-                return;
-            }
+        if (!paymentDate || !selectedUserEmail) {
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
 
-            db.collection("inspections").add({
-                user: inspectionUser,
-                date: firebase.firestore.Timestamp.fromDate(new Date(inspectionDate))
-            }).then(() => alert("Inspección agendada correctamente."))
-              .catch(error => console.error("Error al agendar inspección:", error));
-        });
-    </script>
+        db.collection("users").doc(selectedUserEmail).update({
+            paymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate)),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(new Date(paymentDate).setMonth(new Date(paymentDate).getMonth() + 1)))
+        })
+        .then(() => alert("Fecha de pago actualizada correctamente."))
+        .catch((error) => console.error("Error al actualizar la fecha de pago:", error));
+    }
+
+    // Function to schedule an inspection
+    function scheduleInspection() {
+        const inspectionDate = document.getElementById("inspectionDate").value;
+        const inspectionUser = document.getElementById("inspectionUser").value;
+
+        if (!inspectionDate || !inspectionUser) {
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
+
+        db.collection("inspections").add({
+            user: inspectionUser,
+            date: firebase.firestore.Timestamp.fromDate(new Date(inspectionDate))
+        })
+        .then(() => {
+            alert("Inspección agendada correctamente.");
+            document.getElementById("inspectionDate").value = "";
+            document.getElementById("inspectionUser").value = "";
+        })
+        .catch((error) => console.error("Error al agendar inspección:", error));
+    }
+
+    // Event listeners
+    document.getElementById("buscarUsuariosBtn").addEventListener("click", searchUsersByDate);
+    document.getElementById("actualizarPagoBtn").addEventListener("click", updatePaymentDate);
+    document.getElementById("agendarInspeccionBtn").addEventListener("click", scheduleInspection);
+</script>
+
 </body>
 </html>
