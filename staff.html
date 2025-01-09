@@ -176,10 +176,8 @@
             const startDate = new Date(document.getElementById("startDate").value);
             const endDate = new Date(document.getElementById("endDate").value);
             endDate.setDate(endDate.getDate() + 1); // Include the full day
-            const userResults = document.getElementById("userResults");
             const paymentTable = document.getElementById("paymentTable");
 
-            userResults.innerHTML = ""; // Clear list
             paymentTable.innerHTML = ""; // Clear table
 
             db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
@@ -222,8 +220,8 @@
         function sendEmail(email, name) {
             const subject = `Consulta para ${name}`;
             const body = `Estimado/a ${name},%0D%0A%0D%0AGracias por ser parte de AutoCuidado Club.%0D%0ASaludos,%0D%0AEquipo AutoCuidado Club.`;
-            const zohoMailURL = `https://mail.zoho.com/zm/#compose?from=info@autocuidadoclub.com&to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(zohoMailURL, '_blank');
+            const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoURL;
         }
 
         function sendWhatsApp(phone, name) {
