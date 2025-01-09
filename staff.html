@@ -151,93 +151,135 @@
     </section>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "986704701191",
-            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+        authDomain: "auto-cuidadoclub.firebaseapp.com",
+        databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+        projectId: "auto-cuidadoclub",
+        storageBucket: "auto-cuidadoclub.appspot.com",
+        messagingSenderId: "986704701191",
+        appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+        measurementId: "G-LBBGXV2YX5"
+    };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+
+    function findUsersByDate() {
+        const startDateInput = document.getElementById("startDate").value;
+        const endDateInput = document.getElementById("endDate").value;
+        const userResults = document.getElementById("userResults");
+        const paymentTable = document.getElementById("paymentTable");
+
+        // Validate input dates
+        if (!startDateInput || !endDateInput) {
+            alert("Por favor, selecciona ambas fechas.");
+            return;
         }
 
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // Clear previous results
+        userResults.innerHTML = "";
+        paymentTable.innerHTML = "";
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                db.collection("users").doc(user.email).get().then((doc) => {
-                    if (doc.exists && doc.data().role === "staff") {
-                        document.getElementById("restricted-content").style.display = "block";
-                    } else {
-                        alert("No tienes permiso para acceder.");
-                        window.location.href = "login.html";
-                    }
+        // Parse input dates
+        const startDate = new Date(startDateInput);
+        const endDate = new Date(endDateInput);
+        endDate.setDate(endDate.getDate() + 1); // Include tomorrow's data to account for the full day
+
+        db.collection("users")
+            .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+            .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate)) // Less than endDate (next day)
+            .get()
+            .then((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    alert("No se encontraron usuarios en el rango de fechas.");
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    // Add user to the results list
+                    userResults.innerHTML += `<li>${user.name} - ${user.email}</li>`;
+                    // Add user to the payment table
+                    paymentTable.innerHTML += `
+                        <tr>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.paymentStatus || "Pendiente"}</td>
+                            <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "No disponible"}</td>
+                            <td><button onclick="confirmPayment('${doc.id}')">Confirmar</button></td>
+                        </tr>`;
                 });
-            } else {
-                window.location.href = "login.html";
-            }
-        });
+            })
+            .catch((error) => console.error("Error al buscar usuarios:", error));
+    }
 
-        function findUsersByDate() {
-            const startDate = new Date(document.getElementById("startDate").value);
-            const endDate = new Date(document.getElementById("endDate").value);
-            const userResults = document.getElementById("userResults");
+    function confirmPayment(userId) {
+        const paymentDateInput = document.getElementById("paymentDate").value;
 
-            userResults.innerHTML = "";
-            db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-                .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
-                .get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        const user = doc.data();
-                        userResults.innerHTML += `<li>${user.name} - ${user.email}</li>`;
-                        updatePaymentTable(user);
-                    });
-                })
-                .catch(console.error);
+        if (!paymentDateInput) {
+            alert("Por favor, selecciona una fecha de pago.");
+            return;
         }
 
-        function updatePaymentTable(user) {
-            const paymentTable = document.getElementById("paymentTable");
-            paymentTable.innerHTML += `
-                <tr>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.paymentStatus || "Pendiente"}</td>
-                    <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
-                    <td><button onclick="confirmPayment('${user.email}')">Confirmar</button></td>
-                </tr>`;
+        const paymentDate = new Date(paymentDateInput);
+
+        db.collection("users").doc(userId).update({
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate.setMonth(paymentDate.getMonth() + 1))),
+            paymentStatus: "Confirmado"
+        }).then(() => {
+            alert("Pago confirmado correctamente.");
+            findUsersByDate(); // Refresh the user table
+        }).catch((error) => console.error("Error al confirmar el pago:", error));
+    }
+
+    function bookInspection() {
+        const inspectionDateInput = document.getElementById("inspectionDate").value;
+        const userEmail = document.getElementById("userEmail").value;
+
+        if (!inspectionDateInput || !userEmail) {
+            alert("Por favor, completa todos los campos.");
+            return;
         }
 
-        function confirmPayment(email) {
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+        const inspectionDate = new Date(inspectionDateInput);
 
-            db.collection("users").doc(email).update({
-                paymentStatus: "Confirmado",
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-            }).then(() => {
-                alert("Pago confirmado.");
-                findUsersByDate();
-            }).catch(console.error);
-        }
+        db.collection("inspections").add({
+            email: userEmail,
+            date: firebase.firestore.Timestamp.fromDate(inspectionDate)
+        }).then(() => {
+            alert("Inspección agendada correctamente.");
+            document.getElementById("inspectionList").innerHTML += `<li>${userEmail} - ${inspectionDate.toLocaleDateString("es-ES")}</li>`;
+        }).catch((error) => console.error("Error al agendar inspección:", error));
+    }
 
-        function bookInspection() {
-            const email = document.getElementById("userEmail").value;
-            const date = new Date(document.getElementById("inspectionDate").value);
+    // Load the initial payment data
+    function loadPaymentData() {
+        const paymentTable = document.getElementById("paymentTable");
+        paymentTable.innerHTML = ""; // Clear table
 
-            db.collection("inspections").add({
-                email,
-                date: firebase.firestore.Timestamp.fromDate(date)
-            }).then(() => {
-                alert("Inspección agendada.");
+        db.collection("users").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                paymentTable.innerHTML += `
+                    <tr>
+                        <td>${data.name}</td>
+                        <td>${data.email}</td>
+                        <td>${data.paymentStatus || "Pendiente"}</td>
+                        <td>${data.nextPaymentDate ? data.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "No disponible"}</td>
+                        <td><button onclick="confirmPayment('${doc.id}')">Confirmar</button></td>
+                    </tr>`;
             });
-        }
-    </script>
+        }).catch((error) => console.error("Error al cargar los datos de pago:", error));
+    }
+
+    // Load payment data on page load
+    document.addEventListener("DOMContentLoaded", loadPaymentData);
+</script>
+
 </body>
 </html>
