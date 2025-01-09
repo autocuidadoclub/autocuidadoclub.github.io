@@ -13,13 +13,17 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
         }
         .navbar {
             background-color: #007bff;
             padding: 10px;
+        }
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
         }
         .navbar a {
             color: white;
@@ -27,17 +31,17 @@
             font-weight: bold;
         }
         header {
-            text-align: center;
-            padding: 20px;
             background-color: #f4f4f4;
-        }
-        section {
-            margin: 20px auto;
-            max-width: 800px;
             padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        #restricted-content {
+            padding: 20px;
+        }
+        .section-title {
+            margin-top: 20px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
         }
         table {
             width: 100%;
@@ -46,7 +50,7 @@
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
         }
         th {
@@ -54,190 +58,186 @@
             color: white;
         }
         button {
+            padding: 10px 15px;
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px;
             border-radius: 5px;
             cursor: pointer;
         }
         button:hover {
             background-color: #0056b3;
         }
-        input[type="date"], input[type="text"] {
-            padding: 8px;
-            width: calc(100% - 20px);
-            margin-bottom: 10px;
+        .form-control {
+            margin-bottom: 15px;
         }
-        .hidden {
-            display: none;
+        .form-control label {
+            font-weight: bold;
+            display: block;
+        }
+        .form-control input, .form-control select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
-        <a href="calendar.html">Calendar</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="logout.html">Cerrar Sesión</a>
+        <ul>
+            <li><a href="calendar.html">Calendar</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="logout.html">Cerrar Sesión</a></li>
+        </ul>
     </nav>
 
     <header>
         <h1>Gestión de Clientes</h1>
     </header>
 
-    <section>
-        <h2>Buscar Usuarios por Fecha</h2>
-        <label for="startDate">Desde:</label>
-        <input type="date" id="startDate">
-        <label for="endDate">Hasta:</label>
-        <input type="date" id="endDate">
-        <button id="buscarUsuariosBtn">Buscar Usuarios</button>
+    <section id="restricted-content" style="display: none;">
+        <h2>Panel de Gestión para el Staff</h2>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Email</th>
-                    <th>Estado del Pago</th>
-                    <th>Fecha de Pago</th>
-                    <th>Próximo Pago</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="resultsContainer">
-                <!-- Results will be dynamically inserted here -->
-            </tbody>
-        </table>
+        <!-- Finder Section -->
+        <div>
+            <h3 class="section-title">Buscar Usuarios por Fecha</h3>
+            <div class="form-control">
+                <label for="startDate">Desde:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-control">
+                <label for="endDate">Hasta:</label>
+                <input type="date" id="endDate">
+            </div>
+            <button onclick="findUsersByDate()">Buscar Usuarios</button>
+            <ul id="userResults"></ul>
+        </div>
+
+        <!-- Payment Management -->
+        <div>
+            <h3 class="section-title">Control de Pagos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Estado del Pago</th>
+                        <th>Próximo Pago</th>
+                        <th>Confirmar Pago</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Calendar Management -->
+        <div>
+            <h3 class="section-title">Gestión de Calendario</h3>
+            <div class="form-control">
+                <label for="inspectionDate">Fecha de Inspección:</label>
+                <input type="date" id="inspectionDate">
+            </div>
+            <div class="form-control">
+                <label for="userEmail">Usuario (Email):</label>
+                <input type="email" id="userEmail">
+            </div>
+            <button onclick="bookInspection()">Agendar Inspección</button>
+            <h4>Inspecciones Agendadas</h4>
+            <ul id="inspectionList"></ul>
+        </div>
     </section>
 
-    <section>
-        <h2>Control de Pagos</h2>
-        <label for="paymentDate">Actualizar Fecha de Pago:</label>
-        <input type="date" id="paymentDate">
-        <button id="actualizarPagoBtn">Actualizar Fecha de Pago</button>
-    </section>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            authDomain: "auto-cuidadoclub.firebaseapp.com",
+            projectId: "auto-cuidadoclub",
+            storageBucket: "auto-cuidadoclub.appspot.com",
+            messagingSenderId: "986704701191",
+            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+            measurementId: "G-LBBGXV2YX5"
+        };
 
-    <section>
-        <h2>Gestión de Calendario</h2>
-        <label for="inspectionDate">Fecha de Inspección:</label>
-        <input type="date" id="inspectionDate">
-        <label for="inspectionUser">Usuario (Email):</label>
-        <input type="text" id="inspectionUser" placeholder="Ingrese email del usuario">
-        <button id="agendarInspeccionBtn">Agendar Inspección</button>
-
-        <h3>Inspecciones Agendadas</h3>
-        <ul id="scheduledInspections">
-            <!-- Scheduled inspections will appear here -->
-        </ul>
-    </section>
-
-   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-        authDomain: "auto-cuidadoclub.firebaseapp.com",
-        databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-        projectId: "auto-cuidadoclub",
-        storageBucket: "auto-cuidadoclub.appspot.com",
-        messagingSenderId: "986704701191",
-        appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-        measurementId: "G-LBBGXV2YX5"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // Function to search users by date range
-    function searchUsersByDate() {
-        const startDate = document.getElementById("startDate").value;
-        const endDate = document.getElementById("endDate").value;
-
-        if (!startDate || !endDate) {
-            alert("Por favor, selecciona ambas fechas.");
-            return;
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
 
-        db.collection("users")
-            .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(new Date(startDate)))
-            .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(new Date(endDate)))
-            .get()
-            .then((querySnapshot) => {
-                const resultsContainer = document.getElementById("resultsContainer");
-                resultsContainer.innerHTML = "";
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-                if (querySnapshot.empty) {
-                    resultsContainer.innerHTML = "<tr><td colspan='6'>No se encontraron usuarios.</td></tr>";
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
-                    const user = doc.data();
-                    const row = `
-                        <tr>
-                            <td>${user.name || "N/A"}</td>
-                            <td>${user.email || "N/A"}</td>
-                            <td>${user.paymentStatus || "Sin estado"}</td>
-                            <td>${user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
-                            <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin próxima fecha"}</td>
-                            <td><button type="button" onclick="populatePaymentFields('${user.email}')">Actualizar Pago</button></td>
-                        </tr>`;
-                    resultsContainer.insertAdjacentHTML("beforeend", row);
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                db.collection("users").doc(user.email).get().then((doc) => {
+                    if (doc.exists && doc.data().role === "staff") {
+                        document.getElementById("restricted-content").style.display = "block";
+                    } else {
+                        alert("No tienes permiso para acceder.");
+                        window.location.href = "login.html";
+                    }
                 });
-            })
-            .catch((error) => console.error("Error al buscar usuarios:", error));
-    }
+            } else {
+                window.location.href = "login.html";
+            }
+        });
 
-    // Function to populate fields for payment update
-    function populatePaymentFields(email) {
-        document.getElementById("selectedUserEmail").value = email;
-    }
+        function findUsersByDate() {
+            const startDate = new Date(document.getElementById("startDate").value);
+            const endDate = new Date(document.getElementById("endDate").value);
+            const userResults = document.getElementById("userResults");
 
-    // Function to update payment date
-    function updatePaymentDate() {
-        const paymentDate = document.getElementById("paymentDate").value;
-        const selectedUserEmail = document.getElementById("selectedUserEmail").value;
-
-        if (!paymentDate || !selectedUserEmail) {
-            alert("Por favor, completa todos los campos.");
-            return;
+            userResults.innerHTML = "";
+            db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+                .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        userResults.innerHTML += `<li>${user.name} - ${user.email}</li>`;
+                        updatePaymentTable(user);
+                    });
+                })
+                .catch(console.error);
         }
 
-        db.collection("users").doc(selectedUserEmail).update({
-            paymentDate: firebase.firestore.Timestamp.fromDate(new Date(paymentDate)),
-            nextPaymentDate: firebase.firestore.Timestamp.fromDate(new Date(new Date(paymentDate).setMonth(new Date(paymentDate).getMonth() + 1)))
-        })
-        .then(() => alert("Fecha de pago actualizada correctamente."))
-        .catch((error) => console.error("Error al actualizar la fecha de pago:", error));
-    }
-
-    // Function to schedule an inspection
-    function scheduleInspection() {
-        const inspectionDate = document.getElementById("inspectionDate").value;
-        const inspectionUser = document.getElementById("inspectionUser").value;
-
-        if (!inspectionDate || !inspectionUser) {
-            alert("Por favor, completa todos los campos.");
-            return;
+        function updatePaymentTable(user) {
+            const paymentTable = document.getElementById("paymentTable");
+            paymentTable.innerHTML += `
+                <tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.paymentStatus || "Pendiente"}</td>
+                    <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
+                    <td><button onclick="confirmPayment('${user.email}')">Confirmar</button></td>
+                </tr>`;
         }
 
-        db.collection("inspections").add({
-            user: inspectionUser,
-            date: firebase.firestore.Timestamp.fromDate(new Date(inspectionDate))
-        })
-        .then(() => {
-            alert("Inspección agendada correctamente.");
-            document.getElementById("inspectionDate").value = "";
-            document.getElementById("inspectionUser").value = "";
-        })
-        .catch((error) => console.error("Error al agendar inspección:", error));
-    }
+        function confirmPayment(email) {
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
 
-    // Event listeners
-    document.getElementById("buscarUsuariosBtn").addEventListener("click", searchUsersByDate);
-    document.getElementById("actualizarPagoBtn").addEventListener("click", updatePaymentDate);
-    document.getElementById("agendarInspeccionBtn").addEventListener("click", scheduleInspection);
-</script>
+            db.collection("users").doc(email).update({
+                paymentStatus: "Confirmado",
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+            }).then(() => {
+                alert("Pago confirmado.");
+                findUsersByDate();
+            }).catch(console.error);
+        }
 
+        function bookInspection() {
+            const email = document.getElementById("userEmail").value;
+            const date = new Date(document.getElementById("inspectionDate").value);
+
+            db.collection("inspections").add({
+                email,
+                date: firebase.firestore.Timestamp.fromDate(date)
+            }).then(() => {
+                alert("Inspección agendada.");
+            });
+        }
+    </script>
 </body>
 </html>
