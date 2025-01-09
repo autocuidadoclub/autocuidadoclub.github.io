@@ -186,39 +186,38 @@
         function findUsersByDate() {
             const startDate = new Date(document.getElementById("startDate").value);
             const endDate = new Date(document.getElementById("endDate").value);
+            endDate.setDate(endDate.getDate() + 1); // Include the full day
             const userResults = document.getElementById("userResults");
+            const paymentTable = document.getElementById("paymentTable");
 
-            userResults.innerHTML = "";
+            userResults.innerHTML = ""; // Clear list
+            paymentTable.innerHTML = ""; // Clear table
+
             db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-                .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
+                .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
                 .get()
                 .then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
                         const user = doc.data();
                         userResults.innerHTML += `<li>${user.name} - ${user.email}</li>`;
-                        updatePaymentTable(user);
+                        paymentTable.innerHTML += `
+                            <tr>
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.paymentStatus || "Pendiente"}</td>
+                                <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
+                                <td><button onclick="confirmPayment('${doc.id}')">Confirmar</button></td>
+                            </tr>`;
                     });
                 })
                 .catch(console.error);
         }
 
-        function updatePaymentTable(user) {
-            const paymentTable = document.getElementById("paymentTable");
-            paymentTable.innerHTML += `
-                <tr>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.paymentStatus || "Pendiente"}</td>
-                    <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
-                    <td><button onclick="confirmPayment('${user.email}')">Confirmar</button></td>
-                </tr>`;
-        }
-
-        function confirmPayment(email) {
+        function confirmPayment(userId) {
             const nextPaymentDate = new Date();
             nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
 
-            db.collection("users").doc(email).update({
+            db.collection("users").doc(userId).update({
                 paymentStatus: "Confirmado",
                 nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
             }).then(() => {
