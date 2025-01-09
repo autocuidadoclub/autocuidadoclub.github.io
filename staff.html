@@ -131,17 +131,33 @@
                         <th>Fecha de Pago</th>
                         <th>Estado del Pago</th>
                         <th>Próximo Pago</th>
-                        <th>Acciones</th>
+                        <th>Confirmar Pago</th>
                     </tr>
                 </thead>
                 <tbody id="paymentTable"></tbody>
             </table>
         </div>
+
+        <!-- Calendar Management -->
+        <div>
+            <h3 class="section-title">Gestión de Calendario</h3>
+            <div class="form-control">
+                <label for="inspectionDate">Fecha de Inspección:</label>
+                <input type="date" id="inspectionDate">
+            </div>
+            <div class="form-control">
+                <label for="userEmail">Usuario (Email):</label>
+                <input type="email" id="userEmail">
+            </div>
+            <button onclick="bookInspection()">Agendar Inspección</button>
+            <h4>Inspecciones Agendadas</h4>
+            <ul id="inspectionList"></ul>
+        </div>
     </section>
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSy...",
+            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
             authDomain: "auto-cuidadoclub.firebaseapp.com",
             projectId: "auto-cuidadoclub",
             storageBucket: "auto-cuidadoclub.appspot.com",
@@ -176,8 +192,10 @@
             const startDate = new Date(document.getElementById("startDate").value);
             const endDate = new Date(document.getElementById("endDate").value);
             endDate.setDate(endDate.getDate() + 1); // Include the full day
+            const userResults = document.getElementById("userResults");
             const paymentTable = document.getElementById("paymentTable");
 
+            userResults.innerHTML = ""; // Clear list
             paymentTable.innerHTML = ""; // Clear table
 
             db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
@@ -186,52 +204,53 @@
                 .then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
                         const user = doc.data();
-                        updatePaymentTable(user, doc.id);
+                        const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
+                        const selectedSchedule = user.selectedSchedule || "No asignado";
+                        const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
+                        const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
+
+                        userResults.innerHTML += `<li>${user.name} - ${user.email}</li>`;
+                        paymentTable.innerHTML += `
+                            <tr>
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.phone || "No disponible"}</td>
+                                <td>${registrationDate}</td>
+                                <td>${selectedSchedule}</td>
+                                <td>${lastReschedule}</td>
+                                <td>${paymentDate}</td>
+                                <td>${user.paymentStatus || "Pendiente"}</td>
+                                <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
+                                <td><button onclick="confirmPayment('${doc.id}')">Confirmar</button></td>
+                            </tr>`;
                     });
                 })
                 .catch(console.error);
         }
 
-        function updatePaymentTable(user, userId) {
-            const paymentTable = document.getElementById("paymentTable");
-            const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
-            const selectedSchedule = user.selectedSchedule || "No asignado";
-            const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
-            const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
+        function confirmPayment(userId) {
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
 
-            paymentTable.innerHTML += `
-                <tr>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.phone || "No disponible"}</td>
-                    <td>${registrationDate}</td>
-                    <td>${selectedSchedule}</td>
-                    <td>${lastReschedule}</td>
-                    <td>${paymentDate}</td>
-                    <td>${user.paymentStatus || "Pendiente"}</td>
-                    <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
-                    <td>
-                        <button onclick="sendEmail('${user.email}', '${user.name}')">Enviar Email</button>
-                        <button onclick="sendWhatsApp('${user.phone}', '${user.name}')">Enviar WhatsApp</button>
-                    </td>
-                </tr>`;
+            db.collection("users").doc(userId).update({
+                paymentStatus: "Confirmado",
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+            }).then(() => {
+                alert("Pago confirmado.");
+                findUsersByDate();
+            }).catch(console.error);
         }
 
-        function sendEmail(email, name) {
-            const subject = `Consulta para ${name}`;
-            const body = `Estimado/a ${name},%0D%0A%0D%0AGracias por ser parte de AutoCuidado Club.%0D%0ASaludos,%0D%0AEquipo AutoCuidado Club.`;
-            const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.location.href = mailtoURL;
-        }
+        function bookInspection() {
+            const email = document.getElementById("userEmail").value;
+            const date = new Date(document.getElementById("inspectionDate").value);
 
-        function sendWhatsApp(phone, name) {
-            if (!phone) {
-                alert("Número de teléfono no disponible.");
-                return;
-            }
-            const message = `Hola ${name},%0D%0AGracias por ser parte de AutoCuidado Club.`;
-            const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, '_blank');
+            db.collection("inspections").add({
+                email,
+                date: firebase.firestore.Timestamp.fromDate(date)
+            }).then(() => {
+                alert("Inspección agendada.");
+            });
         }
     </script>
 </body>
