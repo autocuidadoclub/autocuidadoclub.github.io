@@ -122,20 +122,6 @@ window.selectScheduleBox = function (cell) {
             const department = document.getElementById("department").value;
             const municipality = document.getElementById("municipality").value;
 
-            const getRegion = (department) => {
-            const occidental = ["Ahuachapán", "Santa Ana", "Sonsonate"];
-            const metropolitan = ["San Salvador", "La Libertad", "Cuscatlán"];
-            const oriental = ["San Miguel", "La Unión", "Morazán"];
-        
-            if (occidental.includes(department)) return "Occidental";
-            if (metropolitan.includes(department)) return "Metropolitan";
-            if (oriental.includes(department)) return "Oriental";
-            return "Unknown";
-        };
-        
-        const region = getRegion(department);
-
-
 
             const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
                 brand: vehicleSection.querySelector('.vehicleBrand').value,
@@ -156,7 +142,6 @@ window.selectScheduleBox = function (cell) {
                 return;
             }
 
-            const region = getRegion(department);
             const userData = {
                 name,
                 email,
@@ -165,7 +150,6 @@ window.selectScheduleBox = function (cell) {
                 vehicles,
                 department, // Add department
                 municipality, // Add municipality
-                region, // Add the derived region
                 selectedSchedule: document.getElementById("selectedSchedule").value,
                 registrationDate: firebase.firestore.Timestamp.now(),
                 lastReschedule: null, // Set to null
@@ -206,24 +190,6 @@ window.selectScheduleBox = function (cell) {
                 default: alert("Plan inválido."); return null;
             }
         }
-
-        function sendWhatsAppNotification(phone, message) {
-            // Use a service like Twilio
-            console.log(`Sending WhatsApp to ${phone}: ${message}`);
-        }
-        
-        function sendEmailNotification(email, subject, body) {
-            // Use a service like SendGrid
-            console.log(`Sending email to ${email}: ${subject}`);
-        }
-        
-        // Notify after successful registration
-        const notificationMessage = `¡Hola ${name}! Tu suscripción al plan ${planType} ha sido confirmada. 
-        Tu inspección está programada para la semana ${week}.`;
-        sendWhatsAppNotification(phone, notificationMessage);
-        sendEmailNotification(email, "Confirmación de Suscripción", notificationMessage);
-
-        
     </script>
 
     <style>
