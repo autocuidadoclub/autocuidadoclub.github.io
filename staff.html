@@ -124,8 +124,11 @@
                     <tr>
                         <th>Usuario</th>
                         <th>Email</th>
+                        <th>Teléfono</th>
                         <th>Fecha de Registro</th>
                         <th>Horario Seleccionado</th>
+                        <th>Última Reprogramación</th>
+                        <th>Fecha de Pago</th>
                         <th>Estado del Pago</th>
                         <th>Próximo Pago</th>
                         <th>Confirmar Pago</th>
@@ -203,13 +206,19 @@
                         const user = doc.data();
                         const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
                         const selectedSchedule = user.selectedSchedule || "No asignado";
+                        const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
+                        const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
+
                         userResults.innerHTML += `<li>${user.name} - ${user.email}</li>`;
                         paymentTable.innerHTML += `
                             <tr>
                                 <td>${user.name}</td>
                                 <td>${user.email}</td>
+                                <td>${user.phone || "No disponible"}</td>
                                 <td>${registrationDate}</td>
                                 <td>${selectedSchedule}</td>
+                                <td>${lastReschedule}</td>
+                                <td>${paymentDate}</td>
                                 <td>${user.paymentStatus || "Pendiente"}</td>
                                 <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
                                 <td><button onclick="confirmPayment('${doc.id}')">Confirmar</button></td>
