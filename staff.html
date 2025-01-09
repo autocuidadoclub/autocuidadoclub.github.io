@@ -131,33 +131,17 @@
                         <th>Fecha de Pago</th>
                         <th>Estado del Pago</th>
                         <th>Próximo Pago</th>
-                        <th>Confirmar Pago</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="paymentTable"></tbody>
             </table>
         </div>
-
-        <!-- Calendar Management -->
-        <div>
-            <h3 class="section-title">Gestión de Calendario</h3>
-            <div class="form-control">
-                <label for="inspectionDate">Fecha de Inspección:</label>
-                <input type="date" id="inspectionDate">
-            </div>
-            <div class="form-control">
-                <label for="userEmail">Usuario (Email):</label>
-                <input type="email" id="userEmail">
-            </div>
-            <button onclick="bookInspection()">Agendar Inspección</button>
-            <h4>Inspecciones Agendadas</h4>
-            <ul id="inspectionList"></ul>
-        </div>
     </section>
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+            apiKey: "AIzaSy...",
             authDomain: "auto-cuidadoclub.firebaseapp.com",
             projectId: "auto-cuidadoclub",
             storageBucket: "auto-cuidadoclub.appspot.com",
@@ -204,53 +188,52 @@
                 .then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
                         const user = doc.data();
-                        const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
-                        const selectedSchedule = user.selectedSchedule || "No asignado";
-                        const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
-                        const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
-
-                        userResults.innerHTML += `<li>${user.name} - ${user.email}</li>`;
-                        paymentTable.innerHTML += `
-                            <tr>
-                                <td>${user.name}</td>
-                                <td>${user.email}</td>
-                                <td>${user.phone || "No disponible"}</td>
-                                <td>${registrationDate}</td>
-                                <td>${selectedSchedule}</td>
-                                <td>${lastReschedule}</td>
-                                <td>${paymentDate}</td>
-                                <td>${user.paymentStatus || "Pendiente"}</td>
-                                <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
-                                <td><button onclick="confirmPayment('${doc.id}')">Confirmar</button></td>
-                            </tr>`;
+                        updatePaymentTable(user, doc.id);
                     });
                 })
                 .catch(console.error);
         }
 
-        function confirmPayment(userId) {
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+        function updatePaymentTable(user, userId) {
+            const paymentTable = document.getElementById("paymentTable");
+            const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
+            const selectedSchedule = user.selectedSchedule || "No asignado";
+            const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
+            const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
 
-            db.collection("users").doc(userId).update({
-                paymentStatus: "Confirmado",
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-            }).then(() => {
-                alert("Pago confirmado.");
-                findUsersByDate();
-            }).catch(console.error);
+            paymentTable.innerHTML += `
+                <tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone || "No disponible"}</td>
+                    <td>${registrationDate}</td>
+                    <td>${selectedSchedule}</td>
+                    <td>${lastReschedule}</td>
+                    <td>${paymentDate}</td>
+                    <td>${user.paymentStatus || "Pendiente"}</td>
+                    <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
+                    <td>
+                        <button onclick="sendEmail('${user.email}', '${user.name}')">Enviar Email</button>
+                        <button onclick="sendWhatsApp('${user.phone}', '${user.name}')">Enviar WhatsApp</button>
+                    </td>
+                </tr>`;
         }
 
-        function bookInspection() {
-            const email = document.getElementById("userEmail").value;
-            const date = new Date(document.getElementById("inspectionDate").value);
+        function sendEmail(email, name) {
+            const subject = `Consulta para ${name}`;
+            const body = `Estimado/a ${name},%0D%0A%0D%0AGracias por ser parte de AutoCuidado Club.%0D%0ASaludos,%0D%0AEquipo AutoCuidado Club.`;
+            const zohoMailURL = `https://mail.zoho.com/zm/#compose?from=info@autocuidadoclub.com&to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(zohoMailURL, '_blank');
+        }
 
-            db.collection("inspections").add({
-                email,
-                date: firebase.firestore.Timestamp.fromDate(date)
-            }).then(() => {
-                alert("Inspección agendada.");
-            });
+        function sendWhatsApp(phone, name) {
+            if (!phone) {
+                alert("Número de teléfono no disponible.");
+                return;
+            }
+            const message = `Hola ${name},%0D%0AGracias por ser parte de AutoCuidado Club.`;
+            const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
         }
     </script>
 </body>
