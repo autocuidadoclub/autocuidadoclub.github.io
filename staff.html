@@ -11,8 +11,6 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
         }
         .navbar {
             background-color: #007bff;
@@ -20,72 +18,40 @@
         }
         .navbar ul {
             list-style: none;
-            padding: 0;
-            margin: 0;
             display: flex;
             justify-content: space-around;
         }
         .navbar a {
             color: white;
             text-decoration: none;
-            font-weight: bold;
         }
-        header {
-            background-color: #f4f4f4;
+        .container {
             padding: 20px;
-            text-align: center;
-        }
-        #restricted-content {
-            padding: 20px;
-        }
-        .section-title {
-            margin-top: 20px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th, td {
-            border: 1px solid #ddd;
+        table th, table td {
             padding: 10px;
+            border: 1px solid #ddd;
             text-align: left;
         }
-        th {
+        table th {
             background-color: #007bff;
             color: white;
         }
         button {
-            padding: 10px 15px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 5px 10px;
             cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .form-control {
-            margin-bottom: 15px;
-        }
-        .form-control label {
-            font-weight: bold;
-            display: block;
-        }
-        .form-control input, .form-control select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <ul>
             <li><a href="calendar.html">Calendar</a></li>
@@ -94,146 +60,128 @@
         </ul>
     </nav>
 
-    <header>
+    <div class="container">
         <h1>Gestión de Clientes</h1>
-    </header>
 
-    <section id="restricted-content" style="display: none;">
-        <h2>Panel de Gestión para el Staff</h2>
+        <!-- User Search Section -->
+        <h2>Buscar Usuarios por Fecha</h2>
+        <form id="searchForm">
+            <label for="fromDate">Desde:</label>
+            <input type="date" id="fromDate" required>
+            <label for="toDate">Hasta:</label>
+            <input type="date" id="toDate" required>
+            <button type="submit">Buscar Usuarios</button>
+        </form>
 
-        <!-- Finder Section -->
-        <div>
-            <h3 class="section-title">Buscar Usuarios por Fecha</h3>
-            <div class="form-control">
-                <label for="startDate">Desde:</label>
-                <input type="date" id="startDate">
-            </div>
-            <div class="form-control">
-                <label for="endDate">Hasta:</label>
-                <input type="date" id="endDate">
-            </div>
-            <button onclick="findUsersByDate()">Buscar Usuarios</button>
-            <ul id="userResults"></ul>
-        </div>
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Estado del Pago</th>
+                    <th>Fecha de Pago</th>
+                    <th>Próximo Pago</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically populated -->
+            </tbody>
+        </table>
 
-        <!-- Payment Management -->
-        <div>
-            <h3 class="section-title">Control de Pagos</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Email</th>
-                        <th>Estado del Pago</th>
-                        <th>Tipo de Pago</th>
-                        <th>Confirmar Pago</th>
-                    </tr>
-                </thead>
-                <tbody id="paymentTable"></tbody>
-            </table>
-        </div>
+        <!-- Payment Control Section -->
+        <h2>Control de Pagos</h2>
+        <label for="paymentDate">Actualizar Fecha de Pago:</label>
+        <input type="date" id="paymentDate">
+        <button id="updatePaymentBtn">Actualizar Fecha de Pago</button>
 
-        <!-- Calendar Management -->
-        <div>
-            <h3 class="section-title">Gestión de Calendario</h3>
-            <div class="form-control">
-                <label for="inspectionDate">Fecha de Inspección:</label>
-                <input type="date" id="inspectionDate">
-            </div>
-            <div class="form-control">
-                <label for="userEmail">Usuario (Email):</label>
-                <input type="email" id="userEmail">
-            </div>
-            <button onclick="bookInspection()">Agendar Inspección</button>
-            <h4>Inspecciones Agendadas</h4>
-            <ul id="inspectionList"></ul>
-        </div>
-    </section>
+        <!-- Calendar Management Section -->
+        <h2>Gestión de Calendario</h2>
+        <label for="inspectionDate">Fecha de Inspección:</label>
+        <input type="date" id="inspectionDate">
+        <label for="inspectionEmail">Usuario (Email):</label>
+        <input type="email" id="inspectionEmail">
+        <button id="scheduleInspectionBtn">Agendar Inspección</button>
+
+        <h3>Inspecciones Agendadas</h3>
+        <ul id="scheduledInspections"></ul>
+    </div>
 
     <script>
+        // Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "986704701191",
-            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
-        const auth = firebase.auth();
+    apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
+    authDomain: "auto-cuidadoclub.firebaseapp.com",
+    databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
+    projectId: "auto-cuidadoclub",
+    storageBucket: "auto-cuidadoclub.appspot.com",
+    messagingSenderId: "986704701191",
+    appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
+    measurementId: "G-LBBGXV2YX5"
+  };
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                db.collection("users").doc(user.email).get().then((doc) => {
-                    if (doc.exists && doc.data().role === "staff") {
-                        document.getElementById("restricted-content").style.display = "block";
-                    } else {
-                        alert("No tienes permiso para acceder.");
-                        window.location.href = "login.html";
-                    }
-                });
-            } else {
-                window.location.href = "login.html";
-            }
-        });
+        // Fetch users based on registration date range
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
+            event.preventDefault();
 
-        function findUsersByDate() {
-            const startDate = new Date(document.getElementById("startDate").value);
-            const endDate = new Date(document.getElementById("endDate").value);
-            const userResults = document.getElementById("userResults");
+            const fromDate = new Date(document.getElementById("fromDate").value);
+            const toDate = new Date(document.getElementById("toDate").value);
+            toDate.setHours(23, 59, 59, 999); // Include the entire day
 
-            userResults.innerHTML = "";
-            db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-                .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
+            db.collection("users")
+                .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(fromDate))
+                .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(toDate))
                 .get()
                 .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        userResults.innerHTML += `<li>${doc.data().name} - ${doc.data().email}</li>`;
-                    });
-                })
-                .catch(console.error);
-        }
+                    const userTable = document.querySelector("#userTable tbody");
+                    userTable.innerHTML = ""; // Clear previous results
 
-        function loadPaymentData() {
-            const paymentTable = document.getElementById("paymentTable");
-            db.collection("users").get().then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    paymentTable.innerHTML += `
-                        <tr>
-                            <td>${data.name}</td>
-                            <td>${data.email}</td>
-                            <td><select>
-                                <option value="pending">Pendiente</option>
-                                <option value="confirmed">Confirmado</option>
-                            </select></td>
-                            <td><select>
-                                <option value="cash">Efectivo</option>
-                                <option value="credit_card">Tarjeta</option>
-                            </select></td>
-                            <td><button>Confirmar</button></td>
-                        </tr>`;
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        const row = `
+                            <tr>
+                                <td>${user.name || "N/A"}</td>
+                                <td>${user.email}</td>
+                                <td>${user.paymentDate ? "Paid" : "Not Paid"}</td>
+                                <td>${user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "N/A"}</td>
+                                <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "N/A"}</td>
+                                <td>
+                                    <button onclick="confirmPayment('${doc.id}')">Confirmar Pago</button>
+                                </td>
+                            </tr>`;
+                        userTable.innerHTML += row;
+                    });
                 });
+        });
+
+        // Confirm payment
+        function confirmPayment(userId) {
+            const paymentDate = new Date();
+            const nextPaymentDate = new Date(paymentDate);
+            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+
+            db.collection("users").doc(userId).update({
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            }).then(() => {
+                alert("Pago confirmado.");
             });
         }
 
-        function bookInspection() {
-            const email = document.getElementById("userEmail").value;
+        // Schedule inspection
+        document.getElementById("scheduleInspectionBtn").addEventListener("click", function () {
+            const email = document.getElementById("inspectionEmail").value;
             const date = new Date(document.getElementById("inspectionDate").value);
 
             db.collection("inspections").add({
                 email,
-                date: firebase.firestore.Timestamp.fromDate(date)
+                date: firebase.firestore.Timestamp.fromDate(date),
             }).then(() => {
                 alert("Inspección agendada.");
             });
-        }
+        });
     </script>
 </body>
 </html>
