@@ -166,7 +166,7 @@
             measurementId: "G-LBBGXV2YX5"
         };
 
-         if (!firebase.apps.length) {
+       if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
 
@@ -175,32 +175,19 @@
 
     auth.onAuthStateChanged((user) => {
         if (user) {
-            console.log(`User logged in: ${user.email}`);
-            db.collection("users").doc(user.email).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        if (userData.role === "staff") {
-                            console.log("Access granted for staff.");
-                            document.getElementById("restricted-content").style.display = "block";
-                        } else {
-                            console.warn("Access denied. User is not staff.");
-                            alert("No tienes permiso para acceder.");
-                            window.location.href = "login.html";
-                        }
-                    } else {
-                        console.error("No user document found.");
-                        alert("Error al verificar permisos.");
-                        window.location.href = "login.html";
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error verifying user role:", error);
-                    alert("Error al verificar permisos.");
+            db.collection("users").doc(user.email).get().then((doc) => {
+                if (doc.exists && doc.data().role === "staff") {
+                    document.getElementById("restricted-content").style.display = "block";
+                } else {
+                    alert("No tienes permiso para acceder.");
                     window.location.href = "login.html";
-                });
+                }
+            }).catch((error) => {
+                console.error("Error verifying user role:", error);
+                alert("Error al verificar permisos.");
+                window.location.href = "login.html";
+            });
         } else {
-            console.warn("User is not logged in.");
             alert("Por favor, inicia sesión.");
             window.location.href = "login.html";
         }
@@ -210,23 +197,14 @@
         const startDate = new Date(document.getElementById("startDate").value);
         const endDate = new Date(document.getElementById("endDate").value);
         endDate.setDate(endDate.getDate() + 1); // Include the full day
-
         const paymentTable = document.getElementById("paymentTable");
         paymentTable.innerHTML = ""; // Clear table
-
-        if (!startDate || !endDate) {
-            alert("Por favor, selecciona un rango de fechas válido.");
-            return;
-        }
-
-        console.log("Fetching users registered between", startDate, "and", endDate);
 
         db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
             .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
             .get()
             .then((querySnapshot) => {
                 if (querySnapshot.empty) {
-                    console.log("No users found in the selected date range.");
                     alert("No se encontraron usuarios en el rango de fechas.");
                     return;
                 }
@@ -260,27 +238,41 @@
                 <td>${user.paymentStatus || "Pendiente"}</td>
                 <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
                 <td>
-                    <button onclick="sendEmail('${user.email}', '${user.name}')">Enviar Email</button>
-                    <button onclick="sendWhatsApp('${user.phone}', '${user.name}')">Enviar WhatsApp</button>
+                    <button onclick="confirmPayment('${userId}')">Confirmar</button>
                 </td>
             </tr>`;
     }
 
-    function sendEmail(email, name) {
-        const subject = `Consulta para ${name}`;
-        const body = `Estimado/a ${name},%0D%0A%0D%0AGracias por ser parte de AutoCuidado Club.%0D%0ASaludos,%0D%0AEquipo AutoCuidado Club.`;
-        const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailtoURL;
+    function confirmPayment(userId) {
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+
+        db.collection("users").doc(userId).update({
+            paymentStatus: "Confirmado",
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentDate: firebase.firestore.Timestamp.fromDate(new Date()) // Set current date as payment date
+        }).then(() => {
+            alert("Pago confirmado.");
+            findUsersByDate();
+        }).catch((error) => {
+            console.error("Error updating payment status:", error);
+            alert("Error al confirmar el pago. Inténtalo nuevamente.");
+        });
     }
 
-    function sendWhatsApp(phone, name) {
-        if (!phone) {
-            alert("Número de teléfono no disponible.");
-            return;
-        }
-        const message = `Hola ${name},%0D%0AGracias por ser parte de AutoCuidado Club.`;
-        const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappURL, '_blank');
+    function bookInspection() {
+        const email = document.getElementById("userEmail").value;
+        const date = new Date(document.getElementById("inspectionDate").value);
+
+        db.collection("inspections").add({
+            email,
+            date: firebase.firestore.Timestamp.fromDate(date)
+        }).then(() => {
+            alert("Inspección agendada.");
+        }).catch((error) => {
+            console.error("Error scheduling inspection:", error);
+            alert("Error al agendar inspección. Inténtalo nuevamente.");
+        });
     }
 </script>
 </body>
