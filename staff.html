@@ -264,7 +264,7 @@
 
     function sendEmail(email, name) {
         const subject = `Consulta para ${name}`;
-        const body = `Estimado/a ${name},%0D%0A%0D%0AGracias por ser parte de AutoCuidado Club.%0D%0ASaludos,%0D%0AEquipo AutoCuidado Club.`;
+        const body = `Estimado/a ${name},Bienvenido al club del cuidado automotriz, nos enorgullese que formes parte de AutoCuidado Club.`;
         const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.location.href = mailtoURL;
     }
@@ -274,7 +274,7 @@
             alert("Número de teléfono no disponible.");
             return;
         }
-        const message = `Hola ${name},%0D%0AGracias por ser parte de AutoCuidado Club.`;
+        const message = `Hola ${name}, Bienvenido al club del cuidado automotriz, nos enorgullese que formes parte de AutoCuidado Club.`;
         const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
         window.open(whatsappURL, '_blank');
     }
