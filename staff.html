@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Clientes - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,15 +79,13 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-
         .client-info {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -110,7 +105,7 @@
     <section id="restricted-content" style="display: none;">
         <h2>Panel de Gestión para el Staff</h2>
 
-        <!-- Finder Section -->
+        <!-- Finder Section: Buscar Usuarios por Fecha -->
         <div>
             <h3 class="section-title">Buscar Usuarios por Fecha</h3>
             <div class="form-control">
@@ -122,122 +117,99 @@
                 <input type="date" id="endDate">
             </div>
             <button onclick="findUsersByDate()">Buscar Usuarios</button>
-            <ul id="userResults"></ul>
+            <table id="userResults">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Fecha de Registro</th>
+                    </tr>
+                </thead>
+                <tbody id="userResultsBody"></tbody>
+            </table>
         </div>
 
-<div>
-    <h3 class="section-title">Buscar Información del Cliente</h3>
-    <input type="text" id="queryInput" placeholder="Buscar por email o placa del vehículo">
-    <button onclick="searchGoogleFormData()">Buscar</button>
-    <div id="formResults"></div>
-</div>
+        <!-- Finder Section: Buscar Información del Cliente -->
+        <div>
+            <h3 class="section-title">Buscar Información del Cliente</h3>
+            <input type="text" id="queryInput" placeholder="Buscar por email o placa del vehículo">
+            <button onclick="searchGoogleFormData()">Buscar</button>
+            <div id="formResults"></div>
+        </div>
+    </section>
 
-
-        
-        
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-            authDomain: "auto-cuidadoclub.firebaseapp.com",
-            projectId: "auto-cuidadoclub",
-            storageBucket: "auto-cuidadoclub.appspot.com",
-            messagingSenderId: "986704701191",
-            appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-            measurementId: "G-LBBGXV2YX5"
-        };
+        const googleFormWebAppUrl = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"; // Replace with your Web App URL
 
-       if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+        // Simulate Firebase user authentication for staff
+        document.getElementById("restricted-content").style.display = "block";
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+        // Fetch users by date range
+        async function findUsersByDate() {
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            const userResultsBody = document.getElementById("userResultsBody");
+            userResultsBody.innerHTML = ""; // Clear previous results
 
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            db.collection("users").doc(user.email).get().then((doc) => {
-                if (doc.exists && doc.data().role === "staff") {
-                    document.getElementById("restricted-content").style.display = "block";
+            if (!startDate || !endDate) {
+                alert("Por favor, selecciona un rango de fechas válido.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${googleFormWebAppUrl}?startDate=${startDate}&endDate=${endDate}`);
+                const users = await response.json();
+
+                if (users.length > 0) {
+                    users.forEach(user => {
+                        const row = `<tr>
+                            <td>${user.name || "N/A"}</td>
+                            <td>${user.email || "N/A"}</td>
+                            <td>${user.registrationDate || "N/A"}</td>
+                        </tr>`;
+                        userResultsBody.insertAdjacentHTML("beforeend", row);
+                    });
                 } else {
-                    alert("No tienes permiso para acceder.");
-                    window.location.href = "login.html";
+                    userResultsBody.innerHTML = `<tr><td colspan="3">No se encontraron usuarios en este rango de fechas.</td></tr>`;
                 }
-            }).catch((error) => {
-                console.error("Error verifying user role:", error);
-                alert("Error al verificar permisos.");
-                window.location.href = "login.html";
-            });
-        } else {
-            alert("Por favor, inicia sesión.");
-            window.location.href = "login.html";
+            } catch (error) {
+                console.error("Error fetching users by date:", error);
+                alert("Error al buscar usuarios. Inténtalo nuevamente.");
+            }
         }
-    });
 
-   
+        // Fetch client data from Google Forms
+        async function searchGoogleFormData() {
+            const query = document.getElementById("queryInput").value.trim();
+            const resultsDiv = document.getElementById("formResults");
+            resultsDiv.innerHTML = ""; // Clear previous results
 
-    function sendEmail(email, name) {
-        const subject = `Consulta para ${name}`;
-        const body = `Estimado/a ${name},Bienvenido al club del cuidado automotriz, nos enorgullese que formes parte de AutoCuidado Club.`;
-        const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailtoURL;
-    }
+            if (!query) {
+                resultsDiv.innerHTML = "<p>Por favor, ingrese un email o placa para buscar.</p>";
+                return;
+            }
 
-    function sendWhatsApp(phone, name) {
-        if (!phone) {
-            alert("Número de teléfono no disponible.");
-            return;
+            try {
+                const response = await fetch(`${googleFormWebAppUrl}?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    data.forEach(entry => {
+                        const entryDiv = document.createElement("div");
+                        entryDiv.classList.add("client-info");
+                        entryDiv.innerHTML = Object.entries(entry)
+                            .map(([key, value]) => `<strong>${key}:</strong> ${value || "N/A"}`)
+                            .join("<br>");
+                        resultsDiv.appendChild(entryDiv);
+                    });
+                } else {
+                    resultsDiv.innerHTML = `<p>No se encontraron resultados para "${query}".</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                resultsDiv.innerHTML = `<p>Error al buscar datos. Inténtalo nuevamente.</p>`;
+            }
         }
-        const message = `Hola ${name}, Bienvenido al club del cuidado automotriz, nos enorgullese que formes parte de AutoCuidado Club.`;
-        const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappURL, '_blank');
-    }
-
-    function bookInspection() {
-        const email = document.getElementById("userEmail").value;
-        const date = new Date(document.getElementById("inspectionDate").value);
-
-        db.collection("inspections").add({
-            email,
-            date: firebase.firestore.Timestamp.fromDate(date)
-        }).then(() => {
-            alert("Inspección agendada.");
-        });
-    }
-
-const googleFormWebAppUrl = "https://script.google.com/macros/s/AKfycbwmJYIfK2WJNXJpcvvZQUFR5K7CrhPATRILDb_yhajFJK8_J-wY3ewb2pQNeUhoY77plg/exec"; // Replace with your Web App URL
-async function searchGoogleFormData() {
-    const query = document.getElementById("queryInput").value.trim();
-    const resultsDiv = document.getElementById("formResults");
-    resultsDiv.innerHTML = ""; // Clear previous results
-
-    if (!query) {
-        resultsDiv.innerHTML = "<p>Por favor, ingrese un email o placa para buscar.</p>";
-        return;
-    }
-
-    try {
-        const response = await fetch(`${googleFormWebAppUrl}?query=${encodeURIComponent(query)}`);
-        const data = await response.json();
-
-        if (data.length > 0) {
-            data.forEach((entry) => {
-                const entryDiv = document.createElement("div");
-                entryDiv.classList.add("client-info");
-                entryDiv.innerHTML = Object.entries(entry)
-                    .map(([key, value]) => `<strong>${key}:</strong> ${value || "N/A"}`)
-                    .join("<br>");
-                resultsDiv.appendChild(entryDiv);
-            });
-        } else {
-            resultsDiv.innerHTML = `<p>No se encontraron resultados para "${query}".</p>`;
-        }
-    } catch (error) {
-        console.error("Error fetching form data:", error);
-        resultsDiv.innerHTML = `<p>Error al buscar datos. Inténtalo nuevamente.</p>`;
-    }
-}
-
-</script>
-    
+    </script>
 </body>
 </html>
