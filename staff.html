@@ -82,6 +82,15 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+
+        .client-info {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
     </style>
 </head>
 <body>
@@ -116,6 +125,15 @@
             <ul id="userResults"></ul>
         </div>
 
+<div>
+    <h3 class="section-title">Buscar Información del Cliente</h3>
+    <input type="text" id="queryInput" placeholder="Buscar por email o placa del vehículo">
+    <button onclick="searchGoogleFormData()">Buscar</button>
+    <div id="formResults"></div>
+</div>
+
+
+        
         <!-- Payment Management -->
         <div>
             <h3 class="section-title">Control de Pagos</h3>
@@ -290,6 +308,40 @@
             alert("Inspección agendada.");
         });
     }
+
+const googleFormWebAppUrl = "https://script.google.com/macros/s/AKfycbyi5zjB9HcDY98998aGLfeO_WVagk4FMzsl2LgcLz9IMiYdQvTtfxwTQVbHZ7qSusSN/exec"; // Replace with your Web App URL
+async function searchGoogleFormData() {
+    const query = document.getElementById("queryInput").value.trim();
+    const resultsDiv = document.getElementById("formResults");
+    resultsDiv.innerHTML = ""; // Clear previous results
+
+    if (!query) {
+        resultsDiv.innerHTML = "<p>Por favor, ingrese un email o placa para buscar.</p>";
+        return;
+    }
+
+    try {
+        const response = await fetch(`${googleFormWebAppUrl}?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (data.length > 0) {
+            data.forEach((entry) => {
+                const entryDiv = document.createElement("div");
+                entryDiv.classList.add("client-info");
+                entryDiv.innerHTML = Object.entries(entry)
+                    .map(([key, value]) => `<strong>${key}:</strong> ${value || "N/A"}`)
+                    .join("<br>");
+                resultsDiv.appendChild(entryDiv);
+            });
+        } else {
+            resultsDiv.innerHTML = `<p>No se encontraron resultados para "${query}".</p>`;
+        }
+    } catch (error) {
+        console.error("Error fetching form data:", error);
+        resultsDiv.innerHTML = `<p>Error al buscar datos. Inténtalo nuevamente.</p>`;
+    }
+}
+
 </script>
     
 </body>
