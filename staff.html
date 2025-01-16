@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Clientes - AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -79,13 +82,6 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        .client-info {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
     </style>
 </head>
 <body>
@@ -105,7 +101,7 @@
     <section id="restricted-content" style="display: none;">
         <h2>Panel de Gestión para el Staff</h2>
 
-        <!-- Finder Section: Buscar Usuarios por Fecha -->
+        <!-- Finder Section -->
         <div>
             <h3 class="section-title">Buscar Usuarios por Fecha</h3>
             <div class="form-control">
@@ -117,29 +113,50 @@
                 <input type="date" id="endDate">
             </div>
             <button onclick="findUsersByDate()">Buscar Usuarios</button>
-            <table id="userResults">
+            <ul id="userResults"></ul>
+        </div>
+
+        <!-- Payment Management -->
+        <div>
+            <h3 class="section-title">Control de Pagos</h3>
+            <table>
                 <thead>
                     <tr>
                         <th>Usuario</th>
                         <th>Email</th>
+                        <th>Teléfono</th>
                         <th>Fecha de Registro</th>
+                        <th>Horario Seleccionado</th>
+                        <th>Última Reprogramación</th>
+                        <th>Fecha de Pago</th>
+                        <th>Estado del Pago</th>
+                        <th>Próximo Pago</th>
+                        <th>Confirmar Pago</th>
                     </tr>
                 </thead>
-                <tbody id="userResultsBody"></tbody>
+                <tbody id="paymentTable"></tbody>
             </table>
         </div>
 
-        <!-- Finder Section: Buscar Información del Cliente -->
+        <!-- Calendar Management -->
         <div>
-            <h3 class="section-title">Buscar Información del Cliente</h3>
-            <input type="text" id="queryInput" placeholder="Buscar por email o placa del vehículo">
-            <button onclick="searchGoogleFormData()">Buscar</button>
-            <div id="formResults"></div>
+            <h3 class="section-title">Gestión de Calendario</h3>
+            <div class="form-control">
+                <label for="inspectionDate">Fecha de Inspección:</label>
+                <input type="date" id="inspectionDate">
+            </div>
+            <div class="form-control">
+                <label for="userEmail">Usuario (Email):</label>
+                <input type="email" id="userEmail">
+            </div>
+            <button onclick="bookInspection()">Agendar Inspección</button>
+            <h4>Inspecciones Agendadas</h4>
+            <ul id="inspectionList"></ul>
         </div>
     </section>
 
     <script>
-         const firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
             authDomain: "auto-cuidadoclub.firebaseapp.com",
             projectId: "auto-cuidadoclub",
@@ -273,77 +290,7 @@
             alert("Inspección agendada.");
         });
     }
-        const googleFormWebAppUrl = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"; // Replace with your Web App URL
-
-        // Simulate Firebase user authentication for staff
-        document.getElementById("restricted-content").style.display = "block";
-
-        // Fetch users by date range
-        async function findUsersByDate() {
-            const startDate = document.getElementById("startDate").value;
-            const endDate = document.getElementById("endDate").value;
-            const userResultsBody = document.getElementById("userResultsBody");
-            userResultsBody.innerHTML = ""; // Clear previous results
-
-            if (!startDate || !endDate) {
-                alert("Por favor, selecciona un rango de fechas válido.");
-                return;
-            }
-
-            try {
-                const response = await fetch(`${googleFormWebAppUrl}?startDate=${startDate}&endDate=${endDate}`);
-                const users = await response.json();
-
-                if (users.length > 0) {
-                    users.forEach(user => {
-                        const row = `<tr>
-                            <td>${user.name || "N/A"}</td>
-                            <td>${user.email || "N/A"}</td>
-                            <td>${user.registrationDate || "N/A"}</td>
-                        </tr>`;
-                        userResultsBody.insertAdjacentHTML("beforeend", row);
-                    });
-                } else {
-                    userResultsBody.innerHTML = `<tr><td colspan="3">No se encontraron usuarios en este rango de fechas.</td></tr>`;
-                }
-            } catch (error) {
-                console.error("Error fetching users by date:", error);
-                alert("Error al buscar usuarios. Inténtalo nuevamente.");
-            }
-        }
-
-        // Fetch client data from Google Forms
-        async function searchGoogleFormData() {
-            const query = document.getElementById("queryInput").value.trim();
-            const resultsDiv = document.getElementById("formResults");
-            resultsDiv.innerHTML = ""; // Clear previous results
-
-            if (!query) {
-                resultsDiv.innerHTML = "<p>Por favor, ingrese un email o placa para buscar.</p>";
-                return;
-            }
-
-            try {
-                const response = await fetch(`${googleFormWebAppUrl}?query=${encodeURIComponent(query)}`);
-                const data = await response.json();
-
-                if (data.length > 0) {
-                    data.forEach(entry => {
-                        const entryDiv = document.createElement("div");
-                        entryDiv.classList.add("client-info");
-                        entryDiv.innerHTML = Object.entries(entry)
-                            .map(([key, value]) => `<strong>${key}:</strong> ${value || "N/A"}`)
-                            .join("<br>");
-                        resultsDiv.appendChild(entryDiv);
-                    });
-                } else {
-                    resultsDiv.innerHTML = `<p>No se encontraron resultados para "${query}".</p>`;
-                }
-            } catch (error) {
-                console.error("Error fetching form data:", error);
-                resultsDiv.innerHTML = `<p>Error al buscar datos. Inténtalo nuevamente.</p>`;
-            }
-        }
-    </script>
+</script>
+    
 </body>
 </html>
