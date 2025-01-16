@@ -183,10 +183,8 @@
             window.location.href = "login.html";
         }
     });
-        // Google Forms Web App URL
-        const googleFormWebAppUrl = "https://script.google.com/macros/s/1pEA9yGqn6KqyRkqk62BDhFVlVMsQ5MPF9cfm-YyNWbc/exec";
+       const googleFormWebAppUrl = "https://script.google.com/macros/s/1pEA9yGqn6KqyRkqk62BDhFVlVMsQ5MPF9cfm-YyNWbc/exec";
 
-        // Function to fetch data from Google Forms
         async function searchGoogleFormData() {
             const query = document.getElementById("queryInput").value.trim();
             const resultsDiv = document.getElementById("formResults");
@@ -199,7 +197,15 @@
 
             try {
                 const response = await fetch(`${googleFormWebAppUrl}?query=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+
                 const data = await response.json();
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+                    return;
+                }
 
                 if (data.length > 0) {
                     data.forEach((entry) => {
