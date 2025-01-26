@@ -123,7 +123,6 @@
                         <th>Teléfono</th>
                         <th>Fecha de Registro</th>
                         <th>Horario Seleccionado</th>
-                        <th>Última Reprogramación</th>
                         <th>Fecha de Pago</th>
                         <th>Estado del Pago</th>
                         <th>Próximo Pago</th>
@@ -147,6 +146,19 @@
             </div>
             <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
             <ul id="rescheduleResults"></ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Última Reprogramación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="rescheduleTable"></tbody>
+            </table>
         </div>
     </section>
 
@@ -220,8 +232,8 @@
             const endDate = new Date(document.getElementById("rescheduleEndDate").value);
             endDate.setDate(endDate.getDate() + 1); // Include the full day
 
-            const rescheduleResults = document.getElementById("rescheduleResults");
-            rescheduleResults.innerHTML = ""; // Clear previous results
+            const rescheduleTable = document.getElementById("rescheduleTable");
+            rescheduleTable.innerHTML = ""; // Clear previous results
 
             db.collection("users").where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
                 .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
@@ -235,7 +247,14 @@
                         const user = doc.data();
                         const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
 
-                        rescheduleResults.innerHTML += `<li>${user.name} (${user.email}): Última reprogramación el ${lastReschedule} <button onclick="updateInspection('${doc.id}')">Actualizar Inspección</button></li>`;
+                        rescheduleTable.innerHTML += `
+                            <tr>
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.phone || "No disponible"}</td>
+                                <td>${lastReschedule}</td>
+                                <td><button onclick="updateInspection('${doc.id}', '${user.selectedSchedule}')">Actualizar Inspección</button></td>
+                            </tr>`;
                     });
                 })
                 .catch((error) => {
@@ -244,8 +263,13 @@
                 });
         }
 
-        function updateInspection(userId) {
-            const newInspectionDate = prompt("Ingrese la nueva fecha de inspección (YYYY-MM-DD):");
+        function updateInspection(userId, selectedSchedule) {
+            if (!selectedSchedule) {
+                alert("No se ha definido un horario seleccionado para este usuario.");
+                return;
+            }
+
+            const newInspectionDate = prompt(`Ingrese la nueva fecha de inspección para el horario '${selectedSchedule}' (YYYY-MM-DD):`);
 
             if (!newInspectionDate) {
                 alert("Fecha no válida.");
@@ -269,7 +293,6 @@
             const paymentTable = document.getElementById("paymentTable");
             const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
             const selectedSchedule = user.selectedSchedule || "No asignado";
-            const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
             const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
 
             paymentTable.innerHTML += `
@@ -279,7 +302,6 @@
                     <td>${user.phone || "No disponible"}</td>
                     <td>${registrationDate}</td>
                     <td>${selectedSchedule}</td>
-                    <td>${lastReschedule}</td>
                     <td>${paymentDate}</td>
                     <td>${user.paymentStatus || "Pendiente"}</td>
                     <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
