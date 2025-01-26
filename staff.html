@@ -136,8 +136,16 @@
 
         <!-- Verify Rescheduled Inspections -->
         <div>
-            <h3 class="section-title">Verificar Reprogramaciones Recientes</h3>
-            <button onclick="checkRescheduledInspections()">Revisar Reprogramaciones</button>
+            <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
+            <div class="form-control">
+                <label for="rescheduleStartDate">Desde:</label>
+                <input type="date" id="rescheduleStartDate">
+            </div>
+            <div class="form-control">
+                <label for="rescheduleEndDate">Hasta:</label>
+                <input type="date" id="rescheduleEndDate">
+            </div>
+            <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
             <ul id="rescheduleResults"></ul>
         </div>
     </section>
@@ -207,27 +215,54 @@
                 });
         }
 
-        function checkRescheduledInspections() {
+        function findRescheduledUsers() {
+            const startDate = new Date(document.getElementById("rescheduleStartDate").value);
+            const endDate = new Date(document.getElementById("rescheduleEndDate").value);
+            endDate.setDate(endDate.getDate() + 1); // Include the full day
+
             const rescheduleResults = document.getElementById("rescheduleResults");
             rescheduleResults.innerHTML = ""; // Clear previous results
 
-            db.collection("users").where("lastReschedule", "!=", null).get()
+            db.collection("users").where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+                .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
+                .get()
                 .then((querySnapshot) => {
                     if (querySnapshot.empty) {
-                        alert("No se encontraron usuarios con reprogramaciones recientes.");
+                        alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
                         return;
                     }
                     querySnapshot.forEach((doc) => {
                         const user = doc.data();
                         const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
 
-                        rescheduleResults.innerHTML += `<li>${user.name} (${user.email}): Última reprogramación el ${lastReschedule}</li>`;
+                        rescheduleResults.innerHTML += `<li>${user.name} (${user.email}): Última reprogramación el ${lastReschedule} <button onclick="updateInspection('${doc.id}')">Actualizar Inspección</button></li>`;
                     });
                 })
                 .catch((error) => {
-                    console.error("Error fetching rescheduled inspections:", error);
-                    alert("Error al verificar reprogramaciones. Inténtalo nuevamente.");
+                    console.error("Error fetching rescheduled users:", error);
+                    alert("Error al buscar reprogramaciones. Inténtalo nuevamente.");
                 });
+        }
+
+        function updateInspection(userId) {
+            const newInspectionDate = prompt("Ingrese la nueva fecha de inspección (YYYY-MM-DD):");
+
+            if (!newInspectionDate) {
+                alert("Fecha no válida.");
+                return;
+            }
+
+            const newDate = new Date(newInspectionDate);
+
+            db.collection("users").doc(userId).update({
+                nextInspectionDate: firebase.firestore.Timestamp.fromDate(newDate),
+            }).then(() => {
+                alert("Calendario de inspección actualizado.");
+                findRescheduledUsers();
+            }).catch((error) => {
+                console.error("Error updating inspection date:", error);
+                alert("Error al actualizar la inspección. Inténtalo nuevamente.");
+            });
         }
 
         function updatePaymentTable(user, userId) {
@@ -251,8 +286,22 @@
                     <td>
                         <button onclick="sendEmail('${user.email}', '${user.name}')">Enviar Email</button>
                         <button onclick="sendWhatsApp('${user.phone}', '${user.name}')">Enviar WhatsApp</button>
+                        <button onclick="confirmPayment('${userId}')">Confirmar Pago</button>
                     </td>
                 </tr>`;
+        }
+
+        function confirmPayment(userId) {
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+
+            db.collection("users").doc(userId).update({
+                paymentStatus: "Confirmado",
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+            }).then(() => {
+                alert("Pago confirmado.");
+                findUsersByDate();
+            }).catch(console.error);
         }
 
         function sendEmail(email, name) {
