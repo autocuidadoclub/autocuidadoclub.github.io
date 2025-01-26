@@ -183,44 +183,41 @@
             window.location.href = "login.html";
         }
     });
-       const googleFormWebAppUrl = "const googleFormWebAppUrl = "https://script.google.com/macros/s/AKfycbzaEAyTtU81I5Ped2aMmV-I210mEs6ItMjXTbHBfeHiOlGVpfxNQNtLZ5FuDTkVtu_jFQ/exec";
-";
+        // Google Forms Web App URL
+        const googleFormWebAppUrl = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
 
+        // Function to fetch data from Google Forms
         async function searchGoogleFormData() {
-  const query = document.getElementById("queryInput").value.trim();
-  const resultsDiv = document.getElementById("formResults");
-  resultsDiv.innerHTML = ""; // Clear previous results
+            const query = document.getElementById("queryInput").value.trim();
+            const resultsDiv = document.getElementById("formResults");
+            resultsDiv.innerHTML = ""; // Clear previous results
 
-  if (!query) {
-    resultsDiv.innerHTML = "<p>Por favor, ingrese un email o placa para buscar.</p>";
-    return;
-  }
+            if (!query) {
+                resultsDiv.innerHTML = "<p>Por favor, ingrese un email o placa para buscar.</p>";
+                return;
+            }
 
-  try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzaEAyTtU81I5Ped2aMmV-I210mEs6ItMjXTbHBfeHiOlGVpfxNQNtLZ5FuDTkVtu_jFQ/exec?query=${encodeURIComponent(query)}`
-    );
+            try {
+                const response = await fetch(`${googleFormWebAppUrl}?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
 
-    const data = await response.json();
-
-    if (data.length > 0) {
-      data.forEach((entry) => {
-        const entryDiv = document.createElement("div");
-        entryDiv.classList.add("client-info");
-        entryDiv.innerHTML = Object.entries(entry)
-          .map(([key, value]) => `<strong>${key}:</strong> ${value || "N/A"}`)
-          .join("<br>");
-        resultsDiv.appendChild(entryDiv);
-      });
-    } else {
-      resultsDiv.innerHTML = `<p>No se encontraron resultados para "${query}".</p>`;
-    }
-  } catch (error) {
-    console.error("Error fetching form data:", error);
-    resultsDiv.innerHTML = `<p>Error al buscar datos. Inténtalo nuevamente.</p>`;
-  }
-}
-
+                if (data.length > 0) {
+                    data.forEach((entry) => {
+                        const entryDiv = document.createElement("div");
+                        entryDiv.classList.add("client-info");
+                        entryDiv.innerHTML = Object.entries(entry)
+                            .map(([key, value]) => `<strong>${key}:</strong> ${value || "N/A"}`)
+                            .join("<br>");
+                        resultsDiv.appendChild(entryDiv);
+                    });
+                } else {
+                    resultsDiv.innerHTML = `<p>No se encontraron resultados para "${query}".</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                resultsDiv.innerHTML = `<p>Error al buscar datos. Inténtalo nuevamente.</p>`;
+            }
+        }
         
     function findUsersByDate() {
         const startDate = new Date(document.getElementById("startDate").value);
