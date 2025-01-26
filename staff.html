@@ -253,6 +253,7 @@
                                 <td>${user.email}</td>
                                 <td>${user.phone || "No disponible"}</td>
                                 <td>${lastReschedule}</td>
+                                <td>${selectedSchedule}</td>
                                 <td><button onclick="updateInspection('${doc.id}', '${user.selectedSchedule}')">Actualizar Inspección</button></td>
                             </tr>`;
                     });
@@ -301,7 +302,6 @@
                     <td>${user.email}</td>
                     <td>${user.phone || "No disponible"}</td>
                     <td>${registrationDate}</td>
-                    <td>${selectedSchedule}</td>
                     <td>${paymentDate}</td>
                     <td>${user.paymentStatus || "Pendiente"}</td>
                     <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
