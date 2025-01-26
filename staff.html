@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -161,6 +162,8 @@
                 <tbody id="rescheduleTable"></tbody>
             </table>
         </div>
+
+        <button onclick="authenticateUser()">Autenticar con Google</button>
     </section>
 
     <script>
@@ -201,6 +204,63 @@
             }
         });
 
+        gapi.load('client:auth2', () => {
+            gapi.client.init({
+                apiKey: 'YOUR_API_KEY',
+                clientId: 'YOUR_CLIENT_ID',
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+                scope: "https://www.googleapis.com/auth/calendar.events"
+            }).then(() => {
+                console.log("Google Calendar API Loaded");
+            }).catch((error) => console.error("Error loading Google Calendar API:", error));
+        });
+
+        function authenticateUser() {
+            gapi.auth2.getAuthInstance().signIn().then(() => {
+                console.log("User signed in");
+            }).catch((error) => console.error("Authentication error:", error));
+        }
+
+        function createEvent(inspectionDate, userName, userEmail) {
+            const event = {
+                summary: `Inspection Booking for ${userName}`,
+                description: `Inspection scheduled for ${userName}.`,
+                start: {
+                    dateTime: inspectionDate,
+                    timeZone: 'America/El_Salvador'
+                },
+                end: {
+                    dateTime: new Date(new Date(inspectionDate).getTime() + 3600000).toISOString(),
+                    timeZone: 'America/El_Salvador'
+                },
+                attendees: [{ email: userEmail }]
+            };
+
+            gapi.client.calendar.events.insert({
+                calendarId: 'primary',
+                resource: event
+            }).then(response => {
+                console.log("Event created:", response);
+                alert(`Inspection scheduled for ${userName}`);
+            }).catch(error => {
+                console.error("Error creating event:", error);
+                alert("Failed to schedule inspection.");
+            });
+        }
+
+        function deleteEvent(eventId) {
+            gapi.client.calendar.events.delete({
+                calendarId: 'primary',
+                eventId: eventId
+            }).then(() => {
+                console.log("Event deleted");
+                alert("Event successfully deleted.");
+            }).catch(error => {
+                console.error("Error deleting event:", error);
+                alert("Failed to delete event.");
+            });
+        }
+
         function findUsersByDate() {
             const startDate = new Date(document.getElementById("startDate").value);
             const endDate = new Date(document.getElementById("endDate").value);
@@ -228,69 +288,6 @@
                 });
         }
 
-        function findRescheduledUsers() {
-            const startDate = new Date(document.getElementById("rescheduleStartDate").value);
-            const endDate = new Date(document.getElementById("rescheduleEndDate").value);
-            endDate.setDate(endDate.getDate() + 1); // Include the full day
-
-            const rescheduleTable = document.getElementById("rescheduleTable");
-            rescheduleTable.innerHTML = ""; // Clear previous results
-
-            db.collection("users").where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-                .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
-                .get()
-                .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
-                        return;
-                    }
-                    querySnapshot.forEach((doc) => {
-                        const user = doc.data();
-                        const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
-
-                        rescheduleTable.innerHTML += `
-                            <tr>
-                                <td>${user.name}</td>
-                                <td>${user.email}</td>
-                                <td>${user.phone || "No disponible"}</td>
-                                <td>${user.selectedSchedule || "No asignado"}</td>
-                                <td>${lastReschedule}</td>
-                                <td><button onclick="updateInspection('${doc.id}', '${user.selectedSchedule}')">Actualizar Inspección</button></td>
-                            </tr>`;
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error fetching rescheduled users:", error);
-                    alert("Error al buscar reprogramaciones. Inténtalo nuevamente.");
-                });
-        }
-
-        function updateInspection(userId, selectedSchedule) {
-            if (!selectedSchedule) {
-                alert("No se ha definido un horario seleccionado para este usuario.");
-                return;
-            }
-
-            const newInspectionDate = prompt(`Ingrese la nueva fecha de inspección para el horario '${selectedSchedule}' (YYYY-MM-DD):`);
-
-            if (!newInspectionDate) {
-                alert("Fecha no válida.");
-                return;
-            }
-
-            const newDate = new Date(newInspectionDate);
-
-            db.collection("users").doc(userId).update({
-                nextInspectionDate: firebase.firestore.Timestamp.fromDate(newDate),
-            }).then(() => {
-                alert("Calendario de inspección actualizado.");
-                findRescheduledUsers();
-            }).catch((error) => {
-                console.error("Error updating inspection date:", error);
-                alert("Error al actualizar la inspección. Inténtalo nuevamente.");
-            });
-        }
-
         function updatePaymentTable(user, userId) {
             const paymentTable = document.getElementById("paymentTable");
             const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
@@ -308,41 +305,9 @@
                     <td>${user.paymentStatus || "Pendiente"}</td>
                     <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
                     <td>
-                        <button onclick="sendEmail('${user.email}', '${user.name}')">Enviar Email</button>
-                        <button onclick="sendWhatsApp('${user.phone}', '${user.name}')">Enviar WhatsApp</button>
-                        <button onclick="confirmPayment('${userId}')">Confirmar Pago</button>
+                        <button onclick="createEvent('${user.nextInspectionDate}', '${user.name}', '${user.email}')">Crear Evento</button>
                     </td>
                 </tr>`;
-        }
-
-        function confirmPayment(userId) {
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
-
-            db.collection("users").doc(userId).update({
-                paymentStatus: "Confirmado",
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-            }).then(() => {
-                alert("Pago confirmado.");
-                findUsersByDate();
-            }).catch(console.error);
-        }
-
-        function sendEmail(email, name) {
-            const subject = `Consulta para ${name}`;
-            const body = `Estimado/a ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
-            const zohoMailUrl = `https://mail.zoho.com/zm/#compose?to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(zohoMailUrl, '_blank');
-        }
-
-        function sendWhatsApp(phone, name) {
-            if (!phone) {
-                alert("Número de teléfono no disponible.");
-                return;
-            }
-            const message = `Hola ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
-            const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, '_blank');
         }
     </script>
 </body>
