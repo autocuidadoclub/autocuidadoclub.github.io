@@ -122,6 +122,7 @@
                         <th>Email</th>
                         <th>Teléfono</th>
                         <th>Fecha de Registro</th>
+                        <th>Horario Seleccionado</th>
                         <th>Fecha de Pago</th>
                         <th>Estado del Pago</th>
                         <th>Próximo Pago</th>
@@ -152,8 +153,8 @@
                         <th>Usuario</th>
                         <th>Email</th>
                         <th>Teléfono</th>
-                        <th>Última Reprogramación</th>
                         <th>Horario Seleccionado</th>
+                        <th>Última Reprogramación</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -252,8 +253,8 @@
                                 <td>${user.name}</td>
                                 <td>${user.email}</td>
                                 <td>${user.phone || "No disponible"}</td>
+                                <td>${user.selectedSchedule || "No asignado"}</td>
                                 <td>${lastReschedule}</td>
-                                <td>${selectedSchedule}</td>
                                 <td><button onclick="updateInspection('${doc.id}', '${user.selectedSchedule}')">Actualizar Inspección</button></td>
                             </tr>`;
                     });
@@ -302,6 +303,7 @@
                     <td>${user.email}</td>
                     <td>${user.phone || "No disponible"}</td>
                     <td>${registrationDate}</td>
+                    <td>${selectedSchedule}</td>
                     <td>${paymentDate}</td>
                     <td>${user.paymentStatus || "Pendiente"}</td>
                     <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
@@ -329,8 +331,8 @@
         function sendEmail(email, name) {
             const subject = `Consulta para ${name}`;
             const body = `Estimado/a ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
-            const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.location.href = mailtoURL;
+            const zohoMailUrl = `https://mail.zoho.com/mail/compose?to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(zohoMailUrl, '_blank');
         }
 
         function sendWhatsApp(phone, name) {
