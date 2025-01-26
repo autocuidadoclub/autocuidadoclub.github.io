@@ -331,7 +331,7 @@
         function sendEmail(email, name) {
             const subject = `Consulta para ${name}`;
             const body = `Estimado/a ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
-            const zohoMailUrl = `https://mail.zoho.com/mail/compose?to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            const zohoMailUrl = `https://mail.zoho.com/zm/#compose?to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(zohoMailUrl, '_blank');
         }
 
