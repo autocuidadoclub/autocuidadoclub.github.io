@@ -166,6 +166,7 @@
             </table>
         </div>
        <button id="authenticateButton" onclick="authenticateUser()">Autenticar con Google</button>
+        <button onclick="logoutGoogle()">Cerrar Sesión de Google</button>
         <div>
     <button onclick="createEvent('2025-01-30T10:00:00Z', 'John Doe', 'john.doe@example.com')">Crear Evento de Ejemplo</button>
     <button onclick="updateEvent('exampleEventId123', '2025-02-01T14:00:00Z')">Actualizar Evento de Ejemplo</button>
@@ -299,6 +300,15 @@ function deleteEvent(eventId) {
     }).catch(error => {
         console.error("Error deleting event:", error);
         alert("Error al eliminar el evento.");
+    });
+}
+function logoutGoogle() {
+    gapi.auth2.getAuthInstance().signOut().then(() => {
+        console.log("User logged out");
+        alert("Cierre de sesión exitoso.");
+    }).catch(error => {
+        console.error("Error logging out:", error);
+        alert("Error al cerrar sesión.");
     });
 }
 
