@@ -8,6 +8,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -98,6 +100,8 @@
         <h1>Gestión de Clientes</h1>
     </header>
 
+
+    
     <section id="restricted-content" style="display: none;">
         <h2>Panel de Gestión para el Staff</h2>
 
@@ -161,6 +165,12 @@
                 <tbody id="rescheduleTable"></tbody>
             </table>
         </div>
+       <button id="authenticateButton" onclick="authenticateUser()">Autenticar con Google</button>
+        <div>
+    <button onclick="createEvent('2025-01-30T10:00:00Z', 'John Doe', 'john.doe@example.com')">Crear Evento de Ejemplo</button>
+    <button onclick="updateEvent('exampleEventId123', '2025-02-01T14:00:00Z')">Actualizar Evento de Ejemplo</button>
+    <button onclick="deleteEvent('exampleEventId123')">Eliminar Evento de Ejemplo</button>
+</div>
     </section>
 
     <script>
@@ -181,6 +191,20 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        gapi.load('client:auth2', () => {
+    gapi.client.init({
+        apiKey: 'YOUR_API_KEY', // Replace with your Google API key
+        clientId: 'YOUR_CLIENT_ID', // Replace with your Google Client ID
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+        scope: "https://www.googleapis.com/auth/calendar.events"
+    }).then(() => {
+        console.log("Google Calendar API Loaded");
+    }).catch((error) => {
+        console.error("Error loading Google Calendar API:", error);
+    });
+});
+
+        
         auth.onAuthStateChanged((user) => {
             if (user) {
                 db.collection("users").doc(user.email).get().then((doc) => {
@@ -200,6 +224,83 @@
                 window.location.href = "login.html";
             }
         });
+
+        function authenticateUser() {
+    gapi.auth2.getAuthInstance().signIn().then(() => {
+        console.log("User authenticated");
+        alert("Autenticación exitosa con Google Calendar.");
+    }).catch((error) => {
+        console.error("Authentication error:", error);
+        alert("Error en la autenticación con Google Calendar.");
+    });
+}
+
+        function createEvent(inspectionDate, userName, userEmail) {
+    const event = {
+        summary: `Inspection Booking for ${userName}`,
+        description: `Inspection scheduled for ${userName}.`,
+        start: {
+            dateTime: inspectionDate, // Format: 'YYYY-MM-DDTHH:mm:ssZ'
+            timeZone: 'America/El_Salvador'
+        },
+        end: {
+            dateTime: new Date(new Date(inspectionDate).getTime() + 3600000).toISOString(),
+            timeZone: 'America/El_Salvador'
+        },
+        attendees: [{ email: userEmail }]
+    };
+
+    gapi.client.calendar.events.insert({
+        calendarId: 'primary',
+        resource: event
+    }).then(response => {
+        console.log("Event created:", response.result);
+        alert(`Inspection scheduled for ${userName}`);
+        // Save event ID to your database
+        const eventId = response.result.id;
+        console.log("Event ID saved:", eventId);
+    }).catch(error => {
+        console.error("Error creating event:", error);
+        alert("Error al crear el evento.");
+    });
+}
+
+        function updateEvent(eventId, newInspectionDate) {
+    const updatedEvent = {
+        start: {
+            dateTime: newInspectionDate,
+            timeZone: 'America/El_Salvador'
+        },
+        end: {
+            dateTime: new Date(new Date(newInspectionDate).getTime() + 3600000).toISOString(),
+            timeZone: 'America/El_Salvador'
+        }
+    };
+
+    gapi.client.calendar.events.patch({
+        calendarId: 'primary',
+        eventId: eventId,
+        resource: updatedEvent
+    }).then(response => {
+        console.log("Event updated:", response);
+        alert("Inspection rescheduled successfully.");
+    }).catch(error => {
+        console.error("Error updating event:", error);
+        alert("Error al actualizar el evento.");
+    });
+}
+function deleteEvent(eventId) {
+    gapi.client.calendar.events.delete({
+        calendarId: 'primary',
+        eventId: eventId
+    }).then(() => {
+        console.log("Event deleted");
+        alert("Evento eliminado con éxito.");
+    }).catch(error => {
+        console.error("Error deleting event:", error);
+        alert("Error al eliminar el evento.");
+    });
+}
 
         function findUsersByDate() {
             const startDate = new Date(document.getElementById("startDate").value);
