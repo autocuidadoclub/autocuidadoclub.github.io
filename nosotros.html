@@ -10,6 +10,48 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+    /* Fix header alignment */
+    header {
+        background-color: #002b5c; /* Dark blue for branding */
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+        position: relative;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .header-text h1 {
+        font-size: 2rem;
+        margin: 0;
+    }
+
+    .header-text p {
+        font-size: 1.2rem;
+        margin-top: 5px;
+    }
+
+    /* Ensure text is visible and not blending with background */
+    .header-text {
+        max-width: 800px;
+        margin: 0 auto;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .header-text h1 {
+            font-size: 1.8rem;
+        }
+
+        .header-text p {
+            font-size: 1rem;
+        }
+    }
+</style>
+
 </head>
 <body>
 
