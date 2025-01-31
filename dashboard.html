@@ -161,7 +161,7 @@
         </div>
 
 
-     <div class="card">
+    <div class="card">
     <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
     <p><strong>Miembro Desde:</strong></p>
     <p><span id="memberSince">Cargando...</span></p>   
@@ -175,8 +175,14 @@
         ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
         Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
     </div>
-</div>
 
+    <!-- Button to complete payment -->
+    <div id="complete-payment" style="margin-top: 10px; display: none;">
+        <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+            Completa tu pago ahora 🔗
+        </a>
+    </div>
+</div>
 
 
            
@@ -364,15 +370,45 @@ function updateUserInfo(userData) {
     document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
-    // Vehicles Fix
     const vehiclesList = document.getElementById("vehicles-list");
-
     if (userData.vehicles && Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
         vehiclesList.innerText = userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ");
     } else {
         vehiclesList.innerText = "No hay vehículos registrados.";
     }
+
+    // Check payment status
+    if (!userData.paymentDate || userData.paymentDate === "Pendiente") {
+        document.getElementById("payment-warning").style.display = "block";
+        
+        // Get the PayPal link for the user's plan
+        let payPalURL = getPaypalLink(userData.planType);
+        
+        if (payPalURL) {
+            document.getElementById("payment-link").href = payPalURL;
+            document.getElementById("complete-payment").style.display = "block";
+        } else {
+            console.error("No PayPal link found for plan:", userData.planType);
+        }
+    } else {
+        document.getElementById("payment-warning").style.display = "none";
+        document.getElementById("complete-payment").style.display = "none";
+    }
 }
+
+// Function to return the correct PayPal link based on the plan type
+function getPaypalLink(planType) {
+    switch (planType) {
+        case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
+        case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
+        case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
+        case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
+        case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
+        case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
+        default: return null;
+    }
+}
+
 
 
     // Load user profile data
