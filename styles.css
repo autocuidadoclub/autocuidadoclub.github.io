@@ -1,3 +1,4 @@
+
 /* General Styles */
 body {
     font-family: Arial, sans-serif;
@@ -1270,36 +1271,3 @@ hr.separator {
         font-size: 14px;
     }
 }
-
-/* Register Section Styling */
-.register-container {
-    text-align: center;
-    margin-top: 25px;
-    padding: 15px;
-    background-color: #f8f9fa; /* Light background for contrast */
-    border-radius: 8px;
-}
-
-.register-text {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.register-button {
-    display: inline-block;
-    padding: 12px 25px;
-    background-color: #ff6600; /* AutoCuidado Club's orange */
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 18px;
-    font-weight: bold;
-    transition: background 0.3s, transform 0.2s;
-}
-
-.register-button:hover {
-    background-color: #cc5500; /* Darker shade on hover */
-    transform: scale(1.05);
-}
-
