@@ -215,7 +215,30 @@ window.selectScheduleBox = function (cell) {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
     </style>
+    
 </head>
 <body>
     <!-- Navigation -->
@@ -231,7 +254,9 @@ window.selectScheduleBox = function (cell) {
             <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
     </nav>
-
+<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
 <!-- Header -->
     <header>
         <div class="header-container">
