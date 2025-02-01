@@ -132,7 +132,31 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             document.getElementById('forgot-password-section').style.display = sectionToShow === 'forgot-password' ? 'block' : 'none';
         }
     </script>
-    </head>
+<style>
+        .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
+    </style>    
+
+</head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
@@ -157,7 +181,9 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             </div>
         </div>
     </header>
-
+<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
     <!-- Login Section -->
     <section id="login-section" class="login-section">
         <div class="form-container">
