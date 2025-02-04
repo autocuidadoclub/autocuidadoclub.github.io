@@ -1,4 +1,6 @@
+window._env_={
 FIREBASE_API_KEY=AIzaSyDoHaEwvqpt396a65zGDqaydrdGpFNwWQ8
 FIREBASE_AUTH_DOMAIN=auto-cuidadoclub.firebaseapp.com
 FIREBASE_PROJECT_ID=auto-cuidadoclub
 FIREBASE_STORAGE_BUCKET=auto-cuidadoclub.appspot.com
+};
