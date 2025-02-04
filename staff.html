@@ -10,6 +10,65 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
 
+     <script>
+        const webAppUrl = "YOUR_WEB_APP_URL"; // Replace with the actual deployed Apps Script Web App URL
+
+        async function fetchInspectionData() {
+            const query = document.getElementById("queryInput").value.trim();
+            const resultsDiv = document.getElementById("inspectionResults");
+            resultsDiv.innerHTML = ""; // Clear previous results
+
+            try {
+                const response = await fetch(`${webAppUrl}?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                    return;
+                }
+
+                if (data.length > 0) {
+                    const table = document.createElement("table");
+                    table.border = "1";
+                    table.style.width = "100%";
+
+                    // Create table headers
+                    const headers = Object.keys(data[0]);
+                    const thead = document.createElement("thead");
+                    const trHead = document.createElement("tr");
+
+                    headers.forEach(header => {
+                        const th = document.createElement("th");
+                        th.textContent = header;
+                        trHead.appendChild(th);
+                    });
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+
+                    // Populate table rows
+                    const tbody = document.createElement("tbody");
+                    data.forEach(row => {
+                        const tr = document.createElement("tr");
+                        headers.forEach(header => {
+                            const td = document.createElement("td");
+                            td.textContent = row[header] || "N/A";
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+
+                    resultsDiv.appendChild(table);
+                } else {
+                    resultsDiv.innerHTML = `<p>No se encontraron inspecciones para "${query}".</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching inspection data:", error);
+                resultsDiv.innerHTML = `<p>Error al obtener datos. Inténtalo nuevamente.</p>`;
+            }
+        }
+    </script>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -172,8 +231,20 @@
     <button onclick="updateEvent('exampleEventId123', '2025-02-01T14:00:00Z')">Actualizar Evento de Ejemplo</button>
     <button onclick="deleteEvent('exampleEventId123')">Eliminar Evento de Ejemplo</button>
 </div>
-    </section>
+  
 
+ <div class="navbar">Gestión de Inspecciones - AutoCuidado Club</div>
+
+    <div class="container">
+        <h2>Buscar Inspecciones</h2>
+        <input type="text" id="queryInput" placeholder="Buscar por email, fecha, etc.">
+        <button onclick="fetchInspectionData()">Buscar</button>
+
+        <div id="inspectionResults"></div>
+    </div>
+  </section>
+    
+    
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
