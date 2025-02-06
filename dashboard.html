@@ -8,6 +8,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+     <!-- Load Environment Variables -->
+    <script src="env.js"></script>
+    
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -327,20 +331,67 @@
       
     <script>
     // Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-        authDomain: "auto-cuidadoclub.firebaseapp.com",
-        databaseURL: "https://auto-cuidadoclub-default-rtdb.firebaseio.com",
-        projectId: "auto-cuidadoclub",
-        storageBucket: "auto-cuidadoclub.appspot.com",
-        messagingSenderId: "986704701191",
-        appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-        measurementId: "G-LBBGXV2YX5"
-    };
+   const firebaseConfig = {
+    apiKey: window._env_.FIREBASE_API_KEY,
+    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+    databaseURL: window._env_.FIREBASE_DATABASE_URL,
+    projectId: window._env_.FIREBASE_PROJECT_ID,
+    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+    appId: window._env_.FIREBASE_APP_ID,
+    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+};
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+
+    document.addEventListener("DOMContentLoaded", function () {
+    if (window._env_) {
+        const firebaseConfig = {
+            apiKey: window._env_.FIREBASE_API_KEY,
+            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+            databaseURL: window._env_.FIREBASE_DATABASE_URL,
+            projectId: window._env_.FIREBASE_PROJECT_ID,
+            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+            appId: window._env_.FIREBASE_APP_ID,
+            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => console.log("Authentication persistence set to LOCAL."))
+            .catch((error) => console.error("Error setting authentication persistence:", error.message));
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("User logged in:", user.email);
+                document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+
+                db.collection("users").doc(user.email).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            updateUserInfo(userData);
+                        } else {
+                            console.error("User profile not found.");
+                        }
+                    })
+                    .catch((error) => console.error("Error fetching user profile:", error));
+            } else {
+                console.log("No authenticated user. Redirecting to login.");
+                window.location.href = 'login.html';
+            }
+        });
+    } else {
+        console.error("Environment variables (env.js) not loaded.");
     }
+});
+
 
     const auth = firebase.auth();
     const db = firebase.firestore();
