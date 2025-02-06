@@ -24,73 +24,28 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
 
-    <script>
-      // Firebase configuration
+<!-- Load env.js before initializing Firebase -->
+<script src="env.js"></script>
+
+<script>
+  // Initialize Firebase using dynamically loaded environment variables
   const firebaseConfig = {
-  apiKey: "AIzaSyBsYS6pHWaTgXzdml-H_y3lQewWgOUezPM",
-  authDomain: "auto-cuidadoclub.firebaseapp.com",
-  projectId: "auto-cuidadoclub",
-  storageBucket: "auto-cuidadoclub.appspot.com",
-  messagingSenderId: "986704701191",
-  appId: "1:986704701191:web:fc96ef678d64c1cdcf47a2",
-  measurementId: "G-LBBGXV2YX5"
-      };
+    apiKey: window._env_.FIREBASE_API_KEY,
+    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+    databaseURL: window._env_.FIREBASE_DATABASE_URL,
+    projectId: window._env_.FIREBASE_PROJECT_ID,
+    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+    appId: window._env_.FIREBASE_APP_ID,
+    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+  };
 
-      // Initialize Firebase
-      const app = firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
-      const auth = firebase.auth();
-      
-      // Function to check if the subscription has been renewed and payment is verified
-      function checkSubscriptionStatus() {
-        const userId = auth.currentUser.uid;
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
+</script>
 
-        db.ref('users/' + userId).once('value').then((snapshot) => {
-          const userData = snapshot.val();
-          const subscriptionEndDate = new Date(userData.subscriptionEndDate); // Subscription end date
-          const currentDate = new Date();
-          const paymentVerified = userData.paymentVerified; // Check if the payment is verified
-
-          if (currentDate > subscriptionEndDate && paymentVerified) {
-            // Allow vehicle info update if subscription has ended, been renewed, and payment is verified
-            enableVehicleUpdate();
-          } else if (!paymentVerified) {
-            alert("No puedes actualizar tu vehículo hasta que el pago de la nueva suscripción sea verificado.");
-          } else {
-            alert("No puedes actualizar la información del vehículo hasta que tu suscripción termine o se renueve.");
-          }
-        });
-      }
-
-      // Function to enable vehicle information update
-      function enableVehicleUpdate() {
-        document.getElementById('vehicle-form').style.display = 'block';
-      }
-
-      // Function to register or update vehicle info
-      function registerVehicle() {
-        const userId = auth.currentUser.uid;
-
-        const vehicleData = {
-          plate: document.getElementById('plate').value,
-          make: document.getElementById('make').value,
-          model: document.getElementById('model').value,
-          year: document.getElementById('year').value,
-          municipio: document.getElementById('municipio').value
-        };
-
-        db.ref('users/' + userId).update({
-          vehicle: vehicleData
-        });
-
-        alert("Vehículo registrado o actualizado correctamente.");
-      }
-
-      // Function to check subscription status when the page loads
-      window.onload = function() {
-        checkSubscriptionStatus();
-      }
-    </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
