@@ -31,12 +31,12 @@ jobs:
           echo "  GOOGLE_PROJECT_NUMBER: '${{ secrets.GOOGLE_PROJECT_NUMBER }}'" >> public/env.js
           echo "};" >> public/env.js
 
-           - name: Force Add env.js and Push
+      - name: Force Add env.js and Push
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add -f env.js  # Force add env.js even if it's in .gitignore
-          git commit -m "Force add env.js with GitHub Secrets"
+          git add -f public/env.js  # Force add env.js even if it's in .gitignore
+          git commit -m "Force add env.js with GitHub Secrets" || echo "No changes to commit"
           git push
 
       - name: Install Firebase CLI
@@ -52,7 +52,8 @@ jobs:
           echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > service-account.json
 
       - name: Authenticate Google Cloud SDK
-        run: gcloud auth activate-service-account --key-file=service-account.json
+        run: |
+          gcloud auth activate-service-account --key-file=service-account.json
 
       - name: Deploy Google Cloud Functions
         run: |
