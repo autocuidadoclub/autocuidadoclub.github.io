@@ -31,12 +31,12 @@ jobs:
           echo "  GOOGLE_PROJECT_NUMBER: '${{ secrets.GOOGLE_PROJECT_NUMBER }}'" >> public/env.js
           echo "};" >> public/env.js
 
-      - name: Commit and Push Updated env.js
+           - name: Force Add env.js and Push
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add public/env.js
-          git commit -m "Update env.js with GitHub Secrets" || echo "No changes to commit"
+          git add -f env.js  # Force add env.js even if it's in .gitignore
+          git commit -m "Force add env.js with GitHub Secrets"
           git push
 
       - name: Install Firebase CLI
