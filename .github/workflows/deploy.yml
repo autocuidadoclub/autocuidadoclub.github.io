@@ -35,7 +35,8 @@ jobs:
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_DEPLOY_TOKEN }}
-        run: firebase deploy --only hosting
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: firebase deploy --only hosting --project $FIREBASE_PROJECT_ID
 
 
       - name: Inject API Keys into env.js
