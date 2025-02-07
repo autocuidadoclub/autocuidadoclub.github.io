@@ -32,13 +32,14 @@ jobs:
           echo "};" >> public/env.js
 
       - name: Create PR for env.js (if main is protected)
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git checkout -b update-env
-          git add -f public/env.js  # Force add env.js even if it's in .gitignore
-          git commit -m "Update env.js with GitHub Secrets"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git update-env --force || echo "Push failed"
+  run: |
+    git config --global user.name "github-actions"
+    git config --global user.email "github-actions@github.com"
+    git checkout -b update-env
+    git add -f public/env.js
+    git commit -m "Update env.js with GitHub Secrets"
+    git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git update-env --force || echo "Push failed"
+
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
@@ -62,3 +63,10 @@ jobs:
             --trigger-http \
             --allow-unauthenticated \
             --region=us-central1
+
+            - name: Configure Git Credentials
+  run: |
+    git config --global user.name "github-actions"
+    git config --global user.email "github-actions@github.com"
+    git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
