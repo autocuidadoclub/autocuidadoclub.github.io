@@ -55,11 +55,9 @@ jobs:
       - name: Deploy Google Cloud Functions
         run: |
           gcloud functions deploy processSubscription \
-          --source=functions \
-          --runtime nodejs18 \
-          --trigger-http \
-          --allow-unauthenticated \
-          --region=us-central1 \
-          --project=${{ secrets.FIREBASE_PROJECT_ID }}
-
-
+            --source=functions \
+            --runtime nodejs18 \
+            --trigger-http \
+            --allow-unauthenticated \
+            --region=us-central1 \
+            --project=${{ secrets.FIREBASE_PROJECT_ID }}
