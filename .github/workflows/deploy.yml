@@ -59,7 +59,7 @@ jobs:
 
       - name: Deploy to Firebase Hosting
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_DEPLOY_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: service-account.json
         run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }}
 
       - name: Deploy Google Cloud Functions
