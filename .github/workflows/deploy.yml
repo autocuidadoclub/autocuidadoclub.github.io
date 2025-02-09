@@ -45,8 +45,11 @@ jobs:
       - name: Validate Google Cloud Service Account Key
         run: cat service-account.json | jq .
 
+      - name: Inject Google Cloud Credentials
+        run: echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > $HOME/service-account.json
+      
       - name: Authenticate Google Cloud SDK
-        run: gcloud auth activate-service-account --key-file=service-account.json
+        run: gcloud auth activate-service-account --key-file=$HOME/service-account.json
 
       - name: Set Google Cloud Project
         run: gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
