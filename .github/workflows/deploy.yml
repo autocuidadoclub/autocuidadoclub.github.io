@@ -33,9 +33,9 @@ jobs:
 
       - name: Ensure Public Directory Exists
         run: |
-          mkdir -p public  # Create the 'public' folder if it doesn't exist
-          touch public/index.html  # Create an index.html file if missing
-          echo "<h1>AutoCuidado Club is Live</h1>" > public/index.html  # Basic content
+          mkdir -p public
+          touch public/index.html  
+          echo "<h1>AutoCuidado Club is Live</h1>" > public/index.html  
 
       # ✅ Ensure Google Cloud Credentials are Valid
       - name: Inject Google Cloud Credentials
@@ -58,8 +58,6 @@ jobs:
         run: firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
 
       - name: Deploy to Firebase Hosting
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: service-account.json
         run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }}
 
       - name: Deploy Google Cloud Functions
