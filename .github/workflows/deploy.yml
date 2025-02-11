@@ -33,37 +33,46 @@ jobs:
 
       - name: Ensure Public Directory Exists
         run: |
-          mkdir -p public
+          mkdir -p public  
           touch public/index.html  
           echo "<h1>AutoCuidado Club is Live</h1>" > public/index.html  
 
-      # ✅ Ensure Google Cloud Credentials are Valid
+      # ✅ Authenticate Google Cloud
       - name: Inject Google Cloud Credentials
-        run: |
-          echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > service-account.json
+        run: echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > $HOME/service-account.json
 
       - name: Validate Google Cloud Service Account Key
-        run: cat service-account.json | jq .
+        run: cat $HOME/service-account.json | jq .
 
-      - name: Inject Google Cloud Credentials
-        run: echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > $HOME/service-account.json
-      
       - name: Authenticate Google Cloud SDK
         run: gcloud auth activate-service-account --key-file=$HOME/service-account.json
 
       - name: Set Google Cloud Project
         run: gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
 
+      - name: Enable Required Google Cloud APIs
+        run: |
+          gcloud services enable firebase.googleapis.com \
+                                  firebasestorage.googleapis.com \
+                                  firebasehosting.googleapis.com \
+                                  cloudfunctions.googleapis.com \
+                                  cloudbuild.googleapis.com \
+                                  iam.googleapis.com \
+                                  cloudresourcemanager.googleapis.com \
+                                  serviceusage.googleapis.com \
+                                  run.googleapis.com
+
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Set Firebase Project
-        run: firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
-
       - name: Deploy to Firebase Hosting
-        run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-account.json
+        run: firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
 
       - name: Deploy Google Cloud Functions
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-account.json
         run: |
           gcloud functions deploy processSubscription \
             --source=functions \
