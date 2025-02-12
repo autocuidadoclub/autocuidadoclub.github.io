@@ -82,3 +82,21 @@ jobs:
             --region=us-central1 \
             --gen2 \
             --project=${{ secrets.FIREBASE_PROJECT_ID }}
+
+
+          name: Deploy to GitHub Pages
+            on:
+              push:
+                branches:
+                  - main
+            jobs:
+              deploy:
+                runs-on: ubuntu-latest
+                steps:
+                  - uses: actions/checkout@v3
+                  - run: cp -r public/* .
+                  - uses: JamesIves/github-pages-deploy-action@v4
+                    with:
+                      branch: gh-pages
+                      folder: .
+
