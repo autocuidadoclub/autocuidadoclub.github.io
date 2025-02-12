@@ -9,7 +9,7 @@
     "rewrites": [
       {
         "source": "/env.js",
-        "destination": "/public/env.js"
+        "destination": "/env.js"
       },
       {
         "source": "**",
