@@ -1,0 +1,32 @@
+name: Move Files to Public Directory
+
+on:
+  push:
+    branches:
+      - main  # Change this if your branch is different
+
+jobs:
+  move-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Move Website Files to Public Directory
+        run: |
+          mkdir -p public
+          mv *.html public/ || true
+          mv *.css public/ || true
+          mv *.js public/ || true
+          mv favicon* public/ || true
+          mv site.webmanifest public/ || true
+          mv images public/ || true
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Move web files to public directory automatically"
+          git push origin main || echo "No changes to commit"
