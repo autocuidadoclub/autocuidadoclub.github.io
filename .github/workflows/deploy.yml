@@ -95,8 +95,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Copy Public Folder to Root
-        run: cp -r public/* .
+      - name: Move Files from Public to Root
+        run: |
+          shopt -s dotglob
+          mv public/* .
+          rm -rf public
 
       - name: Configure Git
         run: |
