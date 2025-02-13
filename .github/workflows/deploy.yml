@@ -106,10 +106,9 @@ jobs:
       - name: Check for Changes and Push
         run: |
           git add .
-          if git diff --quiet HEAD --; then
-            echo "No changes to commit, skipping deployment."
+          if git diff-index --quiet HEAD --; then
+            echo "✅ No changes to commit, skipping deployment."
             exit 0
           fi
           git commit -m "Auto-update GitHub Pages"
-          git push origin gh-pages
-
+          git push origin gh-pages || echo "✅ No changes to push."
