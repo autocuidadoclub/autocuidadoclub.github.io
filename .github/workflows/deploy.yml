@@ -115,9 +115,9 @@ jobs:
           # Check if there are any changes before committing
           if git diff --cached --quiet; then
             echo "✅ No changes detected, skipping commit."
-            exit 0
-          else
-            git commit -m "Move web files to public directory automatically"
-            git push origin main
+            exit 0  # Exiting here still marks workflow as failed, so we handle it differently
           fi
-
+          
+          git commit -m "Move web files to public directory automatically"
+          git push origin main || echo "✅ No changes to push, skipping."
+        continue-on-error: true
