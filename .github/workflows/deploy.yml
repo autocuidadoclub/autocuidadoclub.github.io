@@ -112,13 +112,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git add .
           
-          # Check if there are any changes
+          # Check if there are any changes before committing
           if git diff --cached --quiet; then
             echo "✅ No changes detected, skipping commit."
-            exit 0
+            exit 0  # Exit without failure
           fi
           
           git commit -m "Move web files to public directory automatically"
           git push origin main || echo "✅ No changes to push, skipping."
         continue-on-error: true
-
