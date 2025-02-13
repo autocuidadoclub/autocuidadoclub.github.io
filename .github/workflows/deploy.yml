@@ -108,7 +108,7 @@ jobs:
 
       - name: Check for Changes and Push
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions[bot]"
           git add .
 
@@ -116,8 +116,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "✅ No changes detected, skipping commit."
             exit 0
-          else
-            git commit -m "Move web files to public directory automatically"
-            git push origin main
           fi
-        continue-on-error: true
+
+          git commit -m "Move web files to public directory automatically" || echo "✅ No changes to commit."
+          git push origin main || echo "✅ No changes to push, skipping."
+
