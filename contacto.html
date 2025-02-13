@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado Club - Contacto</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+        /* Contact Form Styling */
+        .contact-form-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-form-container h2 {
+            text-align: center;
+            color: #003366;
+        }
+
+        .contact-form-container label {
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .contact-form-container input[type="text"],
+        .contact-form-container input[type="email"],
+        .contact-form-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .contact-form-container button {
+            background-color: #003366;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+        }
+
+        .contact-form-container button:hover {
+            background-color: #ff6600;
+        }
+
+        .contact-info {
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Loader Styling */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loader img {
+            width: 80px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Load Environment Variables -->
+<script src="env.js"></script>
+    
+<!-- Navigation -->
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+    </ul>
+    <div class="logo-container">
+        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+    </div>
+</nav>
+
+<!-- Header -->
+<header>
+    <div class="header-container">
+        <div class="header-text">
+            <h1>Bienvenido a AutoCuidado Club</h1>
+            <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+        </div>
+    </div>
+</header>
+
+<!-- Contact Form -->
+<section class="contact-form-container">
+    <h2>Contáctanos</h2>
+    <form id="contactForm">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="phone">Número de WhatsApp</label>
+        <input type="text" id="phone" name="phone" required>
+        
+        <label for="message">Mensaje</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+        
+        <button type="submit">Enviar</button>
+    </form>
+
+    <div id="loader">
+        <img src="loading.gif" alt="Cargando...">
+    </div>
+
+    <div class="contact-info">
+        <h3>Teléfono: +503 XXX-XXXX</h3>
+        <h3><a href="https://wa.me/+50376064062" target="_blank" class="whatsapp-button">Contácta con nosotros en WhatsApp</a></h3>
+        <h3>Email: info@autocuidadoclub.com</h3>
+    </div>
+</section>
+
+<!-- JavaScript for Form Submission -->
+<script>
+    document.getElementById('contactForm').onsubmit = function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex'; // Show loader
+
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: 'POST',
+            body: new FormData(document.getElementById('contactForm'))
+        })
+        .then(response => response.json())
+        .then(data => {
+            loader.style.display = 'none'; // Hide loader
+            if (data.success) {
+                alert('Gracias, su mensaje ha sido enviado.');
+                document.getElementById('contactForm').reset();
+            } else {
+                alert('Hubo un error al enviar su mensaje. Por favor, inténtelo nuevamente.');
+            }
+        })
+        .catch(error => {
+            loader.style.display = 'none'; // Hide loader
+            console.error('Error:', error);
+            alert('Hubo un error al enviar su mensaje.');
+        });
+    };
+</script>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+    <ul>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+         <li><a href="tac.html">Términos y Condiciones</a></li>
+    </ul>
+
+<div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
+        crossorigin="anonymous"></script>
+
+
+    
+</footer>
+
+</body>
+</html>

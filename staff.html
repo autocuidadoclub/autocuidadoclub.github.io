@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+
+     <script>
+        const webAppUrl = "YOUR_WEB_APP_URL"; // Replace with the actual deployed Apps Script Web App URL
+
+        async function fetchInspectionData() {
+            const query = document.getElementById("queryInput").value.trim();
+            const resultsDiv = document.getElementById("inspectionResults");
+            resultsDiv.innerHTML = ""; // Clear previous results
+
+            try {
+                const response = await fetch(`${webAppUrl}?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                    return;
+                }
+
+                if (data.length > 0) {
+                    const table = document.createElement("table");
+                    table.border = "1";
+                    table.style.width = "100%";
+
+                    // Create table headers
+                    const headers = Object.keys(data[0]);
+                    const thead = document.createElement("thead");
+                    const trHead = document.createElement("tr");
+
+                    headers.forEach(header => {
+                        const th = document.createElement("th");
+                        th.textContent = header;
+                        trHead.appendChild(th);
+                    });
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+
+                    // Populate table rows
+                    const tbody = document.createElement("tbody");
+                    data.forEach(row => {
+                        const tr = document.createElement("tr");
+                        headers.forEach(header => {
+                            const td = document.createElement("td");
+                            td.textContent = row[header] || "N/A";
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+
+                    resultsDiv.appendChild(table);
+                } else {
+                    function escapeHTML(str) {
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(query)}".`;
+
+                }
+            } catch (error) {
+                console.error("Error fetching inspection data:", error);
+                resultsDiv.innerHTML = `<p>Error al obtener datos. Inténtalo nuevamente.</p>`;
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #007bff;
+            padding: 10px;
+        }
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        header {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+        #restricted-content {
+            padding: 20px;
+        }
+        .section-title {
+            margin-top: 20px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .form-control {
+            margin-bottom: 15px;
+        }
+        .form-control label {
+            font-weight: bold;
+            display: block;
+        }
+        .form-control input, .form-control select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul>
+            <li><a href="calendar.html">Calendar</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="logout.html">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>Gestión de Clientes</h1>
+    </header>
+
+
+    
+    <section id="restricted-content" style="display: none;">
+        <h2>Panel de Gestión para el Staff</h2>
+
+        <!-- Finder Section -->
+        <div>
+            <h3 class="section-title">Buscar Usuarios por Fecha</h3>
+            <div class="form-control">
+                <label for="startDate">Desde:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-control">
+                <label for="endDate">Hasta:</label>
+                <input type="date" id="endDate">
+            </div>
+            <button onclick="findUsersByDate()">Buscar Usuarios</button>
+            <ul id="userResults"></ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Fecha de Registro</th>
+                        <th>Horario Seleccionado</th>
+                        <th>Fecha de Pago</th>
+                        <th>Estado del Pago</th>
+                        <th>Próximo Pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Verify Rescheduled Inspections -->
+        <div>
+            <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
+            <div class="form-control">
+                <label for="rescheduleStartDate">Desde:</label>
+                <input type="date" id="rescheduleStartDate">
+            </div>
+            <div class="form-control">
+                <label for="rescheduleEndDate">Hasta:</label>
+                <input type="date" id="rescheduleEndDate">
+            </div>
+            <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
+            <ul id="rescheduleResults"></ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Horario Seleccionado</th>
+                        <th>Última Reprogramación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="rescheduleTable"></tbody>
+            </table>
+        </div>
+       <button id="authenticateButton" onclick="authenticateUser()">Autenticar con Google</button>
+        <button onclick="logoutGoogle()">Cerrar Sesión de Google</button>
+        <div>
+    <button onclick="createEvent('2025-01-30T10:00:00Z', 'John Doe', 'john.doe@example.com')">Crear Evento de Ejemplo</button>
+    <button onclick="updateEvent('exampleEventId123', '2025-02-01T14:00:00Z')">Actualizar Evento de Ejemplo</button>
+    <button onclick="deleteEvent('exampleEventId123')">Eliminar Evento de Ejemplo</button>
+</div>
+  
+
+ <div class="navbar">Gestión de Inspecciones - AutoCuidado Club</div>
+
+    <div class="container">
+        <h2>Buscar Inspecciones</h2>
+        <input type="text" id="queryInput" placeholder="Buscar por email, fecha, etc.">
+        <button onclick="fetchInspectionData()">Buscar</button>
+
+        <div id="inspectionResults"></div>
+    </div>
+  </section>
+    
+    
+    
+       <!-- Load env.js before initializing Firebase -->
+<script src="env.js"></script>
+
+<script>
+  // Initialize Firebase using dynamically loaded environment variables
+  const firebaseConfig = {
+    apiKey: window._env_.FIREBASE_API_KEY,
+    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+    databaseURL: window._env_.FIREBASE_DATABASE_URL,
+    projectId: window._env_.FIREBASE_PROJECT_ID,
+    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+    appId: window._env_.FIREBASE_APP_ID,
+    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+  };
+
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+
+        gapi.load('client:auth2', () => {
+    gapi.client.init({
+        apiKey: 'YOUR_API_KEY', // Replace with your Google API key
+        clientId: 'YOUR_CLIENT_ID', // Replace with your Google Client ID
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+        scope: "https://www.googleapis.com/auth/calendar.events"
+    }).then(() => {
+        console.log("Google Calendar API Loaded");
+    }).catch((error) => {
+        console.error("Error loading Google Calendar API:", error);
+    });
+});
+
+        
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                db.collection("users").doc(user.email).get().then((doc) => {
+                    if (doc.exists && doc.data().role === "staff") {
+                        document.getElementById("restricted-content").style.display = "block";
+                    } else {
+                        alert("No tienes permiso para acceder.");
+                        window.location.href = "login.html";
+                    }
+                }).catch((error) => {
+                    console.error("Error verifying user role:", error);
+                    alert("Error al verificar permisos.");
+                    window.location.href = "login.html";
+                });
+            } else {
+                alert("Por favor, inicia sesión.");
+                window.location.href = "login.html";
+            }
+        });
+
+        function authenticateUser() {
+    gapi.auth2.getAuthInstance().signIn().then(() => {
+        console.log("User authenticated");
+        alert("Autenticación exitosa con Google Calendar.");
+    }).catch((error) => {
+        console.error("Authentication error:", error);
+        alert("Error en la autenticación con Google Calendar.");
+    });
+}
+
+        function createEvent(inspectionDate, userName, userEmail) {
+    const event = {
+        summary: `Inspection Booking for ${userName}`,
+        description: `Inspection scheduled for ${userName}.`,
+        start: {
+            dateTime: inspectionDate, // Format: 'YYYY-MM-DDTHH:mm:ssZ'
+            timeZone: 'America/El_Salvador'
+        },
+        end: {
+            dateTime: new Date(new Date(inspectionDate).getTime() + 3600000).toISOString(),
+            timeZone: 'America/El_Salvador'
+        },
+        attendees: [{ email: userEmail }]
+    };
+
+    gapi.client.calendar.events.insert({
+        calendarId: 'primary',
+        resource: event
+    }).then(response => {
+        console.log("Event created:", response.result);
+        alert(`Inspection scheduled for ${userName}`);
+        // Save event ID to your database
+        const eventId = response.result.id;
+        console.log("Event ID saved:", eventId);
+    }).catch(error => {
+        console.error("Error creating event:", error);
+        alert("Error al crear el evento.");
+    });
+}
+
+        function updateEvent(eventId, newInspectionDate) {
+    const updatedEvent = {
+        start: {
+            dateTime: newInspectionDate,
+            timeZone: 'America/El_Salvador'
+        },
+        end: {
+            dateTime: new Date(new Date(newInspectionDate).getTime() + 3600000).toISOString(),
+            timeZone: 'America/El_Salvador'
+        }
+    };
+
+    gapi.client.calendar.events.patch({
+        calendarId: 'primary',
+        eventId: eventId,
+        resource: updatedEvent
+    }).then(response => {
+        console.log("Event updated:", response);
+        alert("Inspection rescheduled successfully.");
+    }).catch(error => {
+        console.error("Error updating event:", error);
+        alert("Error al actualizar el evento.");
+    });
+}
+function deleteEvent(eventId) {
+    gapi.client.calendar.events.delete({
+        calendarId: 'primary',
+        eventId: eventId
+    }).then(() => {
+        console.log("Event deleted");
+        alert("Evento eliminado con éxito.");
+    }).catch(error => {
+        console.error("Error deleting event:", error);
+        alert("Error al eliminar el evento.");
+    });
+}
+function logout() {
+    const auth = firebase.auth();
+    
+    auth.signOut().then(() => {
+        console.log("Usuario ha cerrado sesión correctamente.");
+        alert("Has cerrado sesión correctamente.");
+        window.location.href = "login.html"; // Redirect to login page
+    }).catch((error) => {
+        console.error("Error al cerrar sesión:", error);
+        alert("Error al cerrar sesión.");
+    });
+}
+
+
+        function findUsersByDate() {
+            const startDate = new Date(document.getElementById("startDate").value);
+            const endDate = new Date(document.getElementById("endDate").value);
+            endDate.setDate(endDate.getDate() + 1); // Include the full day
+
+            const paymentTable = document.getElementById("paymentTable");
+            paymentTable.innerHTML = ""; // Clear table
+
+            db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+                .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        alert("No se encontraron usuarios en el rango de fechas.");
+                        return;
+                    }
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        updatePaymentTable(user, doc.id);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error fetching users by date:", error);
+                    alert("Error al buscar usuarios. Inténtalo nuevamente.");
+                });
+        }
+
+        function findRescheduledUsers() {
+            const startDate = new Date(document.getElementById("rescheduleStartDate").value);
+            const endDate = new Date(document.getElementById("rescheduleEndDate").value);
+            endDate.setDate(endDate.getDate() + 1); // Include the full day
+
+            const rescheduleTable = document.getElementById("rescheduleTable");
+            rescheduleTable.innerHTML = ""; // Clear previous results
+
+            db.collection("users").where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+                .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
+                        return;
+                    }
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
+
+                        rescheduleTable.innerHTML += `
+                            <tr>
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.phone || "No disponible"}</td>
+                                <td>${user.selectedSchedule || "No asignado"}</td>
+                                <td>${lastReschedule}</td>
+                                <td><button onclick="updateInspection('${doc.id}', '${user.selectedSchedule}')">Actualizar Inspección</button></td>
+                            </tr>`;
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error fetching rescheduled users:", error);
+                    alert("Error al buscar reprogramaciones. Inténtalo nuevamente.");
+                });
+        }
+
+        function updateInspection(userId, selectedSchedule) {
+            if (!selectedSchedule) {
+                alert("No se ha definido un horario seleccionado para este usuario.");
+                return;
+            }
+
+            const newInspectionDate = prompt(`Ingrese la nueva fecha de inspección para el horario '${selectedSchedule}' (YYYY-MM-DD):`);
+
+            if (!newInspectionDate) {
+                alert("Fecha no válida.");
+                return;
+            }
+
+            const newDate = new Date(newInspectionDate);
+
+            db.collection("users").doc(userId).update({
+                nextInspectionDate: firebase.firestore.Timestamp.fromDate(newDate),
+            }).then(() => {
+                alert("Calendario de inspección actualizado.");
+                findRescheduledUsers();
+            }).catch((error) => {
+                console.error("Error updating inspection date:", error);
+                alert("Error al actualizar la inspección. Inténtalo nuevamente.");
+            });
+        }
+
+        function updatePaymentTable(user, userId) {
+            const paymentTable = document.getElementById("paymentTable");
+            const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
+            const selectedSchedule = user.selectedSchedule || "No asignado";
+            const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
+
+            paymentTable.innerHTML += `
+                <tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone || "No disponible"}</td>
+                    <td>${registrationDate}</td>
+                    <td>${selectedSchedule}</td>
+                    <td>${paymentDate}</td>
+                    <td>${user.paymentStatus || "Pendiente"}</td>
+                    <td>${user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha"}</td>
+                    <td>
+                        <button onclick="sendEmail('${user.email}', '${user.name}')">Enviar Email</button>
+                        <button onclick="sendWhatsApp('${user.phone}', '${user.name}')">Enviar WhatsApp</button>
+                        <button onclick="confirmPayment('${userId}')">Confirmar Pago</button>
+                    </td>
+                </tr>`;
+        }
+
+        function confirmPayment(userId) {
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+
+            db.collection("users").doc(userId).update({
+                paymentStatus: "Confirmado",
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+            }).then(() => {
+                alert("Pago confirmado.");
+                findUsersByDate();
+            }).catch(console.error);
+        }
+
+        function sendEmail(email, name) {
+            const subject = `Consulta para ${name}`;
+            const body = `Estimado/a ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
+            const zohoMailUrl = `https://mail.zoho.com/zm/#compose?to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(zohoMailUrl, '_blank');
+        }
+
+        function sendWhatsApp(phone, name) {
+            if (!phone) {
+                alert("Número de teléfono no disponible.");
+                return;
+            }
+            const message = `Hola ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
+            const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
+        }
+    </script>
+</body>
+</html>
