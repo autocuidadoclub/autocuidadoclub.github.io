@@ -1,4 +1,4 @@
-# 🚀 Deploy AutoCuidado Club to Firebase Hosting & Google Cloud
+# 🚀 Deploy AutoCuidado Club to Firebase Hosting & GitHub Pages
 name: Deploy AutoCuidado Club
 
 on:
@@ -72,7 +72,9 @@ jobs:
       - name: Deploy to Firebase Hosting
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-account.json
-        run: firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
+          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
 
       - name: Deploy Google Cloud Functions
         env:
@@ -87,16 +89,6 @@ jobs:
             --gen2 \
             --project=${{ secrets.FIREBASE_PROJECT_ID }}
 
----
-# 🚀 Deploy Public Folder to GitHub Pages
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
   deploy_github_pages:
     runs-on: ubuntu-latest
     steps:
@@ -106,8 +98,17 @@ jobs:
       - name: Copy Public Folder to Root
         run: cp -r public/* .
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: .
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Check for Changes and Push
+        run: |
+          git add .
+          if git diff --quiet HEAD --; then
+            echo "No changes to commit, skipping deployment."
+            exit 0
+          fi
+          git commit -m "Auto-update GitHub Pages"
+          git push origin gh-pages
