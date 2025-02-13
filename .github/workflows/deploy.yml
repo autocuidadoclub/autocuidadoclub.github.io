@@ -105,10 +105,15 @@ jobs:
 
       - name: Check for Changes and Push
         run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git add .
-          if git diff-index --quiet HEAD --; then
-            echo "✅ No changes to commit, skipping deployment."
+          
+          # Check if there are any changes
+          if git diff --cached --quiet; then
+            echo "✅ No changes detected, skipping commit."
             exit 0
           fi
-          git commit -m "Auto-update GitHub Pages"
-          git push origin gh-pages || echo "✅ No changes to push."
+          
+          git commit -m "Move web files to public directory automatically"
+          git push origin main
