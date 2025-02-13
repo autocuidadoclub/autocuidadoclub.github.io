@@ -1,3 +1,4 @@
+# 🚀 Deploy AutoCuidado Club to Firebase Hosting & Google Cloud
 name: Deploy AutoCuidado Club
 
 on:
@@ -6,7 +7,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy_firebase:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,6 +41,9 @@ jobs:
       # ✅ Authenticate Google Cloud
       - name: Inject Google Cloud Credentials
         run: echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > $HOME/service-account.json
+
+      - name: Install jq
+        run: sudo apt-get install -y jq  # ✅ Fix missing jq
 
       - name: Validate Google Cloud Service Account Key
         run: cat $HOME/service-account.json | jq .
@@ -83,20 +87,27 @@ jobs:
             --gen2 \
             --project=${{ secrets.FIREBASE_PROJECT_ID }}
 
+---
+# 🚀 Deploy Public Folder to GitHub Pages
+name: Deploy to GitHub Pages
 
-          name: Deploy to GitHub Pages
-            on:
-              push:
-                branches:
-                  - main
-            jobs:
-              deploy:
-                runs-on: ubuntu-latest
-                steps:
-                  - uses: actions/checkout@v3
-                  - run: cp -r public/* .
-                  - uses: JamesIves/github-pages-deploy-action@v4
-                    with:
-                      branch: gh-pages
-                      folder: .
+on:
+  push:
+    branches:
+      - main
 
+jobs:
+  deploy_github_pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Copy Public Folder to Root
+        run: cp -r public/* .
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: .
