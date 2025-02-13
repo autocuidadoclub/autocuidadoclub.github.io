@@ -116,4 +116,6 @@ jobs:
           fi
           
           git commit -m "Move web files to public directory automatically"
-          git push origin main
+          git push origin main || echo "✅ No changes to push, skipping."
+        continue-on-error: true
+
