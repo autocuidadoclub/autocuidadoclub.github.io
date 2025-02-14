@@ -17,7 +17,7 @@ jobs:
       - name: Authenticate with Google Cloud
         run: |
           echo "🔍 Loading Firebase credentials from GitHub Secrets..."
-          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' | base64 --decode > $HOME/service-account.json
+          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > $HOME/service-account.json
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           echo "✅ Firebase credentials loaded successfully."
 
