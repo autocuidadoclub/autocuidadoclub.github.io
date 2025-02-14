@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+     <!-- Load Environment Variables -->
+    <script src="env.js"></script>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+  <style>
+        /* Styles for Loyalty Card */
+        .loyalty-card {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .holes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            justify-items: center;
+            margin-bottom: 20px;
+        }
+
+        .hole {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease-in-out;
+            border: 2px dashed #ccc;
+            background-color: #fff;
+            color: #ccc;
+        }
+
+        .hole.completed {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+        }
+
+        .hole.star {
+            font-size: 24px;
+            color: gold;
+        }
+
+        .hole.star.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .rewards {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .reward-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .reward-card:hover {
+            background-color: #e6f7e6;
+        }
+
+        .reward-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .reward-info h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .reward-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .reward-status {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .reward-status.locked {
+            background-color: #ccc;
+            color: white;
+        }
+
+        .reward-status.unlocked {
+            background-color: #4caf50;
+            color: white;
+        }
+      .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <h2 id="user-info">Cargando usuario...</h2>
+            <button onclick="logoutUser()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+<section class="dashboard-section">
+    <!-- User Info -->
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+            <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+            <P><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
+            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
+            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+            <p><strong>Vehiculos: </strong> <span id="vehicles-list">Cargando...</span></p>
+        </div>
+
+        <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
+
+
+    <div class="card">
+    <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+    <p><strong>Miembro Desde:</strong></p>
+    <p><span id="memberSince">Cargando...</span></p>   
+    <p><strong>Fecha del último pago de su suscripción:</strong> </p>
+    <p><span id="paymentDate">Cargando...</span></p>
+    <p><strong>Próximo Pago:</strong></p>
+    <p><span id="nextPaymentDate">Cargando...</span></p>
+
+    <!-- Message for unpaid users -->
+    <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+        ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
+        Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
+    </div>
+
+    <!-- Button to complete payment -->
+    <div id="complete-payment" style="margin-top: 10px; display: none;">
+        <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+            Completa tu pago ahora 🔗
+        </a>
+    </div>
+</div>
+
+
+           
+    <!-- Reschedule Section -->
+    <div class="card reschedule-section">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
+        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="save-schedule-btn" onclick="updateSchedule()"><p><strong>Guardar Nuevo Horario</strong></p>Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.</button>
+    </div>
+
+<p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    
+    <!-- Loyalty Rewards Section -->
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
+            <div class="loyalty-card">
+                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+                <div class="holes">
+                    <div class="hole completed">✔</div>
+                    <p>Proceso de registro completo</p>
+                    <div class="hole completed">✔</div>
+                    <p>Pago inicial procesado en tu suscripción</p>
+                    <div class="hole">○</div>
+                    <p>1er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>3er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>5to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>6to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>7to Mes de suscripción activo</p>
+                    <div class="hole star">★</div>
+                    <p>8to Mes de suscripción activo</p>
+                </div>
+                <div class="description">
+                    <p><strong>Current Progress:</strong></p>
+                </div>
+            </div>
+
+            <!-- Rewards -->
+            <div class="rewards">
+                <h3>Available Rewards</h3>
+                <div class="reward-card">
+                    <div class="reward-icon">🎐</div>
+                    <div class="reward-info">
+                        <h4>Recarga de A/C</h4>
+                        <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">🚗</div>
+                    <div class="reward-info">
+                        <h4>Carwash gratis</h4>
+                        <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">📝</div>
+                    <div class="reward-info">
+                        <h4>Revisión extra del mes en curso</h4>
+                        <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+      
+    <script>
+    // Firebase configuration
+   const firebaseConfig = {
+    apiKey: window._env_.FIREBASE_API_KEY,
+    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+    databaseURL: window._env_.FIREBASE_DATABASE_URL,
+    projectId: window._env_.FIREBASE_PROJECT_ID,
+    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+    appId: window._env_.FIREBASE_APP_ID,
+    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+};
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    if (window._env_) {
+        const firebaseConfig = {
+            apiKey: window._env_.FIREBASE_API_KEY,
+            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+            databaseURL: window._env_.FIREBASE_DATABASE_URL,
+            projectId: window._env_.FIREBASE_PROJECT_ID,
+            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+            appId: window._env_.FIREBASE_APP_ID,
+            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => console.log("Authentication persistence set to LOCAL."))
+            .catch((error) => console.error("Error setting authentication persistence:", error.message));
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("User logged in:", user.email);
+                document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+
+                db.collection("users").doc(user.email).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            updateUserInfo(userData);
+                        } else {
+                            console.error("User profile not found.");
+                        }
+                    })
+                    .catch((error) => console.error("Error fetching user profile:", error));
+            } else {
+                console.log("No authenticated user. Redirecting to login.");
+                window.location.href = 'login.html';
+            }
+        });
+    } else {
+        console.error("Environment variables (env.js) not loaded.");
+    }
+});
+
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            console.log("Authentication persistence set to LOCAL.");
+        })
+        .catch((error) => {
+            console.error("Error setting authentication persistence:", error.message);
+        });
+
+    // Check if user is logged in and load profile info
+   auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("User is logged in:", user.email);
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+
+        // Fetch user profile
+        db.collection("users").doc(user.email).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    console.log("User profile data:", userData);
+
+                    // Update user info first
+                    updateUserInfo(userData);
+
+                    // Then update the loyalty card
+                    updateLoyaltyCard(userData);
+                } else {
+                    console.error("User profile not found.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching user profile:", error);
+            });
+    } else {
+        console.log("No authenticated user. Redirecting to login.");
+        window.location.href = 'login.html';
+    }
+});
+
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+
+    const vehiclesList = document.getElementById("vehicles-list");
+    if (userData.vehicles && Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
+        vehiclesList.innerText = userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ");
+    } else {
+        vehiclesList.innerText = "No hay vehículos registrados.";
+    }
+
+    // Check payment status
+    if (!userData.paymentDate || userData.paymentDate === "Pendiente") {
+        document.getElementById("payment-warning").style.display = "block";
+        
+        // Get the PayPal link for the user's plan
+        let payPalURL = getPaypalLink(userData.planType);
+        
+        if (payPalURL) {
+            document.getElementById("payment-link").href = payPalURL;
+            document.getElementById("complete-payment").style.display = "block";
+        } else {
+            console.error("No PayPal link found for plan:", userData.planType);
+        }
+    } else {
+        document.getElementById("payment-warning").style.display = "none";
+        document.getElementById("complete-payment").style.display = "none";
+    }
+}
+
+// Function to return the correct PayPal link based on the plan type
+function getPaypalLink(planType) {
+    switch (planType) {
+        case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
+        case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
+        case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
+        case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
+        case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
+        case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
+        default: return null;
+    }
+}
+
+
+
+    // Load user profile data
+    function loadUserProfile(email) {
+        db.collection("users").doc(email).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                      document.getElementById("name").innerText = userData.name || "N/A";
+                document.getElementById("phone").innerText = userData.phone || "N/A";
+                document.getElementById("planType").innerText = userData.planType || "N/A";
+                document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+                document.getElementById("user-department").innerText = userData.department || "Desconocido";
+                document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+                document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+                document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+                document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+              document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
+            
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Authentication persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting authentication persistence:", error.message);
+    });
+
+            
+                    // Dynamically update loyalty card based on subscription status
+                    if (userData.subscriptionStatus === "active") {
+                        updateLoyaltyCard({
+                            hasRegistered: true,
+                            subscriptionPlan: userData.planType || "N/A",
+                            carsRegistered: userData.vehicles ? userData.vehicles.length : 1,
+                            monthsPaid: userData.monthsPaid || 0
+                        });
+                    } else {
+                        resetLoyaltyCard(); // Reset progress if subscription is inactive
+                    }
+                } else {
+                    console.error("User profile not found.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error loading user profile:", error);
+            });
+    }
+
+function loadVehicles(vehicles) {
+    const vehiclesList = document.getElementById("vehicles-list");
+    vehiclesList.innerHTML = ""; // Clear existing content
+
+    if (vehicles.length === 0) {
+        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+        return;
+    }
+
+    vehicles.forEach((vehicle, index) => {
+        const vehicleHTML = `
+            <div class="vehicle-card">
+                <h4>Vehículo ${index + 1}</h4>
+                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+            </div>
+        `;
+        vehiclesList.innerHTML += vehicleHTML;
+    });
+}
+
+        function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    if (!selectedCell) {
+        alert("Por favor selecciona un horario.");
+        return;
+    }
+
+    const timeBlock = selectedCell.innerText.trim();
+    const dayIndex = selectedCell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
+        alert("Por favor selecciona un horario válido.");
+        return;
+    }
+
+    const user = auth.currentUser;
+    const newSchedule = `${day} - ${timeBlock}`;
+    const currentDate = new Date().toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+
+    db.collection("users").doc(user.email).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+                const currentDateObj = new Date();
+
+                if (lastReschedule) {
+                    const rescheduleMonth = lastReschedule.getMonth();
+                    const currentMonth = currentDateObj.getMonth();
+                    const rescheduleYear = lastReschedule.getFullYear();
+                    const currentYear = currentDateObj.getFullYear();
+
+                    if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                        const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        });
+                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
+                        return;
+                    }
+                }
+
+                db.collection("users").doc(user.email).update({
+                    selectedSchedule: newSchedule,
+                    lastReschedule: firebase.firestore.Timestamp.now(),
+                }).then(() => {
+                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
+                    loadUserProfile(user.email); // Reload profile info
+                }).catch((error) => {
+                    console.error("Error al actualizar el horario:", error);
+                });
+            } else {
+                console.error("Usuario no encontrado en la base de datos.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error al verificar reprogramaciones previas:", error);
+        });
+}
+
+
+// Add CSS for selected schedule cells
+document.addEventListener("DOMContentLoaded", function () {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .schedule-table tbody td.selected-box {
+            background-color: #FF6600 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+
+// Format Firestore timestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+        
+function updateLoyaltyCard(userData) {
+    console.log("Updating loyalty card with data:", userData);
+
+    const holes = document.querySelectorAll('.hole');
+    let progress = 1; // Registration is always step 1.
+
+    // Check if registration is complete
+    if (userData.registrationDate) {
+        console.log("Registration complete.");
+        holes[0].classList.add('completed');
+        progress++;
+    }
+
+   // Check if payment is confirmed
+if (userData.paymentDate) {
+    const paymentDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
+
+    if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
+        console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
+        holes[1].classList.add('completed');
+        progress++;
+    } else {
+        console.error("Invalid paymentDate found:", userData.paymentDate);
+    }
+} else {
+    console.log("Payment date not available.");
+}
+    
+    // Calculate progress based on subscription months
+    if (userData.subscriptionStatus === "active") {
+        console.log("Subscription active. Months paid:", userData.monthsPaid);
+        progress += userData.monthsPaid || 0;
+    }
+
+    // Check for prepaid 12-month subscription
+    if (userData.planType === "basic12m" || userData.planType === "plus12m") {
+        console.log("12-month subscription detected.");
+        progress = 8;
+    } else if (progress >= 6 && userData.monthsPaid >= 6) {
+        console.log("7th month paid; filling 8th hole.");
+        progress = Math.min(progress + 1, 8);
+    }
+
+    console.log("Calculated progress:", progress);
+
+    // Update UI holes
+    holes.forEach((hole, index) => {
+        if (index < progress) {
+            console.log(`Filling hole ${index + 1}`);
+            hole.classList.add('completed');
+        } else {
+            hole.classList.remove('completed');
+        }
+    });
+
+    // Update progress description
+    const progressDescription = document.querySelector('.description p strong');
+    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+
+    console.log("Loyalty card UI updated.");
+}
+
+        
+    function resetLoyaltyCard() {
+        const holes = document.querySelectorAll('.hole');
+        const rewardStatusElements = document.querySelectorAll('.reward-status');
+        const acRewards = document.getElementById('ac-rewards');
+        const carwashRewards = document.getElementById('carwash-rewards');
+        const reviewRewards = document.getElementById('review-rewards');
+
+        // Reset all holes
+        holes.forEach((hole) => hole.classList.remove('completed'));
+
+        // Reset reward multipliers
+        acRewards.textContent = `0x`;
+        carwashRewards.textContent = `0x`;
+        reviewRewards.textContent = `0x`;
+
+        // Lock all rewards
+        rewardStatusElements.forEach((status) => {
+            status.textContent = "Locked";
+            status.classList.add("locked");
+            status.classList.remove("unlocked");
+        });
+
+        // Update progress description
+        const progressDescription = document.querySelector('.description p strong');
+        progressDescription.textContent = `Current Progress: 0 of 8 steps completed.`;
+    }
+
+    function logoutUser() {
+        auth.signOut()
+            .then(() => {
+                window.location.href = 'login.html';
+            })
+            .catch((error) => {
+                console.error("Error during logout:", error);
+            });
+    }
+</script>
+
+    
+     <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
+   
+ <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
+        crossorigin="anonymous"></script>
+
+
+
+    
+    </footer>
+</body>
+</html>
