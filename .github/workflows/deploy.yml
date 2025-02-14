@@ -17,6 +17,7 @@ jobs:
       - name: Authenticate with Firebase
         run: |
           echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > $HOME/service-account.json
+          cat $HOME/service-account.json  # Debugging step to check if credentials exist
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
 
       - name: Install Firebase CLI
