@@ -8,11 +8,11 @@
     ],
     "rewrites": [
       { "source": "/env.js", "destination": "/env.js" },
-      { "source": "/nosotros", "destination": "/public/nosotros.html" },
-      { "source": "/servicios", "destination": "/public/servicios.html" },
-      { "source": "/suscripciones", "destination": "/public/suscripciones.html" },
-      { "source": "/contacto", "destination": "/public/contacto.html" },
-      { "source": "**", "destination": "/public/index.html" }
+      { "source": "/nosotros", "destination": "/nosotros.html" },
+      { "source": "/servicios", "destination": "/servicios.html" },
+      { "source": "/suscripciones", "destination": "/suscripciones.html" },
+      { "source": "/contacto", "destination": "/contacto.html" },
+      { "source": "**", "destination": "/index.html" }
     ]
   }
 }
