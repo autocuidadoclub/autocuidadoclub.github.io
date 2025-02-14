@@ -1,0 +1,44 @@
+# 🚀 Deploy AutoCuidado Club to Firebase Hosting & GitHub Pages
+name: Deploy AutoCuidado Club
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_firebase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate Google Cloud SDK
+        run: echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > $HOME/service-account.json
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy to Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-account.json
+        run: |
+          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
+
+  deploy_github_pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up GitHub Pages
+        run: |
+          mkdir -p public
+          cp index.html public/index.html
+
+      - name: Deploy GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: public
