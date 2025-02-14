@@ -52,3 +52,16 @@ jobs:
         with:
           branch: gh-pages
           folder: public
+
+
+      - name: Debug Firebase Credentials
+        run: |
+          echo "🔍 Checking if Firebase key is loading..."
+          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > $HOME/service-account.json
+          if [ ! -s $HOME/service-account.json ]; then
+            echo "❌ Firebase credentials file is empty!"
+            exit 1
+          fi
+          echo "✅ Firebase authentication file exists!"
+          echo "🔍 Checking first 5 lines..."
+          head -n 5 $HOME/service-account.json
