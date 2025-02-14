@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado Club - Inicio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+        .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
+    </style>
+    </head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+
+            <!-- Preventive Maintenance Section -->
+    <section id="preventive-maintenance" class="info-section">
+        <div class="container">
+            <h2>¿Sabías que el mantenimiento preventivo puede ahorrarte hasta un 40% en reparaciones imprevistas?</h2>
+            <p>Muchos conductores solo piensan en cambiar el aceite cuando ven una alerta en el tablero. Pero el mantenimiento regular no solo protege tu vehículo, también protege tu bolsillo.</p>
+            
+        </div>
+    </section>
+
+    </header>
+
+    <!-- Intro Section -->
+    <section id="intro">
+        <h2>Cuidamos de tu vehículo para que tú no tengas que hacerlo</h2>
+        <p>Ofrecemos mantenimiento preventivo y revisiones completas a domicilio, utilizando tecnología avanzada y profesionales calificados.</p>
+        </section>
+
+    <!-- Why Different Section -->
+    <section class="why-different-section">
+        <h2>¿Por qué AutoCuidado Club es diferente?</h2>
+        <div class="description-text">
+            <p>En AutoCuidado Club entendemos los desafíos de la cultura automotriz en nuestro país.</p>
+         </div>
+        <div class="description-text">
+        <P>Estamos comprometidos con un servicio excepcional e integral como nuestro nombre, por ello tambien pensamos en el medio ambiente por eso, <strong>los servicios de AutoCuidado Club están disponibles exclusivamente para motores de gasolina</strong>, reflejando nuestro compromiso con la movilidad de la huella de carbono más baja. </p>
+        </div>
+    </section>
+
+    <!-- Transformando la Cultura Automotriz -->
+    <section class="transform-culture-section">
+        <h2>Transformando la Cultura Automotriz en El Salvador</h2>
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab-button" data-tab="tab1">Cómo Funciona</button>
+                <button class="tab-button" data-tab="tab2">Nuestro sistema innovador</button>
+                <button class="tab-button active" data-tab="tab3">¿Porqué fundamos AutocuidadoClub?</button>
+            </div>
+<div class="tab-content" id="tab3">
+    <ul class="styled-list">
+        <li>
+            <i class="fas fa-check-circle"></i> 
+            <strong>Queremos transformar el mantenimiento automotriz.</strong>
+        </li>
+        <li>
+            <i class="fas fa-shield-alt"></i> 
+            <strong>Ofrecer tranquilidad, confianza y un servicio profesional.</strong>
+        </li>
+        <li>
+            <i class="fas fa-cogs"></i> 
+        <strong>Nos enfocamos en nuestros socios y sus necesidades mediante un sistema innovador.</strong>
+        </li>
+        <li>
+            <i class="fas fa-exclamation-triangle"></i> 
+           <strong>¿Te ha pasado cuando llevas el auto al taller?</strong> 
+            <ul class="nested-list">
+                <li><i class="fas fa-angle-right"></i> Trabajos costosos.</li>
+                <li><i class="fas fa-angle-right"></i> Invertir tiempo libre en reparaciones.</li>
+                <li><i class="fas fa-angle-right"></i> Soportar tráfico para llegar al taller.</li>
+                <li><i class="fas fa-angle-right"></i> Prácticas poco éticas como el uso indebido de vehículos.</li>
+                <li><i class="fas fa-angle-right"></i> Intercambio de piezas sin autorización.</li>
+            </ul>
+        </li>
+        <li>
+            <i class="fas fa-heart"></i> 
+          <strong>  Nuestro deber, <strong>mantenerte libre de estrés, cuidar de tu auto, de ti, tu familia, tu productividad y mantenerte en movimiento.</strong>
+        </li>
+    </ul>
+</div>
+
+<style>
+    .styled-list {
+        list-style: none; /* Remove default bullets */
+        padding: 0;
+    }
+
+    .styled-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px; /* Add spacing between items */
+        font-size: 1.1em;
+    }
+
+    .styled-list i {
+        color: #007bff; /* Icon color */
+        margin-right: 10px; /* Space between icon and text */
+        font-size: 1.5em; /* Make icons larger */
+    }
+
+    .styled-list strong {
+        color: #0056b3; /* Emphasize important text */
+    }
+
+    .nested-list {
+        list-style: none; /* Remove bullets for nested list */
+        margin-left: 30px; /* Indent nested items */
+        padding: 0;
+    }
+
+    .nested-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+
+    .nested-list i {
+        color: #FF6600; /* Icon color for nested items */
+        margin-right: 8px;
+        font-size: 1.2em; /* Slightly smaller icons */
+    }
+</style>
+
+
+            
+            <div class="tab-content" id="tab2" style="display: none;">
+    <ul class="styled-list">
+        <li>
+            <i class="fas fa-thumbs-up"></i>
+            <strong>Suscripción automotriz accesible:</strong> Eliminan incentivos para prácticas deshonestas.
+        </li>
+        <li>
+            <i class="fas fa-tools"></i>
+            <strong>Recursos optimizados:</strong> Te ayudamos a identificar únicamente las piezas que necesitas cambiar, en el momento indicado y de forma paulatina para evitarte grandes inversiones y usando nuestros códigos de descuento en las principales centas de respuesto.
+        </li>
+        <li>
+            <i class="fas fa-tags"></i>
+            <strong>Política de transparencia:</strong> Ofrecemos descuentos exclusivos.
+        </li>
+        <li>
+            <i class="fas fa-heart"></i>
+            <strong>Tu tranquilidad es nuestra prioridad:</strong> Nuestro compromiso es ayudarte a mantener tu vehículo en las mejores condiciones, sin preocupaciones.
+        </li>
+    </ul>
+</div>
+<div class="tab-content" id="tab3" style="display: none;">
+    <p class="highlight-text">Con una suscripción mensual, accedes a un plan de mantenimiento personalizado que asegura la longevidad de tu vehículo y la tranquilidad de tu inversión.</p>
+</div>
+
+<style>
+    /* General List Styling */
+    .styled-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .styled-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+    }
+
+    .styled-list i {
+        color: #007bff; /* Icon color */
+        margin-right: 10px;
+        font-size: 1.5em; /* Icon size */
+    }
+
+    .styled-list strong {
+        color: #0056b3; /* Text highlight color */
+    }
+
+    /* Highlight Text for Tab 3 */
+    .highlight-text {
+        background-color: #f1f9ff;
+        color: #0056b3;
+        padding: 10px 15px;
+        border-left: 5px solid #007bff;
+        font-size: 1.2em;
+        line-height: 1.6;
+    }
+</style>
+
+            
+            <div class="tab-content" id="tab1" style="display: none;">
+                <p>Con una suscripción mensual, accedes a un plan de mantenimiento personalizado que asegura la longevidad de tu vehículo y la tranquilidad de tu inversión.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Schedule Section -->
+    <section class="schedule-section">
+        <h2>Nuestros Horarios</h2>
+        <p>Definimos bloques de tiempo para brindar comodidad y eficiencia a nuestros clientes.</p>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td>9:00 AM – 11:00 AM</td>
+                    <td>10:00 AM – 12:00 PM</td>
+                    <td>01:00 PM – 03:00 PM</td>
+                    <td>08:00 AM – 10:00 AM</td>
+                    <td>09:00 AM – 11:00 AM</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td>12:00 PM – 02:00 PM</td>
+                    <td>01:00 PM – 03:00 PM</td>
+                    <td>04:00 PM – 06:00 PM</td>
+                    <td>11:00 AM – 01:00 PM</td>
+                    <td>12:00 PM – 02:00 PM</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td>03:00 PM – 05:00 PM</td>
+                    <td>04:00 PM – 06:00 PM</td>
+                    <td>-</td>
+                    <td>02:00 PM – 04:00 PM</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+<!-- Comparación de Planes de Suscripción Section -->
+<section id="suscripciones-comparacion" class="subscription-section">
+    <h2>Comparación de Planes de Suscripción</h2>
+    <p>Para ayudarte a mantener tu vehículo en óptimas condiciones, hemos diseñado planes de suscripción flexibles que se adaptan a tus necesidades. Además, ofrecemos descuentos especiales en planes semestrales y ¡aún mayores ahorros en planes anuales!</p>
+    
+    <div class="subscription-cards">
+        <!-- Basic Plan Card -->
+        <div class="subscription-card basic-plan">
+            <h3>Suscripción Básica</h3>
+            <p>Ideal para quienes desean cubrir el mantenimiento de un único vehículo.</p>
+            <ul>
+                <li>Mantenimiento para 1 vehículo</li>
+                <li><strong>10% de descuento</strong> en las suscripción de 6 meses</li>
+                <li><strong>25% de descuento</strong> en las suscripción de 12 meses</li>
+                <li>Acceso al programa de lealtad</li>
+            </ul>
+        </div>
+        
+        <!-- Plus Plan Card -->
+        <div class="subscription-card plus-plan">
+            <h3>Suscripción Plus</h3>
+            <p>Perfecta para familias o negocios, con esta suscripcion cubres 3 vehículos por el mismo precio. </p>
+            <ul>
+                <li>Mantenimiento para 3 vehículos</li>
+                <li>Acceso al programa de lealtad</li>
+                <li><strong>37% de descuento</strong> en las suscripción de 3 meses</li>
+                <li><strong>43% de descuento</strong> en las suscripción de 6 meses</li>
+                <li><strong>53% de descuento</strong> en las suscripción de 12 meses</li>
+            </ul>
+        </div>
+    </div>
+
+    <p class="cta-text">Con nuestra Suscripción Plus, incentivamos la cobertura de varios vehículos, ofreciendo la mejor relación entre calidad, precio y conveniencia.</p>
+    <p><strong>Los porcentajes mostrados, son comparados contra el costo plán basico de 3 meses para 1 vehiculo.</strong></p>
+    <p><strong>¿Cuál es el plan ideal para ti? Descúbrelo hoy y mantén tu tranquilidad al volante.</strong></p>
+</section>
+
+<style>
+/* General Section Styling */
+.subscription-section {
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 900px;
+}
+
+.subscription-section h2 {
+    color: #003366;
+    margin-bottom: 15px;
+}
+
+.subscription-section p {
+    color: #555;
+    font-size: 1.1em;
+}
+
+/* Subscription Cards Styling */
+.subscription-cards {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.subscription-card {
+    flex: 1;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.subscription-card h3 {
+    color: #0056b3;
+    margin-bottom: 10px;
+}
+
+.subscription-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.subscription-card ul li {
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.subscription-card ul li:before {
+    content: "✔";
+    color: #007bff;
+    margin-right: 8px;
+}
+
+/* Highlight Plans */
+.basic-plan {
+    border-top: 5px solid #007bff;
+}
+
+.plus-plan {
+    border-top: 5px solid #ff6600;
+}
+
+/* CTA Text */
+.cta-text {
+    margin-top: 20px;
+    color: #333;
+    font-size: 1.1em;
+}
+</style>
+
+    
+    <!-- Call to Action -->
+    <section id="cta">
+        <h2>¿Listo para unirte?</h2>
+        <button class="cta-button" onclick="window.location.href='servicios.html';">Conoce nuestros servicios</button>
+        <button class="cta-button" onclick="window.location.href='contacto.html';">Contáctanos</button>
+    </section>
+
+   
+    <!-- JavaScript for Tabs -->
+    <script>
+        const tabs = document.querySelectorAll(".tab-button");
+        const contents = document.querySelectorAll(".tab-content");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(btn => btn.classList.remove("active"));
+                contents.forEach(content => content.style.display = "none");
+
+                tab.classList.add("active");
+                document.getElementById(tab.dataset.tab).style.display = "block";
+            });
+        });
+    </script>
+
+    <!-- CSS -->
+    <style>
+        .tabs { display: flex; justify-content: center; margin: 20px 0; }
+        .tab-button { padding: 10px 20px; cursor: pointer; border: 1px solid #007bff; }
+        .tab-button.active { background-color: #007bff; color: #fff; }
+        .tab-content { text-align: center; }
+        .cta-button { padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        .cta-button:hover { background-color: #0056b3; }
+    </style>
+
+     <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
+   
+    <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+    
+    </footer>
+    
+</body>
+</html> 
