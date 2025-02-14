@@ -1,4 +1,4 @@
- # 🚀 Deploy AutoCuidado Club to Firebase Hosting & GitHub Pages
+# 🚀 Deploy AutoCuidado Club to Firebase Hosting & GitHub Pages
 name: Deploy AutoCuidado Club
 
 on:
@@ -16,27 +16,20 @@ jobs:
 
       - name: Inject API Keys into env.js
         run: |
-          mkdir -p public  # Ensure public directory exists
-          echo "window._env_ = {" > public/env.js
-          echo "  FIREBASE_API_KEY: '${{ secrets.FIREBASE_API_KEY }}'," >> public/env.js
-          echo "  FIREBASE_AUTH_DOMAIN: '${{ secrets.FIREBASE_AUTH_DOMAIN }}'," >> public/env.js
-          echo "  FIREBASE_DATABASE_URL: '${{ secrets.FIREBASE_DATABASE_URL }}'," >> public/env.js
-          echo "  FIREBASE_PROJECT_ID: '${{ secrets.FIREBASE_PROJECT_ID }}'," >> public/env.js
-          echo "  FIREBASE_STORAGE_BUCKET: '${{ secrets.FIREBASE_STORAGE_BUCKET }}'," >> public/env.js
-          echo "  FIREBASE_MESSAGING_SENDER_ID: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}'," >> public/env.js
-          echo "  FIREBASE_APP_ID: '${{ secrets.FIREBASE_APP_ID }}'," >> public/env.js
-          echo "  FIREBASE_MEASUREMENT_ID: '${{ secrets.FIREBASE_MEASUREMENT_ID }}'," >> public/env.js
-          echo "  GOOGLE_CLOUD_API_KEY: '${{ secrets.GOOGLE_CLOUD_API_KEY }}'," >> public/env.js
-          echo "  GOOGLE_CALENDAR_ID: '${{ secrets.GOOGLE_CALENDAR_ID }}'," >> public/env.js
-          echo "  GOOGLE_CLIENT_ID: '${{ secrets.GOOGLE_CLIENT_ID }}'," >> public/env.js
-          echo "  GOOGLE_PROJECT_NUMBER: '${{ secrets.GOOGLE_PROJECT_NUMBER }}'" >> public/env.js
-          echo "};" >> public/env.js
-
-      - name: Ensure Public Directory Exists
-        run: |
-          mkdir -p public  
-          touch public/index.html  
-          echo "<h1>AutoCuidado Club is Live</h1>" > public/index.html  
+          echo "window._env_ = {" > env.js
+          echo "  FIREBASE_API_KEY: '${{ secrets.FIREBASE_API_KEY }}'," >> env.js
+          echo "  FIREBASE_AUTH_DOMAIN: '${{ secrets.FIREBASE_AUTH_DOMAIN }}'," >> env.js
+          echo "  FIREBASE_DATABASE_URL: '${{ secrets.FIREBASE_DATABASE_URL }}'," >> env.js
+          echo "  FIREBASE_PROJECT_ID: '${{ secrets.FIREBASE_PROJECT_ID }}'," >> env.js
+          echo "  FIREBASE_STORAGE_BUCKET: '${{ secrets.FIREBASE_STORAGE_BUCKET }}'," >> env.js
+          echo "  FIREBASE_MESSAGING_SENDER_ID: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}'," >> env.js
+          echo "  FIREBASE_APP_ID: '${{ secrets.FIREBASE_APP_ID }}'," >> env.js
+          echo "  FIREBASE_MEASUREMENT_ID: '${{ secrets.FIREBASE_MEASUREMENT_ID }}'," >> env.js
+          echo "  GOOGLE_CLOUD_API_KEY: '${{ secrets.GOOGLE_CLOUD_API_KEY }}'," >> env.js
+          echo "  GOOGLE_CALENDAR_ID: '${{ secrets.GOOGLE_CALENDAR_ID }}'," >> env.js
+          echo "  GOOGLE_CLIENT_ID: '${{ secrets.GOOGLE_CLIENT_ID }}'," >> env.js
+          echo "  GOOGLE_PROJECT_NUMBER: '${{ secrets.GOOGLE_PROJECT_NUMBER }}'" >> env.js
+          echo "};" >> env.js
 
       # ✅ Authenticate Google Cloud
       - name: Inject Google Cloud Credentials
@@ -95,12 +88,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Move Files from Public to Root
-        run: |
-          shopt -s dotglob
-          mv public/* .
-          rm -rf public
-
       - name: Configure Git
         run: |
           git config --global user.email "github-actions@github.com"
@@ -108,15 +95,13 @@ jobs:
 
       - name: Check for Changes and Push
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "github-actions[bot]"
           git add .
-
+          
           # Check if there are changes before committing
           if git diff --cached --quiet; then
             echo "✅ No changes detected, skipping commit."
             exit 0
           fi
 
-          git commit -m "Move web files to public directory automatically" || true
+          git commit -m "Auto-deploy: Update website files" || true
           git push origin main || true
