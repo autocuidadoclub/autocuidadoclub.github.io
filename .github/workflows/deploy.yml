@@ -65,3 +65,8 @@ jobs:
           echo "✅ Firebase authentication file exists!"
           echo "🔍 Checking first 5 lines..."
           head -n 5 $HOME/service-account.json
+
+      - name: Check Firebase CLI
+        run: |
+          echo "🔍 Checking Firebase CLI installation..."
+          firebase --version || echo "❌ Firebase CLI is NOT installed!"
