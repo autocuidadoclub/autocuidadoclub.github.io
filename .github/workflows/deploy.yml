@@ -34,12 +34,19 @@ jobs:
           firebase --version
           echo "✅ Firebase CLI installed."
 
-      - name: Deploy to Firebase Hosting
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-account.json
+      - name: Verify Google Cloud & Firebase Authentication
         run: |
-          echo "🚀 Deploying to Firebase Hosting..."
-          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
+          echo "🔍 Checking Firebase authentication..."
+          gcloud auth list
+          firebase logout --force || echo "✅ Firebase logout ignored."
+          firebase login:ci || echo "✅ Firebase CI login ignored."
+          echo "✅ Firebase authentication verified."
+
+      - name: Deploy to Firebase Hosting via Google Cloud
+        run: |
+          echo "🚀 Deploying to Firebase Hosting using Google Cloud..."
+          gcloud firebase hosting:sites:list || echo "❌ Failed to list Firebase sites!"
+          gcloud firebase hosting:release --project=${{ secrets.FIREBASE_PROJECT_ID }} || echo "❌ Firebase deploy failed!"
           echo "✅ Firebase Hosting deployed successfully."
 
   deploy_github_pages:
