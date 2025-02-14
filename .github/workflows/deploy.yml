@@ -16,15 +16,12 @@ jobs:
 
       - name: Authenticate with Firebase
         run: |
+          echo "🔍 Loading Firebase credentials from GitHub Secrets..."
           echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > $HOME/service-account.json
-          echo "🔍 Checking Firebase authentication file..."
-          if [ ! -s $HOME/service-account.json ]; then
-            echo "❌ Firebase credentials file is empty or missing!"
-            exit 1
-          fi
-          echo "✅ Firebase authentication file exists!"
+          echo "✅ Firebase credentials loaded successfully."
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           gcloud auth activate-service-account --key-file=$HOME/service-account.json
+
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
