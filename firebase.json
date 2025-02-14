@@ -1,25 +1,14 @@
 {
-  "name": "autocuidadoclub-functions",
-  "version": "1.0.0",
-  "description": "Cloud Functions for AutoCuidado Club",
-  "main": "index.js",
-  "scripts": {
-    "lint": "eslint .",
-    "serve": "firebase emulators:start --only functions",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
-  },
-  "dependencies": {
-    "firebase-admin": "^11.10.1",
-    "firebase-functions": "^4.0.1",
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "axios": "^1.4.0"
-  },
-  "devDependencies": {
-    "eslint": "^8.39.0"
-  },
-  "engines": {
-    "node": "20"
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      { "source": "/env.js", "destination": "/env.js" },
+      { "source": "**", "destination": "/index.html" }
+    ]
   }
 }
