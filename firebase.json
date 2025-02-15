@@ -1,12 +1,18 @@
 {
   "hosting": {
     "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
     "rewrites": [
       { "source": "/nosotros", "destination": "/nosotros.html" },
       { "source": "/servicios", "destination": "/servicios.html" },
       { "source": "/suscripciones", "destination": "/suscripciones.html" },
       { "source": "/contacto", "destination": "/contacto.html" },
+      { "source": "/staff", "destination": "/staff.html" },
       { "source": "**", "destination": "/index.html" }
     ]
   }
