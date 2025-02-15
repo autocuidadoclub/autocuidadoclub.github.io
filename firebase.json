@@ -1,13 +1,8 @@
 {
   "hosting": {
     "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
-      { "source": "/env.js", "destination": "/env.js" },
       { "source": "/nosotros", "destination": "/nosotros.html" },
       { "source": "/servicios", "destination": "/servicios.html" },
       { "source": "/suscripciones", "destination": "/suscripciones.html" },
