@@ -4,28 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
+
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
- <script>
+    <!-- 🔍 Load env.js BEFORE Firebase to ensure environment variables are available -->
+    <script src="/env.js"></script>
+
+    <!-- Debugging: Ensure environment variables are loaded before Firebase -->
+    <script>
       console.log("✅ Loaded Environment Variables:", window._env_);
+
+      if (!window._env_ || !window._env_.FIREBASE_API_KEY) {
+        console.error("❌ Error: Environment variables not loaded. Check env.js or make sure it's accessible.");
+      }
     </script>
-    
-    <!-- Firebase Compatibility SDK -->
+
+    <!-- ✅ Firebase Compatibility SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
- <script>
-      // ✅ Ensure Firebase initializes with env.js variables
-      if (!window._env_) {
-        console.error("❌ Error: Environment variables not loaded. Check env.js.");
-      } else {
+    <!-- ✅ Initialize Firebase AFTER ensuring env.js is loaded -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (!window._env_ || !window._env_.FIREBASE_API_KEY) {
+          console.error("❌ Firebase configuration is missing! Check if env.js is loading properly.");
+          return;
+        }
+
         const firebaseConfig = {
           apiKey: window._env_.FIREBASE_API_KEY,
           authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
@@ -37,262 +48,23 @@
           measurementId: window._env_.FIREBASE_MEASUREMENT_ID
         };
 
-  // Initialize Firebase
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-  }
-
-  const db = firebase.firestore();
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const registerSection = document.getElementById("register-section");
-            const scheduleSection = document.getElementById("schedule-section");
-            const vehicleSections = document.getElementById("vehicle-sections");
-
-            // Hide sections initially
-            registerSection.style.display = "none";
-            scheduleSection.style.display = "none";
-
-            // Show registration and schedule sections when a subscription button is clicked
-            window.showRegistrationForm = function (planType) {
-                // Set the selected plan type
-                document.getElementById("planType").value = planType;
-
-                // Adjust vehicle fields
-                vehicleSections.innerHTML = '';
-                const vehicleCount = planType.startsWith("plus") ? 3 : 1;
-                for (let i = 1; i <= vehicleCount; i++) {
-                    vehicleSections.insertAdjacentHTML('beforeend', `
-                        <div class="vehicle-info">
-                            <h4>Información del Vehículo ${i}</h4>
-                            <label for="vehicleBrand${i}">Marca:</label>
-                            <input type="text" id="vehicleBrand${i}" class="vehicleBrand" required>
-                            <label for="vehicleModel${i}">Modelo:</label>
-                            <input type="text" id="vehicleModel${i}" class="vehicleModel" required>
-                            <label for="vehicleYear${i}">Año:</label>
-                            <input type="text" id="vehicleYear${i}" class="vehicleYear" required pattern="\\d{4}" title="Cuatro dígitos">
-                            <label for="vehiclePlate${i}">Placa:</label>
-                            <input type="text" id="vehiclePlate${i}" class="vehiclePlate" required>
-                        </div>
-                    `);
-                }
-
-                // Show the sections
-                registerSection.style.display = "block";
-                scheduleSection.style.display = "block";
-
-                // Smooth scroll to the registration section
-                registerSection.scrollIntoView({ behavior: "smooth" });
-            };
-
-         
-// Highlight selected schedule box and capture day and time block
-window.selectScheduleBox = function (cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-    
-    // Check if the cell contains a valid time
-    const timeBlock = cell.innerText.trim();
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
-    }
-
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
-
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText : "Unknown";
-
-    // Store the selected day and time block in a hidden input field
-    document.getElementById("selectedSchedule").value = `${day} - ${timeBlock}`;
-};
-
-
-
-            // Add CSS for selected box
-            const style = document.createElement("style");
-            style.innerHTML = `
-                .schedule-table tbody td.selected-box {
-                    background-color: #FF6600 !important;
-                    color: white !important;
-                    font-weight: bold;
-                }
-            `;
-            document.head.appendChild(style);
-        });
-
-        function registerAndPay(event) {
-            event.preventDefault();
-
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const planType = document.getElementById("planType").value;
-            const password = document.getElementById("password").value;
-            const department = document.getElementById("department").value;
-            const municipality = document.getElementById("municipality").value;
-
-
-            const vehicles = Array.from(document.querySelectorAll('.vehicle-info')).map(vehicleSection => ({
-                brand: vehicleSection.querySelector('.vehicleBrand').value,
-                model: vehicleSection.querySelector('.vehicleModel').value,
-                year: vehicleSection.querySelector('.vehicleYear').value,
-                plate: vehicleSection.querySelector('.vehiclePlate').value,
-            }));
-
-            // Validate required fields
-    if (!name || !email || !phone || !password || !department || !municipality) {
-        alert("Por favor, complete todos los campos obligatorios.");
-        return;
-    }
-
-            const selectedSchedule = document.querySelector(".schedule-table tbody td.selected-box");
-            if (!selectedSchedule) {
-                alert("Por favor, seleccione un horario.");
-                return;
-            }
-
-            const userData = {
-                name,
-                email,
-                phone,
-                planType,
-                vehicles,
-                department, // Add department
-                municipality, // Add municipality
-                selectedSchedule: document.getElementById("selectedSchedule").value,
-                registrationDate: firebase.firestore.Timestamp.now(),
-                lastReschedule: null, // Set to null
-                paymentDate: null, // Initialize paymentDate as null 
-                nextPaymentDate: null // Placeholder for next payment
-            };
-            const usersRef = db.collection("users");
-
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then(userCredential => {
-                    const newUser = userCredential.user;
-                    userData.uid = newUser.uid;
-                    return usersRef.doc(email).set(userData);
-                })
-                .then(() => {
-                    alert("Registro exitoso. Presiona OK para proceder al pago.");
-                    const paypalLink = getPaypalLink(planType);
-                    if (paypalLink) window.open(paypalLink, '_blank');
-                })
-                .then(() => {
-                    alert("Registro exitoso. Serás redirigido al login.");
-                    window.location.href = "login.html"; // Redirect to login.html
-                })
-                .catch(error => {
-                    console.error("Error:", error.message);
-                    alert("Hubo un error en el registro: " + error.message);
-                });
+        // ✅ Initialize Firebase only once
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+          console.log("✅ Firebase initialized successfully!");
+        } else {
+          console.warn("⚠️ Firebase was already initialized.");
         }
 
-        function getPaypalLink(planType) {
-            switch (planType) {
-                case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
-                case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
-                case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
-                case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
-                case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
-                case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
-                default: alert("Plan inválido."); return null;
-            }
-        }
+        // ✅ Initialize Firestore
+        const db = firebase.firestore();
+        window.db = db; // Make Firestore accessible globally
+      });
     </script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-        }
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-        }
-        label {
-            font-weight: bold;
-        }
-        select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .floating-contact-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff6600;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s, transform 0.2s;
-}
-
-.floating-contact-button:hover {
-    background-color: #cc5500;
-    transform: scale(1.05);
-}
-
-        /* Improved Table Styling */
-        .subscription-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 18px;
-            text-align: left;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .subscription-table th, .subscription-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
-        .subscription-table th {
-            background: #FF6600;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-        }
-        .subscription-table td {
-            text-align: center;
-        }
-        .highlight-cell {
-            font-weight: bold;
-            color: #FF6600;
-        }
-        .warning-text {
-            color: red;
-            font-weight: bold;
-        }
-        .benefits-list {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-    </style>
-    
 </head>
+
+
+    
 <body>
 
     <div id="install-banner" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center; font-size: 14px; position: fixed; top: 0; width: 100%; z-index: 1000;">
