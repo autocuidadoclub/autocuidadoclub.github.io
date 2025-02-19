@@ -320,6 +320,48 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
         <div class="logo-container">
             <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
+
+<!-- Updated Navigation Bar Styling -->
+<style>
+    .navbar {
+        background-color: #003366;
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .nav-links li {
+        margin: 0 15px;
+    }
+    .nav-links a {
+        text-decoration: none;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        transition: color 0.3s;
+    }
+    .nav-links a:hover {
+        color: #FFA500;
+    }
+    @media screen and (max-width: 768px) {
+        .nav-links {
+            flex-direction: column;
+            text-align: center;
+        }
+        .nav-links li {
+            margin: 8px 0;
+        }
+    }
+</style>
+
+        
     </nav>
 <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
     <i class="fas fa-headset"></i> Contactar Staff
