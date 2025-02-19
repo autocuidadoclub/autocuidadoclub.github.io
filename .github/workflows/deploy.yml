@@ -19,21 +19,27 @@ jobs:
           echo "🔍 Generating env.js from GitHub Secrets..."
           cat <<EOF > public/env.js
           window._env_ = {
-            FIREBASE_API_KEY: '${{ secrets.FIREBASE_API_KEY }}',
-            FIREBASE_AUTH_DOMAIN: '${{ secrets.FIREBASE_AUTH_DOMAIN }}',
-            FIREBASE_DATABASE_URL: '${{ secrets.FIREBASE_DATABASE_URL }}',
-            FIREBASE_PROJECT_ID: '${{ secrets.FIREBASE_PROJECT_ID }}',
-            FIREBASE_STORAGE_BUCKET: '${{ secrets.FIREBASE_STORAGE_BUCKET }}',
-            FIREBASE_MESSAGING_SENDER_ID: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}',
-            FIREBASE_APP_ID: '${{ secrets.FIREBASE_APP_ID }}',
-            FIREBASE_MEASUREMENT_ID: '${{ secrets.FIREBASE_MEASUREMENT_ID }}',
-            GOOGLE_CLOUD_API_KEY: '${{ secrets.GOOGLE_CLOUD_API_KEY }}',
-            GOOGLE_CALENDAR_ID: '${{ secrets.GOOGLE_CALENDAR_ID }}',
-            GOOGLE_CLIENT_ID: '${{ secrets.GOOGLE_CLIENT_ID }}',
-            GOOGLE_PROJECT_NUMBER: '${{ secrets.GOOGLE_PROJECT_NUMBER }}'
+            FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}",
+            FIREBASE_AUTH_DOMAIN: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+            FIREBASE_DATABASE_URL: "${{ secrets.FIREBASE_DATABASE_URL }}",
+            FIREBASE_PROJECT_ID: "${{ secrets.FIREBASE_PROJECT_ID }}",
+            FIREBASE_STORAGE_BUCKET: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+            FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
+            FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}",
+            FIREBASE_MEASUREMENT_ID: "${{ secrets.FIREBASE_MEASUREMENT_ID }}",
+            GOOGLE_CLOUD_API_KEY: "${{ secrets.GOOGLE_CLOUD_API_KEY }}",
+            GOOGLE_CALENDAR_ID: "${{ secrets.GOOGLE_CALENDAR_ID }}",
+            GOOGLE_CLIENT_ID: "${{ secrets.GOOGLE_CLIENT_ID }}",
+            GOOGLE_PROJECT_NUMBER: "${{ secrets.GOOGLE_PROJECT_NUMBER }}"
           };
           EOF
           echo "✅ env.js successfully generated."
+
+      - name: Verify env.js content
+        run: |
+          echo "🔍 Checking env.js content..."
+          cat public/env.js
+          echo "✅ env.js verified."
 
       - name: Authenticate with Google Cloud
         run: |
@@ -63,11 +69,10 @@ jobs:
           firebase login:ci || echo "✅ Firebase CI login ignored."
           echo "✅ Firebase authentication verified."
 
-      - name: Deploy to Firebase Hosting via Google Cloud
+      - name: Deploy to Firebase Hosting
         run: |
-          echo "🚀 Deploying to Firebase Hosting using Google Cloud..."
-          gcloud firebase hosting:sites:list || echo "❌ Failed to list Firebase sites!"
-          gcloud firebase hosting:release --project=${{ secrets.FIREBASE_PROJECT_ID }} || echo "❌ Firebase deploy failed!"
+          echo "🚀 Deploying to Firebase Hosting..."
+          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
           echo "✅ Firebase Hosting deployed successfully."
 
   deploy_github_pages:
