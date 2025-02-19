@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado Club - Servicios</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <style>
+        /* General Section Styling */
+        .section-container {
+            padding: 20px;
+            margin: 20px auto;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 15px;
+        }
+
+        .flowchart {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .flow-step {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .step-number {
+            font-size: 24px;
+            color: #003366;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .inspection-tabs button {
+            padding: 10px 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .inspection-tabs button:hover {
+            background-color: #FF6600;
+        }
+
+        .cta-button {
+            padding: 10px 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background-color: #FF6600;
+        }
+ 
+        .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+    </ul>
+    <div class="logo-container">
+        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+    </div>
+</nav>
+
+ <header class="header-container">
+    <div class="header-text">
+        <h1>Servicios de AutoCuidado Club</h1>
+        <p>Cuidamos de tu vehículo con <strong>innovación, confianza</strong> y <strong>eficiencia</strong>.</p>
+    </div>
+</header>
+
+<style>
+    .header-container {
+        background-color: #003366; /* Blue background matching the logo */
+        color: white; /* White text for contrast */
+        padding: 20px 0; /* Add padding for spacing */
+        text-align: center; /* Center-align the text */
+    }
+
+    .header-text h1 {
+        font-size: 2em; /* Make the main heading larger */
+        margin-bottom: 10px; /* Add spacing below the heading */
+        font-weight: bold;
+    }
+
+    .header-text p {
+        font-size: 1.2em; /* Increase paragraph font size */
+        margin: 0;
+    }
+
+    .header-text strong {
+        color: #FFCC00; /* Highlight key text in yellow */
+    }
+</style>
+
+    
+
+<!-- Disclaimer Section -->
+<section class="disclaimer-section">
+    <p><strong>Nota importante:</strong> Nuestros servicios están disponibles exclusivamente para motores de gasolina, reforzando nuestro compromiso con una movilidad más limpia y responsable.</p>
+</section>
+<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
+    
+<!-- Inspection Section -->
+<section id="explore-checks" class="section-container">
+    <h2 class="section-title">¿Qué Revisamos en tu Vehículo?</h2>
+    <p>Explora de forma breve el enfoque de nuestras revisiones detalladas en las áreas de motor, interior y exterior.</p>
+    <div class="inspection-container">
+        <div class="inspection-tabs">
+            <button onclick="showInspection('motor')">Motor</button>
+            <button onclick="showInspection('interior')">Interior</button>
+            <button onclick="showInspection('exterior')">Exterior</button>
+        </div>
+        <div id="inspection-content">
+            <h3>Revisiones del Motor</h3>
+            <ul id="inspection-list">
+                <li>Análisis del rendimiento de lubricantes.</li>
+                <li>Inspección a los del sistema de combustión y encendido.</li>
+                <li>Monitoreo de todos los sistemas de apoyo  (Frenos, AC, Refrigeración, computadoras, etc).</li>
+                <li>Diagnóstico en todo el sistema eléctrico.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="loyalty-program" class="section-container">
+    <h2 class="section-title">⭐ Programa de Lealtad AutoCuidado Club</h2>
+    <p class="section-description">¡Gana increíbles recompensas por mantener tu suscripción activa durante 8 meses consecutivos!</p>
+
+    <!-- Steps to Participate -->
+    <div class="loyalty-steps">
+        <h3 class="steps-title">🔷 ¿Cómo Participar?</h3>
+        <ol class="steps-list">
+            <li><strong>1er Paso:</strong> Regístrate en AutoCuidado Club (es gratis).</li>
+            <li><strong>2do Paso:</strong> Realiza tu primer pago de suscripción.</li>
+            <li><strong>3er Paso:</strong> Mantén tu suscripción activa y constante durante 8 meses.</li>
+        </ol>
+    </div>
+
+    <!-- Rewards Section -->
+    <div class="loyalty-rewards">
+        <h3 class="rewards-title">🎁 Recompensas al Completar 8 Meses</h3>
+        <ul class="rewards-list">
+            <li>✅ <strong>1 Recarga de A/C gratis</strong> por cada vehículo registrado.</li>
+            <li>✅ <strong>1 Carwash gratis</strong> por cada vehículo registrado.</li>
+            <li>✅ <strong>1 Revisión extra del mes en curso</strong> al desbloquear las recompensas.</li>
+        </ul>
+        <p class="rewards-note"><em>Las recompensas se desbloquean al completar 8 meses consecutivos sin interrupciones.</em></p>
+        <p class="rewards-callout">¡Cada mantenimiento te acerca más a tus recompensas!</p>
+    </div>
+</section>
+
+<style>
+    /* General Section Styling */
+    .section-container {
+        padding: 20px;
+        margin: 20px auto;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        max-width: 800px;
+    }
+
+    .section-title {
+        color: #003366;
+        text-align: center;
+        font-size: 1.8em;
+        margin-bottom: 15px;
+    }
+
+    .section-description {
+        text-align: center;
+        color: #555;
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+
+    /* Steps Styling */
+    .loyalty-steps {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .steps-title {
+        font-size: 1.3em;
+        color: #003366;
+        margin-bottom: 10px;
+    }
+
+    .steps-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .steps-list li {
+        font-size: 1em;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    /* Rewards Styling */
+    .loyalty-rewards {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .rewards-title {
+        font-size: 1.3em;
+        color: #FF6600;
+        margin-bottom: 10px;
+    }
+
+    .rewards-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .rewards-list li {
+        font-size: 1em;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    .rewards-list strong {
+        color: #003366;
+    }
+
+    .rewards-note {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 10px;
+        font-style: italic;
+    }
+
+    .rewards-callout {
+        font-size: 1em;
+        color: #003366;
+        font-weight: bold;
+        margin-top: 5px;
+        text-align: center;
+    }
+</style>
+
+
+   <section class="process-section section-container">
+    <h2 class="section-title">Nuestro Proceso</h2>
+    <p class="section-description">Descubre cómo funciona nuestro servicio paso a paso para brindarte tranquilidad y confianza en el cuidado de tu vehículo.</p>
+    
+    <!-- Steps Container -->
+    <div class="steps-container">
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-map-marker-alt step-icon"></i>
+                <h3>1. Elige tu plan</h3>
+            </div>
+            <p>Selecciona el plan que mejor se adapte a tus necesidades.</p>
+        </div>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-user-circle step-icon"></i>
+                <h3>2. Registra tu información</h3>
+            </div>
+            <p>Proporciona tus datos y los de tu vehículo.</p>
+        </div>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-calendar-check step-icon"></i>
+                <h3>3. Agenda tu cita</h3>
+            </div>
+            <p>Escoge el día y bloque horario que prefieras.</p>
+        </div>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-check-circle step-icon"></i>
+                <h3>4. Confirma tu suscripción</h3>
+            </div>
+            <p>Nuestro equipo te contactará para confirmar.</p>
+        </div>
+        
+        <div class="step-box">
+            <div class="step-header">
+                <i class="fas fa-search-plus step-icon"></i>
+                <h3>5. Primera revisión</h3>
+            </div>
+            <p>Realizamos un diagnóstico completo de tu vehículo.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Public Information Section -->
+<section id="valor-general" class="section-container">
+    <h2 class="section-title">Te Ayudamos a Ahorrar y Conducir Seguro</h2>
+   <p>En AutoCuidado Club, no solo mantenemos tu coche, sino que también te proporcionamos información clave para ahorrar dinero, garantizar tu seguridad y mantener tu vehículo al 100%.</p>
+    <p>Te compartimos un Adelanto de Cómo Cuidamos de Ti</p>
+    
+    <div class="preview-tips">
+        <div class="tip">
+            <h3>Para la Temporada de Lluvias</h3>
+            <p>¿Sabías que cambiar tus limpiaparabrisas en el mes de Abril puede ahorrarte dinero? La mayoria de tiendas suben los precios previo a la temporada</p>
+        </div>
+        <div class="tip">
+            <h3>El sistema TPMS ayuda a prolongar la vida de tus neumáticos</h3>
+            <p>La correcta presión de trabajo en neumáticos evita la deformación y desgaste irregular de los neumáticos</p>
+        </div>
+        <div class="tip">
+            <h3>¿Sabias que las llantas o neumáticos tienen fecha de vencimiento y fabricación?</h3>
+            <p>Un neumático tiene una vide útil de 10 años, si encuentras una liquidación y ves llantas con buen gravado pueden tener varios años desde que se fabricaron y no puede ser la mejor opción</p>
+        </div>
+    </div>
+
+</section>
+<style>
+/* General Section Styling */
+.section-container {
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 900px;
+}
+
+.section-title {
+    color: #003366;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.section-description {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Steps Container Styling */
+.steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .steps-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+}
+
+/* Step Box Styling */
+.step-box {
+    flex: 1;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 250px;
+    margin: auto;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.step-icon {
+    font-size: 1.5em;
+    color: #FF6600;
+}
+
+.step-box h3 {
+    font-size: 1.2em;
+    color: #003366;
+    margin: 0;
+}
+
+.step-box p {
+    font-size: 0.95em;
+    color: #555;
+    margin: 0;
+}
+</style>
+
+
+<style>
+    /* General Section Styling */
+    .section-container {
+        padding: 20px;
+        margin: 20px auto;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        text-align: center;
+        max-width: 900px;
+    }
+
+    .section-title {
+        color: #003366;
+        margin-bottom: 20px;
+        font-size: 1.8em;
+    }
+
+    .flowchart {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    /* Flow Step Box Styling */
+    .flow-step {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 250px;
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .flow-step:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Step Number Styling */
+    .step-number {
+        background: #ff6600;
+        color: white;
+        font-size: 1.5em;
+        font-weight: bold;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+    }
+
+    /* Text Styling */
+    .flow-step p {
+        font-size: 1em;
+        color: #555;
+        margin: 0;
+    }
+
+    .flow-step strong {
+        color: #003366;
+    }
+</style>
+
+<section id="special-offer" class="section-container">
+    <h2 class="section-title">La Mejor Manera de Iniciar el Año con Tu Auto al 100%</h2>
+    <p>
+        Queremos celebrar contigo ofreciéndote <strong>descuentos especiales</strong> en nuestros planes de mantenimiento. 
+        Aprovecha esta oportunidad para mantener tu vehículo en las mejores condiciones, al mejor precio.
+    </p>
+    <p>
+        🚗 <strong>Planes destacados:</strong> Ahorra hasta un <strong>30% en el Plan Básico de 3 meses</strong> y un <strong>15% en el Plan Básico de 6 meses</strong>.
+    </p>
+    <div class="offer-benefits">
+        <h3>¿Por Qué lo Hacemos?</h3>
+        <ul>
+            <li>🎉 Agradecemos a nuestros clientes por confiar en AutoCuidado Club.</li>
+            <li>💰 Queremos ayudarte a cuidar tu vehículo al mejor precio.</li>
+            <li>⏰ Esta oferta es <strong>por tiempo limitado</strong>, ¡no dejes pasar la oportunidad!</li>
+        </ul>
+    </div>
+    <p class="cta-highlight">
+        🎁 Únete a AutoCuidado Club hoy y comienza el año con ahorros y tranquilidad. ¡Disponible solo en Febrero!
+    </p>
+   </section>
+
+<style>
+#special-offer {
+    text-align: center;
+    background-color: #f8f9fa;
+    padding: 30px;
+    margin: 30px auto;
+    border: 2px solid #FF6600;
+    border-radius: 10px;
+    max-width: 800px;
+    box-shadow: 0px 4px 10px rgba(255, 102, 0, 0.2);
+}
+
+#special-offer h2 {
+    color: #003366;
+    font-size: 2em;
+    margin-bottom: 15px;
+}
+
+#special-offer p {
+    color: #555;
+    font-size: 1em;
+    margin-bottom: 15px;
+}
+
+#special-offer .offer-benefits {
+    text-align: left;
+    margin: 20px auto;
+    font-size: 1em;
+    max-width: 700px;
+}
+
+#special-offer .offer-benefits h3 {
+    color: #003366;
+    margin-bottom: 10px;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+#special-offer ul {
+    list-style: none;
+    padding: 0;
+}
+
+#special-offer ul li {
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+    color: #555;
+}
+
+#special-offer ul li::before {
+    content: "✔️";
+    position: absolute;
+    left: 0;
+    color: #FF6600;
+    font-size: 1.2em;
+}
+
+#special-offer .cta-highlight {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #FF6600;
+    margin: 20px 0;
+}
+
+.cta-button {
+    background-color: #003366;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #FF6600;
+}
+</style>
+
+    
+    <!-- Call to Action -->
+<section class="section-container">
+    <h2 class="section-title">Confía en Nosotros</h2>
+    <p>En AutoCuidado Club, nos encargamos de todo para que tú solo disfrutes del camino.</p>
+    <p>¿Listo para obtener información clave y práctica? El registro en nuestra plataforma es gratis</p>
+    <p>Aprovecha nuestra promoción en el plan básico de 3 meses (30% de descuento sobre precio regular)</p>
+</section>
+    <div>
+        <button class="cta-button" onclick="window.location.href='suscripciones.html';">Conoce nuestros planes</button>
+        <button class="cta-button" onclick="window.location.href='contacto.html';">Contáctanos</button>
+    </div>
+</section>
+
+<script>
+    function showInspection(section) {
+        const content = document.getElementById("inspection-content");
+        const list = document.getElementById("inspection-list");
+        const titles = {
+            motor: "Revisiones del Motor",
+            interior: "Revisiones del Interior",
+            exterior: "Revisiones del Exterior"
+        };
+        const items = {
+            motor: `
+               <li>Análisis del rendimiento de lubricantes.</li>
+                <li>Inspección a los del sistema de combustión y encendido.</li>
+                <li>Monitoreo de todos los sistemas de apoyo  (Frenos, AC, Refrigeración, computadoras, etc).</li>
+                <li>Diagnóstico en todo el sistema eléctrico.</li>`,
+            interior: `
+                <li>Inspección a los sistemas de seguridad activa.</li>
+                <li>Evaluamos el desempeño a los sistemas de comfort.</li>
+                <li>Pruebas en módulos electrónicos.</li>
+                <li>Inspección de controles multimedia.</li>`,
+            exterior: `
+                <li>Análisis de desgaste de neumáticos.</li>
+                <li>Revisiones del sistema de frenos.</li>
+                <li>Inspección a los sistemas de iluminación.</li>
+                <li>Evaluación a los elementos aerodinámicos.</li>`
+        };
+        content.querySelector("h3").textContent = titles[section];
+        list.innerHTML = items[section];
+    }
+</script>
+
+  
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
+
+          <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
+        crossorigin="anonymous"></script>
+
+
+    
+    </footer>
+
+</body>
+</html>
+    
