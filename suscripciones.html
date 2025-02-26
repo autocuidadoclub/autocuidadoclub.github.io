@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,82 +33,34 @@
     <!-- ✅ Initialize Firebase AFTER ensuring env.js is loaded -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-    if (!window._env_ || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Firebase configuration is missing! Check if env.js is loading properly.");
-        return;
-    }
-
-    const firebaseConfig = {
-  apiKey: "AIzaSyCY6BeuJSbUboosMDrvlzQUmeNLb2dJX_0",
-  authDomain: "bookings-autocuidad-club.firebaseapp.com",
-  projectId: "bookings-autocuidad-club",
-  storageBucket: "bookings-autocuidad-club.firebasestorage.app",
-  messagingSenderId: "179075180686",
-  appId: "1:179075180686:web:6950b87b7fd6c6f49d01df",
-  measurementId: "G-LXJ50PGESY"
-};
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase initialized successfully!");
-    } else {
-        console.warn("⚠️ Firebase was already initialized.");
-    }
-
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-
-    // Function to register user and store data
-    async function registerAndPay(event) {
-        event.preventDefault();
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const phone = document.getElementById("phone").value;
-        const password = document.getElementById("password").value;
-        const planType = document.getElementById("planType").value;
-        const selectedSchedule = document.getElementById("selectedSchedule").value;
-        const department = document.getElementById("department").value;
-        const municipality = document.getElementById("municipality").value;
-        
-        try {
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const userId = userCredential.user.uid;
-            console.log("✅ User registered with UID:", userId);
-
-            const userRef = db.collection("users").doc(userId);
-            await userRef.set({
-                fullName: name,
-                email: email,
-                phoneNumber: phone,
-                registrationDate: new Date().toISOString(),
-                status: "active"
-            });
-
-            const subscriptionRef = userRef.collection("subscriptions").doc();
-            await subscriptionRef.set({
-                planId: planType,
-                planName: planType.replace(/\d+/g, "") + " Plan",
-                selectedSchedule: selectedSchedule,
-                department: department,
-                municipality: municipality,
-                subscriptionDate: new Date().toISOString(),
-                expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-                status: "active"
-            });
-
-            console.log("✅ Subscription saved successfully.");
-
-            alert("Registration and Subscription Successful! Redirecting to Payment...");
-            window.location.href = "payment.html";
-        } catch (error) {
-            console.error("❌ Error during registration:", error);
-            alert("Registration failed: " + error.message);
+        if (!window._env_ || !window._env_.FIREBASE_API_KEY) {
+          console.error("❌ Firebase configuration is missing! Check if env.js is loading properly.");
+          return;
         }
-    }
 
-    document.getElementById("registerForm").addEventListener("submit", registerAndPay);
-});
+        const firebaseConfig = {
+          apiKey: window._env_.FIREBASE_API_KEY,
+          authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+          databaseURL: window._env_.FIREBASE_DATABASE_URL,
+          projectId: window._env_.FIREBASE_PROJECT_ID,
+          storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+          messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+          appId: window._env_.FIREBASE_APP_ID,
+          measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+        };
 
+        // ✅ Initialize Firebase only once
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+          console.log("✅ Firebase initialized successfully!");
+        } else {
+          console.warn("⚠️ Firebase was already initialized.");
+        }
+
+        // ✅ Initialize Firestore
+        const db = firebase.firestore();
+        window.db = db; // Make Firestore accessible globally
+      });
     </script>
 </head>
 
