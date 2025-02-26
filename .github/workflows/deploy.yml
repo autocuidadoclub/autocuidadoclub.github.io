@@ -53,19 +53,20 @@ jobs:
           echo "✅ Firebase credentials loaded successfully."
 
 
-      - name: Authenticate with Firebase
+      - name: Authenticate with Google Cloud
         run: |
-          echo "🔍 Authenticating with Firebase..."
+          echo "🔍 Authenticating with Google Cloud..."
           gcloud auth activate-service-account --key-file=$HOME/service-account.json
           gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
           gcloud auth list
           echo "✅ Google Cloud authentication successful."
       
-      - name: Set Firebase CLI Authentication
+      - name: Generate Firebase Token for Authentication
         run: |
-          echo "🔍 Configuring Firebase CLI authentication..."
+          echo "🔍 Generating Firebase authentication token..."
           export FIREBASE_TOKEN="$(gcloud auth print-access-token)"
           echo "✅ Firebase CLI authenticated."
+      
 
 
       # ✅ Install Firebase CLI
