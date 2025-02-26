@@ -53,14 +53,20 @@ jobs:
           echo "✅ Firebase credentials loaded successfully."
 
 
-      # ✅ Authenticate with Google Cloud
-      - name: Authenticate with Google Cloud
+      - name: Authenticate with Firebase
         run: |
-          echo "🔍 Authenticating with Google Cloud..."
+          echo "🔍 Authenticating with Firebase..."
           gcloud auth activate-service-account --key-file=$HOME/service-account.json
           gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
           gcloud auth list
           echo "✅ Google Cloud authentication successful."
+      
+      - name: Set Firebase CLI Authentication
+        run: |
+          echo "🔍 Configuring Firebase CLI authentication..."
+          export FIREBASE_TOKEN="$(gcloud auth print-access-token)"
+          echo "✅ Firebase CLI authenticated."
+
 
       # ✅ Install Firebase CLI
       - name: Install Firebase CLI
@@ -70,12 +76,12 @@ jobs:
           firebase --version
           echo "✅ Firebase CLI installed."
 
-      # ✅ Deploy to Firebase Hosting
       - name: Deploy to Firebase Hosting
         run: |
           echo "🚀 Deploying to Firebase Hosting..."
-          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
+          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }} --token "$FIREBASE_TOKEN"
           echo "✅ Firebase Hosting deployed successfully."
+
 
   # ✅ Deploy to GitHub Pages
   deploy_github_pages:
