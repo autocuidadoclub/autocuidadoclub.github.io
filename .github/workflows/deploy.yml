@@ -14,6 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # ✅ Generate env.js from GitHub Secrets
       - name: Generate env.js from GitHub Secrets
         run: |
           echo "🔍 Generating env.js from GitHub Secrets..."
@@ -31,32 +32,28 @@ jobs:
           EOF
           echo "✅ env.js successfully generated."
 
+      # ✅ Verify env.js content
       - name: Verify env.js content
         run: |
           echo "🔍 Checking env.js content..."
           cat public/env.js
           echo "✅ env.js verified."
 
+      # ✅ Set Up Firebase Credentials from GitHub Secrets
       - name: Set Up Firebase Credentials
         run: |
           echo "🔍 Setting up Firebase credentials..."
-          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
-            echo "❌ Error: FIREBASE_SERVICE_ACCOUNT secret is missing!"
-            exit 1
-          fi
-      
-          echo "🔍 Decoding Firebase credentials..."
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
-          
+
           if [ ! -s "$HOME/service-account.json" ]; then
             echo "❌ Error: service-account.json is empty or missing!"
             exit 1
           fi
-      
+
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           echo "✅ Firebase credentials loaded successfully."
 
-
+      # ✅ Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
         run: |
           echo "🔍 Authenticating with Google Cloud..."
@@ -65,6 +62,7 @@ jobs:
           gcloud auth list
           echo "✅ Google Cloud authentication successful."
 
+      # ✅ Install Firebase CLI
       - name: Install Firebase CLI
         run: |
           echo "🔍 Installing Firebase CLI..."
@@ -72,20 +70,14 @@ jobs:
           firebase --version
           echo "✅ Firebase CLI installed."
 
-      - name: Verify Google Cloud & Firebase Authentication
-        run: |
-          echo "🔍 Checking Firebase authentication..."
-          gcloud auth list
-          firebase logout --force || echo "✅ Firebase logout ignored."
-          firebase login:ci || echo "✅ Firebase CI login ignored."
-          echo "✅ Firebase authentication verified."
-
+      # ✅ Deploy to Firebase Hosting
       - name: Deploy to Firebase Hosting
         run: |
           echo "🚀 Deploying to Firebase Hosting..."
           firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
           echo "✅ Firebase Hosting deployed successfully."
 
+  # ✅ Deploy to GitHub Pages
   deploy_github_pages:
     runs-on: ubuntu-latest
 
