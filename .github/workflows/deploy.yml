@@ -80,8 +80,9 @@ jobs:
       - name: Deploy to Firebase Hosting
         run: |
           echo "🚀 Deploying to Firebase Hosting..."
-          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }} --token "$FIREBASE_TOKEN"
+          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_CI_TOKEN }}
           echo "✅ Firebase Hosting deployed successfully."
+
 
 
   # ✅ Deploy to GitHub Pages
