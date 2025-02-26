@@ -37,12 +37,27 @@ jobs:
           cat public/env.js
           echo "✅ env.js verified."
 
-      - name: Authenticate with Google Cloud
+      - name: Set Up Firebase Credentials
         run: |
-          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' | base64 --decode > $HOME/service-account.json
+          echo "🔍 Setting up Firebase credentials..."
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+            echo "❌ Error: FIREBASE_SERVICE_ACCOUNT secret is missing!"
+            exit 1
+          fi
+
+          echo "🔍 Decoding Firebase credentials..."
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
+
+          if [ ! -s "$HOME/service-account.json" ]; then
+            echo "❌ Error: service-account.json is empty or missing!"
+            exit 1
+          fi
+
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           echo "✅ Firebase credentials loaded successfully."
 
+      - name: Authenticate with Google Cloud
+        run: |
           echo "🔍 Authenticating with Google Cloud..."
           gcloud auth activate-service-account --key-file=$HOME/service-account.json
           gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
