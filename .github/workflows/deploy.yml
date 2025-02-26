@@ -44,7 +44,7 @@ jobs:
             echo "❌ Error: FIREBASE_SERVICE_ACCOUNT secret is missing!"
             exit 1
           fi
-          
+      
           echo "🔍 Decoding Firebase credentials..."
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
           
@@ -55,6 +55,7 @@ jobs:
       
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           echo "✅ Firebase credentials loaded successfully."
+
 
       - name: Authenticate with Google Cloud
         run: |
