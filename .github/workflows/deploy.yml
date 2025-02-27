@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ✅ Debug: Show GitHub Secrets (Without revealing values)
+      # ✅ Debug: Ensure GitHub Secrets are present
       - name: Debug GitHub Secrets Presence
         run: |
           echo "🔍 Checking secrets..."
@@ -52,16 +52,16 @@ jobs:
         run: |
           echo "🔍 Setting up Firebase credentials..."
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
-      
+
           if [ ! -s "$HOME/service-account.json" ]; then
             echo "❌ Error: service-account.json is empty or missing!"
             exit 1
           fi
-      
+
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           echo "✅ Firebase credentials loaded successfully."
 
-      # ✅ Authenticate with Google Cloud
+      # ✅ Authenticate with Google Cloud using Service Account
       - name: Authenticate with Google Cloud
         run: |
           echo "🔍 Authenticating with Google Cloud..."
@@ -69,13 +69,6 @@ jobs:
           gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
           gcloud auth list
           echo "✅ Google Cloud authentication successful."
-
-      # ✅ Debug: Generate Firebase Token (Ensure Authentication Works)
-      - name: Generate Firebase Token for Authentication
-        run: |
-          echo "🔍 Generating Firebase authentication token..."
-          export FIREBASE_TOKEN="$(gcloud auth print-access-token)"
-          echo "✅ Firebase CLI authenticated."
 
       # ✅ Install Firebase CLI
       - name: Install Firebase CLI
@@ -85,7 +78,7 @@ jobs:
           firebase --version
           echo "✅ Firebase CLI installed."
 
-      # ✅ Debug Firebase Authentication
+      # ✅ Debug: Verify Firebase Authentication
       - name: Verify Firebase Authentication
         run: |
           echo "🔍 Checking Firebase authentication..."
@@ -94,12 +87,7 @@ jobs:
           firebase list || echo "✅ Firebase projects listed."
           echo "✅ Firebase authentication verified."
 
-      # ✅ Debug Firebase Token Before Deployment
-      - name: Debug Firebase Token
-        run: |
-          echo "🔍 FIREBASE_TOKEN: '$FIREBASE_TOKEN'"
-      
-      # ✅ Deploy to Firebase Hosting Using Service Account (No CI Token)
+      # ✅ Deploy to Firebase Hosting Using Service Account
       - name: Deploy to Firebase Hosting (Service Account)
         run: |
           echo "🚀 Deploying using Service Account..."
