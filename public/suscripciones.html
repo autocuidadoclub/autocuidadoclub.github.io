@@ -1,89 +1,210 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
-
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
-    <!-- 🔍 Load env.js BEFORE Firebase to ensure environment variables are available -->
-    <script src="/env.js"></script>
 
-    <!-- Debugging: Ensure environment variables are loaded before Firebase -->
-    <script>
-      console.log("✅ Loaded Environment Variables:", window._env_);
-
-      if (!window._env_ || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Environment variables not loaded. Check env.js or make sure it's accessible.");
-      }
-    </script>
-
-    <!-- ✅ Firebase Compatibility SDK -->
+    <!-- Firebase Compatibility SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-    <!-- ✅ Initialize Firebase AFTER ensuring env.js is loaded -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        if (!window._env_ || !window._env_.FIREBASE_API_KEY) {
-          console.error("❌ Firebase configuration is missing! Check if env.js is loading properly.");
-          return;
-        }
-
-        const firebaseConfig = {
-          apiKey: window._env_.FIREBASE_API_KEY,
-          authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-          databaseURL: window._env_.FIREBASE_DATABASE_URL,
-          projectId: window._env_.FIREBASE_PROJECT_ID,
-          storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-          messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-          appId: window._env_.FIREBASE_APP_ID,
-          measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-        };
-
-        // ✅ Initialize Firebase only once
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-          console.log("✅ Firebase initialized successfully!");
-        } else {
-          console.warn("⚠️ Firebase was already initialized.");
-        }
-
-        // ✅ Initialize Firestore
-        const db = firebase.firestore();
-        window.db = db; // Make Firestore accessible globally
-      });
-    </script>
-</head>
-
-
+<!-- Load GitHub Secrets -->
+    <script src="env.js"></script>
     
-<body>
-
-    <div id="install-banner" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center; font-size: 14px; position: fixed; top: 0; width: 100%; z-index: 1000;">
-    📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
-    <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
-</div>
-
 <script>
-function dismissBanner() {
-    document.getElementById("install-banner").style.display = "none";
+        document.addEventListener("DOMContentLoaded", function () {
+            // Ensure Firebase secrets are loaded
+            if (window._env_ && window._env_.FIREBASE_API_KEY) {
+                console.log("✅ Firebase API Key Loaded:", window._env_.FIREBASE_API_KEY);
+
+                const firebaseConfig = {
+                    apiKey: window._env_.FIREBASE_API_KEY,
+                    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                    databaseURL: window._env_.FIREBASE_DATABASE_URL,
+                    projectId: window._env_.FIREBASE_PROJECT_ID,
+                    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                    appId: window._env_.FIREBASE_APP_ID
+                };
+
+                // Initialize Firebase (Ensure it's initialized only once)
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+
+                const db = firebase.firestore();
+                const auth = firebase.auth();
+
+                // Show registration form and handle Firebase sign-up
+                window.registerAndPay = function (event) {
+                    event.preventDefault();
+
+                    const name = document.getElementById("name").value.trim();
+                    const email = document.getElementById("email").value.trim();
+                    const phone = document.getElementById("phone").value.trim();
+                    const password = document.getElementById("password").value.trim();
+                    const planType = document.getElementById("planType").value;
+                    const department = document.getElementById("department").value;
+                    const municipality = document.getElementById("municipality").value;
+                    const selectedSchedule = document.getElementById("selectedSchedule").value;
+
+                    if (!name || !email || !phone || !password || !department || !municipality || !selectedSchedule) {
+                        alert("Por favor, complete todos los campos obligatorios.");
+                        return;
+                    }
+
+                    // Create Firebase User
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            const newUser = userCredential.user;
+                            console.log("✅ Usuario creado en Firebase:", newUser.uid);
+
+                            const userData = {
+                                uid: newUser.uid,
+                                name,
+                                email,
+                                phone,
+                                planType,
+                                department,
+                                municipality,
+                                selectedSchedule,
+                                registrationDate: firebase.firestore.Timestamp.now(),
+                                lastReschedule: null,
+                                paymentDate: null,
+                                nextPaymentDate: null
+                            };
+
+                            return db.collection("users").doc(newUser.uid).set(userData);
+                        })
+                        .then(() => {
+                            alert("Registro exitoso. Presiona OK para proceder al pago.");
+                            const paypalLink = getPaypalLink(planType);
+                            if (paypalLink) window.open(paypalLink, '_blank');
+                        })
+                        .then(() => {
+                            alert("Registro exitoso. Serás redirigido al login.");
+                            window.location.href = "login.html";
+                        })
+                        .catch((error) => {
+                            console.error("❌ Error en registro:", error.message);
+                            alert("Hubo un error en el registro: " + error.message);
+                        });
+                };
+
+                function getPaypalLink(planType) {
+                    const links = {
+                        "basic3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
+                        "basic6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A",
+                        "basic12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ",
+                        "plus3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS",
+                        "plus6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56",
+                        "plus12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN"
+                    };
+                    return links[planType] || null;
+                }
+            } else {
+                console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
+            }
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
 }
 
-if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
-    document.getElementById("install-banner").style.display = "block";
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
 }
-</script>
 
+        /* Improved Table Styling */
+        .subscription-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 18px;
+            text-align: left;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .subscription-table th, .subscription-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        .subscription-table th {
+            background: #FF6600;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        .subscription-table td {
+            text-align: center;
+        }
+        .highlight-cell {
+            font-weight: bold;
+            color: #FF6600;
+        }
+        .warning-text {
+            color: red;
+            font-weight: bold;
+        }
+        .benefits-list {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
     
+</head>
+<body>
     <!-- Navigation -->
     <nav class="navbar">
         <ul class="nav-links">
@@ -96,48 +217,6 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
         <div class="logo-container">
             <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
-
-<!-- Updated Navigation Bar Styling -->
-<style>
-    .navbar {
-        background-color: #003366;
-        padding: 15px 0;
-        text-align: center;
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    .nav-links {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    .nav-links li {
-        margin: 0 15px;
-    }
-    .nav-links a {
-        text-decoration: none;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        transition: color 0.3s;
-    }
-    .nav-links a:hover {
-        color: #FFA500;
-    }
-    @media screen and (max-width: 768px) {
-        .nav-links {
-            flex-direction: column;
-            text-align: center;
-        }
-        .nav-links li {
-            margin: 8px 0;
-        }
-    }
-</style>
-
-        
     </nav>
 <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
     <i class="fas fa-headset"></i> Contactar Staff
@@ -159,11 +238,6 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
   </p>
 </div>
 
-<script>
-  console.log("✅ Environment Variables Loaded:", window._env_);
-</script>
-
-    
 <!-- Optional styles -->
 <style>
   .subscription-disclaimer {
@@ -177,20 +251,19 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
   }
 </style>
 
-   <!-- Improved Subscription Table -->
-<section>
-    <h2>📊 Comparación de Planes y Descuentos</h2>
-    <div class="table-container">
+    <!-- Discount & Subscription Comparison Table -->
+    <section>
+        <h2>📊 Comparación de Planes y Descuentos</h2>
         <table class="subscription-table">
             <thead>
                 <tr>
                     <th>Tipo de Suscripción</th>
-                    <th>3 Meses<br>(por vehículo)</th>
-                    <th>6 Meses<br>(por vehículo)</th>
-                    <th>12 Meses<br>(por vehículo)</th>
-                    <th>Descuento<br>vs. 3 meses</th>
+                    <th>3 Meses (por vehículo)</th>
+                    <th>6 Meses (por vehículo)</th>
+                    <th>12 Meses (por vehículo)</th>
+                    <th>Descuento vs. plan básico de 3 meses</th>
                     <th>Ahorro Total</th>
-                    <th>Beneficios adicionales</th>
+                    <th colspan="2">Beneficios adicionales</th>
                 </tr>
             </thead>
             <tbody>
@@ -199,8 +272,8 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
                     <td>$34.99</td>
                     <td class="highlight-cell">$32.50</td>
                     <td class="highlight-cell">$30.00</td>
-                    <td>7% (6m) <br> 14% (12m)</td>
-                    <td>Hasta <b>$60/año</b> 🏆<br><b>1.8 meses gratis</b></td>
+                    <td><p>7% (6m)</p> <p>14% (12m)</p></td>
+                    <td colspan="2" class="merged-cell">Hasta <b>$60/año</b> 🏆 <b>Equivalente a 1.8 meses gratis</b></td>
                     <td>✔ Accede a beneficios después de 8 meses</td>
                 </tr>
                 <tr>
@@ -208,58 +281,13 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
                     <td class="highlight-cell">$23.50</td>
                     <td class="highlight-cell">$22.00</td>
                     <td class="highlight-cell">$20.00</td>
-                    <td>33% (3m) <br> 38% (6m) <br> 42% (12m)</td>
-                    <td>Hasta <b>$180/año</b> 🏆<br><b>5.5 meses gratis</b></td>
+                    <td><p>33% (3m)</p> <p>38% (6m)</p> <p>42% (12m)</p></td>
+                    <td colspan="2" class="merged-cell">Hasta <b>$180/año</b> 🏆 <b>Equivalente a 5.5 meses gratis</b></td>
                     <td>✔ Accede a beneficios después de 8 meses</td>
                 </tr>
             </tbody>
         </table>
-    </div>
-</section>
-
-<!-- Responsive Table Styling -->
-<style>
-    .table-container {
-        overflow-x: auto;
-        max-width: 100%;
-    }
-    .subscription-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-size: 16px;
-        text-align: center;
-        background: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-        min-width: 600px;
-    }
-    .subscription-table th, .subscription-table td {
-        padding: 12px;
-        border: 1px solid #ddd;
-    }
-    .subscription-table th {
-        background: #FF6600;
-        color: white;
-        font-weight: bold;
-        text-align: center;
-    }
-    .subscription-table td {
-        text-align: center;
-    }
-    .highlight-cell {
-        font-weight: bold;
-        color: #FF6600;
-    }
-    @media screen and (max-width: 768px) {
-        .subscription-table {
-            font-size: 14px;
-        }
-        .subscription-table th, .subscription-table td {
-            padding: 8px;
-        }
-    }
-</style>
+    </section>
 
     <!-- Loyalty Program & Explanation -->
     <section>
@@ -459,7 +487,7 @@ button:hover {
             <input type="password" id="password" required>
             <input type="hidden" id="planType">
             <input type="hidden" id="selectedSchedule" name="selectedSchedule">
-            <div id="vehicle-sections">
+            <div id="vehicle-sections"></div>
 
  <!-- Schedule Section -->
     <section id="schedule-section" class="schedule-section">
@@ -503,7 +531,6 @@ button:hover {
             </tbody>
         </table>
     </section>
-            </div>
 <p></p>
             <p></p>
             <p></p>
@@ -611,10 +638,7 @@ button:hover {
 </div>
 
 <!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
-        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
-        crossorigin="anonymous"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
     
         
