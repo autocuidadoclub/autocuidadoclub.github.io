@@ -14,6 +14,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # ✅ Debug GitHub Secrets to verify API Key is being read correctly
+      - name: Debug GitHub Secrets
+        run: |
+          echo "🔍 FIREBASE_API_KEY: '${{ secrets.FIREBASE_API_KEY }}'"
+
       # ✅ Generate env.js from GitHub Secrets
       - name: Generate env.js from GitHub Secrets
         run: |
@@ -52,7 +57,6 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           echo "✅ Firebase credentials loaded successfully."
 
-
       - name: Authenticate with Google Cloud
         run: |
           echo "🔍 Authenticating with Google Cloud..."
@@ -61,13 +65,12 @@ jobs:
           gcloud auth list
           echo "✅ Google Cloud authentication successful."
       
+      # ✅ Generate Firebase Token for Authentication
       - name: Generate Firebase Token for Authentication
         run: |
           echo "🔍 Generating Firebase authentication token..."
           export FIREBASE_TOKEN="$(gcloud auth print-access-token)"
           echo "✅ Firebase CLI authenticated."
-      
-
 
       # ✅ Install Firebase CLI
       - name: Install Firebase CLI
@@ -80,10 +83,8 @@ jobs:
       - name: Deploy to Firebase Hosting
         run: |
           echo "🚀 Deploying to Firebase Hosting..."
-          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_CI_TOKEN }}
+          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }} --token "$FIREBASE_TOKEN"
           echo "✅ Firebase Hosting deployed successfully."
-
-
 
   # ✅ Deploy to GitHub Pages
   deploy_github_pages:
