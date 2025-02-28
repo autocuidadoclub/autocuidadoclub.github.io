@@ -35,7 +35,6 @@ jobs:
           echo "};" >> public/env.js
           echo "firebase.initializeApp(firebaseConfig);" >> public/env.js
 
-
       # ✅ Verify env.js content
       - name: Verify env.js content
         run: |
