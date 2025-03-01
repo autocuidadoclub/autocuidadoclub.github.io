@@ -42,50 +42,50 @@
                 const auth = firebase.auth();
                 
                 window.registerUser = function (event) {
-                    event.preventDefault();
-                    
-                    const name = document.getElementById("name").value.trim();
-                    const email = document.getElementById("email").value.trim();
-                    const phone = document.getElementById("phone").value.trim();
-                    const password = document.getElementById("password").value.trim();
-                    const department = document.getElementById("department").value;
-                    const municipality = document.getElementById("municipality").value;
-                    const vehicles = getVehicleData();
-                    
-                    if (!name || !email || !phone || !password || !department || !municipality || vehicles.length === 0) {
-                        alert("Por favor, completa todos los campos y añade al menos un vehículo.");
-                        return;
-                    }
+    event.preventDefault();
+    
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    const vehicles = getVehicleData();
 
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .then((userCredential) => {
-                            const newUser = userCredential.user;
-                            console.log("✅ Usuario creado en Firebase:", newUser.uid);
-                            
-                            const userData = {
-                                uid: newUser.uid,
-                                fullName: name,
-                                email,
-                                phoneNumber: phone,
-                                department,
-                                municipality,
-                                vehicles,
-                                registrationDate: firebase.firestore.Timestamp.now(),
-                                status: "pending_payment"
-                            };
+    if (!name || !email || !phone || !password || !department || !municipality || vehicles.length === 0) {
+        alert("Por favor, completa todos los campos y añade al menos un vehículo.");
+        return;
+    }
 
-                            return db.collection("users").doc(newUser.uid).set(userData);
-                        })
-                        .then(() => {
-                            document.getElementById("confirmationMessage").textContent = "Registro exitoso. Ahora puedes acceder a tu perfil y añadir tu método de pago.";
-                            document.getElementById("confirmationMessage").style.display = "block";
-                            setTimeout(() => { window.location.href = "profile.html"; }, 2000);
-                        })
-                        .catch((error) => {
-                            console.error("❌ Error en registro:", error.message);
-                            alert("Error en el registro: " + error.message);
-                        });
-                };
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const newUser = userCredential.user;
+            console.log("✅ Usuario creado en Firebase:", newUser.uid);
+            
+            const userData = {
+                uid: newUser.uid,
+                fullName: name,
+                email,
+                phoneNumber: phone,
+                department,
+                municipality,
+                vehicles,  // ✅ Now storing vehicles
+                registrationDate: firebase.firestore.Timestamp.now(),
+                status: "pending_payment"
+            };
+
+            return db.collection("users").doc(newUser.uid).set(userData);
+        })
+        .then(() => {
+            alert("Registro exitoso. Ahora puedes acceder a tu perfil y añadir tu método de pago.");
+            window.location.href = "profile.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en registro:", error.message);
+            alert("Error en el registro: " + error.message);
+        });
+};
+
 
                 function getVehicleData() {
                     const vehicleElements = document.querySelectorAll(".vehicle-entry");
@@ -116,6 +116,8 @@
                 <input type="text" class="vehicle-model" required>
                 <label>Año:</label>
                 <input type="text" class="vehicle-year" required>
+                <input type="text" class="vehicle-plate" required>
+                <label>Numero de Placa del vehiculo:</label>
                 <button type="button" onclick="removeVehicle(this)">Eliminar</button>
             `;
             container.appendChild(div);
@@ -124,6 +126,21 @@
         function removeVehicle(button) {
             button.parentElement.remove();
         }
+
+     function getVehicleData() {
+        const vehicleElements = document.querySelectorAll(".vehicle-entry");
+        let vehicles = [];
+        vehicleElements.forEach(vehicle => {
+            const brand = vehicle.querySelector(".vehicle-brand").value.trim();
+            const model = vehicle.querySelector(".vehicle-model").value.trim();
+            const year = vehicle.querySelector(".vehicle-year").value.trim();
+            const year = vehicle.querySelector(".vehicle-plate").value.trim();
+            if (brand && model && year) {
+                vehicles.push({ brand, model, year });
+            }
+        });
+        return vehicles;
+    }
 
                 function getPaypalLink(planType) {
                     const links = {
