@@ -47,19 +47,20 @@ jobs:
           cat public/env.js
           echo "✅ env.js verified."
 
-      # ✅ Set Up Firebase Credentials (Service Account JSON)
+     # ✅ Set Up Firebase Credentials (Service Account JSON)
       - name: Set Up Firebase Credentials
         run: |
           echo "🔍 Setting up Firebase credentials..."
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
-
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | tr -d '\r' | jq '.' > $HOME/service-account.json
+      
           if [ ! -s "$HOME/service-account.json" ]; then
             echo "❌ Error: service-account.json is empty or missing!"
             exit 1
           fi
-
+      
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           echo "✅ Firebase credentials loaded successfully."
+
 
       # ✅ Authenticate with Google Cloud using Service Account
       - name: Authenticate with Google Cloud
