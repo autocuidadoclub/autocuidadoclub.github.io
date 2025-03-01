@@ -106,22 +106,23 @@
         });
 
         function addVehicle() {
-            const container = document.getElementById("vehicle-container");
-            const div = document.createElement("div");
-            div.className = "vehicle-entry";
-            div.innerHTML = `
-                <label>Marca:</label>
-                <input type="text" class="vehicle-brand" required>
-                <label>Modelo:</label>
-                <input type="text" class="vehicle-model" required>
-                <label>Año:</label>
-                <input type="text" class="vehicle-year" required>
-                <input type="text" class="vehicle-plate" required>
-                <label>Numero de Placa del vehiculo:</label>
-                <button type="button" onclick="removeVehicle(this)">Eliminar</button>
-            `;
-            container.appendChild(div);
-        }
+    const container = document.getElementById("vehicle-container");
+    const div = document.createElement("div");
+    div.className = "vehicle-entry";
+    div.innerHTML = `
+        <label>Marca:</label>
+        <input type="text" class="vehicle-brand" required>
+        <label>Modelo:</label>
+        <input type="text" class="vehicle-model" required>
+        <label>Año:</label>
+        <input type="text" class="vehicle-year" required>
+        <label>Número de Placa del Vehículo:</label> <!-- ✅ Fix: Move label above input -->
+        <input type="text" class="vehicle-plate" required>
+        <button type="button" onclick="removeVehicle(this)">Eliminar</button>
+    `;
+    container.appendChild(div);
+}
+
 
         function removeVehicle(button) {
             button.parentElement.remove();
