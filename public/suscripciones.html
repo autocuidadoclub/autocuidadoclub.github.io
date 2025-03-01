@@ -41,9 +41,9 @@
                 const db = firebase.firestore();
                 const auth = firebase.auth();
                 
-                window.registerUser = function (event) {
-    event.preventDefault();
-    
+               window.registerUser = function (event) {
+    event.preventDefault(); // ✅ Ensure form doesn't auto-submit
+
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
@@ -61,7 +61,7 @@
         .then((userCredential) => {
             const newUser = userCredential.user;
             console.log("✅ Usuario creado en Firebase:", newUser.uid);
-            
+
             const userData = {
                 uid: newUser.uid,
                 fullName: name,
@@ -69,7 +69,7 @@
                 phoneNumber: phone,
                 department,
                 municipality,
-                vehicles,  // ✅ Now storing vehicles
+                vehicles,
                 registrationDate: firebase.firestore.Timestamp.now(),
                 status: "pending_payment"
             };
@@ -77,8 +77,8 @@
             return db.collection("users").doc(newUser.uid).set(userData);
         })
         .then(() => {
-            alert("Registro exitoso. Ahora puedes acceder a tu perfil y añadir tu método de pago.");
-            window.location.href = "profile.html";
+            alert("Registro exitoso. Redirigiendo...");
+            window.location.href = "profile.html"; // ✅ FIX: Correct redirect
         })
         .catch((error) => {
             console.error("❌ Error en registro:", error.message);
@@ -128,20 +128,22 @@
             button.parentElement.remove();
         }
 
-     function getVehicleData() {
-        const vehicleElements = document.querySelectorAll(".vehicle-entry");
-        let vehicles = [];
-        vehicleElements.forEach(vehicle => {
-            const brand = vehicle.querySelector(".vehicle-brand").value.trim();
-            const model = vehicle.querySelector(".vehicle-model").value.trim();
-            const year = vehicle.querySelector(".vehicle-year").value.trim();
-            const year = vehicle.querySelector(".vehicle-plate").value.trim();
-            if (brand && model && year) {
-                vehicles.push({ brand, model, year });
-            }
-        });
-        return vehicles;
-    }
+    function getVehicleData() {
+    const vehicleElements = document.querySelectorAll(".vehicle-entry");
+    let vehicles = [];
+    vehicleElements.forEach(vehicle => {
+        const brand = vehicle.querySelector(".vehicle-brand").value.trim();
+        const model = vehicle.querySelector(".vehicle-model").value.trim();
+        const year = vehicle.querySelector(".vehicle-year").value.trim();
+        const plate = vehicle.querySelector(".vehicle-plate").value.trim(); // ✅ FIX
+
+        if (brand && model && year && plate) {
+            vehicles.push({ brand, model, year, plate });
+        }
+    });
+    return vehicles;
+}
+
 
                 function getPaypalLink(planType) {
                     const links = {
@@ -533,13 +535,7 @@ button:hover {
         <label for="password">Contraseña:</label>
         <input type="password" id="password" required>
         
-        <label for="department">Departamento:</label>
-        <select id="department" onchange="updateMunicipalities()" required></select>
-        
-        <label for="municipality">Municipio:</label>
-        <select id="municipality" required></select>
-        
-        <div id="vehicles-section">
+       <div id="vehicles-section">
             <h3>Vehículos</h3>
             <button type="button" onclick="addVehicle()">Agregar Vehículo</button>
             <div id="vehicle-container"></div>
@@ -595,17 +591,18 @@ button:hover {
 
             
              <div class="card">
-        <h3><i class="fas fa-map-marker-alt"></i> Seleccione su Ubicación</h3>
-        <label for="department">Departamento:</label>
-        <select id="department" onchange="updateMunicipalities()">
-            <option value="">Seleccione un departamento</option>
-        </select>
-        
-        <label for="municipality">Municipio:</label>
-        <select id="municipality">
-            <option value="">Seleccione un municipio</option>
-        </select>
-    </div>
+    <h3><i class="fas fa-map-marker-alt"></i> Seleccione su Ubicación</h3>
+    <label for="department">Departamento:</label>
+    <select id="department" onchange="updateMunicipalities()">
+        <option value="">Seleccione un departamento</option>
+    </select>
+
+    <label for="municipality">Municipio:</label>
+    <select id="municipality">
+        <option value="">Seleccione un municipio</option>
+    </select>
+</div>
+
 
     <script>
         const locations = {
