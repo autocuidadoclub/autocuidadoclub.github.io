@@ -23,84 +23,107 @@
     
 <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Ensure Firebase secrets are loaded
             if (window._env_ && window._env_.FIREBASE_API_KEY) {
-                console.log("✅ Firebase API Key Loaded:", window._env_.FIREBASE_API_KEY);
-
                 const firebaseConfig = {
-  apiKey: window._env_.FIREBASE_API_KEY,
-  authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-  projectId: window._env_.FIREBASE_PROJECT_ID,
-  storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-  appId: window._env_.FIREBASE_APP_ID,
-  measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-};
+                    apiKey: window._env_.FIREBASE_API_KEY,
+                    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                    projectId: window._env_.FIREBASE_PROJECT_ID,
+                    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                    appId: window._env_.FIREBASE_APP_ID,
+                    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+                };
 
-
-                // Initialize Firebase (Ensure it's initialized only once)
                 if (!firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                 }
-
+                
                 const db = firebase.firestore();
                 const auth = firebase.auth();
-
-                // Show registration form and handle Firebase sign-up
-                window.registerAndPay = function (event) {
+                
+                window.registerUser = function (event) {
                     event.preventDefault();
-
+                    
                     const name = document.getElementById("name").value.trim();
                     const email = document.getElementById("email").value.trim();
                     const phone = document.getElementById("phone").value.trim();
                     const password = document.getElementById("password").value.trim();
-                    const planType = document.getElementById("planType").value;
                     const department = document.getElementById("department").value;
                     const municipality = document.getElementById("municipality").value;
-                    const selectedSchedule = document.getElementById("selectedSchedule").value;
-
-                    if (!name || !email || !phone || !password || !department || !municipality || !selectedSchedule) {
-                        alert("Por favor, complete todos los campos obligatorios.");
+                    const vehicles = getVehicleData();
+                    
+                    if (!name || !email || !phone || !password || !department || !municipality || vehicles.length === 0) {
+                        alert("Por favor, completa todos los campos y añade al menos un vehículo.");
                         return;
                     }
 
-                    // Create Firebase User
                     auth.createUserWithEmailAndPassword(email, password)
                         .then((userCredential) => {
                             const newUser = userCredential.user;
                             console.log("✅ Usuario creado en Firebase:", newUser.uid);
-
+                            
                             const userData = {
                                 uid: newUser.uid,
-                                name,
+                                fullName: name,
                                 email,
-                                phone,
-                                planType,
+                                phoneNumber: phone,
                                 department,
                                 municipality,
-                                selectedSchedule,
+                                vehicles,
                                 registrationDate: firebase.firestore.Timestamp.now(),
-                                lastReschedule: null,
-                                paymentDate: null,
-                                nextPaymentDate: null
+                                status: "pending_payment"
                             };
 
                             return db.collection("users").doc(newUser.uid).set(userData);
                         })
                         .then(() => {
-                            alert("Registro exitoso. Presiona OK para proceder al pago.");
-                            const paypalLink = getPaypalLink(planType);
-                            if (paypalLink) window.open(paypalLink, '_blank');
-                        })
-                        .then(() => {
-                            alert("Registro exitoso. Serás redirigido al login.");
-                            window.location.href = "login.html";
+                            document.getElementById("confirmationMessage").textContent = "Registro exitoso. Ahora puedes acceder a tu perfil y añadir tu método de pago.";
+                            document.getElementById("confirmationMessage").style.display = "block";
+                            setTimeout(() => { window.location.href = "profile.html"; }, 2000);
                         })
                         .catch((error) => {
                             console.error("❌ Error en registro:", error.message);
-                            alert("Hubo un error en el registro: " + error.message);
+                            alert("Error en el registro: " + error.message);
                         });
                 };
+
+                function getVehicleData() {
+                    const vehicleElements = document.querySelectorAll(".vehicle-entry");
+                    let vehicles = [];
+                    vehicleElements.forEach(vehicle => {
+                        const brand = vehicle.querySelector(".vehicle-brand").value.trim();
+                        const model = vehicle.querySelector(".vehicle-model").value.trim();
+                        const year = vehicle.querySelector(".vehicle-year").value.trim();
+                        if (brand && model && year) {
+                            vehicles.push({ brand, model, year });
+                        }
+                    });
+                    return vehicles;
+                }
+            } else {
+                console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
+            }
+        });
+
+        function addVehicle() {
+            const container = document.getElementById("vehicle-container");
+            const div = document.createElement("div");
+            div.className = "vehicle-entry";
+            div.innerHTML = `
+                <label>Marca:</label>
+                <input type="text" class="vehicle-brand" required>
+                <label>Modelo:</label>
+                <input type="text" class="vehicle-model" required>
+                <label>Año:</label>
+                <input type="text" class="vehicle-year" required>
+                <button type="button" onclick="removeVehicle(this)">Eliminar</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeVehicle(button) {
+            button.parentElement.remove();
+        }
 
                 function getPaypalLink(planType) {
                     const links = {
@@ -624,6 +647,9 @@ button:hover {
             
                 <button type="submit">Registrarse Gratis</button>
         </form>
+
+        <p id="confirmationMessage" style="display:none; color: green; font-weight: bold;"></p>
+    
     </section>
 
     <!-- Footer -->
