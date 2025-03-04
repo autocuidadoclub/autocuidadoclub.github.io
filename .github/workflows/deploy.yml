@@ -47,6 +47,13 @@ jobs:
           cat public/env.js
           echo "✅ env.js verified."
 
+      - name: Verify env.js exists
+        run: |
+          echo "🔍 Checking if env.js exists..."
+          ls -l public/env.js || echo "❌ env.js NOT FOUND!"
+          cat public/env.js || echo "❌ env.js is EMPTY!"
+
+
      # ✅ Set Up Firebase Credentials (Service Account JSON)
       - name: Set Up Firebase Credentials
         run: |
