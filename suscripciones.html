@@ -37,6 +37,11 @@
                 if (!firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                 }
+
+                 console.log("✅ Firebase initialized correctly!");
+        } else {
+            console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
+        }
                 
                 const db = firebase.firestore();
                 const auth = firebase.auth();
