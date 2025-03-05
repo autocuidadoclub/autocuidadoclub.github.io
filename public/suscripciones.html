@@ -46,63 +46,7 @@
                 const db = firebase.firestore();
                 const auth = firebase.auth();
                 
-             function registerUser(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const department = document.getElementById("department").value;
-    const municipality = document.getElementById("municipality").value;
-    const schedule = document.getElementById("schedule").value;
-    const vehicleBrand = document.querySelector(".vehicle-brand").value.trim();
-    const vehicleModel = document.querySelector(".vehicle-model").value.trim();
-    const vehicleYear = document.querySelector(".vehicle-year").value.trim();
-    const vehiclePlate = document.querySelector(".vehicle-plate").value.trim();
-    
-    if (!name || !email || !phone || !password || !department || !municipality || !schedule || !vehicleBrand || !vehicleModel || !vehicleYear || !vehiclePlate) {
-        alert("Por favor, completa todos los campos.");
-        return;
-    }
-    
-    if (typeof firebase === 'undefined' || !firebase.firestore) {
-        console.error("❌ Error: Firebase no está cargado correctamente. Verifica env.js y GitHub Secrets.");
-        alert("Error: No se pudo conectar con Firebase. Contacta al soporte técnico.");
-        return;
-    }
-    
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const newUser = userCredential.user;
-            console.log("✅ Usuario creado en Firebase:", newUser.uid);
-
-            const userData = {
-                uid: newUser.uid,
-                fullName: name,
-                email,
-                phoneNumber: phone,
-                department,
-                municipality,
-                schedule,
-                vehicles: [{ brand: vehicleBrand, model: vehicleModel, year: vehicleYear, plate: vehiclePlate }],
-                registrationDate: firebase.firestore.Timestamp.now(),
-                status: "pending_payment"
-            };
-
-            return db.collection("users").doc(newUser.uid).set(userData);
-        })
-        .then(() => {
-            alert("Registro exitoso. Redirigiendo...");
-            window.location.href = "profile.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en registro:", error.message);
-            alert("Error en el registro: " + error.message);
-        });
-}
-
-
+             
                 function getVehicleData() {
     const vehicleElements = document.querySelectorAll(".vehicle-entry");
     let vehicles = [];
@@ -566,32 +510,10 @@ button:hover {
     <input type="hidden" id="planType" value="basic3m">
     
     <div id="vehicles-section">
-        <h3>Vehículo</h3>
-        <div class="vehicle-entry">
-            <label>Marca:</label>
-            <input type="text" class="vehicle-brand" required>
-    
-            <label>Modelo:</label>
-            <input type="text" class="vehicle-model" required>
-    
-            <label>Año:</label>
-            <input type="text" class="vehicle-year" required>
-    
-            <label>Número de Placa:</label>
-            <input type="text" class="vehicle-plate" required>
-        </div>
+        <h3>Vehículos</h3>
+        <div id="vehicle-container"></div>
     </div>
-
- <!-- ADD THIS LINE BELOW -->
-    <input type="hidden" id="planType" value="basic3m">
         
-       <div id="vehicles-section">
-            <h3>Vehículos</h3>
-            <button type="button" onclick="addVehicle()">Agregar Vehículo</button>
-            <div id="vehicle-container"></div>
-        </div>
-    
-
  <!-- Schedule Section -->
     <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
@@ -716,6 +638,102 @@ button:hover {
     
     </section>
 
+
+    <script>
+function updateVehicleFields() {
+    const container = document.getElementById("vehicle-container");
+    container.innerHTML = ""; 
+    const selectedPlan = document.getElementById("planType").value;
+    const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
+
+    for (let i = 0; i < maxVehicles; i++) {
+        const div = document.createElement("div");
+        div.className = "vehicle-entry";
+        div.innerHTML = `
+            <label>Marca:</label>
+            <input type="text" class="vehicle-brand" required>
+
+            <label>Modelo:</label>
+            <input type="text" class="vehicle-model" required>
+
+            <label>Año:</label>
+            <input type="text" class="vehicle-year" required>
+
+            <label>Número de Placa:</label>
+            <input type="text" class="vehicle-plate" required>
+        `;
+        container.appendChild(div);
+    }
+}
+
+document.getElementById("planType").addEventListener("change", updateVehicleFields);
+document.addEventListener("DOMContentLoaded", updateVehicleFields);
+
+function registerUser(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    const schedule = document.getElementById("schedule").value;
+    const vehicles = Array.from(document.querySelectorAll(".vehicle-entry")).map(vehicle => {
+        return {
+            brand: vehicle.querySelector(".vehicle-brand").value.trim(),
+            model: vehicle.querySelector(".vehicle-model").value.trim(),
+            year: vehicle.querySelector(".vehicle-year").value.trim(),
+            plate: vehicle.querySelector(".vehicle-plate").value.trim()
+        };
+    });
+
+    const selectedPlan = document.getElementById("planType").value;
+    const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
+    
+    if (!name || !email || !phone || !password || !department || !municipality || !schedule || vehicles.length === 0 || vehicles.length > maxVehicles) {
+        alert(`Debes agregar entre 1 y ${maxVehicles} vehículos según tu plan.`);
+        return;
+    }
+    
+    if (typeof firebase === 'undefined' || !firebase.firestore) {
+        console.error("❌ Error: Firebase no está cargado correctamente. Verifica env.js y GitHub Secrets.");
+        alert("Error: No se pudo conectar con Firebase. Contacta al soporte técnico.");
+        return;
+    }
+    
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const newUser = userCredential.user;
+            console.log("✅ Usuario creado en Firebase:", newUser.uid);
+
+            const userData = {
+                uid: newUser.uid,
+                fullName: name,
+                email,
+                phoneNumber: phone,
+                department,
+                municipality,
+                schedule,
+                vehicles,
+                registrationDate: firebase.firestore.Timestamp.now(),
+                status: "pending_payment"
+            };
+
+            return db.collection("users").doc(newUser.uid).set(userData);
+        })
+        .then(() => {
+            alert("Registro exitoso. Redirigiendo...");
+            window.location.href = "profile.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en registro:", error.message);
+            alert("Error en el registro: " + error.message);
+        });
+}
+</script>
+
+    
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
