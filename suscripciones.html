@@ -46,30 +46,32 @@
                 const db = firebase.firestore();
                 const auth = firebase.auth();
                 
-              window.registerUser = function (event) {
-    event.preventDefault(); // ✅ Prevent form submission
-
+             function registerUser(event) {
+    event.preventDefault();
+    
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const password = document.getElementById("password").value.trim();
     const department = document.getElementById("department").value;
     const municipality = document.getElementById("municipality").value;
-    const vehicles = getVehicleData();
+    const schedule = document.getElementById("schedule").value;
+    const vehicleBrand = document.querySelector(".vehicle-brand").value.trim();
+    const vehicleModel = document.querySelector(".vehicle-model").value.trim();
+    const vehicleYear = document.querySelector(".vehicle-year").value.trim();
+    const vehiclePlate = document.querySelector(".vehicle-plate").value.trim();
     
-    const selectedPlan = document.getElementById("planType").value; // Ensure we get the correct plan
-    const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1; // ✅ Limit vehicles
-
-    if (!name || !email || !phone || !password || !department || !municipality) {
+    if (!name || !email || !phone || !password || !department || !municipality || !schedule || !vehicleBrand || !vehicleModel || !vehicleYear || !vehiclePlate) {
         alert("Por favor, completa todos los campos.");
         return;
     }
-
-    if (vehicles.length === 0 || vehicles.length > maxVehicles) {
-        alert(`Debes agregar entre 1 y ${maxVehicles} vehículos según tu plan.`);
+    
+    if (typeof firebase === 'undefined' || !firebase.firestore) {
+        console.error("❌ Error: Firebase no está cargado correctamente. Verifica env.js y GitHub Secrets.");
+        alert("Error: No se pudo conectar con Firebase. Contacta al soporte técnico.");
         return;
     }
-
+    
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             const newUser = userCredential.user;
@@ -82,23 +84,23 @@
                 phoneNumber: phone,
                 department,
                 municipality,
-                vehicles,
+                schedule,
+                vehicles: [{ brand: vehicleBrand, model: vehicleModel, year: vehicleYear, plate: vehiclePlate }],
                 registrationDate: firebase.firestore.Timestamp.now(),
-                status: "pending_payment",
-                planType: selectedPlan
+                status: "pending_payment"
             };
 
             return db.collection("users").doc(newUser.uid).set(userData);
         })
         .then(() => {
             alert("Registro exitoso. Redirigiendo...");
-            window.location.href = "profile.html"; // ✅ FIX: Correct redirect
+            window.location.href = "profile.html";
         })
         .catch((error) => {
             console.error("❌ Error en registro:", error.message);
             alert("Error en el registro: " + error.message);
         });
-};
+}
 
 
                 function getVehicleData() {
@@ -549,17 +551,36 @@ button:hover {
     <p>Regístrate gratis y accede a tu perfil. Podrás agregar tu método de pago después.</p>
     
     <form id="registerForm" onsubmit="registerUser(event)">
-        <label for="name">Nombre Completo:</label>
-        <input type="text" id="name" required>
-        
-        <label for="email">Email:</label>
-        <input type="email" id="email" required>
-        
-        <label for="phone">Teléfono:</label>
-        <input type="text" id="phone" required>
-        
-        <label for="password">Contraseña:</label>
-        <input type="password" id="password" required>
+    <label for="name">Nombre Completo:</label>
+    <input type="text" id="name" required>
+    
+    <label for="email">Email:</label>
+    <input type="email" id="email" required>
+    
+    <label for="phone">Teléfono:</label>
+    <input type="text" id="phone" required>
+    
+    <label for="password">Contraseña:</label>
+    <input type="password" id="password" required>
+
+    <input type="hidden" id="planType" value="basic3m">
+    
+    <div id="vehicles-section">
+        <h3>Vehículo</h3>
+        <div class="vehicle-entry">
+            <label>Marca:</label>
+            <input type="text" class="vehicle-brand" required>
+    
+            <label>Modelo:</label>
+            <input type="text" class="vehicle-model" required>
+    
+            <label>Año:</label>
+            <input type="text" class="vehicle-year" required>
+    
+            <label>Número de Placa:</label>
+            <input type="text" class="vehicle-plate" required>
+        </div>
+    </div>
 
  <!-- ADD THIS LINE BELOW -->
     <input type="hidden" id="planType" value="basic3m">
@@ -620,19 +641,18 @@ button:hover {
 
             
              <div class="card">
-    <h3><i class="fas fa-map-marker-alt"></i> Seleccione su Ubicación</h3>
+    <h3>Seleccione su Ubicación</h3>
     <label for="department">Departamento:</label>
-    <select id="department" onchange="updateMunicipalities()">
+    <select id="department" onchange="updateMunicipalities()" required>
         <option value="">Seleccione un departamento</option>
     </select>
-
+    
     <label for="municipality">Municipio:</label>
-    <select id="municipality">
+    <select id="municipality" required>
         <option value="">Seleccione un municipio</option>
     </select>
-</div>
-
-
+    
+    
     <script>
         const locations = {
             "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
