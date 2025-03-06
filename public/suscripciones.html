@@ -675,9 +675,11 @@ function selectScheduleBox(cell) {
     document.getElementById("schedule").value = cell.innerText.trim();
 }
 
-document.querySelectorAll(".schedule-table td").forEach(cell => {
-    cell.addEventListener("click", function() {
-        selectScheduleBox(this);
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".schedule-table td").forEach(cell => {
+        cell.addEventListener("click", function () {
+            selectScheduleBox(this);
+        });
     });
 });
 
@@ -685,18 +687,16 @@ function registerUser(event) {
     event.preventDefault();
     
     try {
-        const name = document.getElementById("name")?.value.trim();
-        const email = document.getElementById("email")?.value.trim();
-        const phone = document.getElementById("phone")?.value.trim();
-        const password = document.getElementById("password")?.value.trim();
-        const department = document.getElementById("department")?.value;
-        const municipality = document.getElementById("municipality")?.value;
-        const schedule = document.getElementById("schedule")?.value;
-        const selectedPlan = document.getElementById("planType")?.value;
+        const requiredFields = ["name", "email", "phone", "password", "department", "municipality", "schedule", "planType"];
+        let formData = {};
         
-        if (!name || !email || !phone || !password || !department || !municipality || !schedule || !selectedPlan) {
-            alert("Error: Todos los campos son obligatorios.");
-            return;
+        for (const field of requiredFields) {
+            const input = document.getElementById(field);
+            if (!input || !input.value.trim()) {
+                alert(`Error: El campo ${field} es obligatorio.`);
+                return;
+            }
+            formData[field] = input.value.trim();
         }
         
         const vehicleEntries = document.querySelectorAll(".vehicle-entry");
@@ -705,19 +705,14 @@ function registerUser(event) {
             return;
         }
         
-        const vehicles = Array.from(vehicleEntries).map(vehicle => {
+        formData.vehicles = Array.from(vehicleEntries).map(vehicle => {
             return {
-                brand: vehicle.querySelector(".vehicle-brand")?.value.trim(),
-                model: vehicle.querySelector(".vehicle-model")?.value.trim(),
-                year: vehicle.querySelector(".vehicle-year")?.value.trim(),
-                plate: vehicle.querySelector(".vehicle-plate")?.value.trim()
+                brand: vehicle.querySelector(".vehicle-brand").value.trim(),
+                model: vehicle.querySelector(".vehicle-model").value.trim(),
+                year: vehicle.querySelector(".vehicle-year").value.trim(),
+                plate: vehicle.querySelector(".vehicle-plate").value.trim()
             };
         });
-        
-        if (vehicles.some(v => !v.brand || !v.model || !v.year || !v.plate)) {
-            alert("Todos los campos del vehículo son obligatorios.");
-            return;
-        }
 
         if (typeof firebase === 'undefined' || !firebase.firestore) {
             console.error("❌ Error: Firebase no está cargado correctamente.");
@@ -725,25 +720,16 @@ function registerUser(event) {
             return;
         }
         
-        auth.createUserWithEmailAndPassword(email, password)
+        auth.createUserWithEmailAndPassword(formData.email, formData.password)
             .then((userCredential) => {
                 const newUser = userCredential.user;
                 console.log("✅ Usuario creado en Firebase:", newUser.uid);
                 
-                const userData = {
-                    uid: newUser.uid,
-                    fullName: name,
-                    email,
-                    phoneNumber: phone,
-                    department,
-                    municipality,
-                    schedule,
-                    vehicles,
-                    registrationDate: firebase.firestore.Timestamp.now(),
-                    status: "pending_payment"
-                };
-
-                return db.collection("users").doc(newUser.uid).set(userData);
+                formData.uid = newUser.uid;
+                formData.registrationDate = firebase.firestore.Timestamp.now();
+                formData.status = "pending_payment";
+                
+                return db.collection("users").doc(newUser.uid).set(formData);
             })
             .then(() => {
                 alert("Registro exitoso. Redirigiendo...");
