@@ -642,7 +642,12 @@ button:hover {
     <script>
 function updateVehicleFields() {
     const container = document.getElementById("vehicle-container");
-    container.innerHTML = ""; 
+    if (!container) {
+        console.error("❌ Error: No se encontró el contenedor de vehículos.");
+        return;
+    }
+
+    container.innerHTML = "";
     const selectedPlan = document.getElementById("planType").value;
     const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
 
@@ -666,46 +671,51 @@ function updateVehicleFields() {
     }
 }
 
+// Ensure vehicle fields update on plan selection
 document.getElementById("planType").addEventListener("change", updateVehicleFields);
 document.addEventListener("DOMContentLoaded", updateVehicleFields);
 
+        
 function selectScheduleBox(cell) {
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
     cell.classList.add("selected");
     document.getElementById("schedule").value = cell.innerText.trim();
 }
 
-document.querySelectorAll(".schedule-table td").forEach(cell => {
-    cell.addEventListener("click", function() {
-        selectScheduleBox(this);
+// Ensure event listeners are properly attached
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".schedule-table td").forEach(cell => {
+        cell.addEventListener("click", function () {
+            selectScheduleBox(this);
+        });
     });
 });
 
 function registerUser(event) {
     event.preventDefault();
-    
+
     try {
-        const name = document.getElementById("name")?.value.trim();
-        const email = document.getElementById("email")?.value.trim();
-        const phone = document.getElementById("phone")?.value.trim();
-        const password = document.getElementById("password")?.value.trim();
-        const department = document.getElementById("department")?.value;
-        const municipality = document.getElementById("municipality")?.value;
-        const schedule = document.getElementById("schedule")?.value;
-        const selectedPlan = document.getElementById("planType")?.value;
-        
-        if (!name || !email || !phone || !password || !department || !municipality || !schedule || !selectedPlan) {
-            alert("Error: Todos los campos son obligatorios.");
-            return;
+        // Ensure all required form fields are available
+        const requiredFields = ["name", "email", "phone", "password", "department", "municipality", "schedule", "planType"];
+        let formData = {};
+
+        for (const field of requiredFields) {
+            const input = document.getElementById(field);
+            if (!input || !input.value.trim()) {
+                alert(`Error: El campo ${field} es obligatorio.`);
+                return;
+            }
+            formData[field] = input.value.trim();
         }
-        
+
+        // Handle Vehicle Entries
         const vehicleEntries = document.querySelectorAll(".vehicle-entry");
         if (!vehicleEntries.length) {
             alert("Debes ingresar la información de al menos un vehículo.");
             return;
         }
-        
-        const vehicles = Array.from(vehicleEntries).map(vehicle => {
+
+        formData.vehicles = Array.from(vehicleEntries).map(vehicle => {
             return {
                 brand: vehicle.querySelector(".vehicle-brand")?.value.trim(),
                 model: vehicle.querySelector(".vehicle-model")?.value.trim(),
@@ -713,8 +723,9 @@ function registerUser(event) {
                 plate: vehicle.querySelector(".vehicle-plate")?.value.trim()
             };
         });
-        
-        if (vehicles.some(v => !v.brand || !v.model || !v.year || !v.plate)) {
+
+        // Ensure vehicle fields are not empty
+        if (formData.vehicles.some(v => !v.brand || !v.model || !v.year || !v.plate)) {
             alert("Todos los campos del vehículo son obligatorios.");
             return;
         }
@@ -724,26 +735,18 @@ function registerUser(event) {
             alert("Error: No se pudo conectar con Firebase.");
             return;
         }
-        
-        auth.createUserWithEmailAndPassword(email, password)
+
+        // Register user in Firebase Authentication
+        auth.createUserWithEmailAndPassword(formData.email, formData.password)
             .then((userCredential) => {
                 const newUser = userCredential.user;
                 console.log("✅ Usuario creado en Firebase:", newUser.uid);
-                
-                const userData = {
-                    uid: newUser.uid,
-                    fullName: name,
-                    email,
-                    phoneNumber: phone,
-                    department,
-                    municipality,
-                    schedule,
-                    vehicles,
-                    registrationDate: firebase.firestore.Timestamp.now(),
-                    status: "pending_payment"
-                };
 
-                return db.collection("users").doc(newUser.uid).set(userData);
+                formData.uid = newUser.uid;
+                formData.registrationDate = firebase.firestore.Timestamp.now();
+                formData.status = "pending_payment";
+
+                return db.collection("users").doc(newUser.uid).set(formData);
             })
             .then(() => {
                 alert("Registro exitoso. Redirigiendo...");
@@ -758,6 +761,7 @@ function registerUser(event) {
         alert("Error inesperado: revisa la consola para más detalles.");
     }
 }
+
     
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
