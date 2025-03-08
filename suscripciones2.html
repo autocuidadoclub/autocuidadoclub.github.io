@@ -12,99 +12,91 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <!-- Ensure env.js loads (fails silently if missing) -->
-    <script>
-        let firebaseConfig;
-        let db, auth;
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // ✅ Ensure env.js is loaded before initializing Firebase
+    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+        console.error("❌ Error: Firebase env.js not loaded.");
+        alert("❌ Firebase is not initialized. Check env.js.");
+        return;  // Stop execution if env.js is missing
+    }
 
-        function initializeFirebase() {
-            if (window._env_ && window._env_.FIREBASE_API_KEY) {
-                firebaseConfig = {
-                    apiKey: window._env_.FIREBASE_API_KEY,
-                    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                    projectId: window._env_.FIREBASE_PROJECT_ID,
-                    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-                    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-                    appId: window._env_.FIREBASE_APP_ID
-                };
+    // ✅ Firebase Configuration from env.js
+    const firebaseConfig = {
+        apiKey: window._env_.FIREBASE_API_KEY,
+        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+        projectId: window._env_.FIREBASE_PROJECT_ID,
+        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+        appId: window._env_.FIREBASE_APP_ID,
+        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
 
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                    console.log("✅ Firebase initialized!");
-                }
+    // ✅ Initialize Firebase only if not already initialized
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("✅ Firebase initialized successfully!");
+    } else {
+        console.log("ℹ️ Firebase already initialized.");
+    }
 
-                db = firebase.firestore();
-                auth = firebase.auth();
-            } else {
-                console.error("❌ Error: Firebase env.js not loaded.");
-            }
+    // ✅ Firebase References
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ✅ Function to Select Schedule Box
+    window.selectScheduleBox = function(cell, day) {
+        document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+        cell.classList.add("selected");
+        document.getElementById("selectedDay").value = day;
+        document.getElementById("selectedTime").value = cell.innerText.trim();
+        console.log(`✅ Selected Schedule: ${day} - ${cell.innerText.trim()}`);
+    };
+
+    // ✅ Function to Register User
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const planType = document.getElementById("planType").value;
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
+
+        if (!name || !email || !phone || !password || !selectedDay || !selectedTime) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
         }
 
-        // Load env.js dynamically and initialize Firebase
-        function loadEnvAndInitFirebase() {
-            const script = document.createElement("script");
-            script.src = "env.js";
-            script.onload = initializeFirebase;
-            script.onerror = () => console.error("❌ Failed to load env.js.");
-            document.head.appendChild(script);
-        }
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const userId = userCredential.user.uid;
+                console.log("✅ Usuario registrado:", userId);
 
-        document.addEventListener("DOMContentLoaded", loadEnvAndInitFirebase);
-    </script>
-
-    <script>
-        function selectScheduleBox(cell, day) {
-            document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
-            cell.classList.add("selected");
-            document.getElementById("selectedDay").value = day;
-            document.getElementById("selectedTime").value = cell.innerText.trim();
-        }
-
-        function registerUser(event) {
-            event.preventDefault();
-
-            if (!db || !auth) {
-                alert("❌ Firebase is not initialized.");
-                return;
-            }
-
-            const formData = {
-                name: document.getElementById("name").value.trim(),
-                email: document.getElementById("email").value.trim(),
-                phone: document.getElementById("phone").value.trim(),
-                password: document.getElementById("password").value.trim(),
-                planType: document.getElementById("planType").value,
-                selectedDay: document.getElementById("selectedDay").value.trim(),
-                selectedTime: document.getElementById("selectedTime").value.trim(),
-                vehicles: []
-            };
-
-            // Get Vehicle Data
-            document.querySelectorAll(".vehicle-entry").forEach(vehicle => {
-                formData.vehicles.push({
-                    brand: vehicle.querySelector(".vehicle-brand").value.trim(),
-                    model: vehicle.querySelector(".vehicle-model").value.trim(),
-                    year: vehicle.querySelector(".vehicle-year").value.trim(),
-                    plate: vehicle.querySelector(".vehicle-plate").value.trim()
+                return db.collection("users").doc(userId).set({
+                    uid: userId,
+                    name,
+                    email,
+                    phone,
+                    planType,
+                    schedule: { day: selectedDay, time: selectedTime },
+                    registrationDate: firebase.firestore.Timestamp.now()
                 });
+            })
+            .then(() => {
+                alert("✅ Registro exitoso. Redirigiendo...");
+                window.location.href = "profile.html";
+            })
+            .catch((error) => {
+                console.error("❌ Error en el registro:", error.message);
+                alert("❌ Error en el registro: " + error.message);
             });
-
-            // Firebase Authentication & Firestore Storage
-            auth.createUserWithEmailAndPassword(formData.email, formData.password)
-                .then(userCredential => {
-                    formData.uid = userCredential.user.uid;
-                    formData.registrationDate = firebase.firestore.Timestamp.now();
-                    return db.collection("users").doc(formData.uid).set(formData);
-                })
-                .then(() => {
-                    alert("✅ Registro exitoso!");
-                    window.location.href = "profile.html";
-                })
-                .catch(error => {
-                    console.error("❌ Firebase Error:", error);
-                    alert("Error: " + error.message);
-                });
-        }
-    </script>
+    });
+});
+</script>
+    
 </head>
 
 <body>
