@@ -50,10 +50,13 @@
                 div.innerHTML = `
                     <label>Marca:</label>
                     <input type="text" class="vehicle-brand" required>
+                    
                     <label>Modelo:</label>
                     <input type="text" class="vehicle-model" required>
+                    
                     <label>Año:</label>
                     <input type="text" class="vehicle-year" required>
+                    
                     <label>Número de Placa:</label>
                     <input type="text" class="vehicle-plate" required>
                 `;
@@ -63,55 +66,6 @@
 
         document.getElementById("planType").addEventListener("change", updateVehicleFields);
         updateVehicleFields();
-
-        function selectScheduleBox(cell, day) {
-            document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
-            cell.classList.add("selected");
-            document.getElementById("selectedDay").value = day;
-            document.getElementById("selectedTime").value = cell.innerText.trim();
-        }
-
-        function registerUser(event) {
-            event.preventDefault();
-
-            const requiredFields = ["name", "email", "phone", "password", "planType", "selectedDay", "selectedTime"];
-            let formData = {};
-
-            for (const field of requiredFields) {
-                const input = document.getElementById(field);
-                if (!input || !input.value.trim()) {
-                    alert("Error: Todos los campos son obligatorios.");
-                    return;
-                }
-                formData[field] = input.value.trim();
-            }
-
-            const vehicleEntries = document.querySelectorAll(".vehicle-entry");
-            formData.vehicles = Array.from(vehicleEntries).map(vehicle => ({
-                brand: vehicle.querySelector(".vehicle-brand").value.trim(),
-                model: vehicle.querySelector(".vehicle-model").value.trim(),
-                year: vehicle.querySelector(".vehicle-year").value.trim(),
-                plate: vehicle.querySelector(".vehicle-plate").value.trim()
-            }));
-
-            auth.createUserWithEmailAndPassword(formData.email, formData.password)
-                .then((userCredential) => {
-                    const newUser = userCredential.user;
-                    formData.uid = newUser.uid;
-                    formData.registrationDate = firebase.firestore.Timestamp.now();
-                    formData.status = "pending_payment";
-                    return db.collection("users").doc(newUser.uid).set(formData);
-                })
-                .then(() => {
-                    alert("Registro exitoso. Redirigiendo...");
-                    window.location.href = "profile.html";
-                })
-                .catch((error) => {
-                    alert("Error en el registro: " + error.message);
-                });
-        }
-
-        document.getElementById("registerForm").addEventListener("submit", registerUser);
     });
     </script>
 </head>
@@ -120,42 +74,70 @@
     <form id="registerForm">
         <label>Nombre:</label>
         <input type="text" id="name" required>
+
         <label>Email:</label>
         <input type="email" id="email" required>
+
         <label>Teléfono:</label>
         <input type="text" id="phone" required>
+
         <label>Contraseña:</label>
         <input type="password" id="password" required>
+
         <label>Selecciona tu Plan:</label>
         <select id="planType">
-            <option value="basic">Basic - 1 Vehículo</option>
-            <option value="plus">Plus - Hasta 3 Vehículos</option>
+            <option value="basic3m">Basic - 1 Vehículo</option>
+            <option value="plus3m">Plus - Hasta 3 Vehículos</option>
         </select>
+
         <div id="vehicles-section">
             <h3>Vehículos</h3>
             <div id="vehicle-container"></div>
         </div>
+
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
-            <tr>
-                <th>Horario</th>
-                <th>Lunes</th>
-                <th>Miércoles</th>
-                <th>Viernes</th>
-                <th>Sábado</th>
-                <th>Domingo</th>
-            </tr>
-            <tr>
-                <td>Bloque 1</td>
-                <td onclick="selectScheduleBox(this, 'Lunes')">9:00 - 11:00</td>
-                <td onclick="selectScheduleBox(this, 'Miércoles')">10:00 - 12:00</td>
-                <td onclick="selectScheduleBox(this, 'Viernes')">13:00 - 15:00</td>
-                <td onclick="selectScheduleBox(this, 'Sábado')">8:00 - 10:00</td>
-                <td onclick="selectScheduleBox(this, 'Domingo')">9:00 - 11:00</td>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this, 'Lunes')">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this, 'Miércoles')">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this, 'Viernes')">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this, 'Sábado')">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this, 'Domingo')">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this, 'Lunes')">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this, 'Miércoles')">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this, 'Viernes')">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this, 'Sábado')">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this, 'Domingo')">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this, 'Lunes')">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this, 'Miércoles')">16:00 - 18:00</td>
+                    <td>-</td>
+                    <td onclick="selectScheduleBox(this, 'Sábado')">14:00 - 16:00</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
         </table>
+
         <input type="hidden" id="selectedDay" required>
         <input type="hidden" id="selectedTime" required>
+
         <button type="submit">Registrarse</button>
     </form>
 </body>
