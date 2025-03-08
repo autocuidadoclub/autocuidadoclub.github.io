@@ -3,120 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - AutoCuidado Club</title>
-
-    <!-- Firebase SDK -->
+    <title>Registro en AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase Compatibility SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="env.js"></script> <!-- GitHub Secrets -->
-</head>
-<body>
 
-    <h2>Registro en AutoCuidado Club</h2>
-    
-    <form id="registerForm" onsubmit="registerUser(event)">
-        <label>Nombre:</label>
-        <input type="text" id="name" required>
-        
-        <label>Email:</label>
-        <input type="email" id="email" required>
-        
-        <label>Teléfono:</label>
-        <input type="text" id="phone" required>
-        
-        <label>Contraseña:</label>
-        <input type="password" id="password" required>
-
-        <label>Selecciona tu Plan:</label>
-        <select id="planType" onchange="updateVehicleFields()">
-            <option value="basic3m">Basic - 1 Vehículo</option>
-            <option value="basic6m">Basic - 1 Vehículo</option>
-            <option value="basic12m">Basic - 1 Vehículo</option>
-            <option value="plus3m">Plus - Hasta 3 Vehículos</option>
-            <option value="plus6m">Plus - Hasta 3 Vehículos</option>
-            <option value="plus12m">Plus - Hasta 3 Vehículos</option>
-        </select>
-
-        <div id="vehicles-section">
-            <h3>Vehículos</h3>
-            <div id="vehicle-container"></div>
-        </div>
-
-        <!-- Schedule Section -->
-        <section id="schedule-section">
-            <h2>Selecciona tu Horario</h2>
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th>Horario</th>
-                        <th>Lunes</th>
-                        <th>Miércoles</th>
-                        <th>Viernes</th>
-                        <th>Sábado</th>
-                        <th>Domingo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Bloque 1</td>
-                        <td onclick="selectScheduleBox(this, 'Lunes')">9:00 - 11:00</td>
-                        <td onclick="selectScheduleBox(this, 'Miércoles')">10:00 - 12:00</td>
-                        <td onclick="selectScheduleBox(this, 'Viernes')">13:00 - 15:00</td>
-                        <td onclick="selectScheduleBox(this, 'Sábado')">8:00 - 10:00</td>
-                        <td onclick="selectScheduleBox(this, 'Domingo')">9:00 - 11:00</td>
-                    </tr>
-                    <tr>
-                        <td>Bloque 2</td>
-                        <td onclick="selectScheduleBox(this, 'Lunes')">12:00 - 14:00</td>
-                        <td onclick="selectScheduleBox(this, 'Miércoles')">13:00 - 15:00</td>
-                        <td onclick="selectScheduleBox(this, 'Viernes')">16:00 - 18:00</td>
-                        <td onclick="selectScheduleBox(this, 'Sábado')">11:00 - 13:00</td>
-                        <td onclick="selectScheduleBox(this, 'Domingo')">12:00 - 14:00</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Hidden Inputs to Store Selected Schedule -->
-        <input type="hidden" id="selectedDay">
-        <input type="hidden" id="selectedTime">
-
-        <button type="submit">Registrarse</button>
-    </form>
+    <!-- Load GitHub Secrets -->
+    <script src="env.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window._env_ && window._env_.FIREBASE_API_KEY) {
-                const firebaseConfig = {
-                    apiKey: window._env_.FIREBASE_API_KEY,
-                    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                    projectId: window._env_.FIREBASE_PROJECT_ID,
-                    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-                    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-                    appId: window._env_.FIREBASE_APP_ID
-                };
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window._env_ && window._env_.FIREBASE_API_KEY) {
+            const firebaseConfig = {
+                apiKey: window._env_.FIREBASE_API_KEY,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                projectId: window._env_.FIREBASE_PROJECT_ID,
+                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                appId: window._env_.FIREBASE_APP_ID
+            };
 
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-
-                console.log("✅ Firebase initialized correctly!");
-            } else {
-                console.error("❌ Firebase secrets not loaded. Check env.js.");
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
             }
-        });
+
+            console.log("✅ Firebase initialized correctly!");
+        } else {
+            console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
+        }
 
         const db = firebase.firestore();
         const auth = firebase.auth();
-
-        function selectScheduleBox(cell, day) {
-            document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
-            cell.classList.add("selected");
-
-            document.getElementById("selectedDay").value = day;
-            document.getElementById("selectedTime").value = cell.innerText.trim();
-        }
 
         function updateVehicleFields() {
             const container = document.getElementById("vehicle-container");
@@ -130,18 +50,28 @@
                 div.innerHTML = `
                     <label>Marca:</label>
                     <input type="text" class="vehicle-brand" required>
-
+                    
                     <label>Modelo:</label>
                     <input type="text" class="vehicle-model" required>
-
+                    
                     <label>Año:</label>
                     <input type="text" class="vehicle-year" required>
-
+                    
                     <label>Número de Placa:</label>
                     <input type="text" class="vehicle-plate" required>
                 `;
                 container.appendChild(div);
             }
+        }
+
+        document.getElementById("planType").addEventListener("change", updateVehicleFields);
+        updateVehicleFields();
+
+        function selectScheduleBox(cell, day) {
+            document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+            cell.classList.add("selected");
+            document.getElementById("selectedDay").value = day;
+            document.getElementById("selectedTime").value = cell.innerText.trim();
         }
 
         function registerUser(event) {
@@ -153,26 +83,27 @@
             for (const field of requiredFields) {
                 const input = document.getElementById(field);
                 if (!input || !input.value.trim()) {
-                    alert(`Error: El campo ${field} es obligatorio.`);
+                    alert(`Error: Todos los campos son obligatorios.`);
                     return;
                 }
                 formData[field] = input.value.trim();
             }
 
-            formData.vehicles = Array.from(document.querySelectorAll(".vehicle-entry")).map(vehicle => ({
+            const vehicleEntries = document.querySelectorAll(".vehicle-entry");
+            if (!vehicleEntries.length) {
+                alert("Debes ingresar la información de al menos un vehículo.");
+                return;
+            }
+
+            formData.vehicles = Array.from(vehicleEntries).map(vehicle => ({
                 brand: vehicle.querySelector(".vehicle-brand").value.trim(),
                 model: vehicle.querySelector(".vehicle-model").value.trim(),
                 year: vehicle.querySelector(".vehicle-year").value.trim(),
                 plate: vehicle.querySelector(".vehicle-plate").value.trim()
             }));
 
-            if (formData.vehicles.length === 0) {
-                alert("Debes ingresar al menos un vehículo.");
-                return;
-            }
-
             if (typeof firebase === 'undefined' || !firebase.firestore) {
-                console.error("❌ Firebase no cargado correctamente.");
+                console.error("❌ Error: Firebase no está cargado correctamente.");
                 alert("Error: No se pudo conectar con Firebase.");
                 return;
             }
@@ -180,8 +111,7 @@
             auth.createUserWithEmailAndPassword(formData.email, formData.password)
                 .then((userCredential) => {
                     const newUser = userCredential.user;
-                    console.log("✅ Usuario creado:", newUser.uid);
-
+                    console.log("✅ Usuario creado en Firebase:", newUser.uid);
                     formData.uid = newUser.uid;
                     formData.registrationDate = firebase.firestore.Timestamp.now();
                     formData.status = "pending_payment";
@@ -197,7 +127,70 @@
                     alert("Error en el registro: " + error.message);
                 });
         }
+
+        document.getElementById("registerForm").addEventListener("submit", registerUser);
+    });
     </script>
+
+</head>
+<body>
+
+    <h2>Registro en AutoCuidado Club</h2>
+    <form id="registerForm">
+        <label>Nombre:</label>
+        <input type="text" id="name" required>
+
+        <label>Email:</label>
+        <input type="email" id="email" required>
+
+        <label>Teléfono:</label>
+        <input type="text" id="phone" required>
+
+        <label>Contraseña:</label>
+        <input type="password" id="password" required>
+
+        <label>Selecciona tu Plan:</label>
+        <select id="planType">
+            <option value="basic3m">Basic - 1 Vehículo</option>
+            <option value="plus3m">Plus - Hasta 3 Vehículos</option>
+        </select>
+
+        <div id="vehicles-section">
+            <h3>Vehículos</h3>
+            <div id="vehicle-container"></div>
+        </div>
+
+        <h2>Planes de Suscripciones Plus (cobertura: 3 vehículos)</h2>
+        <div class="subscription-row">
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $70.50/mes (para 3 vehículos)</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas para cada vehículo (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para clientes con más de un vehículo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
+                        <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
+                </div>
+            </div>
+        </div>
+
+        <h2>Selecciona tu Horario</h2>
+        <table class="schedule-table">
+            <tr>
+                <td onclick="selectScheduleBox(this, 'Lunes')">9:00 - 11:00</td>
+                <td onclick="selectScheduleBox(this, 'Miércoles')">10:00 - 12:00</td>
+                <td onclick="selectScheduleBox(this, 'Viernes')">13:00 - 15:00</td>
+            </tr>
+        </table>
+
+        <input type="hidden" id="selectedDay" name="selectedDay" required>
+        <input type="hidden" id="selectedTime" name="selectedTime" required>
+
+        <button type="submit">Registrarse</button>
+    </form>
 
 </body>
 </html>
