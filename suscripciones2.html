@@ -12,8 +12,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <!-- Ensure env.js loads (fails silently if missing) -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+<script src="env.js"></script>
+    <script>
+   
+    document.addEventListener("DOMContentLoaded", function () {
     // ✅ Ensure env.js is loaded before initializing Firebase
     if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
         console.error("❌ Error: Firebase env.js not loaded.");
