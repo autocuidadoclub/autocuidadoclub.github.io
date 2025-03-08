@@ -134,7 +134,42 @@
 
 </head>
 <body>
+ <h2>Planes de Suscripciones Plus (cobertura: 1 vehículos)</h2>
+    <!-- 6-Month Plan -->
+    <div class="plan-item highlight">
+        <div class="discount-badge">¡Inicio de Año: Ahorra 15% Solo Febrero!</div>
+        <div class="plan-option">
+            <img src="6mb.jpg" alt="Plan Básico 6 meses" class="plan-image">
+            <p><strong>6 meses:</strong> <s>$32.50</s> <span class="discounted-price">$27.60/mes</span></p>
+            <ul class="plan-benefits">
+                <li>6 inspecciones preventivas (una cada mes).</li>
+                <li><strong>Beneficio:</strong> Ahorro mensual y servicio confiable a mediano plazo.</li>
+                <li><strong>Ideal para:</strong> Clientes que buscan equilibrio entre compromiso y flexibilidad.</li>
+            </ul>
+            <p class="limited-time">Promoción válida solo en Febrero, ¡aprovecha hoy mismo!</p>
+            <button onclick="showRegistrationForm('basic6m')">Suscribirse - Plan Básico 6 meses</button>
+        </div>
+    </div>
 
+    
+    <h2>Planes de Suscripciones Plus (cobertura: 3 vehículos)</h2>
+        <div class="subscription-row">
+            <div class="plan-item">
+                <div class="plan-option">
+                    <img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
+                    <p><strong>3 meses:</strong> $70.50/mes (para 3 vehículos)</p>
+                    <ul class="plan-benefits">
+                        <li>3 inspecciones preventivas para cada vehículo (una cada mes).</li>
+                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para clientes con más de un vehículo.</li>
+                        <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
+                        <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
+                    </ul>
+                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
+                </div>
+            </div>
+        </div>
+
+    
     <h2>Registro en AutoCuidado Club</h2>
     <form id="registerForm">
         <label>Nombre:</label>
@@ -160,22 +195,7 @@
             <div id="vehicle-container"></div>
         </div>
 
-        <h2>Planes de Suscripciones Plus (cobertura: 3 vehículos)</h2>
-        <div class="subscription-row">
-            <div class="plan-item">
-                <div class="plan-option">
-                    <img src="3mp.jpg" alt="Plan Plus 3 meses" class="plan-image">
-                    <p><strong>3 meses:</strong> $70.50/mes (para 3 vehículos)</p>
-                    <ul class="plan-benefits">
-                        <li>3 inspecciones preventivas para cada vehículo (una cada mes).</li>
-                        <li><strong>Beneficio:</strong> Prueba rápida y flexible para clientes con más de un vehículo.</li>
-                        <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
-                        <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
-                    </ul>
-                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
-                </div>
-            </div>
-        </div>
+       
 
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
