@@ -8,8 +8,7 @@ on:
 
 jobs:
   deploy_firebase:
-    runs-on: ubuntu-22.04  # Change from ubuntu-latest
-
+    runs-on: ubuntu-20.04
 
     steps:
       # ✅ Checkout repository
