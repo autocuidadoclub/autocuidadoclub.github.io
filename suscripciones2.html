@@ -38,6 +38,7 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // ✅ Update vehicle fields dynamically based on plan selection
         function updateVehicleFields() {
             const container = document.getElementById("vehicle-container");
             container.innerHTML = ""; 
@@ -67,6 +68,7 @@
         document.getElementById("planType").addEventListener("change", updateVehicleFields);
         updateVehicleFields();
 
+        // ✅ Select schedule and store the selected day & time
         function selectScheduleBox(cell, day) {
             document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
             cell.classList.add("selected");
@@ -74,6 +76,7 @@
             document.getElementById("selectedTime").value = cell.innerText.trim();
         }
 
+        // ✅ Register user and store in Firebase
         function registerUser(event) {
             event.preventDefault();
 
