@@ -46,26 +46,23 @@ jobs:
           cat public/env.js
           echo "✅ env.js verified."
 
-      # ✅ Verify env.js existence
       - name: Verify env.js exists
         run: |
           echo "🔍 Checking if env.js exists..."
           ls -l public/env.js || echo "❌ env.js NOT FOUND!"
           cat public/env.js || echo "❌ env.js is EMPTY!"
 
-      # ✅ Set Up Firebase Credentials (Service Account JSON)
-      - name: Set Up Firebase Credentials
+      # ✅ Decode and Set Up Firebase Service Account Credentials
+      - name: Decode Firebase Service Account JSON
         run: |
-          echo "🔍 Setting up Firebase credentials..."
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | tr -d '\r' | jq '.' > $HOME/service-account.json
-      
+          echo "🔍 Decoding Firebase Service Account JSON..."
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
           if [ ! -s "$HOME/service-account.json" ]; then
             echo "❌ Error: service-account.json is empty or missing!"
             exit 1
           fi
-      
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
-          echo "✅ Firebase credentials loaded successfully."
+          echo "✅ Firebase Service Account decoded and loaded."
 
       # ✅ Authenticate with Google Cloud using Service Account
       - name: Authenticate with Google Cloud
@@ -84,7 +81,7 @@ jobs:
           firebase --version
           echo "✅ Firebase CLI installed."
 
-      # ✅ Debug: Verify Firebase Authentication
+      # ✅ Verify Firebase Authentication
       - name: Verify Firebase Authentication
         run: |
           echo "🔍 Checking Firebase authentication..."
@@ -93,10 +90,10 @@ jobs:
           firebase list || echo "✅ Firebase projects listed."
           echo "✅ Firebase authentication verified."
 
-      # ✅ Deploy to Firebase Hosting Using Service Account
-      - name: Deploy to Firebase Hosting (Service Account)
+      # ✅ Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting
         run: |
-          echo "🚀 Deploying using Service Account..."
+          echo "🚀 Deploying to Firebase Hosting..."
           GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
           echo "✅ Firebase Hosting deployed successfully."
 
