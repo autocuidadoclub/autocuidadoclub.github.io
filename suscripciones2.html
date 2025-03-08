@@ -1,4 +1,21 @@
-document.addEventListener("DOMContentLoaded", function () {
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro en AutoCuidado Club</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase Compatibility SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <!-- Load GitHub Secrets -->
+    <script src="env.js"></script>
+
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
     if (window._env_ && window._env_.FIREBASE_API_KEY) {
         const firebaseConfig = {
             apiKey: window._env_.FIREBASE_API_KEY,
@@ -24,3 +41,111 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
     }
 });
+
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        function updateVehicleFields() {
+            const container = document.getElementById("vehicle-container");
+            container.innerHTML = ""; 
+            const selectedPlan = document.getElementById("planType").value;
+            const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
+
+            for (let i = 0; i < maxVehicles; i++) {
+                const div = document.createElement("div");
+                div.className = "vehicle-entry";
+                div.innerHTML = `
+                    <label>Marca:</label>
+                    <input type="text" class="vehicle-brand" required>
+                    
+                    <label>Modelo:</label>
+                    <input type="text" class="vehicle-model" required>
+                    
+                    <label>Año:</label>
+                    <input type="text" class="vehicle-year" required>
+                    
+                    <label>Número de Placa:</label>
+                    <input type="text" class="vehicle-plate" required>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        document.getElementById("planType").addEventListener("change", updateVehicleFields);
+        updateVehicleFields();
+    });
+    </script>
+</head>
+<body>
+    <h2>Registro en AutoCuidado Club</h2>
+    <form id="registerForm">
+        <label>Nombre:</label>
+        <input type="text" id="name" required>
+
+        <label>Email:</label>
+        <input type="email" id="email" required>
+
+        <label>Teléfono:</label>
+        <input type="text" id="phone" required>
+
+        <label>Contraseña:</label>
+        <input type="password" id="password" required>
+
+        <label>Selecciona tu Plan:</label>
+        <select id="planType">
+            <option value="basic3m">Basic - 1 Vehículo</option>
+            <option value="plus3m">Plus - Hasta 3 Vehículos</option>
+        </select>
+
+        <div id="vehicles-section">
+            <h3>Vehículos</h3>
+            <div id="vehicle-container"></div>
+        </div>
+
+        <h2>Selecciona tu Horario</h2>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this, 'Lunes')">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this, 'Miércoles')">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this, 'Viernes')">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this, 'Sábado')">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this, 'Domingo')">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this, 'Lunes')">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this, 'Miércoles')">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this, 'Viernes')">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this, 'Sábado')">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this, 'Domingo')">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this, 'Lunes')">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this, 'Miércoles')">16:00 - 18:00</td>
+                    <td>-</td>
+                    <td onclick="selectScheduleBox(this, 'Sábado')">14:00 - 16:00</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <input type="hidden" id="selectedDay" required>
+        <input type="hidden" id="selectedTime" required>
+
+        <button type="submit">Registrarse</button>
+    </form>
+</body>
+</html>
