@@ -5,80 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro en AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Firebase Compatibility SDK -->
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-    <!-- Load GitHub Secrets -->
-    <script src="env.js"></script>
-
+    <!-- Ensure env.js loads (fails silently if missing) -->
     <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window._env_ && window._env_.FIREBASE_API_KEY) {
-        const firebaseConfig = {
-            apiKey: window._env_.FIREBASE_API_KEY,
-            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-            projectId: window._env_.FIREBASE_PROJECT_ID,
-            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-            appId: window._env_.FIREBASE_APP_ID
-        };
+        let firebaseConfig;
+        let db, auth;
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log("✅ Firebase initialized correctly!");
-        } else {
-            console.log("ℹ️ Firebase already initialized.");
-        }
+        function initializeFirebase() {
+            if (window._env_ && window._env_.FIREBASE_API_KEY) {
+                firebaseConfig = {
+                    apiKey: window._env_.FIREBASE_API_KEY,
+                    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                    projectId: window._env_.FIREBASE_PROJECT_ID,
+                    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                    appId: window._env_.FIREBASE_APP_ID
+                };
 
-        // Now, initialize Firestore and Auth
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        console.log("✅ Firestore and Auth initialized!");
-    } else {
-        console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
-    }
-});
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                    console.log("✅ Firebase initialized!");
+                }
 
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        function updateVehicleFields() {
-            const container = document.getElementById("vehicle-container");
-            container.innerHTML = ""; 
-            const selectedPlan = document.getElementById("planType").value;
-            const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
-
-            for (let i = 0; i < maxVehicles; i++) {
-                const div = document.createElement("div");
-                div.className = "vehicle-entry";
-                div.innerHTML = `
-                    <label>Marca:</label>
-                    <input type="text" class="vehicle-brand" required>
-                    
-                    <label>Modelo:</label>
-                    <input type="text" class="vehicle-model" required>
-                    
-                    <label>Año:</label>
-                    <input type="text" class="vehicle-year" required>
-                    
-                    <label>Número de Placa:</label>
-                    <input type="text" class="vehicle-plate" required>
-                `;
-                container.appendChild(div);
+                db = firebase.firestore();
+                auth = firebase.auth();
+            } else {
+                console.error("❌ Error: Firebase env.js not loaded.");
             }
         }
 
-        document.getElementById("planType").addEventListener("change", updateVehicleFields);
-        updateVehicleFields();
-    });
+        // Load env.js dynamically and initialize Firebase
+        function loadEnvAndInitFirebase() {
+            const script = document.createElement("script");
+            script.src = "env.js";
+            script.onload = initializeFirebase;
+            script.onerror = () => console.error("❌ Failed to load env.js.");
+            document.head.appendChild(script);
+        }
+
+        document.addEventListener("DOMContentLoaded", loadEnvAndInitFirebase);
+    </script>
+
+    <script>
+        function selectScheduleBox(cell, day) {
+            document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+            cell.classList.add("selected");
+            document.getElementById("selectedDay").value = day;
+            document.getElementById("selectedTime").value = cell.innerText.trim();
+        }
+
+        function registerUser(event) {
+            event.preventDefault();
+
+            if (!db || !auth) {
+                alert("❌ Firebase is not initialized.");
+                return;
+            }
+
+            const formData = {
+                name: document.getElementById("name").value.trim(),
+                email: document.getElementById("email").value.trim(),
+                phone: document.getElementById("phone").value.trim(),
+                password: document.getElementById("password").value.trim(),
+                planType: document.getElementById("planType").value,
+                selectedDay: document.getElementById("selectedDay").value.trim(),
+                selectedTime: document.getElementById("selectedTime").value.trim(),
+                vehicles: []
+            };
+
+            // Get Vehicle Data
+            document.querySelectorAll(".vehicle-entry").forEach(vehicle => {
+                formData.vehicles.push({
+                    brand: vehicle.querySelector(".vehicle-brand").value.trim(),
+                    model: vehicle.querySelector(".vehicle-model").value.trim(),
+                    year: vehicle.querySelector(".vehicle-year").value.trim(),
+                    plate: vehicle.querySelector(".vehicle-plate").value.trim()
+                });
+            });
+
+            // Firebase Authentication & Firestore Storage
+            auth.createUserWithEmailAndPassword(formData.email, formData.password)
+                .then(userCredential => {
+                    formData.uid = userCredential.user.uid;
+                    formData.registrationDate = firebase.firestore.Timestamp.now();
+                    return db.collection("users").doc(formData.uid).set(formData);
+                })
+                .then(() => {
+                    alert("✅ Registro exitoso!");
+                    window.location.href = "profile.html";
+                })
+                .catch(error => {
+                    console.error("❌ Firebase Error:", error);
+                    alert("Error: " + error.message);
+                });
+        }
     </script>
 </head>
+
 <body>
+
     <h2>Registro en AutoCuidado Club</h2>
-    <form id="registerForm">
+    <form id="registerForm" onsubmit="registerUser(event)">
         <label>Nombre:</label>
         <input type="text" id="name" required>
 
@@ -123,22 +155,6 @@
                     <td onclick="selectScheduleBox(this, 'Sábado')">8:00 - 10:00</td>
                     <td onclick="selectScheduleBox(this, 'Domingo')">9:00 - 11:00</td>
                 </tr>
-                <tr>
-                    <td>Bloque 2</td>
-                    <td onclick="selectScheduleBox(this, 'Lunes')">12:00 - 14:00</td>
-                    <td onclick="selectScheduleBox(this, 'Miércoles')">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this, 'Viernes')">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this, 'Sábado')">11:00 - 13:00</td>
-                    <td onclick="selectScheduleBox(this, 'Domingo')">12:00 - 14:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 3</td>
-                    <td onclick="selectScheduleBox(this, 'Lunes')">15:00 - 17:00</td>
-                    <td onclick="selectScheduleBox(this, 'Miércoles')">16:00 - 18:00</td>
-                    <td>-</td>
-                    <td onclick="selectScheduleBox(this, 'Sábado')">14:00 - 16:00</td>
-                    <td>-</td>
-                </tr>
             </tbody>
         </table>
 
@@ -147,5 +163,6 @@
 
         <button type="submit">Registrarse</button>
     </form>
+
 </body>
 </html>
