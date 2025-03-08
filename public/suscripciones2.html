@@ -38,7 +38,6 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // ✅ Update vehicle fields dynamically based on plan selection
         function updateVehicleFields() {
             const container = document.getElementById("vehicle-container");
             container.innerHTML = ""; 
@@ -51,13 +50,10 @@
                 div.innerHTML = `
                     <label>Marca:</label>
                     <input type="text" class="vehicle-brand" required>
-                    
                     <label>Modelo:</label>
                     <input type="text" class="vehicle-model" required>
-                    
                     <label>Año:</label>
                     <input type="text" class="vehicle-year" required>
-                    
                     <label>Número de Placa:</label>
                     <input type="text" class="vehicle-plate" required>
                 `;
@@ -68,7 +64,6 @@
         document.getElementById("planType").addEventListener("change", updateVehicleFields);
         updateVehicleFields();
 
-        // ✅ Select schedule and store the selected day & time
         function selectScheduleBox(cell, day) {
             document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
             cell.classList.add("selected");
@@ -76,7 +71,6 @@
             document.getElementById("selectedTime").value = cell.innerText.trim();
         }
 
-        // ✅ Register user and store in Firebase
         function registerUser(event) {
             event.preventDefault();
 
@@ -86,18 +80,13 @@
             for (const field of requiredFields) {
                 const input = document.getElementById(field);
                 if (!input || !input.value.trim()) {
-                    alert(`Error: Todos los campos son obligatorios.`);
+                    alert("Error: Todos los campos son obligatorios.");
                     return;
                 }
                 formData[field] = input.value.trim();
             }
 
             const vehicleEntries = document.querySelectorAll(".vehicle-entry");
-            if (!vehicleEntries.length) {
-                alert("Debes ingresar la información de al menos un vehículo.");
-                return;
-            }
-
             formData.vehicles = Array.from(vehicleEntries).map(vehicle => ({
                 brand: vehicle.querySelector(".vehicle-brand").value.trim(),
                 model: vehicle.querySelector(".vehicle-model").value.trim(),
@@ -105,20 +94,12 @@
                 plate: vehicle.querySelector(".vehicle-plate").value.trim()
             }));
 
-            if (typeof firebase === 'undefined' || !firebase.firestore) {
-                console.error("❌ Error: Firebase no está cargado correctamente.");
-                alert("Error: No se pudo conectar con Firebase.");
-                return;
-            }
-
             auth.createUserWithEmailAndPassword(formData.email, formData.password)
                 .then((userCredential) => {
                     const newUser = userCredential.user;
-                    console.log("✅ Usuario creado en Firebase:", newUser.uid);
                     formData.uid = newUser.uid;
                     formData.registrationDate = firebase.firestore.Timestamp.now();
                     formData.status = "pending_payment";
-
                     return db.collection("users").doc(newUser.uid).set(formData);
                 })
                 .then(() => {
@@ -126,7 +107,6 @@
                     window.location.href = "profile.html";
                 })
                 .catch((error) => {
-                    console.error("❌ Error en registro:", error.message);
                     alert("Error en el registro: " + error.message);
                 });
         }
@@ -134,78 +114,49 @@
         document.getElementById("registerForm").addEventListener("submit", registerUser);
     });
     </script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-        }
-        .subscription-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 18px;
-            text-align: center;
-            background: #ffffff;
-            border-radius: 8px;
-        }
-        .subscription-table th, .subscription-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
-        .subscription-table th {
-            background: #FF6600;
-            color: white;
-        }
-        .selected {
-            background-color: #FF6600 !important;
-            color: white !important;
-        }
-    </style>
-
 </head>
 <body>
-
     <h2>Registro en AutoCuidado Club</h2>
     <form id="registerForm">
         <label>Nombre:</label>
         <input type="text" id="name" required>
-
         <label>Email:</label>
         <input type="email" id="email" required>
-
         <label>Teléfono:</label>
         <input type="text" id="phone" required>
-
         <label>Contraseña:</label>
         <input type="password" id="password" required>
-
         <label>Selecciona tu Plan:</label>
         <select id="planType">
-            <option value="basic3m">Basic - 1 Vehículo</option>
-            <option value="plus3m">Plus - Hasta 3 Vehículos</option>
+            <option value="basic">Basic - 1 Vehículo</option>
+            <option value="plus">Plus - Hasta 3 Vehículos</option>
         </select>
-
         <div id="vehicles-section">
             <h3>Vehículos</h3>
             <div id="vehicle-container"></div>
         </div>
-
         <h2>Selecciona tu Horario</h2>
-        <table class="subscription-table">
+        <table class="schedule-table">
             <tr>
+                <th>Horario</th>
+                <th>Lunes</th>
+                <th>Miércoles</th>
+                <th>Viernes</th>
+                <th>Sábado</th>
+                <th>Domingo</th>
+            </tr>
+            <tr>
+                <td>Bloque 1</td>
                 <td onclick="selectScheduleBox(this, 'Lunes')">9:00 - 11:00</td>
                 <td onclick="selectScheduleBox(this, 'Miércoles')">10:00 - 12:00</td>
                 <td onclick="selectScheduleBox(this, 'Viernes')">13:00 - 15:00</td>
+                <td onclick="selectScheduleBox(this, 'Sábado')">8:00 - 10:00</td>
+                <td onclick="selectScheduleBox(this, 'Domingo')">9:00 - 11:00</td>
             </tr>
         </table>
-
-        <input type="hidden" id="selectedDay" name="selectedDay" required>
-        <input type="hidden" id="selectedTime" name="selectedTime" required>
-
+        <input type="hidden" id="selectedDay" required>
+        <input type="hidden" id="selectedTime" required>
         <button type="submit">Registrarse</button>
     </form>
-
 </body>
 </html>
