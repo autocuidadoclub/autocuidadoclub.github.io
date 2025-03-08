@@ -1,6 +1,6 @@
 # 🚀 Deploy AutoCuidado Club to Firebase Hosting & GitHub Pages
 name: Deploy AutoCuidado Club
-
+     
 on:
   push:
     branches:
