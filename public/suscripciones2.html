@@ -6,14 +6,19 @@
     <title>Registro en AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
 
-    <!-- Load env.js First (Ensure Firebase Keys Exist) -->
-    <script src="env.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <!-- ✅ Force Load env.js to Prevent Caching Issues -->
+    <script src="env.js?v=1.0"></script>
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        console.log("✅ Checking env.js:");
-        console.log(window._env_);
+        console.log("🔍 Checking if env.js loaded:", window._env_);
 
+        // ✅ Ensure env.js is loaded before initializing Firebase
         if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
             console.error("❌ Error: Firebase env.js not loaded.");
             alert("❌ Firebase is not initialized. Check env.js.");
@@ -31,7 +36,7 @@
             measurementId: window._env_.FIREBASE_MEASUREMENT_ID
         };
 
-        // ✅ Initialize Firebase
+        // ✅ Initialize Firebase only if not already initialized
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
             console.log("✅ Firebase initialized successfully!");
@@ -42,36 +47,6 @@
         // ✅ Firebase References
         const db = firebase.firestore();
         const auth = firebase.auth();
-
-        // ✅ Function to Update Vehicle Fields Dynamically
-        function updateVehicleFields() {
-            const container = document.getElementById("vehicle-container");
-            container.innerHTML = ""; 
-            const selectedPlan = document.getElementById("planType").value;
-            const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
-
-            for (let i = 0; i < maxVehicles; i++) {
-                const div = document.createElement("div");
-                div.className = "vehicle-entry";
-                div.innerHTML = `
-                    <label>Marca:</label>
-                    <input type="text" class="vehicle-brand" required>
-                    
-                    <label>Modelo:</label>
-                    <input type="text" class="vehicle-model" required>
-                    
-                    <label>Año:</label>
-                    <input type="text" class="vehicle-year" required>
-                    
-                    <label>Número de Placa:</label>
-                    <input type="text" class="vehicle-plate" required>
-                `;
-                container.appendChild(div);
-            }
-        }
-
-        document.getElementById("planType").addEventListener("change", updateVehicleFields);
-        updateVehicleFields();
 
         // ✅ Function to Select Schedule Box
         window.selectScheduleBox = function(cell, day) {
@@ -99,16 +74,6 @@
                 return;
             }
 
-            // Get Vehicle Info
-            const vehicleEntries = document.querySelectorAll(".vehicle-entry");
-            let vehicles = Array.from(vehicleEntries).map(vehicle => ({
-                brand: vehicle.querySelector(".vehicle-brand").value.trim(),
-                model: vehicle.querySelector(".vehicle-model").value.trim(),
-                year: vehicle.querySelector(".vehicle-year").value.trim(),
-                plate: vehicle.querySelector(".vehicle-plate").value.trim()
-            }));
-
-            // ✅ Register User in Firebase Authentication
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     const userId = userCredential.user.uid;
@@ -121,7 +86,6 @@
                         phone,
                         planType,
                         schedule: { day: selectedDay, time: selectedTime },
-                        vehicles,
                         registrationDate: firebase.firestore.Timestamp.now()
                     });
                 })
@@ -134,15 +98,15 @@
                     alert("❌ Error en el registro: " + error.message);
                 });
         });
-
     });
     </script>
+
 </head>
 
 <body>
 
     <h2>Registro en AutoCuidado Club</h2>
-    <form id="registerForm">
+    <form id="registerForm" onsubmit="registerUser(event)">
         <label>Nombre:</label>
         <input type="text" id="name" required>
 
