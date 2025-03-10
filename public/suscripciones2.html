@@ -6,13 +6,15 @@
     <title>Registro en AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
 
+     <!-- ✅ Force Load env.js to Prevent Caching Issues -->
+    <script src="env.js?v=1.0"></script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-    <!-- ✅ Force Load env.js to Prevent Caching Issues -->
-    <script src="env.js?v=1.0"></script>
+   
 
     <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -32,102 +34,74 @@
         measurementId: window._env_.FIREBASE_MEASUREMENT_ID
     };
 
-      console.log("🔥 Checking Firebase SDK...");
-console.log("🔥 Firebase Apps:", firebase.apps);
-console.log("🔥 Firebase Auth Instance:", typeof firebase.auth !== "undefined" ? firebase.auth() : "❌ Firebase Auth NOT LOADED");
-console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "undefined" ? firebase.firestore() : "❌ Firestore NOT LOADED");
-     
-      
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
         console.log("✅ Firebase initialized successfully!");
     } else {
         console.log("ℹ️ Firebase already initialized.");
     }
-});
 
-    // ✅ Check Authentication
-    try {
-        const auth = firebase.auth();
-        console.log("✅ Firebase Auth Loaded:", auth);
-    } catch (error) {
-        console.error("🔥 Firebase Auth Error:", error);
-    }
+    // ✅ Initialize Firebase Auth & Firestore here
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // ✅ Check Firestore
-    try {
-        const db = firebase.firestore();
-        console.log("✅ Firestore Loaded:", db);
-    } catch (error) {
-        console.error("🔥 Firestore Error:", error);
-    }
-});
+    // ✅ Attach Event Listener for Registration Form
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        event.preventDefault();
 
-        // ✅ Firebase References
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const planType = document.getElementById("planType").value;
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
 
-        // ✅ Function to Select Schedule Box
-        window.selectScheduleBox = function(cell, day, time) {
-            document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
-            cell.classList.add("selected");
-            document.getElementById("selectedDay").value = day;
-            document.getElementById("selectedTime").value = time;
-        };
-
-        // ✅ Function to Register User
-        document.getElementById("registerForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            const name = document.getElementById("name").value.trim();
-            const email = document.getElementById("email").value.trim();
-            const phone = document.getElementById("phone").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const planType = document.getElementById("planType").value;
-            const selectedDay = document.getElementById("selectedDay").value;
-            const selectedTime = document.getElementById("selectedTime").value;
-
-             const vehicles = [];
-            document.querySelectorAll(".vehicle-entry").forEach(entry => {
-                vehicles.push({
-                    plate: entry.querySelector(".plate").value,
-                    model: entry.querySelector(".model").value,
-                    brand: entry.querySelector(".brand").value,
-                    year: entry.querySelector(".year").value
-                });
+        const vehicles = [];
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
             });
-
-            if (!name || !email || !phone || !password || !selectedDay || !selectedTime) {
-                alert("❌ Todos los campos son obligatorios.");
-                return;
-            }
-
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const userId = userCredential.user.uid;
-                    console.log("✅ Usuario registrado:", userId);
-
-                    return db.collection("users").doc(userId).set({
-                         uid: userId,
-                        name,
-                        email,
-                        phone,
-                        planType,
-                        schedule: { day: selectedDay, time: selectedTime },
-                        registrationDate: firebase.firestore.Timestamp.now(),
-                        vehicles
-                    });
-                })
-                .then(() => {
-                    alert("✅ Registro exitoso. Redirigiendo...");
-                    window.location.href = "login.html";
-                })
-                .catch((error) => {
-                    console.error("❌ Error en el registro:", error.message);
-                    alert("❌ Error en el registro: " + error.message);
-                });
         });
+
+        if (!name || !email || !phone || !password || !selectedDay || !selectedTime || !department || !municipality) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const userId = userCredential.user.uid;
+                console.log("✅ Usuario registrado:", userId);
+
+                return db.collection("users").doc(userId).set({
+                    uid: userId,
+                    name,
+                    email,
+                    phone,
+                    planType,
+                    schedule: { day: selectedDay, time: selectedTime },
+                    department,
+                    municipality,
+                    registrationDate: firebase.firestore.Timestamp.now(),
+                    vehicles
+                });
+            })
+            .then(() => {
+                alert("✅ Registro exitoso. Redirigiendo...");
+                window.location.href = "login.html";
+            })
+            .catch((error) => {
+                console.error("❌ Error en el registro:", error.message);
+                alert("❌ Error en el registro: " + error.message);
+            });
     });
+});
     </script>
 
 </head>
@@ -233,6 +207,15 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
     
     
     <script>
+        window.selectScheduleBox = function(cell, day, time) {
+    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+    cell.classList.add("selected");
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = time;
+
+    console.log("✅ Horario seleccionado:", day, time);
+};
+
         const locations = {
             "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
             "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
