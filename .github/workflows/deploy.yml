@@ -76,13 +76,13 @@ jobs:
       # ✅ Install Firebase CLI
       - name: Install Firebase CLI
         run: |
-          echo "🔍 Installing Firebase CLI..."
-          curl -sL https://firebase.tools | bash
-          firebase --version
-          echo "✅ Firebase CLI installed."
+            echo "🔍 Installing Firebase CLI..."
+            curl -sL https://firebase.tools | bash
+            firebase --version
+               echo "✅ Firebase CLI installed."
 
-          - name: Verify Firebase Authentication
-          run: |
+               - name: Verify Firebase Authentication
+               run: |
               echo "🔍 Checking Firebase authentication..."
               echo "✅ Skipping interactive login as Service Account is already authenticated."
               firebase projects:list || echo "✅ Firebase projects listed (or skipped if unnecessary)."
