@@ -68,12 +68,11 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
         const auth = firebase.auth();
 
         // ✅ Function to Select Schedule Box
-        window.selectScheduleBox = function(cell, day) {
+        window.selectScheduleBox = function(cell, day, time) {
             document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
             cell.classList.add("selected");
             document.getElementById("selectedDay").value = day;
-            document.getElementById("selectedTime").value = cell.innerText.trim();
-            console.log(`✅ Selected Schedule: ${day} - ${cell.innerText.trim()}`);
+            document.getElementById("selectedTime").value = time;
         };
 
         // ✅ Function to Register User
@@ -88,6 +87,16 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
             const selectedDay = document.getElementById("selectedDay").value;
             const selectedTime = document.getElementById("selectedTime").value;
 
+             const vehicles = [];
+            document.querySelectorAll(".vehicle-entry").forEach(entry => {
+                vehicles.push({
+                    plate: entry.querySelector(".plate").value,
+                    model: entry.querySelector(".model").value,
+                    brand: entry.querySelector(".brand").value,
+                    year: entry.querySelector(".year").value
+                });
+            });
+
             if (!name || !email || !phone || !password || !selectedDay || !selectedTime) {
                 alert("❌ Todos los campos son obligatorios.");
                 return;
@@ -99,13 +108,14 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
                     console.log("✅ Usuario registrado:", userId);
 
                     return db.collection("users").doc(userId).set({
-                        uid: userId,
+                         uid: userId,
                         name,
                         email,
                         phone,
                         planType,
                         schedule: { day: selectedDay, time: selectedTime },
-                        registrationDate: firebase.firestore.Timestamp.now()
+                        registrationDate: firebase.firestore.Timestamp.now(),
+                        vehicles
                     });
                 })
                 .then(() => {
@@ -149,6 +159,8 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
             <div id="vehicle-container"></div>
         </div>
 
+        <!-- Schedule Section -->
+    <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
             <thead>
@@ -164,11 +176,27 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
             <tbody>
                 <tr>
                     <td>Bloque 1</td>
-                    <td onclick="selectScheduleBox(this, 'Lunes')">9:00 - 11:00</td>
-                    <td onclick="selectScheduleBox(this, 'Miércoles')">10:00 - 12:00</td>
-                    <td onclick="selectScheduleBox(this, 'Viernes')">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this, 'Sábado')">8:00 - 10:00</td>
-                    <td onclick="selectScheduleBox(this, 'Domingo')">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
                 </tr>
             </tbody>
         </table>
@@ -176,6 +204,75 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
         <input type="hidden" id="selectedDay" required>
         <input type="hidden" id="selectedTime" required>
 
+        <div class="card">
+    <h3>Seleccione su Ubicación</h3>
+    <label for="department">Departamento:</label>
+    <select id="department" onchange="updateMunicipalities()" required>
+        <option value="">Seleccione un departamento</option>
+    </select>
+    
+    <label for="municipality">Municipio:</label>
+    <select id="municipality" required>
+        <option value="">Seleccione un municipio</option>
+    </select>
+    
+    
+    <script>
+        const locations = {
+            "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
+            "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
+            "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
+            "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+            "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
+            "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
+            "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+            "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+            "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
+            "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
+            "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
+            "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+            "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
+        };
+        const departmentSelect = document.getElementById("department");
+        const municipalitySelect = document.getElementById("municipality");
+
+        // Populate the departments dropdown
+        function populateDepartments() {
+            for (const department in locations) {
+                const option = document.createElement("option");
+                option.value = department;
+                option.textContent = department;
+                departmentSelect.appendChild(option);
+            }
+        }
+
+        // Update municipalities based on selected department
+        function updateMunicipalities() {
+            const selectedDepartment = departmentSelect.value;
+            municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>'; // Reset municipalities
+
+            if (locations[selectedDepartment]) {
+                locations[selectedDepartment].forEach(municipality => {
+                    const option = document.createElement("option");
+                    option.value = municipality;
+                    option.textContent = municipality;
+                    municipalitySelect.appendChild(option);
+                });
+            }
+        }
+
+        // Initialize departments on page load
+        document.addEventListener("DOMContentLoaded", populateDepartments);
+    </script>
+
+<!-- Checkbox for Terms and Conditions -->
+    <div style="margin-top: 15px;">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">
+            He leído y acepto los <a href="tac.html" target="_blank">Términos y Condiciones</a>.
+        </label>
+    </div>
+            
         <button type="submit">Registrarse</button>
     </form>
 
