@@ -152,43 +152,44 @@
     <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Horario</th>
-                    <th>Lunes</th>
-                    <th>Miércoles</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Bloque 1</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 2</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 3</td>
-                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                </tr>
-            </tbody>
-        </table>
+    <thead>
+        <tr>
+            <th>Horario</th>
+            <th>Lunes</th>
+            <th>Miércoles</th>
+            <th>Viernes</th>
+            <th>Sábado</th>
+            <th>Domingo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Bloque 1</td>
+            <td onclick="selectScheduleBox(this, 'Lunes', '9:00 - 11:00')">9:00 - 11:00</td>
+            <td onclick="selectScheduleBox(this, 'Miércoles', '10:00 - 12:00')">10:00 - 12:00</td>
+            <td onclick="selectScheduleBox(this, 'Viernes', '13:00 - 15:00')">13:00 - 15:00</td>
+            <td onclick="selectScheduleBox(this, 'Sábado', '8:00 - 10:00')">8:00 - 10:00</td>
+            <td onclick="selectScheduleBox(this, 'Domingo', '9:00 - 11:00')">9:00 - 11:00</td>
+        </tr>
+        <tr>
+            <td>Bloque 2</td>
+            <td onclick="selectScheduleBox(this, 'Lunes', '12:00 - 14:00')">12:00 - 14:00</td>
+            <td onclick="selectScheduleBox(this, 'Miércoles', '13:00 - 15:00')">13:00 - 15:00</td>
+            <td onclick="selectScheduleBox(this, 'Viernes', '16:00 - 18:00')">16:00 - 18:00</td>
+            <td onclick="selectScheduleBox(this, 'Sábado', '11:00 - 13:00')">11:00 - 13:00</td>
+            <td onclick="selectScheduleBox(this, 'Domingo', '12:00 - 14:00')">12:00 - 14:00</td>
+        </tr>
+        <tr>
+            <td>Bloque 3</td>
+            <td onclick="selectScheduleBox(this, 'Lunes', '15:00 - 17:00')">15:00 - 17:00</td>
+            <td onclick="selectScheduleBox(this, 'Miércoles', '16:00 - 18:00')">16:00 - 18:00</td>
+            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
+            <td onclick="selectScheduleBox(this, 'Sábado', '14:00 - 16:00')">14:00 - 16:00</td>
+            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
+        </tr>
+    </tbody>
+</table>
+
 
         <input type="hidden" id="selectedDay" required>
         <input type="hidden" id="selectedTime" required>
@@ -207,14 +208,28 @@
     
     
     <script>
-        window.selectScheduleBox = function(cell, day, time) {
+       function selectScheduleBox(cell, day, time) {
+    // Get the cell's text value
+    const timeBlock = cell.innerText.trim();
+
+    // Check if the cell is empty or has a dash (invalid)
+    if (!timeBlock || timeBlock === "-") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Exit function to prevent selection
+    }
+
+    // Remove previous selections
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+
+    // Highlight the clicked cell
     cell.classList.add("selected");
+
+    // Store selected schedule in hidden inputs
     document.getElementById("selectedDay").value = day;
     document.getElementById("selectedTime").value = time;
 
-    console.log("✅ Horario seleccionado:", day, time);
-};
+    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
+}
 
         const locations = {
             "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
