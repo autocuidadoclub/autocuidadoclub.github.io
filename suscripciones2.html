@@ -70,6 +70,9 @@
                 const department = document.getElementById("department").value;
                 const municipality = document.getElementById("municipality").value;
 
+                const selectedDay = document.getElementById("selectedDay").value;
+                    const selectedTime = document.getElementById("selectedTime").value;
+                
                 const vehicles = [];
                 document.querySelectorAll(".vehicle-entry").forEach(entry => {
                     vehicles.push({
@@ -80,10 +83,10 @@
                     });
                 });
 
-                if (!name || !email || !phone || !password || !department || !municipality) {
-                    alert("❌ Todos los campos son obligatorios.");
-                    return;
-                }
+                 if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios, incluyendo la selección del horario.");
+        return;
+    }
 
                 auth.createUserWithEmailAndPassword(email, password)
                     .then((userCredential) => {
@@ -100,7 +103,13 @@
                             municipality,
                             registrationDate: firebase.firestore.Timestamp.now(),
                             vehicles
-                        });
+                            selectedSchedule: {
+                    day: selectedDay,
+                    time: selectedTime
+                },
+                registrationDate: firebase.firestore.Timestamp.now(),
+                vehicles
+             });
                     })
                     .then(() => {
                         alert("✅ Registro exitoso. Redirigiendo...");
