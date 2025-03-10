@@ -1,6 +1,6 @@
 # 🚀 Deploy AutoCuidado Club to Firebase Hosting & GitHub Pages
 name: Deploy AutoCuidado Club
-     
+
 on:
   push:
     branches:
@@ -15,17 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ✅ Debug: Ensure GitHub Secrets are present
-      - name: Debug GitHub Secrets Presence
-        run: |
-          echo "🔍 Checking secrets..."
-          echo "✅ FIREBASE_API_KEY is set: [${{ secrets.FIREBASE_API_KEY != '' }}]"
-          echo "✅ FIREBASE_SERVICE_ACCOUNT is set: [${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}]"
-
       # ✅ Generate env.js from GitHub Secrets
-      - name: Generate env.js from GitHub Secrets
+      - name: Generate env.js
         run: |
-          echo "🔍 Generating env.js from GitHub Secrets..."
+          echo "🔍 Generating env.js..."
           cat <<EOF > public/env.js
           window._env_ = {
             FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}",
@@ -37,22 +30,13 @@ jobs:
             FIREBASE_MEASUREMENT_ID: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
           };
           EOF
-          echo "✅ env.js successfully generated."
+          echo "✅ env.js generated successfully."
 
-      # ✅ Verify env.js content
-      - name: Verify env.js content
-        run: |
-          echo "🔍 Checking env.js content..."
-          cat public/env.js
-          echo "✅ env.js verified."
-
+      # ✅ Verify env.js
       - name: Verify env.js exists
-        run: |
-          echo "🔍 Checking if env.js exists..."
-          ls -l public/env.js || echo "❌ env.js NOT FOUND!"
-          cat public/env.js || echo "❌ env.js is EMPTY!"
+        run: cat public/env.js || echo "❌ env.js is missing!"
 
-      # ✅ Decode and Set Up Firebase Service Account Credentials
+      # ✅ Decode Firebase Service Account JSON
       - name: Decode Firebase Service Account JSON
         run: |
           echo "🔍 Decoding Firebase Service Account JSON..."
@@ -61,13 +45,13 @@ jobs:
             echo "❌ Error: service-account.json is empty or missing!"
             exit 1
           fi
-          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
-          echo "✅ Firebase Service Account decoded and loaded."
+          echo "✅ Firebase Service Account decoded."
 
-      # ✅ Authenticate with Google Cloud using Service Account
+      # ✅ Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
         run: |
           echo "🔍 Authenticating with Google Cloud..."
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           gcloud auth activate-service-account --key-file=$HOME/service-account.json
           gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
           gcloud auth list
@@ -76,19 +60,10 @@ jobs:
       # ✅ Install Firebase CLI
       - name: Install Firebase CLI
         run: |
-            echo "🔍 Installing Firebase CLI..."
-            curl -sL https://firebase.tools | bash
-            firebase --version
-               echo "✅ Firebase CLI installed."
-
-               - name: Verify Firebase Authentication
-                 run: |
-                   echo "🔍 Checking Firebase authentication..."
-                   firebase logout --force || echo "✅ Firebase logout ignored."
-                   firebase login:ci || echo "✅ Firebase CI login ignored."
-                   firebase projects:list || echo "✅ Firebase projects listed."
-
-
+          echo "🔍 Installing Firebase CLI..."
+          curl -sL https://firebase.tools | bash
+          firebase --version
+          echo "✅ Firebase CLI installed."
 
       # ✅ Deploy to Firebase Hosting
       - name: Deploy to Firebase Hosting
