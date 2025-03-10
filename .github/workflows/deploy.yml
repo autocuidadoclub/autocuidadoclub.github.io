@@ -82,10 +82,12 @@ jobs:
                echo "✅ Firebase CLI installed."
 
                - name: Verify Firebase Authentication
-               run: |
-              echo "🔍 Checking Firebase authentication..."
-              echo "✅ Skipping interactive login as Service Account is already authenticated."
-              firebase projects:list || echo "✅ Firebase projects listed (or skipped if unnecessary)."
+                 run: |
+                   echo "🔍 Checking Firebase authentication..."
+                   firebase logout --force || echo "✅ Firebase logout ignored."
+                   firebase login:ci || echo "✅ Firebase CI login ignored."
+                   firebase projects:list || echo "✅ Firebase projects listed."
+
 
 
       # ✅ Deploy to Firebase Hosting
