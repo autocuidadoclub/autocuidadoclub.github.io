@@ -154,10 +154,25 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
             <option value="plus3m">Plus - Hasta 3 Vehículos</option>
         </select>
 
-        <div id="vehicles-section">
-            <h3>Vehículos</h3>
-            <div id="vehicle-container"></div>
+        <div id="vehicle-section">
+    <h3>Datos del Vehículo</h3>
+    <div id="vehicle-container">
+        <div class="vehicle-entry">
+            <label for="plate">Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label for="model">Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label for="brand">Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label for="year">Año:</label>
+            <input type="number" class="year" required>
         </div>
+    </div>
+    <button type="button" onclick="addVehicle()">Añadir Vehículo</button>
+</div>
 
         <!-- Schedule Section -->
     <section id="schedule-section" class="schedule-section">
@@ -263,6 +278,38 @@ console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "
 
         // Initialize departments on page load
         document.addEventListener("DOMContentLoaded", populateDepartments);
+
+        function addVehicle() {
+        const vehicleContainer = document.getElementById("vehicle-container");
+        if (vehicleContainer.children.length >= 3) {
+            alert("Solo puedes agregar hasta 3 vehículos.");
+            return;
+        }
+
+        const newVehicle = document.createElement("div");
+        newVehicle.classList.add("vehicle-entry");
+        newVehicle.innerHTML = `
+            <label for="plate">Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label for="model">Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label for="brand">Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label for="year">Año:</label>
+            <input type="number" class="year" required>
+
+            <button type="button" onclick="removeVehicle(this)">Eliminar</button>
+        `;
+        vehicleContainer.appendChild(newVehicle);
+    }
+
+    function removeVehicle(button) {
+        button.parentElement.remove();
+    }
+        
     </script>
 
 <!-- Checkbox for Terms and Conditions -->
