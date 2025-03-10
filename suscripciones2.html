@@ -15,12 +15,9 @@
     <script src="env.js?v=1.0"></script>
 
     <script>
-   document.addEventListener("DOMContentLoaded", function () {
-    console.log("🔍 Checking Firebase initialization...");
-
-    // Ensure Firebase config is present
-    if (!window._env_ || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Firebase config is missing in env.js!");
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+        console.error("❌ Error: Firebase env.js not loaded.");
         alert("❌ Firebase is not initialized. Check env.js.");
         return;
     }
@@ -35,13 +32,19 @@
         measurementId: window._env_.FIREBASE_MEASUREMENT_ID
     };
 
-    // ✅ Initialize Firebase only if not already initialized
+      console.log("🔥 Checking Firebase SDK...");
+console.log("🔥 Firebase Apps:", firebase.apps);
+console.log("🔥 Firebase Auth Instance:", typeof firebase.auth !== "undefined" ? firebase.auth() : "❌ Firebase Auth NOT LOADED");
+console.log("🔥 Firebase Firestore Instance:", typeof firebase.firestore !== "undefined" ? firebase.firestore() : "❌ Firestore NOT LOADED");
+     
+      
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
         console.log("✅ Firebase initialized successfully!");
     } else {
         console.log("ℹ️ Firebase already initialized.");
     }
+});
 
     // ✅ Check Authentication
     try {
