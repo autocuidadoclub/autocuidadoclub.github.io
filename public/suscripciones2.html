@@ -190,7 +190,56 @@
     color: #555;
   }
 
-    
+    /* Table Styling */
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-table th,
+.schedule-table td {
+    padding: 15px;
+    border: 1px solid #ddd;
+}
+
+.schedule-table th {
+    background: #FF6600;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.schedule-table td {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.schedule-table .time-slot {
+    background: #003366;
+    color: white;
+    font-weight: bold;
+}
+
+.schedule-table .empty-cell {
+    background: #f0f0f0;
+    font-style: italic;
+    color: gray;
+}
+
+/* Highlight selected slot */
+.schedule-table td.selected {
+    background: #FF6600 !important;
+    color: white !important;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
 </style>
 
     <!-- Discount & Subscription Comparison Table -->
