@@ -291,25 +291,32 @@ resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(quer
 });
 
         
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                db.collection("users").doc(user.email).get().then((doc) => {
-                    if (doc.exists && doc.data().role === "staff") {
-                        document.getElementById("restricted-content").style.display = "block";
-                    } else {
-                        alert("No tienes permiso para acceder.");
-                        window.location.href = "login.html";
-                    }
-                }).catch((error) => {
-                    console.error("Error verifying user role:", error);
-                    alert("Error al verificar permisos.");
-                    window.location.href = "login.html";
-                });
+        auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        console.log("🔹 Usuario autenticado:", user.email, "UID:", user.uid);
+
+        const userDoc = await db.collection("users").doc(user.uid).get();
+
+        if (userDoc.exists) {
+            console.log("✅ Documento Firestore encontrado:", userDoc.data());
+            if (userDoc.data().role === "staff") {
+                document.getElementById("restricted-content").style.display = "block";
             } else {
-                alert("Por favor, inicia sesión.");
+                alert("⚠️ No tienes permiso para acceder a staff.html");
                 window.location.href = "login.html";
             }
-        });
+        } else {
+            console.log("❌ No existe el documento en Firestore para este UID.");
+            alert("⚠️ No tienes permiso para acceder.");
+            window.location.href = "login.html";
+        }
+    } else {
+        console.log("⚠️ Usuario no autenticado.");
+        alert("Por favor, inicia sesión.");
+        window.location.href = "login.html";
+    }
+});
+
 
         function authenticateUser() {
     gapi.auth2.getAuthInstance().signIn().then(() => {
