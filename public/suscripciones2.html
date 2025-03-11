@@ -552,6 +552,7 @@ function setPlanType(button) {
 
     
     <h2>Registro en AutoCuidado Club</h2>
+    <form id="registerForm" onsubmit="validateForm(event)" novalidate>
     <form id="registerForm" onsubmit="registerUser(event)">
         <label>Nombre:</label>
         <input type="text" id="name" required>
@@ -749,19 +750,19 @@ function setPlanType(button) {
     function removeVehicle(button) {
         button.parentElement.remove();
     }
-
-    function validateForm(event) {
+<script>
+function validateForm(event) {
     event.preventDefault(); // Prevent form submission if validation fails
 
     const formFields = {
-        name: "Por favor, ingrese su nombre.",
-        email: "Por favor, ingrese un email válido.",
-        phone: "Por favor, ingrese su número de teléfono.",
-        password: "Por favor, ingrese una contraseña.",
-        planType: "Por favor, seleccione un plan.",
-        department: "Por favor, seleccione un departamento.",
-        municipality: "Por favor, seleccione un municipio.",
-        terms: "Debe aceptar los Términos y Condiciones."
+        name: "❌ Por favor, ingrese su nombre.",
+        email: "❌ Por favor, ingrese un email válido.",
+        phone: "❌ Por favor, ingrese su número de teléfono.",
+        password: "❌ Por favor, ingrese una contraseña.",
+        planType: "❌ Por favor, seleccione un plan.",
+        department: "❌ Por favor, seleccione un departamento.",
+        municipality: "❌ Por favor, seleccione un municipio.",
+        terms: "❌ Debe aceptar los Términos y Condiciones."
     };
 
     let isValid = true;
@@ -769,19 +770,20 @@ function setPlanType(button) {
     Object.keys(formFields).forEach((field) => {
         const input = document.getElementById(field);
         if (input && !input.value.trim()) {
-            alert(`❌ ${formFields[field]}`);
+            alert(formFields[field]);  // Show Spanish alert
+            input.focus();  // Focus the field that is missing
             isValid = false;
             return;
         }
     });
 
-    // Validate selected schedule
+    // ✅ Validate selected schedule
     if (!document.getElementById("selectedDay").value || !document.getElementById("selectedTime").value) {
         alert("❌ Por favor, seleccione un horario.");
         isValid = false;
     }
 
-    // Validate vehicle data
+    // ✅ Validate vehicle data
     const vehicleEntries = document.querySelectorAll(".vehicle-entry");
     vehicleEntries.forEach((vehicle) => {
         ["plate", "model", "brand", "year"].forEach((field) => {
@@ -793,11 +795,15 @@ function setPlanType(button) {
         });
     });
 
+    // ✅ If all validations pass, submit the form
     if (isValid) {
         alert("✅ Registro exitoso.");
         document.getElementById("registerForm").submit();
     }
 }
+</script>
+
+
     </script>
 
 <!-- Checkbox for Terms and Conditions -->
