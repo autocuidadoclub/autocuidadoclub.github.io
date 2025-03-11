@@ -48,10 +48,13 @@
 window.selectScheduleBox = function(cell, day, time) {
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
     cell.classList.add("selected");
+
     document.getElementById("selectedDay").value = day;
     document.getElementById("selectedTime").value = time;
+
     console.log(`✅ Horario seleccionado: ${day} - ${time}`);
 };
+
 
 
             // ✅ Handle Plan Selection & Show Correct Vehicle Fields
@@ -73,7 +76,7 @@ document.querySelectorAll(".plan-button").forEach(button => {
 
 
             // ✅ Attach Event Listener for Registration Form
-            document.getElementById("registerForm").addEventListener("submit", function (event) {
+document.getElementById("registerForm").addEventListener("submit", function (event) {
     event.preventDefault();
 
     const name = document.getElementById("name").value.trim();
@@ -84,8 +87,14 @@ document.querySelectorAll(".plan-button").forEach(button => {
     const department = document.getElementById("department").value;
     const municipality = document.getElementById("municipality").value;
 
+    // ✅ Ensure selectedDay and selectedTime exist before submission
     const selectedDay = document.getElementById("selectedDay").value;
     const selectedTime = document.getElementById("selectedTime").value;
+
+    if (!selectedDay || !selectedTime) {
+        alert("⚠️ Debes seleccionar un horario antes de registrarte.");
+        return;
+    }
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
@@ -97,7 +106,7 @@ document.querySelectorAll(".plan-button").forEach(button => {
         });
     });
 
-    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+    if (!name || !email || !phone || !password || !department || !municipality || vehicles.length === 0) {
         alert("❌ Todos los campos son obligatorios.");
         return;
     }
@@ -128,18 +137,16 @@ document.querySelectorAll(".plan-button").forEach(button => {
             vehicles
         });
     })
-
-        .then(() => {
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
+    .then(() => {
+        alert("✅ Registro exitoso. Redirigiendo...");
+        window.location.href = "login.html";
+    })
+    .catch((error) => {
+        console.error("❌ Error en el registro:", error.message);
+        alert("❌ Error en el registro: " + error.message);
+    });
 });
 
-        });
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
 function updateVehicleFields(planType) {
