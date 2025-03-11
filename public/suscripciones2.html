@@ -17,114 +17,98 @@
    
 
     <script>
-         document.addEventListener("DOMContentLoaded", function () {
-            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-                console.error("❌ Error: Firebase env.js not loaded.");
-                alert("❌ Firebase is not initialized. Check env.js.");
+             document.addEventListener("DOMContentLoaded", function () {
+        if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+            console.error("❌ Error: Firebase env.js not loaded.");
+            alert("❌ Firebase is not initialized. Check env.js.");
+            return;
+        }
+
+        const firebaseConfig = {
+            apiKey: window._env_.FIREBASE_API_KEY,
+            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+            projectId: window._env_.FIREBASE_PROJECT_ID,
+            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+            appId: window._env_.FIREBASE_APP_ID,
+            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log("✅ Firebase initialized successfully!");
+        } else {
+            console.log("ℹ️ Firebase already initialized.");
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ✅ Handle Plan Selection & Show Correct Vehicle Fields
+        document.querySelectorAll(".plan-button").forEach(button => {
+            button.addEventListener("click", function () {
+                const selectedPlan = this.getAttribute("data-plan");
+                document.getElementById("planType").value = selectedPlan;
+                updateVehicleFields(selectedPlan);
+                document.getElementById("registerForm").scrollIntoView({ behavior: "smooth" });
+            });
+        });
+
+        // ✅ Attach Event Listener for Registration Form
+        document.getElementById("registerForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const planType = document.getElementById("planType").value;
+            const department = document.getElementById("department").value;
+            const municipality = document.getElementById("municipality").value;
+            const selectedDay = document.getElementById("selectedDay").value;
+            const selectedTime = document.getElementById("selectedTime").value;
+            
+            const vehicles = [];
+            document.querySelectorAll(".vehicle-entry").forEach(entry => {
+                vehicles.push({
+                    plate: entry.querySelector(".plate").value,
+                    model: entry.querySelector(".model").value,
+                    brand: entry.querySelector(".brand").value,
+                    year: entry.querySelector(".year").value
+                });
+            });
+
+            if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+                alert("❌ Todos los campos son obligatorios, incluyendo la selección del horario.");
                 return;
             }
 
-            // ✅ Firebase Configuration
-            const firebaseConfig = {
-                apiKey: window._env_.FIREBASE_API_KEY,
-                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                projectId: window._env_.FIREBASE_PROJECT_ID,
-                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-                appId: window._env_.FIREBASE_APP_ID,
-                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-            };
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const userId = userCredential.user.uid;
+                    console.log("✅ Usuario registrado:", userId);
 
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-                console.log("✅ Firebase initialized successfully!");
-            } else {
-                console.log("ℹ️ Firebase already initialized.");
-            }
-
-            const auth = firebase.auth();
-            const db = firebase.firestore();
-
-            // ✅ Handle Plan Selection
-            document.querySelectorAll(".plan-button").forEach(button => {
-                button.addEventListener("click", function () {
-                    const selectedPlan = this.getAttribute("data-plan");
-                    document.getElementById("planType").value = selectedPlan;
-                    updateVehicleFields(selectedPlan);
-
-                    // Scroll to form
-                    document.getElementById("registerForm").scrollIntoView({ behavior: "smooth" });
-
-                    console.log(`✅ Plan seleccionado: ${selectedPlan}`);
-                });
-            });
-
-            // ✅ Register User Function
-            document.getElementById("registerForm").addEventListener("submit", function (event) {
-                event.preventDefault();
-
-                const name = document.getElementById("name").value.trim();
-                const email = document.getElementById("email").value.trim();
-                const phone = document.getElementById("phone").value.trim();
-                const password = document.getElementById("password").value.trim();
-                const planType = document.getElementById("planType").value;
-                const department = document.getElementById("department").value;
-                const municipality = document.getElementById("municipality").value;
-                const selectedDay = document.getElementById("selectedDay").value;
-                const selectedTime = document.getElementById("selectedTime").value;
-
-                // ✅ Ensure plan is selected
-                if (!planType) {
-                    alert("❌ Por favor, seleccione un plan antes de registrarse.");
-                    return;
-                }
-
-                const vehicles = [];
-                document.querySelectorAll(".vehicle-entry").forEach(entry => {
-                    vehicles.push({
-                        plate: entry.querySelector(".plate").value,
-                        model: entry.querySelector(".model").value,
-                        brand: entry.querySelector(".brand").value,
-                        year: entry.querySelector(".year").value
+                    return db.collection("users").doc(userId).set({
+                        uid: userId,
+                        name,
+                        email,
+                        phone,
+                        planType,
+                        department,
+                        municipality,
+                        selectedSchedule: { day: selectedDay, time: selectedTime },
+                        registrationDate: firebase.firestore.Timestamp.now(),
+                        vehicles
                     });
+                })
+                .then(() => {
+                    alert("✅ Registro exitoso. Redirigiendo...");
+                    window.location.href = "login.html";
+                })
+                .catch((error) => {
+                    console.error("❌ Error en el registro:", error.message);
+                    alert("❌ Error en el registro: " + error.message);
                 });
-
-                // ✅ Validate all fields before registration
-                if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-                    alert("❌ Todos los campos son obligatorios, incluyendo la selección del horario.");
-                    return;
-                }
-
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const userId = userCredential.user.uid;
-                        console.log("✅ Usuario registrado:", userId);
-
-                        return db.collection("users").doc(userId).set({
-                            uid: userId,
-                            name,
-                            email,
-                            phone,
-                            planType,
-                            department,
-                            municipality,
-                            selectedSchedule: {
-                                day: selectedDay,
-                                time: selectedTime
-                            },
-                            registrationDate: firebase.firestore.Timestamp.now(),
-                            vehicles
-                        });
-                    })
-                    .then(() => {
-                        alert("✅ Registro exitoso. Redirigiendo...");
-                        window.location.href = "login.html";
-                    })
-                    .catch((error) => {
-                        console.error("❌ Error en el registro:", error.message);
-                        alert("❌ Error en el registro: " + error.message);
-                    });
-            });
         });
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
@@ -140,19 +124,17 @@
                 vehicleEntry.innerHTML = `
                     <label>Placa:</label>
                     <input type="text" class="plate" required>
-
                     <label>Modelo:</label>
                     <input type="text" class="model" required>
-
                     <label>Marca:</label>
                     <input type="text" class="brand" required>
-
                     <label>Año:</label>
                     <input type="number" class="year" required>
                 `;
                 vehicleContainer.appendChild(vehicleEntry);
             }
-        }        
+        }
+    });
     </script>
 
 </head>
