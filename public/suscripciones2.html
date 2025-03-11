@@ -17,12 +17,27 @@
    
 
     <script>
-  document.addEventListener("DOMContentLoaded", function () {
-            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-                console.error("❌ Error: Firebase env.js not loaded.");
-                alert("❌ Firebase is not initialized. Check env.js.");
-                return;
+ document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".plan-button").forEach(button => {
+        button.addEventListener("click", function () {
+            const selectedPlan = this.getAttribute("data-plan");
+            document.getElementById("planType").value = selectedPlan;
+
+            // Ensure vehicle fields are updated correctly
+            updateVehicleFields(selectedPlan);
+
+            // ✅ Ensure the registration form exists before modifying it
+            const registrationForm = document.getElementById("registration-container");
+            if (registrationForm) {
+                registrationForm.style.display = "block"; // ✅ Show the form
+                registrationForm.scrollIntoView({ behavior: "smooth" }); // ✅ Scroll to form
+                console.log(`✅ Plan seleccionado: ${selectedPlan}`);
+            } else {
+                console.error("❌ Error: No se encontró el contenedor de registro.");
             }
+        });
+    });
+});
 
             const firebaseConfig = {
                 apiKey: window._env_.FIREBASE_API_KEY,
