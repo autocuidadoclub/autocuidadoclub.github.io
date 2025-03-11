@@ -637,50 +637,43 @@ button:hover {
     <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
-    <thead>
-        <tr>
-            <th>Horario</th>
-            <th>Lunes</th>
-            <th>Miércoles</th>
-            <th>Viernes</th>
-            <th>Sábado</th>
-            <th>Domingo</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Bloque 1</td>
-            <td onclick="selectScheduleBox(this, 'Lunes', '9:00 - 11:00')">9:00 - 11:00</td>
-            <td onclick="selectScheduleBox(this, 'Miércoles', '10:00 - 12:00')">10:00 - 12:00</td>
-            <td onclick="selectScheduleBox(this, 'Viernes', '13:00 - 15:00')">13:00 - 15:00</td>
-            <td onclick="selectScheduleBox(this, 'Sábado', '8:00 - 10:00')">8:00 - 10:00</td>
-            <td onclick="selectScheduleBox(this, 'Domingo', '9:00 - 11:00')">9:00 - 11:00</td>
-        </tr>
-        <tr>
-            <td>Bloque 2</td>
-            <td onclick="selectScheduleBox(this, 'Lunes', '12:00 - 14:00')">12:00 - 14:00</td>
-            <td onclick="selectScheduleBox(this, 'Miércoles', '13:00 - 15:00')">13:00 - 15:00</td>
-            <td onclick="selectScheduleBox(this, 'Viernes', '16:00 - 18:00')">16:00 - 18:00</td>
-            <td onclick="selectScheduleBox(this, 'Sábado', '11:00 - 13:00')">11:00 - 13:00</td>
-            <td onclick="selectScheduleBox(this, 'Domingo', '12:00 - 14:00')">12:00 - 14:00</td>
-        </tr>
-        <tr>
-            <td>Bloque 3</td>
-            <td onclick="selectScheduleBox(this, 'Lunes', '15:00 - 17:00')">15:00 - 17:00</td>
-            <td onclick="selectScheduleBox(this, 'Miércoles', '16:00 - 18:00')">16:00 - 18:00</td>
-            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
-            <td onclick="selectScheduleBox(this, 'Sábado', '14:00 - 16:00')">14:00 - 16:00</td>
-            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
-        </tr>
-        </tbody>
-            <tfoot>
-        <tr>
-            <td colspan="6" id="errorMessage" style="color: red; text-align: center; display: none;">
-                <!-- This row will display error messages -->
-            </td>
-        </tr>
-    </tfoot>
-</table>
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
 
 
         <input type="hidden" id="selectedDay" required>
@@ -700,37 +693,36 @@ button:hover {
     
     
     <script>
-     function selectScheduleBox(cell, day, time) {
-    // Get the cell's text value
+      function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
     const timeBlock = cell.innerText.trim();
 
-    // Error handling for invalid selection
-    if (!timeBlock || timeBlock === "-") {
-        document.getElementById("errorMessage").textContent = "⚠️ Por favor, seleccione un horario válido.";
-        document.getElementById("errorMessage").style.display = "table-cell";
-        document.getElementById("selectedDay").value = "";
-        document.getElementById("selectedTime").value = "";
-        console.warn("⚠️ Selección inválida de horario.");
-        return; // Exit function to prevent selection
-    } else {
-        document.getElementById("errorMessage").style.display = "none"; // Hide error if valid selection
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
     }
 
-    // Remove previous selections
-    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
 
-    // Highlight the clicked cell
-    cell.classList.add("selected");
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
 
-    // Store selected schedule in hidden inputs
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = time;
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
-    // ✅ Display message
-    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
-    
-    // Show the selected schedule on the page
-    document.getElementById("selectedScheduleMessage").innerText = `✅ Horario seleccionado: ${day} - ${time}`;
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
 }
 
         const locations = {
