@@ -700,27 +700,22 @@ button:hover {
     
     
     <script>
-      function selectScheduleBox(cell, day, time) {
-    // Remove previous selections
-    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+     function selectScheduleBox(cell, day, time) {
+    // Get the cell's text value
+    const timeBlock = cell.innerText.trim();
 
-    // Check if the cell contains a valid time
-    if (!time || time === "-") {
-        alert("⚠️ Por favor, seleccione un horario válido."); // Same alert from staff template
-        return;
+    // Error handling for invalid selection
+    if (!timeBlock || timeBlock === "-") {
+        document.getElementById("errorMessage").textContent = "⚠️ Por favor, seleccione un horario válido.";
+        document.getElementById("errorMessage").style.display = "table-cell";
+        document.getElementById("selectedDay").value = "";
+        document.getElementById("selectedTime").value = "";
+        console.warn("⚠️ Selección inválida de horario.");
+        return; // Exit function to prevent selection
+    } else {
+        document.getElementById("errorMessage").style.display = "none"; // Hide error if valid selection
     }
 
-    // Highlight the clicked cell
-    cell.classList.add("selected");
-
-    // Store selected schedule in hidden inputs
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = time;
-
-    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
-}
-
-
     // Remove previous selections
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
 
@@ -731,10 +726,12 @@ button:hover {
     document.getElementById("selectedDay").value = day;
     document.getElementById("selectedTime").value = time;
 
-    // Hide the error message if a valid selection is made
-    errorMessage.style.display = "none";
+    // ✅ Display message
+    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
+    
+    // Show the selected schedule on the page
+    document.getElementById("selectedScheduleMessage").innerText = `✅ Horario seleccionado: ${day} - ${time}`;
 }
-
 
         const locations = {
             "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
