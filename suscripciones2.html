@@ -91,83 +91,75 @@ document.querySelectorAll(".plan-button").forEach(button => {
 
 
             // ✅ Attach Event Listener for Registration Form
-document.addEventListener("DOMContentLoaded", function () {
-    const registerForm = document.getElementById("registerForm");
+window.registerUser = function(event) {
+    event.preventDefault(); // Prevent page reload on form submission
 
-    if (!registerForm) {
-        console.error("❌ Error: No se encontró el formulario de registro.");
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const planType = document.getElementById("planType").value;
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
+
+    const vehicles = [];
+    document.querySelectorAll(".vehicle-entry").forEach(entry => {
+        vehicles.push({
+            plate: entry.querySelector(".plate").value,
+            model: entry.querySelector(".model").value,
+            brand: entry.querySelector(".brand").value,
+            year: entry.querySelector(".year").value
+        });
+    });
+
+    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios.");
         return;
     }
 
-    registerForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent default form submission
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const planType = document.getElementById("planType").value;
-        const department = document.getElementById("department").value;
-        const municipality = document.getElementById("municipality").value;
+    auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-        const selectedDay = document.getElementById("selectedDay").value;
-        const selectedTime = document.getElementById("selectedTime").value;
-
-        const vehicles = [];
-        document.querySelectorAll(".vehicle-entry").forEach(entry => {
-            vehicles.push({
-                plate: entry.querySelector(".plate").value,
-                model: entry.querySelector(".model").value,
-                brand: entry.querySelector(".brand").value,
-                year: entry.querySelector(".year").value
-            });
+        return db.collection("users").doc(userId).set({
+            uid: userId,
+            name,
+            email,
+            phone,
+            planType,
+            department,
+            municipality,
+            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            },
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentStatus: "Pending",
+            vehicles
         });
-
-        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-            alert("❌ Todos los campos son obligatorios.");
-            return;
-        }
-
-        // ✅ Firebase Authentication & Firestore Handling
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            const paymentDate = new Date();
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-            return db.collection("users").doc(userId).set({
-                uid: userId,
-                name,
-                email,
-                phone,
-                planType,
-                department,
-                municipality,
-                registrationDate: firebase.firestore.Timestamp.now(),
-                schedule: { 
-                    day: selectedDay, 
-                    time: selectedTime 
-                },
-                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                paymentStatus: "Pending",
-                vehicles
-            });
-        })
-        .then(() => {
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
+    })
+    .then(() => {
+        alert("✅ Registro exitoso. Redirigiendo...");
+        window.location.href = "login.html";
+    })
+    .catch((error) => {
+        console.error("❌ Error en el registro:", error.message);
+        alert("❌ Error en el registro: " + error.message);
     });
-});
+};
+
+        });
 
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
