@@ -672,7 +672,14 @@ button:hover {
             <td onclick="selectScheduleBox(this, 'Sábado', '14:00 - 16:00')">14:00 - 16:00</td>
             <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
         </tr>
-    </tbody>
+        </tbody>
+            <tfoot>
+        <tr>
+            <td colspan="6" id="errorMessage" style="color: red; text-align: center; display: none;">
+                <!-- This row will display error messages -->
+            </td>
+        </tr>
+    </tfoot>
 </table>
 
 
@@ -697,9 +704,10 @@ button:hover {
     // Get the cell's text value
     const timeBlock = cell.innerText.trim();
 
-    // Check if the cell is empty or has a dash (invalid)
+   // Check if the cell is empty or has a dash (invalid)
     if (!timeBlock || timeBlock === "-") {
-        alert("Por favor, seleccione un horario válido.");
+        document.getElementById("errorMessage").textContent = "⚠️ Por favor, seleccione un horario válido.";
+        document.getElementById("errorMessage").style.display = "table-cell";
         return; // Exit function to prevent selection
     }
 
