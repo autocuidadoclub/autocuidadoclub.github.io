@@ -810,17 +810,13 @@ button:hover {
         
     </footer>
             <script>
-                document.addEventListener("DOMContentLoaded", function () {
-    const planButtons = document.querySelectorAll(".plan-button");
-    const registrationContainer = document.getElementById("registration-container");
+               document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded!");
+
     const planTypeField = document.getElementById("planType");
+    const planButtons = document.querySelectorAll(".plan-button");
 
-    // ✅ Ensure elements exist before proceeding
-    if (!registrationContainer || !planTypeField) {
-        console.error("❌ Error: Elementos clave no encontrados en el DOM.");
-        return;
-    }
-
+   
     // ✅ Attach event listeners to all plan buttons
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
@@ -833,12 +829,9 @@ button:hover {
 
             // ✅ Set selected plan in form
             planTypeField.value = selectedPlan;
-            planTypeField.disabled = false; // Allow editing if necessary
+            planTypeField.disabled = false;
 
-            // ✅ Update vehicle fields based on the plan
-            updateVehicleFields(selectedPlan);
-
-            // ✅ Make sure the form is visible
+            // ✅ Show the registration form
             registrationContainer.style.display = "block";
 
             // ✅ Smooth scroll to form
@@ -848,6 +841,7 @@ button:hover {
         });
     });
 });
+
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
 function updateVehicleFields(planType) {
