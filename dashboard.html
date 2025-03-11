@@ -342,147 +342,165 @@
     measurementId: window._env_.FIREBASE_MEASUREMENT_ID
 };
 
-
-    document.addEventListener("DOMContentLoaded", function () {
-    if (window._env_) {
-        const firebaseConfig = {
-            apiKey: window._env_.FIREBASE_API_KEY,
-            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-            databaseURL: window._env_.FIREBASE_DATABASE_URL,
-            projectId: window._env_.FIREBASE_PROJECT_ID,
-            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-            appId: window._env_.FIREBASE_APP_ID,
-            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-            .then(() => console.log("Authentication persistence set to LOCAL."))
-            .catch((error) => console.error("Error setting authentication persistence:", error.message));
-
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log("User logged in:", user.email);
-                document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-
-                db.collection("users").doc(user.email).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            const userData = doc.data();
-                            updateUserInfo(userData);
-                        } else {
-                            console.error("User profile not found.");
-                        }
-                    })
-                    .catch((error) => console.error("Error fetching user profile:", error));
-            } else {
-                console.log("No authenticated user. Redirecting to login.");
-                window.location.href = 'login.html';
-            }
-        });
-    } else {
-        console.error("Environment variables (env.js) not loaded.");
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+        console.error("❌ Error: Firebase env.js not loaded.");
+        alert("❌ Firebase is not initialized. Check env.js.");
+        return;
     }
-});
 
+    // ✅ Initialize Firebase
+    const firebaseConfig = {
+        apiKey: window._env_.FIREBASE_API_KEY,
+        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+        projectId: window._env_.FIREBASE_PROJECT_ID,
+        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+        appId: window._env_.FIREBASE_APP_ID,
+        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("✅ Firebase initialized successfully!");
+    }
 
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => {
-            console.log("Authentication persistence set to LOCAL.");
-        })
-        .catch((error) => {
-            console.error("Error setting authentication persistence:", error.message);
-        });
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log("✅ User logged in:", user.email);
 
-    // Check if user is logged in and load profile info
-   auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log("User is logged in:", user.email);
-        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
 
-        // Fetch user profile
-        db.collection("users").doc(user.email).get()
-            .then((doc) => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    console.log("User profile data:", userData);
-
-                    // Update user info first
-                    updateUserInfo(userData);
-
-                    // Then update the loyalty card
-                    updateLoyaltyCard(userData);
-                } else {
-                    console.error("User profile not found.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching user profile:", error);
-            });
-    } else {
-        console.log("No authenticated user. Redirecting to login.");
-        window.location.href = 'login.html';
-    }
+            // Fetch user profile using UID instead of email
+            db.collection("users").doc(user.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        updateUserInfo(userData);
+                    } else {
+                        console.error("❌ User profile not found in Firestore.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("❌ Error fetching user profile:", error);
+                });
+        } else {
+            console.log("❌ No authenticated user. Redirecting to login...");
+            window.location.href = 'login.html';
+        }
+    });
 });
 
+// ✅ Update User Info in Dashboard
 function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
     document.getElementById("phone").innerText = userData.phone || "N/A";
     document.getElementById("planType").innerText = userData.planType || "N/A";
-    document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
+    
+    // ✅ Correct Schedule Format
+    document.getElementById("current-schedule").innerText = userData.schedule 
+        ? `${userData.schedule.day} - ${userData.schedule.time}`
+        : "No asignado";
+
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+
     document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
     document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
+    // ✅ Vehicles Section
+    loadVehicles(userData.vehicles);
+
+    // ✅ Payment Handling
+    handlePaymentStatus(userData);
+
+    // ✅ Update Loyalty Card
+    updateLoyaltyCard(userData);
+}
+
+// ✅ Load User Vehicles
+function loadVehicles(vehicles) {
     const vehiclesList = document.getElementById("vehicles-list");
-    if (userData.vehicles && Array.isArray(userData.vehicles) && userData.vehicles.length > 0) {
-        vehiclesList.innerText = userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ");
-    } else {
-        vehiclesList.innerText = "No hay vehículos registrados.";
+    vehiclesList.innerHTML = ""; // Clear existing content
+
+    if (!vehicles || vehicles.length === 0) {
+        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+        return;
     }
 
-    // Check payment status
-    if (!userData.paymentDate || userData.paymentDate === "Pendiente") {
-        document.getElementById("payment-warning").style.display = "block";
-        
-        // Get the PayPal link for the user's plan
+    vehicles.forEach((vehicle, index) => {
+        vehiclesList.innerHTML += `
+            <div class="vehicle-card">
+                <h4>Vehículo ${index + 1}</h4>
+                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+            </div>
+        `;
+    });
+}
+
+// ✅ Handle Payment Status
+function handlePaymentStatus(userData) {
+    const paymentWarning = document.getElementById("payment-warning");
+    const completePayment = document.getElementById("complete-payment");
+    const paymentLink = document.getElementById("payment-link");
+
+    if (userData.paymentStatus === "Pending") {
+        paymentWarning.style.display = "block";
+
+        // ✅ Get PayPal link based on plan
         let payPalURL = getPaypalLink(userData.planType);
-        
         if (payPalURL) {
-            document.getElementById("payment-link").href = payPalURL;
-            document.getElementById("complete-payment").style.display = "block";
+            paymentLink.href = payPalURL;
+            completePayment.style.display = "block";
         } else {
-            console.error("No PayPal link found for plan:", userData.planType);
+            console.error("❌ No PayPal link found for plan:", userData.planType);
         }
     } else {
-        document.getElementById("payment-warning").style.display = "none";
-        document.getElementById("complete-payment").style.display = "none";
+        paymentWarning.style.display = "none";
+        completePayment.style.display = "none";
     }
 }
 
-// Function to return the correct PayPal link based on the plan type
+// ✅ Get PayPal Link Based on Plan Type
 function getPaypalLink(planType) {
-    switch (planType) {
-        case "basic3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72";
-        case "basic6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A";
-        case "basic12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ";
-        case "plus3m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS";
-        case "plus6m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56";
-        case "plus12m": return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN";
-        default: return null;
-    }
+    const payPalLinks = {
+        "basic3m": "https://www.paypal.com/pay/basic3m",
+        "basic6m": "https://www.paypal.com/pay/basic6m",
+        "basic12m": "https://www.paypal.com/pay/basic12m",
+        "plus3m": "https://www.paypal.com/pay/plus3m",
+        "plus6m": "https://www.paypal.com/pay/plus6m",
+        "plus12m": "https://www.paypal.com/pay/plus12m"
+    };
+    return payPalLinks[planType] || null;
+}
+
+// ✅ Format Firestore Timestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+}
+
+// ✅ Logout Function
+function logoutUser() {
+    auth.signOut()
+        .then(() => {
+            window.location.href = 'login.html';
+        })
+        .catch((error) => {
+            console.error("❌ Error during logout:", error);
+        });
 }
 
 
