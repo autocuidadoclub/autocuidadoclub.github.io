@@ -44,6 +44,16 @@
             const auth = firebase.auth();
             const db = firebase.firestore();
 
+      // ✅ Function to Select a Schedule Box
+window.selectScheduleBox = function(cell, day, time) {
+    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+    cell.classList.add("selected");
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = time;
+    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
+};
+
+
             // ✅ Handle Plan Selection & Show Correct Vehicle Fields
 document.querySelectorAll(".plan-button").forEach(button => {
     button.addEventListener("click", function () {
@@ -103,6 +113,11 @@ document.querySelectorAll(".plan-button").forEach(button => {
                             department,
                             municipality,
                             registrationDate: firebase.firestore.Timestamp.now(),
+                            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            }, // ✅ Make sure this is included
                             vehicles
                         });
                     })
@@ -424,8 +439,9 @@ button:hover {
     cell.classList.add("selected");
 
     // Store selected schedule in hidden inputs
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = time;
+   const selectedDay = document.getElementById("selectedDay").value;
+const selectedTime = document.getElementById("selectedTime").value;
+
 
     console.log(`✅ Horario seleccionado: ${day} - ${time}`);
 }
