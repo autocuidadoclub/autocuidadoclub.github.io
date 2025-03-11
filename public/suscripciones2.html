@@ -45,18 +45,18 @@
             const db = firebase.firestore();
 
             // ✅ Handle Plan Selection & Show Correct Vehicle Fields
-            document.querySelectorAll(".plan-button").forEach(button => {
-                button.addEventListener("click", function () {
-                    const selectedPlan = this.getAttribute("data-plan");
-                    document.getElementById("planType").value = selectedPlan;
-                    updateVehicleFields(selectedPlan);
-                    
-                    // Scroll to registration form
-                    document.getElementById("registerForm").scrollIntoView({ behavior: "smooth" });
+document.querySelectorAll(".plan-button").forEach(button => {
+    button.addEventListener("click", function () {
+        const selectedPlan = this.getAttribute("data-plan");
+        document.getElementById("planType").value = selectedPlan;
+        updateVehicleFields(selectedPlan); // Ensure vehicles update dynamically
 
-                    console.log(`✅ Plan seleccionado: ${selectedPlan}`);
-                });
-            });
+        // Scroll to registration form
+        document.getElementById("registerForm").scrollIntoView({ behavior: "smooth" });
+
+        console.log(`✅ Plan seleccionado: ${selectedPlan}`);
+    });
+});
 
             // ✅ Attach Event Listener for Registration Form
             document.getElementById("registerForm").addEventListener("submit", function (event) {
@@ -115,31 +115,33 @@
         });
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
-        function updateVehicleFields(planType) {
-            const vehicleContainer = document.getElementById("vehicle-container");
-            vehicleContainer.innerHTML = ""; // Clear previous entries
+function updateVehicleFields(planType) {
+    const vehicleContainer = document.getElementById("vehicle-container");
+    vehicleContainer.innerHTML = ""; // Clear previous entries
 
-            let maxVehicles = (planType.includes("plus")) ? 3 : 1;
+    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
 
-            for (let i = 0; i < maxVehicles; i++) {
-                const vehicleEntry = document.createElement("div");
-                vehicleEntry.classList.add("vehicle-entry");
-                vehicleEntry.innerHTML = `
-                    <label>Placa:</label>
-                    <input type="text" class="plate" required>
+    for (let i = 0; i < maxVehicles; i++) {
+        const vehicleEntry = document.createElement("div");
+        vehicleEntry.classList.add("vehicle-entry");
+        vehicleEntry.innerHTML = `
+            <h4>Vehículo ${i + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" class="plate" required>
 
-                    <label>Modelo:</label>
-                    <input type="text" class="model" required>
+            <label>Modelo:</label>
+            <input type="text" class="model" required>
 
-                    <label>Marca:</label>
-                    <input type="text" class="brand" required>
+            <label>Marca:</label>
+            <input type="text" class="brand" required>
 
-                    <label>Año:</label>
-                    <input type="number" class="year" required>
-                `;
-                vehicleContainer.appendChild(vehicleEntry);
-            }
-        } 
+            <label>Año:</label>
+            <input type="number" class="year" required>
+        `;
+        vehicleContainer.appendChild(vehicleEntry);
+    }
+}
+
     </script>
 
 </head>
