@@ -700,21 +700,26 @@ button:hover {
     
     
     <script>
-       function selectScheduleBox(cell, day, time) {
-    // Get the error message element
-    const errorMessage = document.getElementById("errorMessage");
+      function selectScheduleBox(cell, day, time) {
+    // Remove previous selections
+    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
 
-    // Get the cell's text value
-    const timeBlock = cell.innerText.trim();
-
-    // Check if the cell is empty or has a dash (invalid)
-    if (!timeBlock || timeBlock === "-") {
-        errorMessage.textContent = "⚠️ Por favor, seleccione un horario válido.";
-        errorMessage.style.display = "table-cell";
-        errorMessage.style.padding = "10px"; // Add padding for better visibility
-        errorMessage.style.fontWeight = "bold"; 
-        return; // Exit function to prevent selection
+    // Check if the cell contains a valid time
+    if (!time || time === "-") {
+        alert("⚠️ Por favor, seleccione un horario válido."); // Same alert from staff template
+        return;
     }
+
+    // Highlight the clicked cell
+    cell.classList.add("selected");
+
+    // Store selected schedule in hidden inputs
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = time;
+
+    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
+}
+
 
     // Remove previous selections
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
