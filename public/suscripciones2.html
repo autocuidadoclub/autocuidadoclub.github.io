@@ -74,62 +74,64 @@ document.querySelectorAll(".plan-button").forEach(button => {
 
             // ✅ Attach Event Listener for Registration Form
             document.getElementById("registerForm").addEventListener("submit", function (event) {
-                event.preventDefault();
+    event.preventDefault();
 
-                const name = document.getElementById("name").value.trim();
-                const email = document.getElementById("email").value.trim();
-                const phone = document.getElementById("phone").value.trim();
-                const password = document.getElementById("password").value.trim();
-                const planType = document.getElementById("planType").value;
-                const department = document.getElementById("department").value;
-                const municipality = document.getElementById("municipality").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const planType = document.getElementById("planType").value;
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
 
-                const vehicles = [];
-                document.querySelectorAll(".vehicle-entry").forEach(entry => {
-                    vehicles.push({
-                        plate: entry.querySelector(".plate").value,
-                        model: entry.querySelector(".model").value,
-                        brand: entry.querySelector(".brand").value,
-                        year: entry.querySelector(".year").value
-                    });
-                });
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
 
-                if (!name || !email || !phone || !password || !department || !municipality) {
-                    alert("❌ Todos los campos son obligatorios.");
-                    return;
-                }
+    const vehicles = [];
+    document.querySelectorAll(".vehicle-entry").forEach(entry => {
+        vehicles.push({
+            plate: entry.querySelector(".plate").value,
+            model: entry.querySelector(".model").value,
+            brand: entry.querySelector(".brand").value,
+            year: entry.querySelector(".year").value
+        });
+    });
 
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const userId = userCredential.user.uid;
-                        console.log("✅ Usuario registrado:", userId);
+    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios.");
+        return;
+    }
 
-                        return db.collection("users").doc(userId).set({
-                            uid: userId,
-                            name,
-                            email,
-                            phone,
-                            planType,
-                            department,
-                            municipality,
-                            registrationDate: firebase.firestore.Timestamp.now(),
-                            registrationDate: firebase.firestore.Timestamp.now(),
-            schedule: { 
-                day: selectedDay, 
-                time: selectedTime 
-            }, // ✅ Make sure this is included
-                            vehicles
-                        });
-                    })
-                    .then(() => {
-                        alert("✅ Registro exitoso. Redirigiendo...");
-                        window.location.href = "login.html";
-                    })
-                    .catch((error) => {
-                        console.error("❌ Error en el registro:", error.message);
-                        alert("❌ Error en el registro: " + error.message);
-                    });
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            console.log("✅ Usuario registrado:", userId);
+
+            return db.collection("users").doc(userId).set({
+                uid: userId,
+                name,
+                email,
+                phone,
+                planType,
+                department,
+                municipality,
+                registrationDate: firebase.firestore.Timestamp.now(),
+                schedule: { 
+                    day: selectedDay, 
+                    time: selectedTime 
+                }, 
+                vehicles
             });
+        })
+        .then(() => {
+            alert("✅ Registro exitoso. Redirigiendo...");
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+});
 
         });
 
