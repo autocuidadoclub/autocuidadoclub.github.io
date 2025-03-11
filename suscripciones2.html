@@ -35,6 +35,13 @@
             } else {
                 console.error("❌ Error: No se encontró el contenedor de registro.");
             }
+         // ✅ Show the registration form
+            registrationContainer.style.display = "block"; // Ensure it is visible
+
+            // ✅ Scroll smoothly to the registration form
+            registrationContainer.scrollIntoView({ behavior: "smooth" });
+
+            console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
         });
     });
 });
