@@ -174,7 +174,119 @@ function updateVehicleFields(planType) {
 </head>
 
 <body>
+<!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
+<!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Bienvenido a AutoCuidado Club</h1>
+                <p>Tu tiempo es oro, nuestro cuidado es total.</p>
+            </div>
+        </div>
+    </header>
 
+<!-- Add this near the subscription plans, ideally before or after the plan options -->
+<div class="subscription-disclaimer">
+  <p>
+    <strong>Nota:</strong> Los servicios de AutoCuidado Club están diseñados exclusivamente para motores de gasolina. Esto está alineado con nuestro compromiso de ofrecer movilidad con una huella de carbono más baja. Según la Agencia Europea de Medio Ambiente (EEA), los motores diésel son responsables de hasta 20 veces más contaminación que los de gasolina.
+  </p>
+</div>
+
+<!-- Optional styles -->
+<style>
+  .subscription-disclaimer {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    font-size: 15px;
+    color: #555;
+  }
+</style>
+
+    <!-- Discount & Subscription Comparison Table -->
+    <section>
+        <h2>📊 Comparación de Planes y Descuentos</h2>
+        <table class="subscription-table">
+            <thead>
+                <tr>
+                    <th>Tipo de Suscripción</th>
+                    <th>3 Meses (por vehículo)</th>
+                    <th>6 Meses (por vehículo)</th>
+                    <th>12 Meses (por vehículo)</th>
+                    <th>Descuento vs. plan básico de 3 meses</th>
+                    <th>Ahorro Total</th>
+                    <th colspan="2">Beneficios adicionales</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>Basic (1 vehículo)</b></td>
+                    <td>$34.99</td>
+                    <td class="highlight-cell">$32.50</td>
+                    <td class="highlight-cell">$30.00</td>
+                    <td><p>7% (6m)</p> <p>14% (12m)</p></td>
+                    <td colspan="2" class="merged-cell">Hasta <b>$60/año</b> 🏆 <b>Equivalente a 1.8 meses gratis</b></td>
+                    <td>✔ Accede a beneficios después de 8 meses</td>
+                </tr>
+                <tr>
+                    <td><b>Plus (3 vehículos)</b></td>
+                    <td class="highlight-cell">$23.50</td>
+                    <td class="highlight-cell">$22.00</td>
+                    <td class="highlight-cell">$20.00</td>
+                    <td><p>33% (3m)</p> <p>38% (6m)</p> <p>42% (12m)</p></td>
+                    <td colspan="2" class="merged-cell">Hasta <b>$180/año</b> 🏆 <b>Equivalente a 5.5 meses gratis</b></td>
+                    <td>✔ Accede a beneficios después de 8 meses</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Loyalty Program & Explanation -->
+    <section>
+        <h2>🔥 ¿Por qué elegir los planes de 12 meses?</h2>
+        <div class="benefits-list">
+            <h3>💎 Plan de 12 Meses PLUS = Mayor Beneficio</h3>
+            <p>📢 **Obtén más valor y beneficios al pagar 12 meses de una sola vez.**</p>
+            <ul>
+                <li>💰 **Pagar 12 meses significa que cada vehículo recibe el servicio por el equivalente a pagar solo 8.5 meses en comparación con planes más cortos.**</li>
+                <li>📌 **Ahorro total de $180/año y acceso inmediato a recompensas exclusivas en el mes 8.**</li>
+                <li>🎁 **Equivalente a recibir 5.5 meses de servicio gratis en comparación con el plan de 3 meses.**</li>
+            </ul>
+        </div>
+        <div class="benefits-list">
+            <h3>💰 Plan de 12 Meses BASIC = Oportunidad Única</h3>
+            <p>📢 **Paga 12 meses y obtén más por tu dinero.**</p>
+            <ul>
+                <li>💰 **Cada mes cuesta menos, lo que equivale a pagar solo 10 meses en comparación con el plan de 3 meses.**</li>
+                <li>🎁 **Ahorro total de $60/año + acceso a recompensas en el mes 8.**</li>
+            </ul>
+        </div>
+        <div>
+        <h3 class="warning-text">🚀 ¿Cuál elegirás? ¡Elige la mejor opción y empieza a ahorrar HOY! </h3>
+    </div>
+    </section>
+<p></p>
+    <p></p>
+    
+    <!-- Subscription Plans -->
+    <section>
      <!-- Subscription Plans -->
     <section>
         
@@ -543,6 +655,38 @@ const selectedTime = document.getElementById("selectedTime").value;
             
         <button type="submit">Registrarse</button>
     </form>
+ <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
 
+<div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+    
+        
+    </footer>
 </body>
 </html>
