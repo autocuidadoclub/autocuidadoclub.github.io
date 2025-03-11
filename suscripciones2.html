@@ -49,14 +49,18 @@ document.querySelectorAll(".plan-button").forEach(button => {
     button.addEventListener("click", function () {
         const selectedPlan = this.getAttribute("data-plan");
         document.getElementById("planType").value = selectedPlan;
-        updateVehicleFields(selectedPlan); // Ensure vehicles update dynamically
+        updateVehicleFields(selectedPlan);
 
-        // Scroll to registration form
-        document.getElementById("registerForm").scrollIntoView({ behavior: "smooth" });
+        // Show the registration form
+        document.getElementById("registration-container").style.display = "block";
+
+        // Scroll smoothly to registration form
+        document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
 
         console.log(`✅ Plan seleccionado: ${selectedPlan}`);
     });
 });
+
 
             // ✅ Attach Event Listener for Registration Form
             document.getElementById("registerForm").addEventListener("submit", function (event) {
@@ -303,7 +307,7 @@ button:hover {
             </div>
         </div>
     </section>
-    
+    <div id="registration-container" style="display: none;">
     <h2>Registro en AutoCuidado Club</h2>
     <form id="registerForm" onsubmit="registerUser(event)">
         <label>Nombre:</label>
@@ -319,7 +323,7 @@ button:hover {
         <input type="password" id="password" required>
 
         <label>Selecciona tu Plan:</label>
-        <select id="planType">
+        <select id="planType" disabled>
             <option value="basic3m">Basic - 1 Vehículo</option>
             <option value="plus3m">Plus - Hasta 3 Vehículos</option>
         </select>
