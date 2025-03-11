@@ -344,23 +344,31 @@ function logout() {
     paymentTable.innerHTML = ""; // Clear table
 
     db.collection("users")
-        .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-        .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
-        .get()
-        .then((querySnapshot) => {
-            if (querySnapshot.empty) {
-                alert("No se encontraron usuarios en el rango de fechas.");
-                return;
-            }
-            querySnapshot.forEach((doc) => {
-                const user = doc.data();
-                updatePaymentTable(user, doc.id);
-            });
-        })
-        .catch((error) => {
-            console.error("Error fetching users by date:", error);
-            alert("Error al buscar usuarios. Inténtalo nuevamente.");
+    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+    .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
+    .limit(1000)  // ✅ Ensures you fetch up to 1000 users
+    .get()
+        db.collection("users")
+    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+    .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
+    .limit(1000) 
+    .get()
+    .then((querySnapshot) => {
+        console.log(`📊 Total users found: ${querySnapshot.size}`);
+
+        querySnapshot.forEach((doc) => {
+            console.log("👤 User found:", doc.id, doc.data());
         });
+
+        if (querySnapshot.empty) {
+            alert("No se encontraron usuarios en el rango de fechas.");
+        }
+    })
+    .catch((error) => {
+        console.error("❌ Error fetching users:", error);
+        alert("Error al buscar usuarios.");
+    });
+
 }
 
 
