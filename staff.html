@@ -229,13 +229,7 @@ resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(quer
                 </thead>
                 <tbody id="rescheduleTable"></tbody>
             </table>
-        </div>
-       <button id="authenticateButton" onclick="authenticateUser()">Autenticar con Google</button>
-        <button onclick="logoutGoogle()">Cerrar Sesión de Google</button>
-        <div>
-    <button onclick="createEvent('2025-01-30T10:00:00Z', 'John Doe', 'john.doe@example.com')">Crear Evento de Ejemplo</button>
-    <button onclick="updateEvent('exampleEventId123', '2025-02-01T14:00:00Z')">Actualizar Evento de Ejemplo</button>
-    <button onclick="deleteEvent('exampleEventId123')">Eliminar Evento de Ejemplo</button>
+      
 </div>
   
 
@@ -318,82 +312,7 @@ resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(quer
 });
 
 
-        function authenticateUser() {
-    gapi.auth2.getAuthInstance().signIn().then(() => {
-        console.log("User authenticated");
-        alert("Autenticación exitosa con Google Calendar.");
-    }).catch((error) => {
-        console.error("Authentication error:", error);
-        alert("Error en la autenticación con Google Calendar.");
-    });
-}
-
-        function createEvent(inspectionDate, userName, userEmail) {
-    const event = {
-        summary: `Inspection Booking for ${userName}`,
-        description: `Inspection scheduled for ${userName}.`,
-        start: {
-            dateTime: inspectionDate, // Format: 'YYYY-MM-DDTHH:mm:ssZ'
-            timeZone: 'America/El_Salvador'
-        },
-        end: {
-            dateTime: new Date(new Date(inspectionDate).getTime() + 3600000).toISOString(),
-            timeZone: 'America/El_Salvador'
-        },
-        attendees: [{ email: userEmail }]
-    };
-
-    gapi.client.calendar.events.insert({
-        calendarId: 'primary',
-        resource: event
-    }).then(response => {
-        console.log("Event created:", response.result);
-        alert(`Inspection scheduled for ${userName}`);
-        // Save event ID to your database
-        const eventId = response.result.id;
-        console.log("Event ID saved:", eventId);
-    }).catch(error => {
-        console.error("Error creating event:", error);
-        alert("Error al crear el evento.");
-    });
-}
-
-        function updateEvent(eventId, newInspectionDate) {
-    const updatedEvent = {
-        start: {
-            dateTime: newInspectionDate,
-            timeZone: 'America/El_Salvador'
-        },
-        end: {
-            dateTime: new Date(new Date(newInspectionDate).getTime() + 3600000).toISOString(),
-            timeZone: 'America/El_Salvador'
-        }
-    };
-
-    gapi.client.calendar.events.patch({
-        calendarId: 'primary',
-        eventId: eventId,
-        resource: updatedEvent
-    }).then(response => {
-        console.log("Event updated:", response);
-        alert("Inspection rescheduled successfully.");
-    }).catch(error => {
-        console.error("Error updating event:", error);
-        alert("Error al actualizar el evento.");
-    });
-}
-function deleteEvent(eventId) {
-    gapi.client.calendar.events.delete({
-        calendarId: 'primary',
-        eventId: eventId
-    }).then(() => {
-        console.log("Event deleted");
-        alert("Evento eliminado con éxito.");
-    }).catch(error => {
-        console.error("Error deleting event:", error);
-        alert("Error al eliminar el evento.");
-    });
-}
+       
 function logout() {
     const auth = firebase.auth();
     
@@ -408,69 +327,88 @@ function logout() {
 }
 
 
-        function findUsersByDate() {
-            const startDate = new Date(document.getElementById("startDate").value);
-            const endDate = new Date(document.getElementById("endDate").value);
-            endDate.setDate(endDate.getDate() + 1); // Include the full day
+       function findUsersByDate() {
+    const startDateValue = document.getElementById("startDate").value;
+    const endDateValue = document.getElementById("endDate").value;
 
-            const paymentTable = document.getElementById("paymentTable");
-            paymentTable.innerHTML = ""; // Clear table
+    if (!startDateValue || !endDateValue) {
+        alert("Por favor, seleccione ambas fechas.");
+        return;
+    }
 
-            db.collection("users").where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-                .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
-                .get()
-                .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        alert("No se encontraron usuarios en el rango de fechas.");
-                        return;
-                    }
-                    querySnapshot.forEach((doc) => {
-                        const user = doc.data();
-                        updatePaymentTable(user, doc.id);
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error fetching users by date:", error);
-                    alert("Error al buscar usuarios. Inténtalo nuevamente.");
-                });
-        }
+    const startDate = new Date(startDateValue);
+    const endDate = new Date(endDateValue);
+    endDate.setDate(endDate.getDate() + 1); // Include full last day
 
-        function findRescheduledUsers() {
-            const startDate = new Date(document.getElementById("rescheduleStartDate").value);
-            const endDate = new Date(document.getElementById("rescheduleEndDate").value);
-            endDate.setDate(endDate.getDate() + 1); // Include the full day
+    const paymentTable = document.getElementById("paymentTable");
+    paymentTable.innerHTML = ""; // Clear table
 
-            const rescheduleTable = document.getElementById("rescheduleTable");
-            rescheduleTable.innerHTML = ""; // Clear previous results
+    db.collection("users")
+        .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get()
+        .then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                alert("No se encontraron usuarios en el rango de fechas.");
+                return;
+            }
+            querySnapshot.forEach((doc) => {
+                const user = doc.data();
+                updatePaymentTable(user, doc.id);
+            });
+        })
+        .catch((error) => {
+            console.error("Error fetching users by date:", error);
+            alert("Error al buscar usuarios. Inténtalo nuevamente.");
+        });
+}
 
-            db.collection("users").where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-                .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
-                .get()
-                .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
-                        return;
-                    }
-                    querySnapshot.forEach((doc) => {
-                        const user = doc.data();
-                        const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
 
-                        rescheduleTable.innerHTML += `
-                            <tr>
-                                <td>${user.name}</td>
-                                <td>${user.email}</td>
-                                <td>${user.phone || "No disponible"}</td>
-                                <td>${user.selectedSchedule || "No asignado"}</td>
-                                <td>${lastReschedule}</td>
-                                <td><button onclick="updateInspection('${doc.id}', '${user.selectedSchedule}')">Actualizar Inspección</button></td>
-                            </tr>`;
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error fetching rescheduled users:", error);
-                    alert("Error al buscar reprogramaciones. Inténtalo nuevamente.");
-                });
-        }
+       function findRescheduledUsers() {
+    const startDateValue = document.getElementById("rescheduleStartDate").value;
+    const endDateValue = document.getElementById("rescheduleEndDate").value;
+
+    if (!startDateValue || !endDateValue) {
+        alert("Por favor, seleccione ambas fechas.");
+        return;
+    }
+
+    const startDate = new Date(startDateValue);
+    const endDate = new Date(endDateValue);
+    endDate.setDate(endDate.getDate() + 1);
+
+    const rescheduleTable = document.getElementById("rescheduleTable");
+    rescheduleTable.innerHTML = ""; // Clear previous results
+
+    db.collection("users")
+        .where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get()
+        .then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
+                return;
+            }
+            querySnapshot.forEach((doc) => {
+                const user = doc.data();
+                const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
+
+                rescheduleTable.innerHTML += `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone || "No disponible"}</td>
+                        <td>${user.schedule?.day || "No asignado"}, ${user.schedule?.time || "No asignado"}</td>
+                        <td>${lastReschedule}</td>
+                    </tr>`;
+            });
+        })
+        .catch((error) => {
+            console.error("Error fetching rescheduled users:", error);
+            alert("Error al buscar reprogramaciones. Inténtalo nuevamente.");
+        });
+}
+
 
         function updateInspection(userId, selectedSchedule) {
             if (!selectedSchedule) {
