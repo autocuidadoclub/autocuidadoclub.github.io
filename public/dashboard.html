@@ -492,16 +492,30 @@ function formatTimestamp(timestamp) {
     });
 }
 
-// ✅ Logout Function
+// ✅ Logout Function with Error Handling
 function logoutUser() {
+    const auth = firebase.auth();
+    
     auth.signOut()
         .then(() => {
-            window.location.href = 'login.html';
+            console.log("✅ User logged out successfully.");
+            // ✅ Clear session storage and redirect
+            sessionStorage.clear();
+            window.location.href = "login.html";
         })
         .catch((error) => {
-            console.error("❌ Error during logout:", error);
+            console.error("❌ Error during logout:", error.message);
+            alert("❌ Error al cerrar sesión: " + error.message);
         });
 }
+
+// ✅ Attach Logout Function to Button
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.getElementById("logout-btn"); // Ensure the button has this ID
+    if (logoutButton) {
+        logoutButton.addEventListener("click", logoutUser);
+    }
+});
 
 
 
