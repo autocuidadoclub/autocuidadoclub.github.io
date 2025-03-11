@@ -103,26 +103,32 @@ document.querySelectorAll(".plan-button").forEach(button => {
     }
 
     auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            console.log("✅ Usuario registrado:", userId);
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-            return db.collection("users").doc(userId).set({
-                uid: userId,
-                name,
-                email,
-                phone,
-                planType,
-                department,
-                municipality,
-                registrationDate: firebase.firestore.Timestamp.now(),
-                schedule: { 
-                    day: selectedDay, 
-                    time: selectedTime 
-                }, 
-                vehicles
-            });
-        })
+        return db.collection("users").doc(userId).set({
+            uid: userId,
+            name,
+            email,
+            phone,
+            planType,
+            department,
+            municipality,
+            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            },
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentStatus: "Pending",
+            vehicles
+        });
+    })
+
         .then(() => {
             alert("✅ Registro exitoso. Redirigiendo...");
             window.location.href = "login.html";
