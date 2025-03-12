@@ -655,7 +655,7 @@ button:hover {
     
     
     <script>
-      function selectScheduleBox(cell) {
+    function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
 
     // Get the clicked cell's text
@@ -810,13 +810,18 @@ button:hover {
         
     </footer>
             <script>
-               document.addEventListener("DOMContentLoaded", function () {
+              document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
-    const planTypeField = document.getElementById("planType");
+    const registrationContainer = document.getElementById("registration-container");
+
+    if (!registrationContainer) {
+        console.error("❌ Error: No se encontró el contenedor de registro en el DOM.");
+        return;
+    }
+
     const planButtons = document.querySelectorAll(".plan-button");
 
-   
     // ✅ Attach event listeners to all plan buttons
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
@@ -827,10 +832,14 @@ button:hover {
                 return;
             }
 
-    console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
+            registrationContainer.style.display = "block"; // ✅ Show form
+            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+
+            console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
         });
     });
 });
+
 
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
