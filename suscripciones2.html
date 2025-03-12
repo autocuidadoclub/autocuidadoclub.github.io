@@ -84,12 +84,25 @@ window.registerUser = function(event) {
     const selectedTimeField = document.getElementById("selectedTime");
 
     // ✅ Check if any field is missing
-    if (!nameField || !emailField || !phoneField || !passwordField || !planTypeField || 
-        !departmentField || !municipalityField || !selectedDayField || !selectedTimeField) {
-        console.error("❌ Error: Un campo requerido no se encontró en el DOM.");
-        alert("❌ Error interno: Un campo necesario no se encuentra en la página.");
-        return;
-    }
+   // ✅ Check which fields are missing
+const missingFields = [];
+
+if (!nameField) missingFields.push("nameField (Nombre)");
+if (!emailField) missingFields.push("emailField (Email)");
+if (!phoneField) missingFields.push("phoneField (Teléfono)");
+if (!passwordField) missingFields.push("passwordField (Contraseña)");
+if (!planTypeField) missingFields.push("planTypeField (Tipo de Plan)");
+if (!departmentField) missingFields.push("departmentField (Departamento)");
+if (!municipalityField) missingFields.push("municipalityField (Municipio)");
+if (!selectedDayField) missingFields.push("selectedDayField (Día seleccionado)");
+if (!selectedTimeField) missingFields.push("selectedTimeField (Hora seleccionada)");
+
+if (missingFields.length > 0) {
+    console.error("❌ Error: Los siguientes campos están ausentes en el DOM:", missingFields);
+    alert("❌ Error interno: Faltan los siguientes campos en la página:\n" + missingFields.join("\n"));
+    return;
+}
+
 
     const name = nameField.value.trim();
     const email = emailField.value.trim();
