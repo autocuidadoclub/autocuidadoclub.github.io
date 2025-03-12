@@ -51,21 +51,20 @@ window.selectScheduleBox = function(cell, day, time) {
 
 
             // ✅ Handle Plan Selection & Show Correct Vehicle Fields
+let selectedPlanType = ""; // ✅ Store selected plan globally
+
 document.querySelectorAll(".plan-button").forEach(button => {
     button.addEventListener("click", function () {
-        const selectedPlan = this.getAttribute("data-plan");
-        document.getElementById("planType").value = selectedPlan;
-        updateVehicleFields(selectedPlan);
+        selectedPlanType = this.getAttribute("data-plan"); // ✅ Store plan globally
 
         // Show the registration form
         document.getElementById("registration-container").style.display = "block";
-
-        // Scroll smoothly to registration form
         document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
 
-        console.log(`✅ Plan seleccionado: ${selectedPlan}`);
+        console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
     });
 });
+
 
 
           // ✅ Attach Event Listener for Registration Form
@@ -73,9 +72,10 @@ window.registerUser = function(event) {
     event.preventDefault();
 
     if (!selectedPlanType) {
-        alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
-        return;
-    }
+    alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
+    console.error("❌ Error: No se ha seleccionado un plan.");
+    return;
+}
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -874,31 +874,32 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            const paymentDate = new Date();
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-            return db.collection("users").doc(userId).set({
-                uid: userId,
-                name,
-                email,
-                phone,
-                planType: selectedPlanType, // ✅ Use the globally stored planType
-                department,
-                municipality,
-                registrationDate: firebase.firestore.Timestamp.now(),
-                schedule: { 
-                    day: selectedDay, 
-                    time: selectedTime 
-                },
-                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                paymentStatus: "Pending",
-                vehicles
-            });
-        })
+        return db.collection("users").doc(userId).set({
+            uid: userId,
+            name,
+            email,
+            phone,
+            planType: selectedPlanType, // ✅ Ensure the plan type is stored
+            department,
+            municipality,
+            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            },
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentStatus: "Pending",
+            vehicles
+        });
+    })
+
         .then(() => {
             alert("✅ Registro exitoso. Redirigiendo...");
             window.location.href = "login.html";
