@@ -816,8 +816,6 @@ button:hover {
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
-    let selectedPlanType = ""; // ✅ Store selected plan globally
-
     const registrationContainer = document.getElementById("registration-container");
 
     if (!registrationContainer) {
@@ -898,7 +896,17 @@ document.addEventListener("DOMContentLoaded", function () {
             paymentStatus: "Pending",
             vehicles
         });
-    })
+    })  // ✅ Ensure this bracket properly closes .then()
+
+        .then(() => {  // ❌ This might be causing a syntax error
+            alert("✅ Registro exitoso. Redirigiendo...");
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+    };  // ❌ Possible extra bracket causing the error
 
         .then(() => {
             alert("✅ Registro exitoso. Redirigiendo...");
