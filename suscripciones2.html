@@ -567,33 +567,43 @@ button:hover {
     <div id="registration-container" style="display: none;">
     <h2>Registro en AutoCuidado Club</h2>
     <form id="registerForm" onsubmit="registerUser(event)">
-        <label>Nombre:</label>
-        <input type="text" id="name" required>
+<!-- Nombre -->
+<label for="name">Nombre:</label>
+<input type="text" id="name" placeholder="Ingrese su nombre completo" title="Ingrese su nombre completo" autocomplete="name" required>
 
-        <label>Email:</label>
-        <input type="email" id="email" required>
+<!-- Email -->
+<label for="email">Email:</label>
+<input type="email" id="email" placeholder="ejemplo@correo.com" title="Ingrese su correo electrónico" autocomplete="email" required>
 
-        <label>Teléfono:</label>
-        <input type="text" id="phone" required>
+<!-- Teléfono -->
+<label for="phone">Teléfono:</label>
+<input type="text" id="phone" placeholder="Número de teléfono" title="Ingrese su número de teléfono" autocomplete="tel" required>
 
-        <label>Contraseña:</label>
-        <input type="password" id="password" required>
+<!-- Contraseña -->
+<label for="password">Contraseña:</label>
+<input type="password" id="password" placeholder="Cree una contraseña segura" title="Cree una contraseña segura" autocomplete="new-password" required>
+
 
         <div id="vehicle-section">
     <h3>Datos del Vehículo</h3>
     <div id="vehicle-container">
         <div class="vehicle-entry">
-            <label for="plate">Placa:</label>
-            <input type="text" class="plate" required>
+            <!-- Placa (Número de placa del vehículo) -->
+<label for="plate">Placa:</label>
+<input type="text" id="plate" class="plate" placeholder="Número de placa" title="Ingrese el número de placa" autocomplete="off" required>
 
-            <label for="model">Modelo:</label>
-            <input type="text" class="model" required>
+<!-- Modelo (Modelo del vehículo) -->
+<label for="model">Modelo:</label>
+<input type="text" id="model" class="model" placeholder="Modelo del vehículo" title="Ingrese el modelo del vehículo" autocomplete="off" required>
 
-            <label for="brand">Marca:</label>
-            <input type="text" class="brand" required>
+<!-- Marca (Marca del vehículo) -->
+<label for="brand">Marca:</label>
+<input type="text" id="brand" class="brand" placeholder="Marca del vehículo" title="Ingrese la marca del vehículo" autocomplete="off" required>
 
-            <label for="year">Año:</label>
-            <input type="number" class="year" required>
+<!-- Año (Año del vehículo) -->
+<label for="year">Año:</label>
+<input type="number" id="year" class="year" placeholder="Año del vehículo" title="Ingrese el año del vehículo" autocomplete="off" required>
+
         </div>
     </div>
    </div>
@@ -906,17 +916,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("❌ Error en el registro:", error.message);
             alert("❌ Error en el registro: " + error.message);
         });
-    };  // ❌ Possible extra bracket causing the error
-
-        .then(() => {
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
-    };
+    };  
 });
 
 
