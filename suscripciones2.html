@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
  
 
-   <script>
+      <script>
         document.addEventListener("DOMContentLoaded", function () {
             if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
                 console.error("❌ Error: Firebase env.js not loaded.");
@@ -63,6 +63,7 @@
                 cell.classList.add("selected");
                 document.getElementById("selectedDay").value = day;
                 document.getElementById("selectedTime").value = time;
+                console.log(`✅ Horario seleccionado: ${day} - ${time}`);
             };
 
             // ✅ Attach Event Listener for Registration Form
