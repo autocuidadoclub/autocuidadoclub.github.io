@@ -3,138 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conoce Nuestras Suscripciones - AutoCuidado Club</title>
+    <title>Registro en AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-
-
-    <!-- Firebase Compatibility SDK -->
+     <!-- ✅ Force Load env.js to Prevent Caching Issues -->
+    <script src="env.js?v=1.0"></script>
+    
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+ 
 
-<!-- Load GitHub Secrets -->
-    <script src="env.js"></script>
-    
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window._env_ && window._env_.FIREBASE_API_KEY) {
-                const firebaseConfig = {
-                    apiKey: window._env_.FIREBASE_API_KEY,
-                    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                    projectId: window._env_.FIREBASE_PROJECT_ID,
-                    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-                    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-                    appId: window._env_.FIREBASE_APP_ID,
-                    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-                };
+    <script>
+            const firebaseConfig = {
+                apiKey: window._env_.FIREBASE_API_KEY,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                projectId: window._env_.FIREBASE_PROJECT_ID,
+                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                appId: window._env_.FIREBASE_APP_ID,
+                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+            };
 
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log("✅ Firebase initialized successfully!");
+            } else {
+                console.log("ℹ️ Firebase already initialized.");
+            }
 
-                 console.log("✅ Firebase initialized correctly!");
-        } else {
-            console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
-        }
-                
-                const db = firebase.firestore();
-                const auth = firebase.auth();
-                
-             
-                function getVehicleData() {
-    const vehicleElements = document.querySelectorAll(".vehicle-entry");
-    let vehicles = [];
-    vehicleElements.forEach(vehicle => {
-        const brand = vehicle.querySelector(".vehicle-brand").value.trim();
-        const model = vehicle.querySelector(".vehicle-model").value.trim();
-        const year = vehicle.querySelector(".vehicle-year").value.trim();
-        const plate = vehicle.querySelector(".vehicle-plate").value.trim(); // ✅ FIX: Correct plate
+            const auth = firebase.auth();
+            const db = firebase.firestore();
 
-        if (brand && model && year && plate) {
-            vehicles.push({ brand, model, year, plate });
-        }
+      // ✅ Function to Select a Schedule Box
+        console.log("📌 Selected Day:", document.getElementById("selectedDay").value);
+console.log("📌 Selected Time:", document.getElementById("selectedTime").value);
+
+window.selectScheduleBox = function(cell) {
+    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+    cell.classList.add("selected");
+
+    const day = cell.closest("table").querySelector(`thead th:nth-child(${cell.cellIndex + 1})`).innerText;
+    const time = cell.innerText;
+
+    document.getElementById("selectedDay").value = day.trim();
+    document.getElementById("selectedTime").value = time.trim();
+
+    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
+};
+
+            // ✅ Handle Plan Selection & Show Correct Vehicle Fields
+let selectedPlanType = ""; // ✅ Store selected plan globally
+
+document.querySelectorAll(".plan-button").forEach(button => {
+    button.addEventListener("click", function () {
+        selectedPlanType = this.getAttribute("data-plan"); // ✅ Store plan globally
+
+        // Show the registration form
+        document.getElementById("registration-container").style.display = "block";
+        document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
+
+        console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
     });
-    return vehicles;
-}
+});
 
+          // ✅ Attach Event Listener for Registration Form
+window.registerUser = function(event) {
+    event.preventDefault();
 
-        function addVehicle() {
-    const container = document.getElementById("vehicle-container");
-    const selectedPlan = document.getElementById("planType").value;
-    const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
+    console.log("📌 Checking form values...");
 
-    if (container.children.length >= maxVehicles) {
-        alert(`Solo puedes agregar hasta ${maxVehicles} vehículo(s) según tu plan.`);
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
+
+    console.log(`📌 Name: ${name}`);
+    console.log(`📌 Email: ${email}`);
+    console.log(`📌 Phone: ${phone}`);
+    console.log(`📌 Password: ${password}`);
+    console.log(`📌 Department: ${department}`);
+    console.log(`📌 Municipality: ${municipality}`);
+    console.log(`📌 Selected Day: ${selectedDay}`);
+    console.log(`📌 Selected Time: ${selectedTime}`);
+
+    const vehicles = [];
+    document.querySelectorAll(".vehicle-entry").forEach(entry => {
+        vehicles.push({
+            plate: entry.querySelector(".plate").value,
+            model: entry.querySelector(".model").value,
+            brand: entry.querySelector(".brand").value,
+            year: entry.querySelector(".year").value
+        });
+    });
+
+    console.log(`📌 Vehicles:`, vehicles);
+
+    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios.");
+        console.error("❌ Error: Some fields are empty!");
         return;
     }
 
-    const div = document.createElement("div");
-    div.className = "vehicle-entry";
-    div.innerHTML = `
-        <label>Marca:</label>
-        <input type="text" class="vehicle-brand" required>
+    auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-        <label>Modelo:</label>
-        <input type="text" class="vehicle-model" required>
-
-        <label>Año:</label>
-        <input type="text" class="vehicle-year" required>
-
-        <label>Número de Placa:</label>
-        <input type="text" class="vehicle-plate" required>
-
-        <button type="button" onclick="removeVehicle(this)">Eliminar</button>
-    `;
-    container.appendChild(div);
-}
-
-
-
-        function removeVehicle(button) {
-            button.parentElement.remove();
-        }
-
-    function getVehicleData() {
-    const vehicleElements = document.querySelectorAll(".vehicle-entry");
-    let vehicles = [];
-    vehicleElements.forEach(vehicle => {
-        const brand = vehicle.querySelector(".vehicle-brand").value.trim();
-        const model = vehicle.querySelector(".vehicle-model").value.trim();
-        const year = vehicle.querySelector(".vehicle-year").value.trim();
-        const plate = vehicle.querySelector(".vehicle-plate").value.trim(); // ✅ FIX
-
-        if (brand && model && year && plate) {
-            vehicles.push({ brand, model, year, plate });
-        }
-    });
-    return vehicles;
-}
-
-
-                function getPaypalLink(planType) {
-                    const links = {
-                        "basic3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VHHUJSESY7J72",
-                        "basic6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QJUNHKG85VS2A",
-                        "basic12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TC2VDQW3AZHTJ",
-                        "plus3m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=G7V3SSBHLTLRS",
-                        "plus6m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZMFTR8FKRRC56",
-                        "plus12m": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B88DSKJ62HDCN"
-                    };
-                    return links[planType] || null;
-                }
-            } else {
-                console.error("❌ Error: Firebase secrets not loaded. Check env.js.");
-            }
+        return db.collection("users").doc(userId).set({
+            uid: userId,
+            name,
+            email,
+            phone,
+            planType: selectedPlanType, // ✅ Use the globally stored planType
+            department,
+            municipality,
+            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            },
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentStatus: "Pending",
+            vehicles
         });
-    </script>
+    })
+    .then(() => {
+        alert("✅ Registro exitoso. Redirigiendo...");
+        window.location.href = "login.html";
+    })
+    .catch((error) => {
+        console.error("❌ Error en el registro:", error.message);
+        alert("❌ Error en el registro: " + error.message);
+    });
+};
 
-    <style>
+    </script>
+<style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -217,11 +230,79 @@
             border-radius: 5px;
             margin-top: 10px;
         }
-    </style>
+  .subscription-disclaimer {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    font-size: 15px;
+    color: #555;
+  }
     
+/* Highlight Plan Badges */
+.discount-badge {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background-color: #FF6600;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Discounted Price */
+.discounted-price {
+    color: #FF6600;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Plan Item Styling */
+.plan-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+.highlight {
+    border: 2px solid #FF6600;
+    box-shadow: 0px 4px 10px rgba(255, 102, 0, 0.3);
+}
+
+/* Limited-Time Offer Message */
+.limited-time {
+    color: #FF6600;
+    font-size: 0.95em;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Button Styles */
+button {
+    background-color: #003366;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+button:hover {
+    background-color: #FF6600;
+}
+
+
+</style>
 </head>
+
 <body>
-    <!-- Navigation -->
+<!-- Navigation -->
     <nav class="navbar">
         <ul class="nav-links">
             <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
@@ -334,6 +415,8 @@
     
     <!-- Subscription Plans -->
     <section>
+     <!-- Subscription Plans -->
+    <section>
         
  <h2>Planes de Suscripciones Básicas (cobertura: 1 vehículo)</h2>
         <div class="subscription-row">
@@ -349,7 +432,7 @@
                 <li><strong>Ideal para:</strong> Clientes nuevos que buscan flexibilidad.</li>
             </ul>
             <p class="limited-time">Promoción válida solo en Febrero, ¡aprovecha hoy mismo!</p>
-            <button onclick="showRegistrationForm('basic3m')">Suscribirse - Plan Básico 3 meses</button>
+            <button class="plan-button" data-plan="basic3m">Basic 3M</button>
         </div>
     </div>
 
@@ -365,7 +448,7 @@
                 <li><strong>Ideal para:</strong> Clientes que buscan equilibrio entre compromiso y flexibilidad.</li>
             </ul>
             <p class="limited-time">Promoción válida solo en Febrero, ¡aprovecha hoy mismo!</p>
-            <button onclick="showRegistrationForm('basic6m')">Suscribirse - Plan Básico 6 meses</button>
+             <button class="plan-button" data-plan="basic6m">Basic 6M</button>
         </div>
     </div>
 
@@ -439,10 +522,10 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
                         <li><strong>Descuento: </strong> 14% de descuento en comparación con el plan básico de 3 meses.</li>
                         </ul>
-                     <button onclick="showRegistrationForm('basic12m')">Suscribirse - Plan Básico 12 meses</button>
-                </div>
+                      <button class="plan-button" data-plan="basic12m">Basic 12M</button>
             </div>
         </div>
+            </div>
 
         <h2>Planes de Suscripciones Plus (cobertura: 3 vehículos)</h2>
         <div class="subscription-row">
@@ -456,7 +539,7 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
                         <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         </ul>
-                    <button onclick="showRegistrationForm('plus3m')">Suscribirse - Plan Plus 3 meses</button>
+                     <button class="plan-button" data-plan="plus3m">Plus 3M</button>
                 </div>
             </div>
             <div class="plan-item">
@@ -469,7 +552,7 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
                         <li><strong>Descuento: </strong> 38% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         </ul>
-                    <button onclick="showRegistrationForm('plus6m')">Suscribirse - Plan Plus 6 meses</button>
+                    <button class="plan-button" data-plan="plus6m">Plus 6M</button>
                 </div>
             </div>
              <div class="plan-item">       
@@ -482,39 +565,56 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
                         <li><strong>Descuento: </strong> 42% de descuento en comparación con el plan básico de 3 meses por vehículo, <strong>Equivalente a 5.5 meses gratis</strong></li>
                         </ul>
-                    <button onclick="showRegistrationForm('plus12m')">Suscribirse - Plan Plus 12 meses</button>
+                    <button class="plan-button" data-plan="plus12m">Plus 12M</button>
                 </div>
             </div>
         </div>
     </section>
-
-     
-    <!-- Registration Form -->
-    <section id="register-section" class="register-section">
-        <h2>Registro en AutoCuidado Club</h2>
-    <p>Regístrate gratis y accede a tu perfil. Podrás agregar tu método de pago después.</p>
-    
+    <div id="registration-container" style="display: none;">
+    <h2>Registro en AutoCuidado Club</h2>
     <form id="registerForm" onsubmit="registerUser(event)">
-    <label for="name">Nombre Completo:</label>
-    <input type="text" id="name" required>
-    
-    <label for="email">Email:</label>
-    <input type="email" id="email" required>
-    
-    <label for="phone">Teléfono:</label>
-    <input type="text" id="phone" required>
-    
-    <label for="password">Contraseña:</label>
-    <input type="password" id="password" required>
+<!-- Nombre -->
+<label for="name">Nombre:</label>
+<input type="text" id="name" placeholder="Ingrese su nombre completo" title="Ingrese su nombre completo" autocomplete="name" required>
 
-    <input type="hidden" id="planType" value="basic3m">
-    
-    <div id="vehicles-section">
-        <h3>Vehículos</h3>
-        <div id="vehicle-container"></div>
+<!-- Email -->
+<label for="email">Email:</label>
+<input type="email" id="email" placeholder="ejemplo@correo.com" title="Ingrese su correo electrónico" autocomplete="email" required>
+
+<!-- Teléfono -->
+<label for="phone">Teléfono:</label>
+<input type="text" id="phone" placeholder="Número de teléfono" title="Ingrese su número de teléfono" autocomplete="tel" required>
+
+<!-- Contraseña -->
+<label for="password">Contraseña:</label>
+<input type="password" id="password" placeholder="Cree una contraseña segura" title="Cree una contraseña segura" autocomplete="new-password" required>
+
+
+        <div id="vehicle-section">
+    <h3>Datos del Vehículo</h3>
+    <div id="vehicle-container">
+        <div class="vehicle-entry">
+            <!-- Placa (Número de placa del vehículo) -->
+<label for="plate">Placa:</label>
+<input type="text" id="plate" class="plate" placeholder="Número de placa" title="Ingrese el número de placa" autocomplete="off" required>
+
+<!-- Modelo (Modelo del vehículo) -->
+<label for="model">Modelo:</label>
+<input type="text" id="model" class="model" placeholder="Modelo del vehículo" title="Ingrese el modelo del vehículo" autocomplete="off" required>
+
+<!-- Marca (Marca del vehículo) -->
+<label for="brand">Marca:</label>
+<input type="text" id="brand" class="brand" placeholder="Marca del vehículo" title="Ingrese la marca del vehículo" autocomplete="off" required>
+
+<!-- Año (Año del vehículo) -->
+<label for="year">Año:</label>
+<input type="number" id="year" class="year" placeholder="Año del vehículo" title="Ingrese el año del vehículo" autocomplete="off" required>
+
+        </div>
     </div>
-        
- <!-- Schedule Section -->
+   </div>
+
+        <!-- Schedule Section -->
     <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
@@ -555,14 +655,12 @@ button:hover {
                 </tr>
             </tbody>
         </table>
-    </section>
-<p></p>
-            <p></p>
-            <p></p>
-            <p></p>
 
-            
-             <div class="card">
+
+        <input type="hidden" id="selectedDay" required>
+        <input type="hidden" id="selectedTime" required>
+
+        <div class="card">
     <h3>Seleccione su Ubicación</h3>
     <label for="department">Departamento:</label>
     <select id="department" onchange="updateMunicipalities()" required>
@@ -576,6 +674,38 @@ button:hover {
     
     
     <script>
+    function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
         const locations = {
             "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
             "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
@@ -621,6 +751,38 @@ button:hover {
 
         // Initialize departments on page load
         document.addEventListener("DOMContentLoaded", populateDepartments);
+
+        function addVehicle() {
+        const vehicleContainer = document.getElementById("vehicle-container");
+        if (vehicleContainer.children.length >= 3) {
+            alert("Solo puedes agregar hasta 3 vehículos.");
+            return;
+        }
+
+        const newVehicle = document.createElement("div");
+        newVehicle.classList.add("vehicle-entry");
+        newVehicle.innerHTML = `
+            <label for="plate">Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label for="model">Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label for="brand">Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label for="year">Año:</label>
+            <input type="number" class="year" required>
+
+            <button type="button" onclick="removeVehicle(this)">Eliminar</button>
+        `;
+        vehicleContainer.appendChild(newVehicle);
+    }
+
+    function removeVehicle(button) {
+        button.parentElement.remove();
+    }
+        
     </script>
 
 <!-- Checkbox for Terms and Conditions -->
@@ -631,153 +793,9 @@ button:hover {
         </label>
     </div>
             
-                <button type="submit">Registrarse Gratis</button>
-        </form>
-
-        <p id="confirmationMessage" style="display:none; color: green; font-weight: bold;"></p>
-    
-    </section>
-
-
-    <script>
-function updateVehicleFields() {
-    const container = document.getElementById("vehicle-container");
-    container.innerHTML = ""; 
-    const selectedPlan = document.getElementById("planType").value;
-    const maxVehicles = selectedPlan.startsWith("plus") ? 3 : 1;
-
-    for (let i = 0; i < maxVehicles; i++) {
-        const div = document.createElement("div");
-        div.className = "vehicle-entry";
-        div.innerHTML = `
-            <label>Marca:</label>
-            <input type="text" class="vehicle-brand" required>
-
-            <label>Modelo:</label>
-            <input type="text" class="vehicle-model" required>
-
-            <label>Año:</label>
-            <input type="text" class="vehicle-year" required>
-
-            <label>Número de Placa:</label>
-            <input type="text" class="vehicle-plate" required>
-        `;
-        container.appendChild(div);
-    }
-}
-
-document.getElementById("planType").addEventListener("change", updateVehicleFields);
-document.addEventListener("DOMContentLoaded", updateVehicleFields);
-
-function selectScheduleBox(cell) {
-    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
-    cell.classList.add("selected");
-    document.getElementById("schedule").value = cell.innerText.trim();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".schedule-table td").forEach(cell => {
-        cell.addEventListener("click", function () {
-            selectScheduleBox(this);
-        });
-    });
-});
-
-function registerUser(event) {
-    event.preventDefault();
-    
-    try {
-        const requiredFields = ["name", "email", "phone", "password", "department", "municipality", "schedule", "planType"];
-        let formData = {};
-        
-        for (const field of requiredFields) {
-            const input = document.getElementById(field);
-            if (!input || !input.value.trim()) {
-                alert(`Error: El campo ${field} es obligatorio.`);
-                return;
-            }
-            formData[field] = input.value.trim();
-        }
-        
-        const vehicleEntries = document.querySelectorAll(".vehicle-entry");
-        if (!vehicleEntries.length) {
-            alert("Debes ingresar la información de al menos un vehículo.");
-            return;
-        }
-        
-        formData.vehicles = Array.from(vehicleEntries).map(vehicle => {
-            return {
-                brand: vehicle.querySelector(".vehicle-brand").value.trim(),
-                model: vehicle.querySelector(".vehicle-model").value.trim(),
-                year: vehicle.querySelector(".vehicle-year").value.trim(),
-                plate: vehicle.querySelector(".vehicle-plate").value.trim()
-            };
-        });
-
-        if (typeof firebase === 'undefined' || !firebase.firestore) {
-            console.error("❌ Error: Firebase no está cargado correctamente.");
-            alert("Error: No se pudo conectar con Firebase.");
-            return;
-        }
-        
-        auth.createUserWithEmailAndPassword(formData.email, formData.password)
-            .then((userCredential) => {
-                const newUser = userCredential.user;
-                console.log("✅ Usuario creado en Firebase:", newUser.uid);
-                
-                formData.uid = newUser.uid;
-                formData.registrationDate = firebase.firestore.Timestamp.now();
-                formData.status = "pending_payment";
-                
-                return db.collection("users").doc(newUser.uid).set(formData);
-            })
-            .then(() => {
-                alert("Registro exitoso. Redirigiendo...");
-                window.location.href = "profile.html";
-            })
-            .catch((error) => {
-                console.error("❌ Error en registro:", error.message);
-                alert("Error en el registro: " + error.message);
-            });
-    } catch (err) {
-        console.error("❌ Error crítico en el formulario:", err);
-        alert("Error inesperado: revisa la consola para más detalles.");
-    }
-}
-    
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const newUser = userCredential.user;
-            console.log("✅ Usuario creado en Firebase:", newUser.uid);
-
-            const userData = {
-                uid: newUser.uid,
-                fullName: name,
-                email,
-                phoneNumber: phone,
-                department,
-                municipality,
-                schedule,
-                vehicles,
-                registrationDate: firebase.firestore.Timestamp.now(),
-                status: "pending_payment"
-            };
-
-            return db.collection("users").doc(newUser.uid).set(userData);
-        })
-        .then(() => {
-            alert("Registro exitoso. Redirigiendo...");
-            window.location.href = "profile.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en registro:", error.message);
-            alert("Error en el registro: " + error.message);
-        });
-}
-</script>
-
-    
-    <!-- Footer -->
+        <button type="submit">Registrarse</button>
+    </form>
+ <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
         <ul>
@@ -810,43 +828,133 @@ function registerUser(event) {
     
         
     </footer>
+            <script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded!");
 
-    
-    <script>
-    function showRegistrationForm(planType) {
-    document.getElementById("planType").value = planType; // ✅ Update selected plan
-    document.getElementById("register-section").style.display = "block";
-    document.getElementById("schedule-section").style.display = "block";
-    document.getElementById("register-section").scrollIntoView({ behavior: "smooth" });
-}
+    const registrationContainer = document.getElementById("registration-container");
 
-
-    function selectSchedule(cell) {
-        const cells = document.querySelectorAll(".schedule-table tbody td");
-        cells.forEach((c) => c.classList.remove("selected-box"));
-
-        // Highlight the clicked cell
-        cell.classList.add("selected-box");
+    if (!registrationContainer) {
+        console.error("❌ Error: No se encontró el contenedor de registro en el DOM.");
+        return;
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const style = document.createElement("style");
-        style.innerHTML = `
-            .schedule-table tbody td.selected-box {
-                background-color: #FF6600 !important;
-                color: white !important;
-                font-weight: bold;
-            }
-        `;
-        document.head.appendChild(style);
+    const planButtons = document.querySelectorAll(".plan-button");
 
-        const scheduleCells = document.querySelectorAll(".schedule-table tbody td:not(:first-child)");
-        scheduleCells.forEach((cell) => {
-            cell.addEventListener("click", () => selectSchedule(cell));
+    // ✅ Attach event listeners to all plan buttons
+    planButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+
+            registrationContainer.style.display = "block"; // ✅ Show form
+            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+
+            console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
         });
     });
-</script>
+
+    // ✅ Modify registerUser function to use selectedPlanType
+    window.registerUser = function(event) {
+        event.preventDefault();
+
+        if (!selectedPlanType) {
+            alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
+            return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
+
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
+
+        const vehicles = [];
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
+            });
+        });
+
+        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+        return db.collection("users").doc(userId).set({
+            uid: userId,
+            name,
+            email,
+            phone,
+            planType: selectedPlanType, // ✅ Ensure the plan type is stored
+            department,
+            municipality,
+            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            },
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentStatus: "Pending",
+            vehicles
+        });
+    })  // ✅ Ensure this bracket properly closes .then()
+
+        .then(() => {  // ❌ This might be causing a syntax error
+            alert("✅ Registro exitoso. Redirigiendo...");
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+    };  
+});
 
 
+
+
+// ✅ Function to Update Vehicle Fields Based on Plan Type
+function updateVehicleFields(planType) {
+    const vehicleContainer = document.getElementById("vehicle-container");
+    vehicleContainer.innerHTML = ""; // Clear previous entries
+
+    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
+
+    for (let i = 0; i < maxVehicles; i++) {
+        const vehicleEntry = document.createElement("div");
+        vehicleEntry.classList.add("vehicle-entry");
+        vehicleEntry.innerHTML = `
+            <h4>Vehículo ${i + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label>Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label>Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label>Año:</label>
+            <input type="number" class="year" required>
+        `;
+        vehicleContainer.appendChild(vehicleEntry);
+    }
+}
+            </script>
 </body>
 </html>
