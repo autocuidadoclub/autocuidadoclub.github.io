@@ -17,6 +17,35 @@
    
 
     <script>
+ document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".plan-button").forEach(button => {
+        button.addEventListener("click", function () {
+            const selectedPlan = this.getAttribute("data-plan");
+            document.getElementById("planType").value = selectedPlan;
+
+            // Ensure vehicle fields are updated correctly
+            updateVehicleFields(selectedPlan);
+
+            // ✅ Ensure the registration form exists before modifying it
+            const registrationForm = document.getElementById("registration-container");
+            if (registrationForm) {
+                registrationForm.style.display = "block"; // ✅ Show the form
+                registrationForm.scrollIntoView({ behavior: "smooth" }); // ✅ Scroll to form
+                console.log(`✅ Plan seleccionado: ${selectedPlan}`);
+            } else {
+                console.error("❌ Error: No se encontró el contenedor de registro.");
+            }
+         // ✅ Show the registration form
+            registrationContainer.style.display = "block"; // Ensure it is visible
+
+            // ✅ Scroll smoothly to the registration form
+            registrationContainer.scrollIntoView({ behavior: "smooth" });
+
+            console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
+        });
+    });
+});
+
             const firebaseConfig = {
                 apiKey: window._env_.FIREBASE_API_KEY,
                 authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
@@ -136,6 +165,37 @@ window.registerUser = function(event) {
         alert("❌ Error en el registro: " + error.message);
     });
 };
+
+        });
+
+
+        // ✅ Function to Update Vehicle Fields Based on Plan Type
+function updateVehicleFields(planType) {
+    const vehicleContainer = document.getElementById("vehicle-container");
+    vehicleContainer.innerHTML = ""; // Clear previous entries
+
+    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
+
+    for (let i = 0; i < maxVehicles; i++) {
+        const vehicleEntry = document.createElement("div");
+        vehicleEntry.classList.add("vehicle-entry");
+        vehicleEntry.innerHTML = `
+            <h4>Vehículo ${i + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label>Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label>Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label>Año:</label>
+            <input type="number" class="year" required>
+        `;
+        vehicleContainer.appendChild(vehicleEntry);
+    }
+}
 
     </script>
 <style>
@@ -576,6 +636,12 @@ button:hover {
         <label>Contraseña:</label>
         <input type="password" id="password" required>
 
+        <label>Selecciona tu Plan:</label>
+        <select id="planType" disabled>
+            <option value="basic3m">Basic - 1 Vehículo</option>
+            <option value="plus3m">Plus - Hasta 3 Vehículos</option>
+        </select>
+
         <div id="vehicle-section">
     <h3>Datos del Vehículo</h3>
     <div id="vehicle-container">
@@ -809,60 +875,5 @@ button:hover {
     
         
     </footer>
-            <script>
-               document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM fully loaded!");
-
-    const planTypeField = document.getElementById("planType");
-    const planButtons = document.querySelectorAll(".plan-button");
-
-   
-    // ✅ Attach event listeners to all plan buttons
-    planButtons.forEach(button => {
-        button.addEventListener("click", function () {
-            const selectedPlan = this.getAttribute("data-plan");
-
-            if (!selectedPlan) {
-                console.error("❌ Error: No se encontró el plan seleccionado.");
-                return;
-            }
-
-                       // ✅ Smooth scroll to form
-            registrationContainer.scrollIntoView({ behavior: "smooth" });
-
-            console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
-        });
-    });
-});
-
-
-// ✅ Function to Update Vehicle Fields Based on Plan Type
-function updateVehicleFields(planType) {
-    const vehicleContainer = document.getElementById("vehicle-container");
-    vehicleContainer.innerHTML = ""; // Clear previous entries
-
-    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
-
-    for (let i = 0; i < maxVehicles; i++) {
-        const vehicleEntry = document.createElement("div");
-        vehicleEntry.classList.add("vehicle-entry");
-        vehicleEntry.innerHTML = `
-            <h4>Vehículo ${i + 1}</h4>
-            <label>Placa:</label>
-            <input type="text" class="plate" required>
-
-            <label>Modelo:</label>
-            <input type="text" class="model" required>
-
-            <label>Marca:</label>
-            <input type="text" class="brand" required>
-
-            <label>Año:</label>
-            <input type="number" class="year" required>
-        `;
-        vehicleContainer.appendChild(vehicleEntry);
-    }
-}
-            </script>
 </body>
 </html>
