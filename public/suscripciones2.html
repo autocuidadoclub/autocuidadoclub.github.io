@@ -13,8 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
-   
+ 
 
     <script>
             const firebaseConfig = {
@@ -54,9 +53,6 @@ window.selectScheduleBox = function(cell) {
     console.log(`✅ Horario seleccionado: ${day} - ${time}`);
 };
 
-
-
-
             // ✅ Handle Plan Selection & Show Correct Vehicle Fields
 let selectedPlanType = ""; // ✅ Store selected plan globally
 
@@ -71,8 +67,6 @@ document.querySelectorAll(".plan-button").forEach(button => {
         console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
     });
 });
-
-
 
           // ✅ Attach Event Listener for Registration Form
 window.registerUser = function(event) {
