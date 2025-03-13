@@ -13,7 +13,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
- 
+
+   
 
     <script>
             const firebaseConfig = {
@@ -37,78 +38,101 @@
             const db = firebase.firestore();
 
       // ✅ Function to Select a Schedule Box
-        console.log("📌 Selected Day:", document.getElementById("selectedDay").value);
-console.log("📌 Selected Time:", document.getElementById("selectedTime").value);
-
-window.selectScheduleBox = function(cell) {
+window.selectScheduleBox = function(cell, day, time) {
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
     cell.classList.add("selected");
 
-    const day = cell.closest("table").querySelector(`thead th:nth-child(${cell.cellIndex + 1})`).innerText;
-    const time = cell.innerText;
-
-    document.getElementById("selectedDay").value = day.trim();
-    document.getElementById("selectedTime").value = time.trim();
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = time;
 
     console.log(`✅ Horario seleccionado: ${day} - ${time}`);
 };
 
-            // ✅ Handle Plan Selection & Show Correct Vehicle Fields
-let selectedPlanType = ""; // ✅ Store selected plan globally
 
+
+            // ✅ Handle Plan Selection & Show Correct Vehicle Fields
 document.querySelectorAll(".plan-button").forEach(button => {
     button.addEventListener("click", function () {
-        selectedPlanType = this.getAttribute("data-plan"); // ✅ Store plan globally
+        const selectedPlan = this.getAttribute("data-plan");
+        document.getElementById("planType").value = selectedPlan;
+        updateVehicleFields(selectedPlan);
 
         // Show the registration form
         document.getElementById("registration-container").style.display = "block";
+
+        // Scroll smoothly to registration form
         document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
 
-        console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
+        console.log(`✅ Plan seleccionado: ${selectedPlan}`);
     });
 });
 
+
           // ✅ Attach Event Listener for Registration Form
 window.registerUser = function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent page reload on form submission
 
-    console.log("📌 Checking form values...");
+    // ✅ Ensure required fields exist before accessing them
+    const nameField = document.getElementById("name");
+    const emailField = document.getElementById("email");
+    const phoneField = document.getElementById("phone");
+    const passwordField = document.getElementById("password");
+    const planTypeField = document.getElementById("planType");
+    const departmentField = document.getElementById("department");
+    const municipalityField = document.getElementById("municipality");
+    const selectedDayField = document.getElementById("selectedDay");
+    const selectedTimeField = document.getElementById("selectedTime");
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const department = document.getElementById("department").value;
-    const municipality = document.getElementById("municipality").value;
-    const selectedDay = document.getElementById("selectedDay").value;
-    const selectedTime = document.getElementById("selectedTime").value;
+    // ✅ Check if any field is missing
+   // ✅ Check which fields are missing
+const missingFields = [];
 
-    console.log(`📌 Name: ${name}`);
-    console.log(`📌 Email: ${email}`);
-    console.log(`📌 Phone: ${phone}`);
-    console.log(`📌 Password: ${password}`);
-    console.log(`📌 Department: ${department}`);
-    console.log(`📌 Municipality: ${municipality}`);
-    console.log(`📌 Selected Day: ${selectedDay}`);
-    console.log(`📌 Selected Time: ${selectedTime}`);
+if (!nameField) missingFields.push("nameField (Nombre)");
+if (!emailField) missingFields.push("emailField (Email)");
+if (!phoneField) missingFields.push("phoneField (Teléfono)");
+if (!passwordField) missingFields.push("passwordField (Contraseña)");
+if (!planTypeField) missingFields.push("planTypeField (Tipo de Plan)");
+if (!departmentField) missingFields.push("departmentField (Departamento)");
+if (!municipalityField) missingFields.push("municipalityField (Municipio)");
+if (!selectedDayField) missingFields.push("selectedDayField (Día seleccionado)");
+if (!selectedTimeField) missingFields.push("selectedTimeField (Hora seleccionada)");
+
+if (missingFields.length > 0) {
+    console.error("❌ Error: Los siguientes campos están ausentes en el DOM:", missingFields);
+    alert("❌ Error interno: Faltan los siguientes campos en la página:\n" + missingFields.join("\n"));
+    return;
+}
+
+
+    const name = nameField.value.trim();
+    const email = emailField.value.trim();
+    const phone = phoneField.value.trim();
+    const password = passwordField.value.trim();
+    const planType = planTypeField.value;
+    const department = departmentField.value;
+    const municipality = municipalityField.value;
+    const selectedDay = selectedDayField.value;
+    const selectedTime = selectedTimeField.value;
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
-        vehicles.push({
-            plate: entry.querySelector(".plate").value,
-            model: entry.querySelector(".model").value,
-            brand: entry.querySelector(".brand").value,
-            year: entry.querySelector(".year").value
-        });
-    });
+        const plate = entry.querySelector(".plate")?.value;
+        const model = entry.querySelector(".model")?.value;
+        const brand = entry.querySelector(".brand")?.value;
+        const year = entry.querySelector(".year")?.value;
 
-    console.log(`📌 Vehicles:`, vehicles);
+        if (plate && model && brand && year) {
+            vehicles.push({ plate, model, brand, year });
+        }
+    });
 
     if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
         alert("❌ Todos los campos son obligatorios.");
-        console.error("❌ Error: Some fields are empty!");
         return;
     }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
     auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
@@ -122,7 +146,7 @@ window.registerUser = function(event) {
             name,
             email,
             phone,
-            planType: selectedPlanType, // ✅ Use the globally stored planType
+            planType,
             department,
             municipality,
             registrationDate: firebase.firestore.Timestamp.now(),
@@ -145,6 +169,7 @@ window.registerUser = function(event) {
         alert("❌ Error en el registro: " + error.message);
     });
 };
+
 
     </script>
 <style>
@@ -573,43 +598,33 @@ button:hover {
     <div id="registration-container" style="display: none;">
     <h2>Registro en AutoCuidado Club</h2>
     <form id="registerForm" onsubmit="registerUser(event)">
-<!-- Nombre -->
-<label for="name">Nombre:</label>
-<input type="text" id="name" placeholder="Ingrese su nombre completo" title="Ingrese su nombre completo" autocomplete="name" required>
+        <label>Nombre:</label>
+        <input type="text" id="name" required>
 
-<!-- Email -->
-<label for="email">Email:</label>
-<input type="email" id="email" placeholder="ejemplo@correo.com" title="Ingrese su correo electrónico" autocomplete="email" required>
+        <label>Email:</label>
+        <input type="email" id="email" required>
 
-<!-- Teléfono -->
-<label for="phone">Teléfono:</label>
-<input type="text" id="phone" placeholder="Número de teléfono" title="Ingrese su número de teléfono" autocomplete="tel" required>
+        <label>Teléfono:</label>
+        <input type="text" id="phone" required>
 
-<!-- Contraseña -->
-<label for="password">Contraseña:</label>
-<input type="password" id="password" placeholder="Cree una contraseña segura" title="Cree una contraseña segura" autocomplete="new-password" required>
-
+        <label>Contraseña:</label>
+        <input type="password" id="password" required>
 
         <div id="vehicle-section">
     <h3>Datos del Vehículo</h3>
     <div id="vehicle-container">
         <div class="vehicle-entry">
-            <!-- Placa (Número de placa del vehículo) -->
-<label for="plate">Placa:</label>
-<input type="text" id="plate" class="plate" placeholder="Número de placa" title="Ingrese el número de placa" autocomplete="off" required>
+            <label for="plate">Placa:</label>
+            <input type="text" class="plate" required>
 
-<!-- Modelo (Modelo del vehículo) -->
-<label for="model">Modelo:</label>
-<input type="text" id="model" class="model" placeholder="Modelo del vehículo" title="Ingrese el modelo del vehículo" autocomplete="off" required>
+            <label for="model">Modelo:</label>
+            <input type="text" class="model" required>
 
-<!-- Marca (Marca del vehículo) -->
-<label for="brand">Marca:</label>
-<input type="text" id="brand" class="brand" placeholder="Marca del vehículo" title="Ingrese la marca del vehículo" autocomplete="off" required>
+            <label for="brand">Marca:</label>
+            <input type="text" class="brand" required>
 
-<!-- Año (Año del vehículo) -->
-<label for="year">Año:</label>
-<input type="number" id="year" class="year" placeholder="Año del vehículo" title="Ingrese el año del vehículo" autocomplete="off" required>
-
+            <label for="year">Año:</label>
+            <input type="number" class="year" required>
         </div>
     </div>
    </div>
@@ -829,7 +844,7 @@ button:hover {
         
     </footer>
             <script>
-document.addEventListener("DOMContentLoaded", function () {
+              document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
     const registrationContainer = document.getElementById("registration-container");
@@ -844,87 +859,20 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ Attach event listeners to all plan buttons
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
-            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+            const selectedPlan = this.getAttribute("data-plan");
+
+            if (!selectedPlan) {
+                console.error("❌ Error: No se encontró el plan seleccionado.");
+                return;
+            }
 
             registrationContainer.style.display = "block"; // ✅ Show form
             registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
 
-            console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
+            console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
         });
     });
-
-    // ✅ Modify registerUser function to use selectedPlanType
-    window.registerUser = function(event) {
-        event.preventDefault();
-
-        if (!selectedPlanType) {
-            alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
-            return;
-        }
-
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const department = document.getElementById("department").value;
-        const municipality = document.getElementById("municipality").value;
-
-        const selectedDay = document.getElementById("selectedDay").value;
-        const selectedTime = document.getElementById("selectedTime").value;
-
-        const vehicles = [];
-        document.querySelectorAll(".vehicle-entry").forEach(entry => {
-            vehicles.push({
-                plate: entry.querySelector(".plate").value,
-                model: entry.querySelector(".model").value,
-                brand: entry.querySelector(".brand").value,
-                year: entry.querySelector(".year").value
-            });
-        });
-
-        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-            alert("❌ Todos los campos son obligatorios.");
-            return;
-        }
-
-        auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const userId = userCredential.user.uid;
-        const paymentDate = new Date();
-        const nextPaymentDate = new Date();
-        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-        return db.collection("users").doc(userId).set({
-            uid: userId,
-            name,
-            email,
-            phone,
-            planType: selectedPlanType, // ✅ Ensure the plan type is stored
-            department,
-            municipality,
-            registrationDate: firebase.firestore.Timestamp.now(),
-            schedule: { 
-                day: selectedDay, 
-                time: selectedTime 
-            },
-            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-            paymentStatus: "Pending",
-            vehicles
-        });
-    })  // ✅ Ensure this bracket properly closes .then()
-
-        .then(() => {  // ❌ This might be causing a syntax error
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
-    };  
 });
-
 
 
 
