@@ -17,138 +17,182 @@
 
       <script>
         document.addEventListener("DOMContentLoaded", function () {
-            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-                console.error("❌ Error: Firebase env.js not loaded.");
-                alert("❌ Firebase is not initialized. Check env.js.");
-                return;
-            }
-
-            const firebaseConfig = {
-                apiKey: window._env_.FIREBASE_API_KEY,
-                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                projectId: window._env_.FIREBASE_PROJECT_ID,
-                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-                appId: window._env_.FIREBASE_APP_ID,
-                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-            };
-
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-                console.log("✅ Firebase initialized successfully!");
-            }
-
-            const auth = firebase.auth();
-            const db = firebase.firestore();
-            let selectedPlanType = "";
-
-            // ✅ Handle Plan Selection & Show Correct Vehicle Fields
-            document.querySelectorAll(".plan-button").forEach(button => {
-                button.addEventListener("click", function () {
-                    selectedPlanType = this.getAttribute("data-plan");
-                    document.getElementById("planType").value = selectedPlanType;
-                    updateVehicleFields(selectedPlanType);
-                    document.getElementById("registration-container").style.display = "block";
-                    document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
-                });
-            });
-
-            // ✅ Function to Select a Schedule Box
-            window.selectScheduleBox = function(cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-
-    // Get the clicked cell's text
-    const timeBlock = cell.innerText.trim();
-
-    // Validate the clicked cell
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
+    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+        console.error("❌ Error: Firebase env.js not loaded.");
+        alert("❌ Firebase is not initialized. Check env.js.");
+        return;
     }
 
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
+    console.log("✅ DOM fully loaded!");
 
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
+    const firebaseConfig = {
+        apiKey: window._env_.FIREBASE_API_KEY,
+        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+        projectId: window._env_.FIREBASE_PROJECT_ID,
+        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+        appId: window._env_.FIREBASE_APP_ID,
+        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
 
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("✅ Firebase initialized successfully!");
+    }
 
-    // Update the hidden input fields
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = timeBlock;
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let selectedPlanType = "";
 
-    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
-};
+    // Ensure registration container is found
+    const registrationContainer = document.getElementById("registration-container");
+    if (!registrationContainer) {
+        console.error("❌ Error: No se encontró el contenedor de registro.");
+        return;
+    }
 
-            // ✅ Attach Event Listener for Registration Form
-            document.getElementById("registerForm").addEventListener("submit", function (event) {
-                event.preventDefault();
-                if (!selectedPlanType) {
-                    alert("❌ Debes seleccionar un plan antes de registrarte.");
-                    return;
-                }
-                
-                const name = document.getElementById("name").value.trim();
-                const email = document.getElementById("email").value.trim();
-                const phone = document.getElementById("phone").value.trim();
-                const password = document.getElementById("password").value.trim();
-                const department = document.getElementById("department").value;
-                const municipality = document.getElementById("municipality").value;
-                const selectedDay = document.getElementById("selectedDay").value;
-                const selectedTime = document.getElementById("selectedTime").value;
+    const planButtons = document.querySelectorAll(".plan-button");
 
-                const vehicles = [];
-                document.querySelectorAll(".vehicle-entry").forEach(entry => {
-                    vehicles.push({
-                        plate: entry.querySelector(".plate").value,
-                        model: entry.querySelector(".model").value,
-                        brand: entry.querySelector(".brand").value,
-                        year: entry.querySelector(".year").value
-                    });
-                });
+    // ✅ Attach event listeners to all plan buttons
+    planButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+            console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
 
-                if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-                    alert("❌ Todos los campos son obligatorios.");
-                    return;
-                }
+            updateVehicleFields(selectedPlanType); // ✅ Update vehicle input fields
 
-                auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const userId = userCredential.user.uid;
-                    const paymentDate = new Date();
-                    const nextPaymentDate = new Date();
-                    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+            registrationContainer.style.display = "block"; // ✅ Show form
+            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+        });
+    });
 
-                    return db.collection("users").doc(userId).set({
-                        uid: userId,
-                        name,
-                        email,
-                        phone,
-                        planType: selectedPlanType,
-                        department,
-                        municipality,
-                        registrationDate: firebase.firestore.Timestamp.now(),
-                        schedule: { day: selectedDay, time: selectedTime },
-                        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                        paymentStatus: "Pending",
-                        vehicles
-                    });
-                })
-                .then(() => {
-                    alert("✅ Registro exitoso. Redirigiendo...");
-                    window.location.href = "login.html";
-                })
-                .catch((error) => {
-                    console.error("❌ Error en el registro:", error.message);
-                    alert("❌ Error en el registro: " + error.message);
-                });
+    // ✅ Function to Update Vehicle Fields Based on Plan Type
+    function updateVehicleFields(planType) {
+        const vehicleContainer = document.getElementById("vehicle-container");
+        vehicleContainer.innerHTML = ""; // ✅ Clear previous entries
+
+        let maxVehicles = planType.includes("plus") ? 3 : 1; // ✅ Plus plans allow 3, Basic allows 1
+
+        for (let i = 0; i < maxVehicles; i++) {
+            const vehicleEntry = document.createElement("div");
+            vehicleEntry.classList.add("vehicle-entry");
+            vehicleEntry.innerHTML = `
+                <h4>Vehículo ${i + 1}</h4>
+                <label>Placa:</label>
+                <input type="text" class="plate" required>
+
+                <label>Modelo:</label>
+                <input type="text" class="model" required>
+
+                <label>Marca:</label>
+                <input type="text" class="brand" required>
+
+                <label>Año:</label>
+                <input type="number" class="year" required>
+            `;
+            vehicleContainer.appendChild(vehicleEntry);
+        }
+
+        console.log(`✅ Mostrando ${maxVehicles} campos de vehículos para plan: ${planType}`);
+    }
+
+    // ✅ Function to Select a Schedule Box
+    window.selectScheduleBox = function(cell) {
+        const cells = document.querySelectorAll(".schedule-table tbody td");
+
+        // Get the clicked cell's text
+        const timeBlock = cell.innerText.trim();
+
+        // Validate the clicked cell
+        if (timeBlock === "-" || timeBlock === "") {
+            alert("Por favor, seleccione un horario válido.");
+            return; // Do not allow selection of invalid cells
+        }
+
+        // Remove selection from all other cells
+        cells.forEach((c) => c.classList.remove("selected-box"));
+
+        // Highlight the selected cell
+        cell.classList.add("selected-box");
+
+        // Get the corresponding day from the column header
+        const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+        const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+        // Update the hidden input fields
+        document.getElementById("selectedDay").value = day;
+        document.getElementById("selectedTime").value = timeBlock;
+
+        console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+    };
+
+    // ✅ Attach Event Listener for Registration Form
+    document.getElementById("registerForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!selectedPlanType) {
+            alert("❌ Debes seleccionar un plan antes de registrarte.");
+            return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
+
+        const vehicles = [];
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
             });
         });
+
+        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            const paymentDate = new Date();
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+            return db.collection("users").doc(userId).set({
+                uid: userId,
+                name,
+                email,
+                phone,
+                planType: selectedPlanType,
+                department,
+                municipality,
+                registrationDate: firebase.firestore.Timestamp.now(),
+                schedule: { day: selectedDay, time: selectedTime },
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                paymentStatus: "Pending",
+                vehicles
+            });
+        })
+        .then(() => {
+            alert("✅ Registro exitoso. Redirigiendo...");
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+    });
+
+}); // ✅ Closing brace at the correct place
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
         function updateVehicleFields(planType) {
@@ -598,7 +642,7 @@ button:hover {
     </section>
     <div id="registration-container" style="display: none;">
     <h2>Registro en AutoCuidado Club</h2>
-    <form id="registerForm" onsubmit="registerUser(event)">
+    <form id="registerForm">
 <!-- Nombre -->
 <label for="name">Nombre:</label>
 <input type="text" id="name" placeholder="Ingrese su nombre completo" title="Ingrese su nombre completo" autocomplete="name" required>
