@@ -21,6 +21,7 @@
                 console.error("❌ Error: Firebase env.js not loaded.");
                 alert("❌ Firebase is not initialized. Check env.js.");
                 return;
+                console.log("✅ DOM fully loaded!")
             }
 
             const firebaseConfig = {
@@ -42,39 +43,58 @@
             const db = firebase.firestore();
             let selectedPlanType = "";
 
-            // ✅ Handle Plan Selection & Show Correct Vehicle Fields
-            document.querySelectorAll(".plan-button").forEach(button => {
-                button.addEventListener("click", function () {
-                    selectedPlanType = this.getAttribute("data-plan");
-                    document.getElementById("planType").value = selectedPlanType;
-                    updateVehicleFields(selectedPlanType);
-                    document.getElementById("registration-container").style.display = "block";
-                    document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
-                });
-            });
+            // Ensure registration container is found
+    const registrationContainer = document.getElementById("registration-container");
+    if (!registrationContainer) {
+        console.error("❌ Error: No se encontró el contenedor de registro.");
+        return;
+    }
 
-// ✅ Function to Update Vehicle Fields Based on Plan Type
-            function updateVehicleFields(planType) {
-                const vehicleContainer = document.getElementById("vehicle-container");
-                vehicleContainer.innerHTML = "";
-                let maxVehicles = (planType.includes("plus")) ? 3 : 1;
-                for (let i = 0; i < maxVehicles; i++) {
-                    const vehicleEntry = document.createElement("div");
-                    vehicleEntry.classList.add("vehicle-entry");
-                    vehicleEntry.innerHTML = `
-                        <h4>Vehículo ${i + 1}</h4>
-                        <label>Placa:</label>
-                        <input type="text" class="plate" required>
-                        <label>Modelo:</label>
-                        <input type="text" class="model" required>
-                        <label>Marca:</label>
-                        <input type="text" class="brand" required>
-                        <label>Año:</label>
-                        <input type="number" class="year" required>
-                    `;
-                    vehicleContainer.appendChild(vehicleEntry);
-                }
-            }
+    const planButtons = document.querySelectorAll(".plan-button");
+
+    // ✅ Attach event listeners to all plan buttons
+    planButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+            console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+
+            updateVehicleFields(selectedPlanType); // ✅ Update vehicle input fields
+
+            registrationContainer.style.display = "block"; // ✅ Show form
+            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+        });
+    });
+
+    // ✅ Function to Update Vehicle Fields Based on Plan Type
+    function updateVehicleFields(planType) {
+        const vehicleContainer = document.getElementById("vehicle-container");
+        vehicleContainer.innerHTML = ""; // ✅ Clear previous entries
+
+        let maxVehicles = planType.includes("plus") ? 3 : 1; // ✅ Plus plans allow 3, Basic allows 1
+
+        for (let i = 0; i < maxVehicles; i++) {
+            const vehicleEntry = document.createElement("div");
+            vehicleEntry.classList.add("vehicle-entry");
+            vehicleEntry.innerHTML = `
+                <h4>Vehículo ${i + 1}</h4>
+                <label>Placa:</label>
+                <input type="text" class="plate" required>
+
+                <label>Modelo:</label>
+                <input type="text" class="model" required>
+
+                <label>Marca:</label>
+                <input type="text" class="brand" required>
+
+                <label>Año:</label>
+                <input type="number" class="year" required>
+            `;
+            vehicleContainer.appendChild(vehicleEntry);
+        }
+
+        console.log(`✅ Mostrando ${maxVehicles} campos de vehículos para plan: ${planType}`);
+    }
+});
             
             // ✅ Function to Select a Schedule Box
             window.selectScheduleBox = function(cell) {
