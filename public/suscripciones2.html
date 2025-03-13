@@ -17,33 +17,34 @@
 
       <script>
         document.addEventListener("DOMContentLoaded", function () {
-            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-                console.error("❌ Error: Firebase env.js not loaded.");
-                alert("❌ Firebase is not initialized. Check env.js.");
-                return;
-                console.log("✅ DOM fully loaded!")
-            }
+    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+        console.error("❌ Error: Firebase env.js not loaded.");
+        alert("❌ Firebase is not initialized. Check env.js.");
+        return;
+    }
 
-            const firebaseConfig = {
-                apiKey: window._env_.FIREBASE_API_KEY,
-                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                projectId: window._env_.FIREBASE_PROJECT_ID,
-                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-                appId: window._env_.FIREBASE_APP_ID,
-                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-            };
+    console.log("✅ DOM fully loaded!");
 
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-                console.log("✅ Firebase initialized successfully!");
-            }
+    const firebaseConfig = {
+        apiKey: window._env_.FIREBASE_API_KEY,
+        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+        projectId: window._env_.FIREBASE_PROJECT_ID,
+        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+        appId: window._env_.FIREBASE_APP_ID,
+        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
 
-            const auth = firebase.auth();
-            const db = firebase.firestore();
-            let selectedPlanType = "";
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("✅ Firebase initialized successfully!");
+    }
 
-            // Ensure registration container is found
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let selectedPlanType = "";
+
+    // Ensure registration container is found
     const registrationContainer = document.getElementById("registration-container");
     if (!registrationContainer) {
         console.error("❌ Error: No se encontró el contenedor de registro.");
@@ -94,104 +95,104 @@
 
         console.log(`✅ Mostrando ${maxVehicles} campos de vehículos para plan: ${planType}`);
     }
-});
-            
-            // ✅ Function to Select a Schedule Box
-            window.selectScheduleBox = function(cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
 
-    // Get the clicked cell's text
-    const timeBlock = cell.innerText.trim();
+    // ✅ Function to Select a Schedule Box
+    window.selectScheduleBox = function(cell) {
+        const cells = document.querySelectorAll(".schedule-table tbody td");
 
-    // Validate the clicked cell
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
-    }
+        // Get the clicked cell's text
+        const timeBlock = cell.innerText.trim();
 
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
+        // Validate the clicked cell
+        if (timeBlock === "-" || timeBlock === "") {
+            alert("Por favor, seleccione un horario válido.");
+            return; // Do not allow selection of invalid cells
+        }
 
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
+        // Remove selection from all other cells
+        cells.forEach((c) => c.classList.remove("selected-box"));
 
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+        // Highlight the selected cell
+        cell.classList.add("selected-box");
 
-    // Update the hidden input fields
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = timeBlock;
+        // Get the corresponding day from the column header
+        const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+        const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
-    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
-};
+        // Update the hidden input fields
+        document.getElementById("selectedDay").value = day;
+        document.getElementById("selectedTime").value = timeBlock;
 
-            // ✅ Attach Event Listener for Registration Form
-            document.getElementById("registerForm").addEventListener("submit", function (event) {
-                event.preventDefault();
-                if (!selectedPlanType) {
-                    alert("❌ Debes seleccionar un plan antes de registrarte.");
-                    return;
-                }
-                
-                const name = document.getElementById("name").value.trim();
-                const email = document.getElementById("email").value.trim();
-                const phone = document.getElementById("phone").value.trim();
-                const password = document.getElementById("password").value.trim();
-                const department = document.getElementById("department").value;
-                const municipality = document.getElementById("municipality").value;
-                const selectedDay = document.getElementById("selectedDay").value;
-                const selectedTime = document.getElementById("selectedTime").value;
+        console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+    };
 
-                const vehicles = [];
-                document.querySelectorAll(".vehicle-entry").forEach(entry => {
-                    vehicles.push({
-                        plate: entry.querySelector(".plate").value,
-                        model: entry.querySelector(".model").value,
-                        brand: entry.querySelector(".brand").value,
-                        year: entry.querySelector(".year").value
-                    });
-                });
+    // ✅ Attach Event Listener for Registration Form
+    document.getElementById("registerForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!selectedPlanType) {
+            alert("❌ Debes seleccionar un plan antes de registrarte.");
+            return;
+        }
 
-                if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-                    alert("❌ Todos los campos son obligatorios.");
-                    return;
-                }
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
 
-                auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const userId = userCredential.user.uid;
-                    const paymentDate = new Date();
-                    const nextPaymentDate = new Date();
-                    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-                    return db.collection("users").doc(userId).set({
-                        uid: userId,
-                        name,
-                        email,
-                        phone,
-                        planType: selectedPlanType,
-                        department,
-                        municipality,
-                        registrationDate: firebase.firestore.Timestamp.now(),
-                        schedule: { day: selectedDay, time: selectedTime },
-                        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                        paymentStatus: "Pending",
-                        vehicles
-                    });
-                })
-                .then(() => {
-                    alert("✅ Registro exitoso. Redirigiendo...");
-                    window.location.href = "login.html";
-                })
-                .catch((error) => {
-                    console.error("❌ Error en el registro:", error.message);
-                    alert("❌ Error en el registro: " + error.message);
-                });
+        const vehicles = [];
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
             });
         });
+
+        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            const paymentDate = new Date();
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+            return db.collection("users").doc(userId).set({
+                uid: userId,
+                name,
+                email,
+                phone,
+                planType: selectedPlanType,
+                department,
+                municipality,
+                registrationDate: firebase.firestore.Timestamp.now(),
+                schedule: { day: selectedDay, time: selectedTime },
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                paymentStatus: "Pending",
+                vehicles
+            });
+        })
+        .then(() => {
+            alert("✅ Registro exitoso. Redirigiendo...");
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+    });
+
+}); // ✅ Closing brace at the correct place
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
         function updateVehicleFields(planType) {
