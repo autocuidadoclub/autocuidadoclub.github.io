@@ -13,11 +13,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+ 
 
-   
-
-    <script>
-  document.addEventListener("DOMContentLoaded", function () {
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
             if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
                 console.error("❌ Error: Firebase env.js not loaded.");
                 alert("❌ Firebase is not initialized. Check env.js.");
@@ -37,140 +36,144 @@
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
                 console.log("✅ Firebase initialized successfully!");
-            } else {
-                console.log("ℹ️ Firebase already initialized.");
             }
 
             const auth = firebase.auth();
             const db = firebase.firestore();
-
-      // ✅ Function to Select a Schedule Box
-window.selectScheduleBox = function(cell, day, time) {
-    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
-    cell.classList.add("selected");
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = time;
-    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
-};
-
+            let selectedPlanType = "";
 
             // ✅ Handle Plan Selection & Show Correct Vehicle Fields
-document.querySelectorAll(".plan-button").forEach(button => {
-    button.addEventListener("click", function () {
-        const selectedPlan = this.getAttribute("data-plan");
-        document.getElementById("planType").value = selectedPlan;
-        updateVehicleFields(selectedPlan);
+            document.querySelectorAll(".plan-button").forEach(button => {
+                button.addEventListener("click", function () {
+                    selectedPlanType = this.getAttribute("data-plan");
+                    document.getElementById("planType").value = selectedPlanType;
+                    updateVehicleFields(selectedPlanType);
+                    document.getElementById("registration-container").style.display = "block";
+                    document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
+                });
+            });
 
-        // Show the registration form
-        document.getElementById("registration-container").style.display = "block";
+            // ✅ Function to Select a Schedule Box
+            window.selectScheduleBox = function(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
 
-        // Scroll smoothly to registration form
-        document.getElementById("registration-container").scrollIntoView({ behavior: "smooth" });
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
 
-        console.log(`✅ Plan seleccionado: ${selectedPlan}`);
-    });
-});
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
 
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input fields
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = timeBlock;
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+};
 
             // ✅ Attach Event Listener for Registration Form
             document.getElementById("registerForm").addEventListener("submit", function (event) {
-    event.preventDefault();
+                event.preventDefault();
+                if (!selectedPlanType) {
+                    alert("❌ Debes seleccionar un plan antes de registrarte.");
+                    return;
+                }
+                
+                const name = document.getElementById("name").value.trim();
+                const email = document.getElementById("email").value.trim();
+                const phone = document.getElementById("phone").value.trim();
+                const password = document.getElementById("password").value.trim();
+                const department = document.getElementById("department").value;
+                const municipality = document.getElementById("municipality").value;
+                const selectedDay = document.getElementById("selectedDay").value;
+                const selectedTime = document.getElementById("selectedTime").value;
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const planType = document.getElementById("planType").value;
-    const department = document.getElementById("department").value;
-    const municipality = document.getElementById("municipality").value;
+                const vehicles = [];
+                document.querySelectorAll(".vehicle-entry").forEach(entry => {
+                    vehicles.push({
+                        plate: entry.querySelector(".plate").value,
+                        model: entry.querySelector(".model").value,
+                        brand: entry.querySelector(".brand").value,
+                        year: entry.querySelector(".year").value
+                    });
+                });
 
-    const selectedDay = document.getElementById("selectedDay").value;
-    const selectedTime = document.getElementById("selectedTime").value;
+                if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+                    alert("❌ Todos los campos son obligatorios.");
+                    return;
+                }
 
-    const vehicles = [];
-    document.querySelectorAll(".vehicle-entry").forEach(entry => {
-        vehicles.push({
-            plate: entry.querySelector(".plate").value,
-            model: entry.querySelector(".model").value,
-            brand: entry.querySelector(".brand").value,
-            year: entry.querySelector(".year").value
-        });
-    });
+                auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const userId = userCredential.user.uid;
+                    const paymentDate = new Date();
+                    const nextPaymentDate = new Date();
+                    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-        alert("❌ Todos los campos son obligatorios.");
-        return;
-    }
-
-    auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const userId = userCredential.user.uid;
-        const paymentDate = new Date();
-        const nextPaymentDate = new Date();
-        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-        return db.collection("users").doc(userId).set({
-            uid: userId,
-            name,
-            email,
-            phone,
-            planType,
-            department,
-            municipality,
-            registrationDate: firebase.firestore.Timestamp.now(),
-            schedule: { 
-                day: selectedDay, 
-                time: selectedTime 
-            },
-            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-            paymentStatus: "Pending",
-            vehicles
-        });
-    })
-
-        .then(() => {
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
-});
-
+                    return db.collection("users").doc(userId).set({
+                        uid: userId,
+                        name,
+                        email,
+                        phone,
+                        planType: selectedPlanType,
+                        department,
+                        municipality,
+                        registrationDate: firebase.firestore.Timestamp.now(),
+                        schedule: { day: selectedDay, time: selectedTime },
+                        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                        paymentStatus: "Pending",
+                        vehicles
+                    });
+                })
+                .then(() => {
+                    alert("✅ Registro exitoso. Redirigiendo...");
+                    window.location.href = "login.html";
+                })
+                .catch((error) => {
+                    console.error("❌ Error en el registro:", error.message);
+                    alert("❌ Error en el registro: " + error.message);
+                });
+            });
         });
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
-function updateVehicleFields(planType) {
-    const vehicleContainer = document.getElementById("vehicle-container");
-    vehicleContainer.innerHTML = ""; // Clear previous entries
-
-    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
-
-    for (let i = 0; i < maxVehicles; i++) {
-        const vehicleEntry = document.createElement("div");
-        vehicleEntry.classList.add("vehicle-entry");
-        vehicleEntry.innerHTML = `
-            <h4>Vehículo ${i + 1}</h4>
-            <label>Placa:</label>
-            <input type="text" class="plate" required>
-
-            <label>Modelo:</label>
-            <input type="text" class="model" required>
-
-            <label>Marca:</label>
-            <input type="text" class="brand" required>
-
-            <label>Año:</label>
-            <input type="number" class="year" required>
-        `;
-        vehicleContainer.appendChild(vehicleEntry);
-    }
-}
-
+        function updateVehicleFields(planType) {
+            const vehicleContainer = document.getElementById("vehicle-container");
+            vehicleContainer.innerHTML = "";
+            let maxVehicles = (planType.includes("plus")) ? 3 : 1;
+            for (let i = 0; i < maxVehicles; i++) {
+                const vehicleEntry = document.createElement("div");
+                vehicleEntry.classList.add("vehicle-entry");
+                vehicleEntry.innerHTML = `
+                    <h4>Vehículo ${i + 1}</h4>
+                    <label>Placa:</label>
+                    <input type="text" class="plate" required>
+                    <label>Modelo:</label>
+                    <input type="text" class="model" required>
+                    <label>Marca:</label>
+                    <input type="text" class="brand" required>
+                    <label>Año:</label>
+                    <input type="number" class="year" required>
+                `;
+                vehicleContainer.appendChild(vehicleEntry);
+            }
+        }
     </script>
-<style>
+    <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -596,39 +599,43 @@ button:hover {
     <div id="registration-container" style="display: none;">
     <h2>Registro en AutoCuidado Club</h2>
     <form id="registerForm" onsubmit="registerUser(event)">
-        <label>Nombre:</label>
-        <input type="text" id="name" required>
+<!-- Nombre -->
+<label for="name">Nombre:</label>
+<input type="text" id="name" placeholder="Ingrese su nombre completo" title="Ingrese su nombre completo" autocomplete="name" required>
 
-        <label>Email:</label>
-        <input type="email" id="email" required>
+<!-- Email -->
+<label for="email">Email:</label>
+<input type="email" id="email" placeholder="ejemplo@correo.com" title="Ingrese su correo electrónico" autocomplete="email" required>
 
-        <label>Teléfono:</label>
-        <input type="text" id="phone" required>
+<!-- Teléfono -->
+<label for="phone">Teléfono:</label>
+<input type="text" id="phone" placeholder="Número de teléfono" title="Ingrese su número de teléfono" autocomplete="tel" required>
 
-        <label>Contraseña:</label>
-        <input type="password" id="password" required>
+<!-- Contraseña -->
+<label for="password">Contraseña:</label>
+<input type="password" id="password" placeholder="Cree una contraseña segura" title="Cree una contraseña segura" autocomplete="new-password" required>
 
-        <label>Selecciona tu Plan:</label>
-        <select id="planType" disabled>
-            <option value="basic3m">Basic - 1 Vehículo</option>
-            <option value="plus3m">Plus - Hasta 3 Vehículos</option>
-        </select>
 
         <div id="vehicle-section">
     <h3>Datos del Vehículo</h3>
     <div id="vehicle-container">
         <div class="vehicle-entry">
-            <label for="plate">Placa:</label>
-            <input type="text" class="plate" required>
+            <!-- Placa (Número de placa del vehículo) -->
+<label for="plate">Placa:</label>
+<input type="text" id="plate" class="plate" placeholder="Número de placa" title="Ingrese el número de placa" autocomplete="off" required>
 
-            <label for="model">Modelo:</label>
-            <input type="text" class="model" required>
+<!-- Modelo (Modelo del vehículo) -->
+<label for="model">Modelo:</label>
+<input type="text" id="model" class="model" placeholder="Modelo del vehículo" title="Ingrese el modelo del vehículo" autocomplete="off" required>
 
-            <label for="brand">Marca:</label>
-            <input type="text" class="brand" required>
+<!-- Marca (Marca del vehículo) -->
+<label for="brand">Marca:</label>
+<input type="text" id="brand" class="brand" placeholder="Marca del vehículo" title="Ingrese la marca del vehículo" autocomplete="off" required>
 
-            <label for="year">Año:</label>
-            <input type="number" class="year" required>
+<!-- Año (Año del vehículo) -->
+<label for="year">Año:</label>
+<input type="number" id="year" class="year" placeholder="Año del vehículo" title="Ingrese el año del vehículo" autocomplete="off" required>
+
         </div>
     </div>
    </div>
@@ -637,43 +644,43 @@ button:hover {
     <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
-    <thead>
-        <tr>
-            <th>Horario</th>
-            <th>Lunes</th>
-            <th>Miércoles</th>
-            <th>Viernes</th>
-            <th>Sábado</th>
-            <th>Domingo</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Bloque 1</td>
-            <td onclick="selectScheduleBox(this, 'Lunes', '9:00 - 11:00')">9:00 - 11:00</td>
-            <td onclick="selectScheduleBox(this, 'Miércoles', '10:00 - 12:00')">10:00 - 12:00</td>
-            <td onclick="selectScheduleBox(this, 'Viernes', '13:00 - 15:00')">13:00 - 15:00</td>
-            <td onclick="selectScheduleBox(this, 'Sábado', '8:00 - 10:00')">8:00 - 10:00</td>
-            <td onclick="selectScheduleBox(this, 'Domingo', '9:00 - 11:00')">9:00 - 11:00</td>
-        </tr>
-        <tr>
-            <td>Bloque 2</td>
-            <td onclick="selectScheduleBox(this, 'Lunes', '12:00 - 14:00')">12:00 - 14:00</td>
-            <td onclick="selectScheduleBox(this, 'Miércoles', '13:00 - 15:00')">13:00 - 15:00</td>
-            <td onclick="selectScheduleBox(this, 'Viernes', '16:00 - 18:00')">16:00 - 18:00</td>
-            <td onclick="selectScheduleBox(this, 'Sábado', '11:00 - 13:00')">11:00 - 13:00</td>
-            <td onclick="selectScheduleBox(this, 'Domingo', '12:00 - 14:00')">12:00 - 14:00</td>
-        </tr>
-        <tr>
-            <td>Bloque 3</td>
-            <td onclick="selectScheduleBox(this, 'Lunes', '15:00 - 17:00')">15:00 - 17:00</td>
-            <td onclick="selectScheduleBox(this, 'Miércoles', '16:00 - 18:00')">16:00 - 18:00</td>
-            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
-            <td onclick="selectScheduleBox(this, 'Sábado', '14:00 - 16:00')">14:00 - 16:00</td>
-            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
-        </tr>
-    </tbody>
-</table>
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
 
 
         <input type="hidden" id="selectedDay" required>
@@ -693,28 +700,36 @@ button:hover {
     
     
     <script>
-       function selectScheduleBox(cell, day, time) {
-    // Get the cell's text value
+    function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
     const timeBlock = cell.innerText.trim();
 
-    // Check if the cell is empty or has a dash (invalid)
-    if (!timeBlock || timeBlock === "-") {
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
         alert("Por favor, seleccione un horario válido.");
-        return; // Exit function to prevent selection
+        return; // Do not allow selection of invalid cells
     }
 
-    // Remove previous selections
-    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
 
-    // Highlight the clicked cell
-    cell.classList.add("selected");
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
 
-    // Store selected schedule in hidden inputs
-   const selectedDay = document.getElementById("selectedDay").value;
-const selectedTime = document.getElementById("selectedTime").value;
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
 
-    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
 }
 
         const locations = {
@@ -839,5 +854,133 @@ const selectedTime = document.getElementById("selectedTime").value;
     
         
     </footer>
+            <script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded!");
+
+    const registrationContainer = document.getElementById("registration-container");
+
+    if (!registrationContainer) {
+        console.error("❌ Error: No se encontró el contenedor de registro en el DOM.");
+        return;
+    }
+
+    const planButtons = document.querySelectorAll(".plan-button");
+
+    // ✅ Attach event listeners to all plan buttons
+    planButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+
+            registrationContainer.style.display = "block"; // ✅ Show form
+            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+
+            console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
+        });
+    });
+
+    // ✅ Modify registerUser function to use selectedPlanType
+    window.registerUser = function(event) {
+        event.preventDefault();
+
+        if (!selectedPlanType) {
+            alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
+            return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
+
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
+
+        const vehicles = [];
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
+            });
+        });
+
+        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+        return db.collection("users").doc(userId).set({
+            uid: userId,
+            name,
+            email,
+            phone,
+            planType: selectedPlanType, // ✅ Ensure the plan type is stored
+            department,
+            municipality,
+            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            },
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentStatus: "Pending",
+            vehicles
+        });
+    })  // ✅ Ensure this bracket properly closes .then()
+
+        .then(() => {  // ❌ This might be causing a syntax error
+            alert("✅ Registro exitoso. Redirigiendo...");
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+    };  
+});
+
+
+
+
+// ✅ Function to Update Vehicle Fields Based on Plan Type
+function updateVehicleFields(planType) {
+    const vehicleContainer = document.getElementById("vehicle-container");
+    vehicleContainer.innerHTML = ""; // Clear previous entries
+
+    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
+
+    for (let i = 0; i < maxVehicles; i++) {
+        const vehicleEntry = document.createElement("div");
+        vehicleEntry.classList.add("vehicle-entry");
+        vehicleEntry.innerHTML = `
+            <h4>Vehículo ${i + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label>Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label>Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label>Año:</label>
+            <input type="number" class="year" required>
+        `;
+        vehicleContainer.appendChild(vehicleEntry);
+    }
+}
+            </script>
 </body>
 </html>
