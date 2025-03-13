@@ -17,34 +17,12 @@
    
 
     <script>
- document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".plan-button").forEach(button => {
-        button.addEventListener("click", function () {
-            const selectedPlan = this.getAttribute("data-plan");
-            document.getElementById("planType").value = selectedPlan;
-
-            // Ensure vehicle fields are updated correctly
-            updateVehicleFields(selectedPlan);
-
-            // ✅ Ensure the registration form exists before modifying it
-            const registrationForm = document.getElementById("registration-container");
-            if (registrationForm) {
-                registrationForm.style.display = "block"; // ✅ Show the form
-                registrationForm.scrollIntoView({ behavior: "smooth" }); // ✅ Scroll to form
-                console.log(`✅ Plan seleccionado: ${selectedPlan}`);
-            } else {
-                console.error("❌ Error: No se encontró el contenedor de registro.");
+  document.addEventListener("DOMContentLoaded", function () {
+            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+                console.error("❌ Error: Firebase env.js not loaded.");
+                alert("❌ Firebase is not initialized. Check env.js.");
+                return;
             }
-         // ✅ Show the registration form
-            registrationContainer.style.display = "block"; // Ensure it is visible
-
-            // ✅ Scroll smoothly to the registration form
-            registrationContainer.scrollIntoView({ behavior: "smooth" });
-
-            console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
-        });
-    });
-});
 
             const firebaseConfig = {
                 apiKey: window._env_.FIREBASE_API_KEY,
@@ -70,13 +48,10 @@
 window.selectScheduleBox = function(cell, day, time) {
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
     cell.classList.add("selected");
-
     document.getElementById("selectedDay").value = day;
     document.getElementById("selectedTime").value = time;
-
     console.log(`✅ Horario seleccionado: ${day} - ${time}`);
 };
-
 
 
             // ✅ Handle Plan Selection & Show Correct Vehicle Fields
@@ -98,8 +73,8 @@ document.querySelectorAll(".plan-button").forEach(button => {
 
 
             // ✅ Attach Event Listener for Registration Form
-window.registerUser = function(event) {
-    event.preventDefault(); // Prevent page reload on form submission
+            document.getElementById("registerForm").addEventListener("submit", function (event) {
+    event.preventDefault();
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -108,7 +83,7 @@ window.registerUser = function(event) {
     const planType = document.getElementById("planType").value;
     const department = document.getElementById("department").value;
     const municipality = document.getElementById("municipality").value;
-    
+
     const selectedDay = document.getElementById("selectedDay").value;
     const selectedTime = document.getElementById("selectedTime").value;
 
@@ -126,9 +101,6 @@ window.registerUser = function(event) {
         alert("❌ Todos los campos son obligatorios.");
         return;
     }
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
 
     auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
@@ -156,18 +128,18 @@ window.registerUser = function(event) {
             vehicles
         });
     })
-    .then(() => {
-        alert("✅ Registro exitoso. Redirigiendo...");
-        window.location.href = "login.html";
-    })
-    .catch((error) => {
-        console.error("❌ Error en el registro:", error.message);
-        alert("❌ Error en el registro: " + error.message);
-    });
-};
+
+        .then(() => {
+            alert("✅ Registro exitoso. Redirigiendo...");
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+});
 
         });
-
 
         // ✅ Function to Update Vehicle Fields Based on Plan Type
 function updateVehicleFields(planType) {
@@ -665,43 +637,43 @@ button:hover {
     <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
         <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Horario</th>
-                    <th>Lunes</th>
-                    <th>Miércoles</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Bloque 1</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 2</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 3</td>
-                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                </tr>
-            </tbody>
-        </table>
+    <thead>
+        <tr>
+            <th>Horario</th>
+            <th>Lunes</th>
+            <th>Miércoles</th>
+            <th>Viernes</th>
+            <th>Sábado</th>
+            <th>Domingo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Bloque 1</td>
+            <td onclick="selectScheduleBox(this, 'Lunes', '9:00 - 11:00')">9:00 - 11:00</td>
+            <td onclick="selectScheduleBox(this, 'Miércoles', '10:00 - 12:00')">10:00 - 12:00</td>
+            <td onclick="selectScheduleBox(this, 'Viernes', '13:00 - 15:00')">13:00 - 15:00</td>
+            <td onclick="selectScheduleBox(this, 'Sábado', '8:00 - 10:00')">8:00 - 10:00</td>
+            <td onclick="selectScheduleBox(this, 'Domingo', '9:00 - 11:00')">9:00 - 11:00</td>
+        </tr>
+        <tr>
+            <td>Bloque 2</td>
+            <td onclick="selectScheduleBox(this, 'Lunes', '12:00 - 14:00')">12:00 - 14:00</td>
+            <td onclick="selectScheduleBox(this, 'Miércoles', '13:00 - 15:00')">13:00 - 15:00</td>
+            <td onclick="selectScheduleBox(this, 'Viernes', '16:00 - 18:00')">16:00 - 18:00</td>
+            <td onclick="selectScheduleBox(this, 'Sábado', '11:00 - 13:00')">11:00 - 13:00</td>
+            <td onclick="selectScheduleBox(this, 'Domingo', '12:00 - 14:00')">12:00 - 14:00</td>
+        </tr>
+        <tr>
+            <td>Bloque 3</td>
+            <td onclick="selectScheduleBox(this, 'Lunes', '15:00 - 17:00')">15:00 - 17:00</td>
+            <td onclick="selectScheduleBox(this, 'Miércoles', '16:00 - 18:00')">16:00 - 18:00</td>
+            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
+            <td onclick="selectScheduleBox(this, 'Sábado', '14:00 - 16:00')">14:00 - 16:00</td>
+            <td onclick="selectScheduleBox(this, '', '')">-</td> <!-- Empty -->
+        </tr>
+    </tbody>
+</table>
 
 
         <input type="hidden" id="selectedDay" required>
@@ -721,36 +693,28 @@ button:hover {
     
     
     <script>
-      function selectScheduleBox(cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-
-    // Get the clicked cell's text
+       function selectScheduleBox(cell, day, time) {
+    // Get the cell's text value
     const timeBlock = cell.innerText.trim();
 
-    // Validate the clicked cell
-    if (timeBlock === "-" || timeBlock === "") {
+    // Check if the cell is empty or has a dash (invalid)
+    if (!timeBlock || timeBlock === "-") {
         alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
+        return; // Exit function to prevent selection
     }
 
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
+    // Remove previous selections
+    document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
 
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
+    // Highlight the clicked cell
+    cell.classList.add("selected");
 
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    // Store selected schedule in hidden inputs
+   const selectedDay = document.getElementById("selectedDay").value;
+const selectedTime = document.getElementById("selectedTime").value;
 
-    // Update the hidden input field to include both the day and time block
-    const scheduleField = document.getElementById("selectedSchedule");
-    if (scheduleField) {
-        scheduleField.value = `${day} - ${timeBlock}`;
-    }
 
-    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+    console.log(`✅ Horario seleccionado: ${day} - ${time}`);
 }
 
         const locations = {
