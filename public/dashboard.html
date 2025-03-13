@@ -302,7 +302,10 @@ function updateUserInfo(userData) {
                 </tr>
             </tbody>
         </table>
-        <button id="save-schedule-btn" onclick="updateSchedule()"><p><strong>Guardar Nuevo Horario</strong></p>Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.</button>
+       <button id="save-schedule-btn" onclick="updateSchedule()">
+    <strong>Guardar Nuevo Horario</strong>
+</button>
+
     </div>
 
 <p></p>
@@ -633,13 +636,11 @@ function loadVehicles(vehicles) {
         function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
 
-    // Get the clicked cell's text
-    const timeBlock = cell.innerText.trim();
-
     // Validate the clicked cell
+    const timeBlock = cell.innerText.trim();
     if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
+        alert("❌ Por favor, seleccione un horario válido.");
+        return;
     }
 
     // Remove selection from all other cells
@@ -648,24 +649,20 @@ function loadVehicles(vehicles) {
     // Highlight the selected cell
     cell.classList.add("selected-box");
 
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    // Get the corresponding day from the table header
+    const dayIndex = cell.cellIndex;
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
-    // Update the hidden input field to include both the day and time block
-    const scheduleField = document.getElementById("selectedSchedule");
-    if (scheduleField) {
-        scheduleField.value = `${day} - ${timeBlock}`;
-    }
-
-    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+    console.log(`✅ Horario seleccionado: ${day} - ${timeBlock}`);
 }
+
 
 function updateSchedule() {
     const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    
     if (!selectedCell) {
-        alert("Por favor selecciona un horario.");
+        alert("❌ Por favor selecciona un horario.");
         return;
     }
 
@@ -675,64 +672,70 @@ function updateSchedule() {
     const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
     if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
-        alert("Por favor selecciona un horario válido.");
+        alert("❌ Por favor selecciona un horario válido.");
         return;
     }
 
-    const user = auth.currentUser;
+    // Ensure Firebase authentication is initialized
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        console.error("❌ No authenticated user.");
+        alert("Debes estar autenticado para cambiar el horario.");
+        return;
+    }
+
     const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date().toLocaleString("es-ES", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
+    const currentDate = new Date();
 
-    db.collection("users").doc(user.email).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
-                const currentDateObj = new Date();
+    // 🔥 Get user document from Firestore using UID instead of email
+    const userRef = db.collection("users").doc(user.uid);
 
-                if (lastReschedule) {
-                    const rescheduleMonth = lastReschedule.getMonth();
-                    const currentMonth = currentDateObj.getMonth();
-                    const rescheduleYear = lastReschedule.getFullYear();
-                    const currentYear = currentDateObj.getFullYear();
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
 
-                    if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                        const lastRescheduleDate = lastReschedule.toLocaleString("es-ES", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        });
-                        alert(`Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
-                        return;
-                    }
+            // 🚨 Prevent multiple reschedules in the same month
+            if (lastReschedule) {
+                const rescheduleMonth = lastReschedule.getMonth();
+                const currentMonth = currentDate.getMonth();
+                const rescheduleYear = lastReschedule.getFullYear();
+                const currentYear = currentDate.getFullYear();
+
+                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                    const lastRescheduleDate = lastReschedule.toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
+                    return;
                 }
-
-                db.collection("users").doc(user.email).update({
-                    selectedSchedule: newSchedule,
-                    lastReschedule: firebase.firestore.Timestamp.now(),
-                }).then(() => {
-                    alert(`Horario actualizado correctamente. Fecha y hora de reprogramación: ${currentDate}`);
-                    loadUserProfile(user.email); // Reload profile info
-                }).catch((error) => {
-                    console.error("Error al actualizar el horario:", error);
-                });
-            } else {
-                console.error("Usuario no encontrado en la base de datos.");
             }
-        })
-        .catch((error) => {
-            console.error("Error al verificar reprogramaciones previas:", error);
-        });
+
+            // ✅ Update Firestore with new schedule
+            userRef.update({
+                selectedSchedule: newSchedule,
+                lastReschedule: firebase.firestore.Timestamp.now(),
+            }).then(() => {
+                alert(`✅ Horario actualizado correctamente a: ${newSchedule}`);
+                document.getElementById("current-schedule").innerText = newSchedule; // Update UI
+            }).catch((error) => {
+                console.error("❌ Error al actualizar el horario:", error);
+                alert("❌ Error al actualizar el horario. Inténtalo de nuevo.");
+            });
+
+        } else {
+            console.error("❌ Usuario no encontrado en Firestore.");
+            alert("❌ Error: No se encontró tu perfil en la base de datos.");
+        }
+    }).catch((error) => {
+        console.error("❌ Error al obtener el perfil del usuario:", error);
+    });
 }
+
 
 
 // Add CSS for selected schedule cells
