@@ -212,8 +212,6 @@ function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
     document.getElementById("phone").innerText = userData.phone || "N/A";
 
-    console.log("🔥 Debug: userData.planType =", userData.planType);
-
     // Retrieve the plan type from Firebase
     const planType = userData.planType || "N/A";
     document.getElementById("planType").innerText = planType;
@@ -230,14 +228,12 @@ function updateUserInfo(userData) {
 
     // Ensure the plan message updates correctly
     const planMessageElement = document.getElementById("planMessage");
-
-if (planMessageElement) {
-    planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
-    console.log("✅ Plan Seleccionado Actualizado:", planMessageElement.innerText);
-} else {
-    console.error("❌ Error: No se encontró el elemento con ID 'planMessage'");
+    if (planMessageElement) {
+        planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
+    } else {
+        console.error("❌ Elemento con ID 'planMessage' no encontrado.");
+    }
 }
-
     
 </script>
         
@@ -416,18 +412,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
 
-            console.log("🚀 updateUserInfo() called with:", userData); // ❌ ERROR: userData not yet retrieved
-
-db.collection("users").doc(user.uid).get()
-    .then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data(); // ✅ Defined here
-            updateUserInfo(userData);
-        } else {
-            console.error("❌ User profile not found in Firestore.");
-        }
-    })
-
+            // Fetch user profile using UID instead of email
+            db.collection("users").doc(user.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        updateUserInfo(userData);
+                    } else {
+                        console.error("❌ User profile not found in Firestore.");
+                    }
+                })
                 .catch((error) => {
                     console.error("❌ Error fetching user profile:", error);
                 });
