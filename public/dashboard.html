@@ -203,7 +203,7 @@
         
     <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
     <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
-<p><strong>Plan Seleccionado:</strong> <span id="planMessage">Cargando...</span></p>
+
 
 
     
@@ -211,30 +211,33 @@
 function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
     document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    
+    console.log("🔥 Debug: userData.planType =", userData.planType);
 
-    // Retrieve the plan type from Firebase
-    const planType = userData.planType || "N/A";
-    document.getElementById("planType").innerText = planType;
-
-    // Define user-friendly plan descriptions
+    // ✅ Define user-friendly plan descriptions
     const planMessages = {
-        "basic3m": "Elegiste el plan básico de 3 meses",
-        "basic6m": "Elegiste el plan básico de 6 meses",
-        "basic12m": "Elegiste el plan básico de 12 meses",
-        "plus3m": "Elegiste el plan plus de 3 meses",
-        "plus6m": "Elegiste el plan plus de 6 meses",
-        "plus12m": "Elegiste el plan plus de 12 meses"
+        "basic3m": "Plan Básico de 3 meses",
+        "basic6m": "Plan Básico de 6 meses",
+        "basic12m": "Plan Básico de 12 meses",
+        "plus3m": "Plan Plus de 3 meses",
+        "plus6m": "Plan Plus de 6 meses",
+        "plus12m": "Plan Plus de 12 meses"
     };
 
-    // Ensure the plan message updates correctly
+    // ✅ Get the plan type from Firebase
+    const planType = userData.planType || "N/A";
+
+    // ✅ Update the UI with the corresponding plan message
     const planMessageElement = document.getElementById("planMessage");
     if (planMessageElement) {
         planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
+        console.log("✅ Plan Seleccionado Actualizado:", planMessageElement.innerText);
     } else {
-        console.error("❌ Elemento con ID 'planMessage' no encontrado.");
+        console.error("❌ Error: No se encontró el elemento con ID 'planMessage'");
     }
 }
-    
+
 </script>
         
     <!-- Message for unpaid users -->
