@@ -54,17 +54,35 @@
             });
 
             // ✅ Function to Select a Schedule Box
-            window.selectScheduleBox = function(cell, day, time) {
-                if (!time || time === "-") {
-                    alert("Por favor, seleccione un horario válido.");
-                    return;
-                }
-                document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
-                cell.classList.add("selected");
-                document.getElementById("selectedDay").value = day;
-                document.getElementById("selectedTime").value = time;
-                console.log(`✅ Horario seleccionado: ${day} - ${time}`);
-            };
+            window.selectScheduleBox = function(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input fields
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = timeBlock;
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+};
 
             // ✅ Attach Event Listener for Registration Form
             document.getElementById("registerForm").addEventListener("submit", function (event) {
