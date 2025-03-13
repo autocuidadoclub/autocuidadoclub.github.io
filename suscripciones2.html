@@ -19,7 +19,7 @@
     <script>
             const firebaseConfig = {
                 apiKey: window._env_.FIREBASE_API_KEY,
-                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                authDomain: ._env_.FIREBASE_AUTH_DOMAIN,
                 projectId: window._env_.FIREBASE_PROJECT_ID,
                 storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
                 messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
@@ -71,11 +71,7 @@ document.querySelectorAll(".plan-button").forEach(button => {
 window.registerUser = function(event) {
     event.preventDefault();
 
-    if (!selectedPlanType) {
-    alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
-    console.error("❌ Error: No se ha seleccionado un plan.");
-    return;
-}
+    console.log("📌 Checking form values...");
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -83,9 +79,17 @@ window.registerUser = function(event) {
     const password = document.getElementById("password").value.trim();
     const department = document.getElementById("department").value;
     const municipality = document.getElementById("municipality").value;
-    
     const selectedDay = document.getElementById("selectedDay").value;
     const selectedTime = document.getElementById("selectedTime").value;
+
+    console.log(`📌 Name: ${name}`);
+    console.log(`📌 Email: ${email}`);
+    console.log(`📌 Phone: ${phone}`);
+    console.log(`📌 Password: ${password}`);
+    console.log(`📌 Department: ${department}`);
+    console.log(`📌 Municipality: ${municipality}`);
+    console.log(`📌 Selected Day: ${selectedDay}`);
+    console.log(`📌 Selected Time: ${selectedTime}`);
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
@@ -97,8 +101,11 @@ window.registerUser = function(event) {
         });
     });
 
+    console.log(`📌 Vehicles:`, vehicles);
+
     if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
         alert("❌ Todos los campos son obligatorios.");
+        console.error("❌ Error: Some fields are empty!");
         return;
     }
 
@@ -137,8 +144,6 @@ window.registerUser = function(event) {
         alert("❌ Error en el registro: " + error.message);
     });
 };
-
-
 
     </script>
 <style>
