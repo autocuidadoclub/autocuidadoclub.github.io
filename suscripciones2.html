@@ -19,7 +19,7 @@
     <script>
             const firebaseConfig = {
                 apiKey: window._env_.FIREBASE_API_KEY,
-                authDomain: ._env_.FIREBASE_AUTH_DOMAIN,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN
                 projectId: window._env_.FIREBASE_PROJECT_ID,
                 storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
                 messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
@@ -38,15 +38,22 @@
             const db = firebase.firestore();
 
       // ✅ Function to Select a Schedule Box
-window.selectScheduleBox = function(cell, day, time) {
+        console.log("📌 Selected Day:", document.getElementById("selectedDay").value);
+console.log("📌 Selected Time:", document.getElementById("selectedTime").value);
+
+window.selectScheduleBox = function(cell) {
     document.querySelectorAll(".schedule-table td").forEach(td => td.classList.remove("selected"));
     cell.classList.add("selected");
 
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = time;
+    const day = cell.closest("table").querySelector(`thead th:nth-child(${cell.cellIndex + 1})`).innerText;
+    const time = cell.innerText;
+
+    document.getElementById("selectedDay").value = day.trim();
+    document.getElementById("selectedTime").value = time.trim();
 
     console.log(`✅ Horario seleccionado: ${day} - ${time}`);
 };
+
 
 
 
