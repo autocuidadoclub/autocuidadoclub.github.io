@@ -53,6 +53,29 @@
                 });
             });
 
+// ✅ Function to Update Vehicle Fields Based on Plan Type
+            function updateVehicleFields(planType) {
+                const vehicleContainer = document.getElementById("vehicle-container");
+                vehicleContainer.innerHTML = "";
+                let maxVehicles = (planType.includes("plus")) ? 3 : 1;
+                for (let i = 0; i < maxVehicles; i++) {
+                    const vehicleEntry = document.createElement("div");
+                    vehicleEntry.classList.add("vehicle-entry");
+                    vehicleEntry.innerHTML = `
+                        <h4>Vehículo ${i + 1}</h4>
+                        <label>Placa:</label>
+                        <input type="text" class="plate" required>
+                        <label>Modelo:</label>
+                        <input type="text" class="model" required>
+                        <label>Marca:</label>
+                        <input type="text" class="brand" required>
+                        <label>Año:</label>
+                        <input type="number" class="year" required>
+                    `;
+                    vehicleContainer.appendChild(vehicleEntry);
+                }
+            }
+            
             // ✅ Function to Select a Schedule Box
             window.selectScheduleBox = function(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
@@ -598,7 +621,7 @@ button:hover {
     </section>
     <div id="registration-container" style="display: none;">
     <h2>Registro en AutoCuidado Club</h2>
-    <form id="registerForm" onsubmit="registerUser(event)">
+    <form id="registerForm">
 <!-- Nombre -->
 <label for="name">Nombre:</label>
 <input type="text" id="name" placeholder="Ingrese su nombre completo" title="Ingrese su nombre completo" autocomplete="name" required>
