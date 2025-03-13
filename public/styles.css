@@ -1432,3 +1432,27 @@ input:focus, select:focus {
         max-width: 90%;
     }
 }
+
+/* Style for the Registrarse button */
+button[type="submit"] {
+    display: block;
+    width: 100%; /* Make it as wide as the container */
+    max-width: 250px; /* Limit the maximum width */
+    margin: 20px auto; /* Center it horizontally */
+    padding: 15px; /* Make it bigger */
+    font-size: 18px; /* Increase text size */
+    font-weight: bold;
+    background-color: #003366; /* Maintain the AutoCuidado Club dark blue */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s;
+    text-align: center;
+}
+
+/* Hover effect */
+button[type="submit"]:hover {
+    background-color: #FF6600; /* Orange hover effect */
+    transform: scale(1.05); /* Slight zoom-in effect */
+}
