@@ -207,15 +207,15 @@
 
     
 <script>
-    function updateUserInfo(userData) {
+function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
     document.getElementById("phone").innerText = userData.phone || "N/A";
 
-    // Get the plan type from Firebase
+    // Retrieve the plan type from Firebase
     const planType = userData.planType || "N/A";
     document.getElementById("planType").innerText = planType;
 
-    // Map the plan type to a user-friendly message
+    // Define user-friendly plan descriptions
     const planMessages = {
         "basic3m": "Elegiste el plan básico de 3 meses",
         "basic6m": "Elegiste el plan básico de 6 meses",
@@ -225,9 +225,15 @@
         "plus12m": "Elegiste el plan plus de 12 meses"
     };
 
-    // Set the message or show a default
-    document.getElementById("planMessage").innerText = planMessages[planType] || "Tipo de plan desconocido";
+    // Ensure the plan message updates correctly
+    const planMessageElement = document.getElementById("planMessage");
+    if (planMessageElement) {
+        planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
+    } else {
+        console.error("❌ Elemento con ID 'planMessage' no encontrado.");
+    }
 }
+    
 </script>
         
     <!-- Message for unpaid users -->
