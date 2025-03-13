@@ -415,18 +415,19 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("✅ User logged in:", user.email);
 
             document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-console.log("🚀 updateUserInfo() called with:", userData);
 
-            // Fetch user profile using UID instead of email
-            db.collection("users").doc(user.uid).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        updateUserInfo(userData);
-                    } else {
-                        console.error("❌ User profile not found in Firestore.");
-                    }
-                })
+            console.log("🚀 updateUserInfo() called with:", userData); // ❌ ERROR: userData not yet retrieved
+
+db.collection("users").doc(user.uid).get()
+    .then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data(); // ✅ Defined here
+            updateUserInfo(userData);
+        } else {
+            console.error("❌ User profile not found in Firestore.");
+        }
+    })
+
                 .catch((error) => {
                     console.error("❌ Error fetching user profile:", error);
                 });
