@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -68,62 +69,29 @@ document.querySelectorAll(".plan-button").forEach(button => {
 });
 
 
-          // ✅ Attach Event Listener for Registration Form
+            // ✅ Attach Event Listener for Registration Form
 window.registerUser = function(event) {
     event.preventDefault(); // Prevent page reload on form submission
 
-    // ✅ Ensure required fields exist before accessing them
-    const nameField = document.getElementById("name");
-    const emailField = document.getElementById("email");
-    const phoneField = document.getElementById("phone");
-    const passwordField = document.getElementById("password");
-    const planTypeField = document.getElementById("planType");
-    const departmentField = document.getElementById("department");
-    const municipalityField = document.getElementById("municipality");
-    const selectedDayField = document.getElementById("selectedDay");
-    const selectedTimeField = document.getElementById("selectedTime");
-
-    // ✅ Check if any field is missing
-   // ✅ Check which fields are missing
-const missingFields = [];
-
-if (!nameField) missingFields.push("nameField (Nombre)");
-if (!emailField) missingFields.push("emailField (Email)");
-if (!phoneField) missingFields.push("phoneField (Teléfono)");
-if (!passwordField) missingFields.push("passwordField (Contraseña)");
-if (!planTypeField) missingFields.push("planTypeField (Tipo de Plan)");
-if (!departmentField) missingFields.push("departmentField (Departamento)");
-if (!municipalityField) missingFields.push("municipalityField (Municipio)");
-if (!selectedDayField) missingFields.push("selectedDayField (Día seleccionado)");
-if (!selectedTimeField) missingFields.push("selectedTimeField (Hora seleccionada)");
-
-if (missingFields.length > 0) {
-    console.error("❌ Error: Los siguientes campos están ausentes en el DOM:", missingFields);
-    alert("❌ Error interno: Faltan los siguientes campos en la página:\n" + missingFields.join("\n"));
-    return;
-}
-
-
-    const name = nameField.value.trim();
-    const email = emailField.value.trim();
-    const phone = phoneField.value.trim();
-    const password = passwordField.value.trim();
-    const planType = planTypeField.value;
-    const department = departmentField.value;
-    const municipality = municipalityField.value;
-    const selectedDay = selectedDayField.value;
-    const selectedTime = selectedTimeField.value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const planType = document.getElementById("planType").value;
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
-        const plate = entry.querySelector(".plate")?.value;
-        const model = entry.querySelector(".model")?.value;
-        const brand = entry.querySelector(".brand")?.value;
-        const year = entry.querySelector(".year")?.value;
-
-        if (plate && model && brand && year) {
-            vehicles.push({ plate, model, brand, year });
-        }
+        vehicles.push({
+            plate: entry.querySelector(".plate").value,
+            model: entry.querySelector(".model").value,
+            brand: entry.querySelector(".brand").value,
+            year: entry.querySelector(".year").value
+        });
     });
 
     if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
@@ -169,7 +137,6 @@ if (missingFields.length > 0) {
         alert("❌ Error en el registro: " + error.message);
     });
 };
-
 
     </script>
 <style>
@@ -689,7 +656,7 @@ button:hover {
     
     
     <script>
-    function selectScheduleBox(cell) {
+      function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
 
     // Get the clicked cell's text
@@ -844,18 +811,13 @@ button:hover {
         
     </footer>
             <script>
-              document.addEventListener("DOMContentLoaded", function () {
+               document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
-    const registrationContainer = document.getElementById("registration-container");
-
-    if (!registrationContainer) {
-        console.error("❌ Error: No se encontró el contenedor de registro en el DOM.");
-        return;
-    }
-
+    const planTypeField = document.getElementById("planType");
     const planButtons = document.querySelectorAll(".plan-button");
 
+   
     // ✅ Attach event listeners to all plan buttons
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
@@ -866,14 +828,13 @@ button:hover {
                 return;
             }
 
-            registrationContainer.style.display = "block"; // ✅ Show form
-            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+                       // ✅ Smooth scroll to form
+            registrationContainer.scrollIntoView({ behavior: "smooth" });
 
             console.log(`✅ Plan seleccionado: ${selectedPlan}, formulario mostrado.`);
         });
     });
 });
-
 
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
