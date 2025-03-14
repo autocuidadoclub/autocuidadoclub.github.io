@@ -528,22 +528,33 @@ function formatTimestamp(timestamp) {
 }
 
 // ✅ Logout Function with Error Handling
-// ✅ Logout Function with Error Handling
 function logoutUser() {
-    const auth = firebase.auth();
-    
+    if (!auth) {
+        console.error("❌ Firebase Auth is not initialized!");
+        alert("Error: Firebase Auth is not initialized.");
+        return;
+    }
+
     auth.signOut()
         .then(() => {
             console.log("✅ User logged out successfully.");
-            // ✅ Clear session storage and redirect
-            sessionStorage.clear();
-            window.location.href = "login.html";
+            sessionStorage.clear(); // Clear session
+            window.location.href = "login.html"; // Redirect to login page
         })
         .catch((error) => {
             console.error("❌ Error during logout:", error.message);
             alert("❌ Error al cerrar sesión: " + error.message);
         });
 }
+
+// ✅ Ensure Logout Button Works
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.getElementById("logout-btn");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", logoutUser);
+    }
+});
+
 
 // ✅ Attach Logout Function to Button
 document.addEventListener("DOMContentLoaded", function () {
