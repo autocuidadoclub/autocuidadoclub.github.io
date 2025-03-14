@@ -377,69 +377,48 @@ function updateUserInfo(userData) {
 
       
     <script>
-    // Firebase configuration
-   const firebaseConfig = {
-    apiKey: window._env_.FIREBASE_API_KEY,
-    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-    databaseURL: window._env_.FIREBASE_DATABASE_URL,
-    projectId: window._env_.FIREBASE_PROJECT_ID,
-    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-    appId: window._env_.FIREBASE_APP_ID,
-    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-};
-
 document.addEventListener("DOMContentLoaded", function () {
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Firebase env.js not loaded.");
-        alert("❌ Firebase is not initialized. Check env.js.");
-        return;
-    }
+        if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+            console.error("❌ Error: Firebase env.js not loaded.");
+            alert("❌ Firebase is not initialized. Check env.js.");
+            return;
+        }
 
-    // ✅ Initialize Firebase
-    const firebaseConfig = {
-        apiKey: window._env_.FIREBASE_API_KEY,
-        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-        projectId: window._env_.FIREBASE_PROJECT_ID,
-        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-        appId: window._env_.FIREBASE_APP_ID,
-        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-    };
+        // ✅ Initialize Firebase (only if not already initialized)
+        if (!firebase.apps.length) {
+            firebase.initializeApp({
+                apiKey: window._env_.FIREBASE_API_KEY,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                projectId: window._env_.FIREBASE_PROJECT_ID,
+                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                appId: window._env_.FIREBASE_APP_ID,
+                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+            });
+            console.log("✅ Firebase initialized successfully!");
+        }
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase initialized successfully!");
-    }
+        const auth = firebase.auth();
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log("✅ User logged in:", user.email);
-
-            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-
-            // Fetch user profile using UID instead of email
-            db.collection("users").doc(user.uid).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        updateUserInfo(userData);
-                    } else {
-                        console.error("❌ User profile not found in Firestore.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("❌ Error fetching user profile:", error);
-                });
+        // ✅ Ensure the logout button is attached
+        const logoutButton = document.getElementById("logout-btn");
+        if (logoutButton) {
+            logoutButton.addEventListener("click", function () {
+                auth.signOut()
+                    .then(() => {
+                        console.log("✅ User logged out successfully.");
+                        sessionStorage.clear(); // Ensure session is cleared
+                        window.location.href = "login.html";
+                    })
+                    .catch((error) => {
+                        console.error("❌ Error during logout:", error.message);
+                        alert("❌ Error al cerrar sesión: " + error.message);
+                    });
+            });
         } else {
-            console.log("❌ No authenticated user. Redirecting to login...");
-            window.location.href = 'login.html';
+            console.error("❌ Error: Logout button not found.");
         }
     });
-});
 
 // ✅ Update User Info in Dashboard
 function updateUserInfo(userData) {
