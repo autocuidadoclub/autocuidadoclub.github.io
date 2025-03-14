@@ -377,20 +377,36 @@ function updateUserInfo(userData) {
 
       
    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // ✅ Ensure Firebase is initialized
-        if (!firebase.apps.length) {
-            firebase.initializeApp({
-                apiKey: window._env_.FIREBASE_API_KEY,
-                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                projectId: window._env_.FIREBASE_PROJECT_ID,
-                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-                appId: window._env_.FIREBASE_APP_ID,
-                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-            });
-            console.log("✅ Firebase initialized successfully!");
-        }
+    // ✅ Ensure Firebase is initialized globally
+let auth, db;
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+        console.error("❌ Error: Firebase env.js not loaded.");
+        alert("❌ Firebase is not initialized. Check env.js.");
+        return;
+    }
+
+    // ✅ Initialize Firebase if not already initialized
+    const firebaseConfig = {
+        apiKey: window._env_.FIREBASE_API_KEY,
+        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+        projectId: window._env_.FIREBASE_PROJECT_ID,
+        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+        appId: window._env_.FIREBASE_APP_ID,
+        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("✅ Firebase initialized successfully!");
+    }
+
+    // ✅ Assign auth & db globally
+    auth = firebase.auth();
+    db = firebase.firestore();
+});
 
         const auth = firebase.auth();
 
