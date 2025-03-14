@@ -376,15 +376,9 @@ function updateUserInfo(userData) {
     </section>
 
       
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
-        if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-            console.error("❌ Error: Firebase env.js not loaded.");
-            alert("❌ Firebase is not initialized. Check env.js.");
-            return;
-        }
-
-        // ✅ Initialize Firebase (only if not already initialized)
+   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // ✅ Ensure Firebase is initialized
         if (!firebase.apps.length) {
             firebase.initializeApp({
                 apiKey: window._env_.FIREBASE_API_KEY,
@@ -407,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 auth.signOut()
                     .then(() => {
                         console.log("✅ User logged out successfully.");
-                        sessionStorage.clear(); // Ensure session is cleared
+                        sessionStorage.clear(); // Clear session to prevent re-login issues
                         window.location.href = "login.html";
                     })
                     .catch((error) => {
@@ -419,7 +413,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("❌ Error: Logout button not found.");
         }
     });
-
 // ✅ Update User Info in Dashboard
 function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
