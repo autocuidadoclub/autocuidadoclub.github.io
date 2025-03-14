@@ -164,10 +164,13 @@
 
     <!-- Header -->
     <header>
-        <div class="header-container">
-            <h2 id="user-info">Cargando usuario...</h2>
-            <button onclick="logoutUser()">Cerrar Sesión</button>
-        </div>
+        <header>
+    <div class="header-container">
+        <h2 id="user-info">Cargando usuario...</h2>
+        <button id="logout-btn">Cerrar Sesión</button> <!-- Added the ID here -->
+    </div>
+</header>
+
     </header>
 
     <!-- Dashboard Content -->
@@ -537,6 +540,7 @@ function formatTimestamp(timestamp) {
 }
 
 // ✅ Logout Function with Error Handling
+// ✅ Logout Function with Error Handling
 function logoutUser() {
     const auth = firebase.auth();
     
@@ -552,6 +556,14 @@ function logoutUser() {
             alert("❌ Error al cerrar sesión: " + error.message);
         });
 }
+
+// ✅ Attach Logout Function to Button
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.getElementById("logout-btn"); // Ensure the button has this ID
+    if (logoutButton) {
+        logoutButton.addEventListener("click", logoutUser);
+    }
+});
 
 // ✅ Attach Logout Function to Button
 document.addEventListener("DOMContentLoaded", function () {
