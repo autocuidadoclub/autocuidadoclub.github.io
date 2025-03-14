@@ -203,6 +203,7 @@
         
     <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
     <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+<p><strong>Plan Seleccionado:</strong> <span id="planMessage">Cargando...</span></p>
 
 
 
@@ -231,7 +232,11 @@ function updateUserInfo(userData) {
     // ✅ Update the UI with the corresponding plan message
     const planMessageElement = document.getElementById("planMessage");
     if (planMessageElement) {
-        planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
+        if (planMessages[planType]) {
+            planMessageElement.innerText = `✅ ${planMessages[planType]}`;
+        } else {
+            planMessageElement.innerText = "⚠️ Tipo de plan desconocido";
+        }
         console.log("✅ Plan Seleccionado Actualizado:", planMessageElement.innerText);
     } else {
         console.error("❌ Error: No se encontró el elemento con ID 'planMessage'");
@@ -302,7 +307,7 @@ function updateUserInfo(userData) {
                 </tr>
             </tbody>
         </table>
-       <button id="save-schedule-btn" onclick="updateSchedule()">
+      <button id="save-schedule-btn">
     <strong>Guardar Nuevo Horario</strong>
 </button>
 
@@ -387,11 +392,15 @@ function updateUserInfo(userData) {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Firebase env.js not loaded.");
-        alert("❌ Firebase is not initialized. Check env.js.");
-        return;
+    const saveButton = document.getElementById("save-schedule-btn");
+    if (saveButton) {
+        saveButton.addEventListener("click", updateSchedule);
+        console.log("✅ 'Guardar Nuevo Horario' button is ready!");
+    } else {
+        console.error("❌ 'Guardar Nuevo Horario' button not found.");
     }
+});
+
 
     // ✅ Initialize Firebase
     const firebaseConfig = {
@@ -409,28 +418,15 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("✅ Firebase initialized successfully!");
     }
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Global variables for Firebase
+    window.auth = firebase.auth();
+    window.db = firebase.firestore();
 
     auth.onAuthStateChanged((user) => {
         if (user) {
             console.log("✅ User logged in:", user.email);
-
             document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-
-            // Fetch user profile using UID instead of email
-            db.collection("users").doc(user.uid).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        updateUserInfo(userData);
-                    } else {
-                        console.error("❌ User profile not found in Firestore.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("❌ Error fetching user profile:", error);
-                });
+            loadUserProfile(user.uid);
         } else {
             console.log("❌ No authenticated user. Redirecting to login...");
             window.location.href = 'login.html';
@@ -660,7 +656,7 @@ function loadVehicles(vehicles) {
 
 function updateSchedule() {
     const selectedCell = document.querySelector(".schedule-table td.selected-box");
-    
+
     if (!selectedCell) {
         alert("❌ Por favor selecciona un horario.");
         return;
@@ -676,7 +672,6 @@ function updateSchedule() {
         return;
     }
 
-    // Ensure Firebase authentication is initialized
     const user = firebase.auth().currentUser;
     if (!user) {
         console.error("❌ No authenticated user.");
@@ -687,55 +682,54 @@ function updateSchedule() {
     const newSchedule = `${day} - ${timeBlock}`;
     const currentDate = new Date();
 
-    // 🔥 Get user document from Firestore using UID instead of email
-    const userRef = db.collection("users").doc(user.uid);
+    console.log(`✅ Attempting to update schedule: ${newSchedule}`);
 
-    userRef.get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+    const userRef = db.collection("users").doc(user.uid); // Confirm user.uid is correct
 
-            // 🚨 Prevent multiple reschedules in the same month
-            if (lastReschedule) {
-                const rescheduleMonth = lastReschedule.getMonth();
-                const currentMonth = currentDate.getMonth();
-                const rescheduleYear = lastReschedule.getFullYear();
-                const currentYear = currentDate.getFullYear();
+    userRef.get()
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
 
-                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                    const lastRescheduleDate = lastReschedule.toLocaleDateString("es-ES", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
-                    return;
+                // 🚨 Prevent multiple reschedules in the same month
+                if (lastReschedule) {
+                    const rescheduleMonth = lastReschedule.getMonth();
+                    const currentMonth = currentDate.getMonth();
+                    const rescheduleYear = lastReschedule.getFullYear();
+                    const currentYear = currentDate.getFullYear();
+
+                    if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                        const lastRescheduleDate = lastReschedule.toLocaleDateString("es-ES", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        });
+                        alert(`⚠️ Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
+                        return;
+                    }
                 }
+
+                // ✅ Update Firestore with new schedule
+                return userRef.update({
+                    selectedSchedule: newSchedule,
+                    lastReschedule: firebase.firestore.Timestamp.now(),
+                });
+            } else {
+                throw new Error("Usuario no encontrado en Firestore.");
             }
-
-            // ✅ Update Firestore with new schedule
-            userRef.update({
-                selectedSchedule: newSchedule,
-                lastReschedule: firebase.firestore.Timestamp.now(),
-            }).then(() => {
-                alert(`✅ Horario actualizado correctamente a: ${newSchedule}`);
-                document.getElementById("current-schedule").innerText = newSchedule; // Update UI
-            }).catch((error) => {
-                console.error("❌ Error al actualizar el horario:", error);
-                alert("❌ Error al actualizar el horario. Inténtalo de nuevo.");
-            });
-
-        } else {
-            console.error("❌ Usuario no encontrado en Firestore.");
-            alert("❌ Error: No se encontró tu perfil en la base de datos.");
-        }
-    }).catch((error) => {
-        console.error("❌ Error al obtener el perfil del usuario:", error);
-    });
+        })
+        .then(() => {
+            alert(`✅ Horario actualizado correctamente a: ${newSchedule}`);
+            document.getElementById("current-schedule").innerText = newSchedule;
+        })
+        .catch((error) => {
+            console.error("❌ Error al actualizar el horario:", error);
+            alert("❌ Error al actualizar el horario. Inténtalo de nuevo.");
+        });
 }
-
 
 
 // Add CSS for selected schedule cells
