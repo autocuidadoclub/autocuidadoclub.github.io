@@ -202,8 +202,60 @@
             ⬇️ Cambiar a un plan menor
         </button>
     </div>
+    
+<script>
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    
+    console.log("🔥 Debug: userData.planType =", userData.planType);
+    console.log("🔥 Debug: Retrieved User Data =", userData);
+    console.log("🔥 Payment Date:", userData.paymentDate);
+console.log("🔥 Next Payment Date:", userData.nextPaymentDate);
+console.log("🔥 Months Paid:", userData.monthsPaid);
+console.log("🔥 Subscription Status:", userData.subscriptionStatus);
+
+
+
+    // ✅ Define user-friendly plan descriptions
+    const planMessages = {
+        "basic3m": "Plan Básico de 3 meses",
+        "basic6m": "Plan Básico de 6 meses",
+        "basic12m": "Plan Básico de 12 meses",
+        "plus3m": "Plan Plus de 3 meses",
+        "plus6m": "Plan Plus de 6 meses",
+        "plus12m": "Plan Plus de 12 meses"
+    };
+
+    // ✅ Get the plan type from Firebase
+    const planType = userData.planType || "N/A";
+
+    // ✅ Update the UI with the corresponding plan message
+    const planMessageElement = document.getElementById("planMessage");
+    if (planMessageElement) {
+        planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
+        console.log("✅ Plan Seleccionado Actualizado:", planMessageElement.innerText);
+    } else {
+        console.error("❌ Error: No se encontró el elemento con ID 'planMessage'");
+    }
+}
+
+</script>
+        
+   <!-- Message for unpaid users -->
+<div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+    ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
+    Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
 </div>
 
+<!-- Button to complete payment -->
+<div id="complete-payment" style="margin-top: 10px; display: none;">
+    <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+        Completa tu pago ahora 🔗
+    </a>
+</div>
+        
 <script>
     function checkPlanEligibility(userData) {
         const upgradeBtn = document.getElementById("upgrade-btn");
