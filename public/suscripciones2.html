@@ -44,6 +44,37 @@
     const db = firebase.firestore();
     let selectedPlanType = "";
 
+  // ✅ Auto Logout After 10 Minutes of Inactivity
+    document.addEventListener("DOMContentLoaded", function () {
+        let logoutTimer;
+
+        function resetLogoutTimer() {
+            clearTimeout(logoutTimer);
+            logoutTimer = setTimeout(() => {
+                console.log("⏳ 10 minutes of inactivity detected. Logging out...");
+                autoLogout();
+            }, 10 * 60 * 1000); // 10 minutes = 600,000 ms
+        }
+
+        function autoLogout() {
+            const auth = firebase.auth();
+            auth.signOut().then(() => {
+                console.log("✅ User automatically logged out after 10 minutes.");
+                window.location.href = "login.html"; // Redirect to login page
+            }).catch((error) => {
+                console.error("❌ Error logging out:", error);
+            });
+        }
+
+        // Reset timer on user activity
+        document.addEventListener("mousemove", resetLogoutTimer);
+        document.addEventListener("keydown", resetLogoutTimer);
+        document.addEventListener("click", resetLogoutTimer);
+
+        // Start the timer initially
+        resetLogoutTimer();
+    });
+            
     // Ensure registration container is found
     const registrationContainer = document.getElementById("registration-container");
     if (!registrationContainer) {
@@ -856,12 +887,14 @@ button:hover {
     </script>
 
 <!-- Checkbox for Terms and Conditions -->
-    <div style="margin-top: 15px;">
+    <div style="margin-top: 35px;">
         <input type="checkbox" id="terms" name="terms" required>
         <label for="terms">
             He leído y acepto los <a href="tac.html" target="_blank">Términos y Condiciones</a>.
         </label>
     </div>
+            <p></p>
+            <p></p>
             
         <button type="submit">Registrarse</button>
     </form>
