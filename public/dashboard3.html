@@ -788,6 +788,50 @@ document.addEventListener("DOMContentLoaded", function () {
     document.head.appendChild(style);
 });
 
+        const FIREBASE_URL = "https://firestore.googleapis.com/v1/projects/YOUR_PROJECT_ID/databases/(default)/documents/car_tips_daily/";
+const FIREBASE_DOC = "current_tip";  // This will store today's tip
+
+function updateDailyTip() {
+  let today = new Date();
+  let dayOfYear = getDayOfYear(today); // Get day 1-365
+  let tipDocument = dayOfYear.toString(); // Use day number as document ID
+
+  let tipData = fetchTip(tipDocument);
+  
+  if (tipData) {
+    setCurrentTip(tipData);
+  }
+}
+
+function getDayOfYear(date) {
+  let start = new Date(date.getFullYear(), 0, 0);
+  let diff = date - start;
+  let oneDay = 1000 * 60 * 60 * 24;
+  return Math.floor(diff / oneDay);
+}
+
+function fetchTip(docID) {
+  let url = FIREBASE_URL + docID;
+  let response = UrlFetchApp.fetch(url, { method: "GET" });
+  let json = JSON.parse(response.getContentText());
+  return json.fields ? json.fields.tip.stringValue : null;
+}
+
+function setCurrentTip(tip) {
+  let url = FIREBASE_URL + FIREBASE_DOC;
+  let payload = JSON.stringify({
+    fields: {
+      tip: { stringValue: tip }
+    }
+  });
+  
+  UrlFetchApp.fetch(url, {
+    method: "PATCH",
+    contentType: "application/json",
+    payload: payload
+  });
+}
+
 </script>
 
     
