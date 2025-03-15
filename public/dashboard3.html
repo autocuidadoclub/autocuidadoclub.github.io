@@ -530,26 +530,7 @@ function updateUserInfo(userData) {
     
     let auth, db;
 
-    document.addEventListener("DOMContentLoaded", function () {
-        if (!firebase.apps.length) {
-            firebase.initializeApp({
-                apiKey: window._env_.FIREBASE_API_KEY,
-                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-                projectId: window._env_.FIREBASE_PROJECT_ID,
-            });
-        }
-        auth = firebase.auth();
-        db = firebase.firestore();
-
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                loadUserProfile(user.uid);
-            } else {
-                window.location.href = 'login.html';
-            }
-        });
-    });
-
+    
     function loadUserProfile(uid) {
         db.collection("users").doc(uid).get().then((doc) => {
             if (doc.exists) {
