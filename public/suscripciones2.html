@@ -44,36 +44,59 @@
     const db = firebase.firestore();
     let selectedPlanType = "";
 
-  // ✅ Auto Logout After 10 Minutes of Inactivity
-    document.addEventListener("DOMContentLoaded", function () {
-        let logoutTimer;
+ document.addEventListener("DOMContentLoaded", function () {
+    if (!firebase.apps.length) {
+        console.error("❌ Firebase is not initialized.");
+        return;
+    }
 
-        function resetLogoutTimer() {
-            clearTimeout(logoutTimer);
-            logoutTimer = setTimeout(() => {
-                console.log("⏳ 10 minutes of inactivity detected. Logging out...");
-                autoLogout();
-            }, 10 * 60 * 1000); // 10 minutes = 600,000 ms
+    console.log("✅ DOM fully loaded!");
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            console.warn("⚠ No user is logged in. Redirecting to login...");
+            window.location.href = "login.html"; // Redirect if no user
+            return;
         }
 
-        function autoLogout() {
-            const auth = firebase.auth();
-            auth.signOut().then(() => {
-                console.log("✅ User automatically logged out after 10 minutes.");
-                window.location.href = "login.html"; // Redirect to login page
-            }).catch((error) => {
-                console.error("❌ Error logging out:", error);
-            });
-        }
+        console.log(`✅ Logged in as: ${user.email}`);
 
-        // Reset timer on user activity
-        document.addEventListener("mousemove", resetLogoutTimer);
-        document.addEventListener("keydown", resetLogoutTimer);
-        document.addEventListener("click", resetLogoutTimer);
+        const userDocRef = db.collection("users").doc(user.uid);
 
-        // Start the timer initially
-        resetLogoutTimer();
+        userDocRef.get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                console.log("✅ User data retrieved:", userData);
+
+                // ✅ Update Dashboard UI
+                document.getElementById("userName").textContent = userData.name || "No registrado";
+                document.getElementById("userPhone").textContent = userData.phone || "No registrado";
+                document.getElementById("userDepartment").textContent = userData.department || "No registrado";
+                document.getElementById("userMunicipality").textContent = userData.municipality || "No registrado";
+                document.getElementById("userVehicles").textContent = userData.vehicles ? userData.vehicles.map(v => v.plate).join(", ") : "No registrado";
+                
+                document.getElementById("memberSince").textContent = formatTimestamp(userData.registrationDate);
+                document.getElementById("lastPaymentDate").textContent = formatTimestamp(userData.paymentDate);
+                document.getElementById("nextPayment").textContent = formatTimestamp(userData.nextPaymentDate);
+                document.getElementById("planType").textContent = userData.planType || "No registrado";
+            } else {
+                console.warn("⚠ No user data found in Firestore.");
+            }
+        }).catch((error) => {
+            console.error("❌ Error fetching user data:", error);
+            alert("Error cargando datos. Intenta de nuevo.");
+        });
     });
+
+    function formatTimestamp(timestamp) {
+        if (!timestamp) return "No disponible";
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return date.toLocaleDateString("es-ES");
+    }
+});
             
     // Ensure registration container is found
     const registrationContainer = document.getElementById("registration-container");
