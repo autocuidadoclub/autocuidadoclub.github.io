@@ -563,13 +563,21 @@ function formatTimestamp(timestamp) {
 // ✅ Logout Function with Error Handling
 function logoutUser() {
     const auth = firebase.auth();
-    
+
+    if (!auth.currentUser) {
+        console.warn("⚠ No user is currently logged in.");
+        return;
+    }
+
     auth.signOut()
         .then(() => {
             console.log("✅ User logged out successfully.");
-            // ✅ Clear session storage and redirect
-            sessionStorage.clear();
-            window.location.href = "login.html";
+            sessionStorage.clear(); // Clear session to prevent re-login issues
+
+            // 🚀 Walkaround: Force Firebase to reload authentication state
+            setTimeout(() => {
+                window.location.href = "login.html"; // Redirect to login page
+            }, 1000);
         })
         .catch((error) => {
             console.error("❌ Error during logout:", error.message);
@@ -577,15 +585,17 @@ function logoutUser() {
         });
 }
 
-// ✅ Attach Logout Function to Button
+// ✅ Ensure the button is correctly assigned
 document.addEventListener("DOMContentLoaded", function () {
-    const logoutButton = document.getElementById("logout-btn"); // Ensure the button has this ID
+    const logoutButton = document.querySelector("button[onclick='logoutUser()']");
+    
     if (logoutButton) {
         logoutButton.addEventListener("click", logoutUser);
+        console.log("✅ Logout button detected and event attached.");
+    } else {
+        console.error("❌ Logout button not found in DOM.");
     }
 });
-
-
 
     // Load user profile data
     function loadUserProfile(email) {
