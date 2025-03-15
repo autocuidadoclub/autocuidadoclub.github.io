@@ -304,6 +304,9 @@ function updateUserInfo(userData) {
             </tbody>
         </table>
        <button id="save-schedule-btn" onclick="updateSchedule()">
+<input type="hidden" id="selectedDay" name="selectedDay" required>
+<input type="hidden" id="selectedTime" name="selectedTime" required>
+
     <strong>Guardar Nuevo Horario</strong>
 </button>
 
@@ -536,6 +539,35 @@ function getPaypalLink(planType) {
     };
     return payPalLinks[planType] || null;
 }
+
+        function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Validate the clicked cell
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("❌ Por favor, seleccione un horario válido.");
+        return;
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the table header
+    const dayIndex = cell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // ✅ Update the hidden input fields
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = timeBlock;
+
+    console.log(`✅ Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
 
 function updateSchedule() {
     const selectedCell = document.querySelector(".schedule-table td.selected-box");
