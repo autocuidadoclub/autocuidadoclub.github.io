@@ -202,18 +202,26 @@
         <p></p>
         <p></p>
         
-    <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
-    <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
-    <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-    <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-    <div id="plan-actions">
-        <button id="upgrade-btn" onclick="upgradePlan()" style="display:none; background:#007bff; color:white; padding:10px 15px; border-radius:5px;">
-            ⬆️ Mejorar Plan
-        </button>
-        <button id="downgrade-btn" onclick="downgradePlan()" style="display:none; background:#ff6600; color:white; padding:10px 15px; border-radius:5px;">
-            ⬇️ Cambiar a un plan menor
-        </button>
+   <div class="card">
+    <h3><i class="fas fa-layer-group"></i> Suscripción</h3>
+    <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
+
+    <label for="planSelection"><strong>Selecciona un nuevo plan:</strong></label>
+    <select id="planSelection" style="width:100%; padding:8px; margin-top:5px;">
+        <option value="basic3m">Plan Básico - 3 meses</option>
+        <option value="basic6m">Plan Básico - 6 meses</option>
+        <option value="basic12m">Plan Básico - 12 meses</option>
+        <option value="plus3m">Plan Plus - 3 meses</option>
+        <option value="plus6m">Plan Plus - 6 meses</option>
+        <option value="plus12m">Plan Plus - 12 meses</option>
+    </select>
+
+    <div id="plan-actions" style="margin-top:10px;">
+        <button id="upgrade-btn" onclick="processPlanChange('upgrade')" style="display:none; background:#007bff; color:white; padding:10px 15px; border-radius:5px;">⬆️ Mejorar Plan</button>
+        <button id="downgrade-btn" onclick="processPlanChange('downgrade')" style="display:none; background:#ff6600; color:white; padding:10px 15px; border-radius:5px;">⬇️ Cambiar a un plan menor</button>
     </div>
+</div>
+
     
 <script>
 function updateUserInfo(userData) {
@@ -493,7 +501,139 @@ function loadUserProfile(uid) {
             console.error("❌ Error fetching user profile:", error);
         });
 }
-        
+    document.addEventListener("DOMContentLoaded", function () {
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            loadUserProfile(user.uid);
+        }
+    });
+});
+
+function loadUserProfile(uid) {
+    db.collection("users").doc(uid).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            document.getElementById("planType").innerText = userData.planType || "N/A";
+            document.getElementById("paymentDate").innerText = userData.paymentDate ? formatTimestamp(userData.paymentDate) : "N/A";
+            document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate ? formatTimestamp(userData.nextPaymentDate) : "N/A";
+
+            // ✅ Set current plan in dropdown
+            const planSelection = document.getElementById("planSelection");
+            if (planSelection) {
+                planSelection.value = userData.planType || "basic3m"; // Default if not found
+            }
+
+            // ✅ Check eligibility for upgrade/downgrade
+            checkPlanEligibility(userData);
+        }
+    }).catch((error) => {
+        console.error("❌ Error fetching user profile:", error);
+    });
+}
+
+function checkPlanEligibility(userData) {
+    const upgradeBtn = document.getElementById("upgrade-btn");
+    const downgradeBtn = document.getElementById("downgrade-btn");
+    const currentPlan = userData.planType;
+    const availablePlans = ["basic3m", "basic6m", "basic12m", "plus3m", "plus6m", "plus12m"];
+    const nextPaymentDate = userData.nextPaymentDate ? new Date(userData.nextPaymentDate.seconds * 1000) : null;
+    const currentDate = new Date();
+
+    if (nextPaymentDate && nextPaymentDate > currentDate) {
+        upgradeBtn.style.display = "block"; 
+        downgradeBtn.style.display = "block";
+    }
+
+    // ✅ Hide downgrade button if already at the lowest plan
+    if (currentPlan === "basic3m" || currentPlan === "plus3m") {
+        downgradeBtn.style.display = "none";
+    }
+
+    // ✅ Hide upgrade button if already at the highest plan
+    if (currentPlan === "basic12m" || currentPlan === "plus12m") {
+        upgradeBtn.style.display = "none";
+    }
+}
+
+function processPlanChange(action) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const newPlan = document.getElementById("planSelection").value;
+    if (!newPlan) {
+        alert("❌ Debes seleccionar un plan.");
+        return;
+    }
+
+    db.collection("users").doc(user.uid).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const currentPlan = userData.planType;
+
+            if (action === "upgrade" && isUpgradeValid(currentPlan, newPlan)) {
+                window.location.href = getPaymentLink(newPlan);
+            } else if (action === "downgrade" && isDowngradeValid(currentPlan, newPlan)) {
+                const reason = prompt("¿Por qué deseas cambiar a un plan menor?");
+                if (!reason) return;
+
+                db.collection("users").doc(user.uid).update({
+                    planType: newPlan,
+                    downgradeReason: reason,
+                    lastDowngrade: firebase.firestore.Timestamp.now()
+                }).then(() => {
+                    alert("✅ Tu plan ha sido cambiado con éxito.");
+                    location.reload();
+                });
+            } else {
+                alert("❌ Selecciona un plan válido para la acción deseada.");
+            }
+        }
+    });
+}
+
+function isUpgradeValid(currentPlan, newPlan) {
+    const upgradeOptions = {
+        "basic3m": ["basic6m", "basic12m", "plus3m", "plus6m", "plus12m"],
+        "basic6m": ["basic12m", "plus3m", "plus6m", "plus12m"],
+        "basic12m": ["plus3m", "plus6m", "plus12m"],
+        "plus3m": ["plus6m", "plus12m"],
+        "plus6m": ["plus12m"]
+    };
+    return upgradeOptions[currentPlan] && upgradeOptions[currentPlan].includes(newPlan);
+}
+
+function isDowngradeValid(currentPlan, newPlan) {
+    const downgradeOptions = {
+        "basic12m": ["basic6m", "basic3m"],
+        "basic6m": ["basic3m"],
+        "plus12m": ["plus6m", "plus3m"],
+        "plus6m": ["plus3m"]
+    };
+    return downgradeOptions[currentPlan] && downgradeOptions[currentPlan].includes(newPlan);
+}
+
+function getPaymentLink(planType) {
+    const payPalLinks = {
+        "basic3m": "https://www.paypal.com/pay/basic3m",
+        "basic6m": "https://www.paypal.com/pay/basic6m",
+        "basic12m": "https://www.paypal.com/pay/basic12m",
+        "plus3m": "https://www.paypal.com/pay/plus3m",
+        "plus6m": "https://www.paypal.com/pay/plus6m",
+        "plus12m": "https://www.paypal.com/pay/plus12m"
+    };
+    return payPalLinks[planType] || "#";
+}
+
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+}
+    
 
 // ✅ Update User Info on Dashboard
 function updateUserInfo(userData) {
