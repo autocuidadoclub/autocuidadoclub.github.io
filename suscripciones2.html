@@ -16,14 +16,14 @@
  
 
       <script>
-        document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded!");
+
     if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
         console.error("❌ Error: Firebase env.js not loaded.");
         alert("❌ Firebase is not initialized. Check env.js.");
         return;
     }
-
-    console.log("✅ DOM fully loaded!");
 
     const firebaseConfig = {
         apiKey: window._env_.FIREBASE_API_KEY,
@@ -42,25 +42,63 @@
 
     const auth = firebase.auth();
     const db = firebase.firestore();
-    let selectedPlanType = "";
 
- document.addEventListener("DOMContentLoaded", function () {
-    if (!firebase.apps.length) {
-        console.error("❌ Firebase is not initialized.");
-        return;
-    }
-
-    console.log("✅ DOM fully loaded!");
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
+    // **🔹 Improved User Authentication Handling**
     auth.onAuthStateChanged((user) => {
         if (!user) {
-            console.warn("⚠ No user is logged in. Redirecting to login...");
-            window.location.href = "login.html"; // Redirect if no user
+            console.warn("⚠ No user logged in. Redirecting to login...");
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2000); // Redirects after 2 seconds
             return;
         }
+
+        console.log(`✅ Logged in as: ${user.email}`);
+
+        // **Retrieve user data from Firestore**
+        const userDocRef = db.collection("users").doc(user.uid);
+
+        userDocRef.get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                console.log("✅ User data retrieved:", userData);
+
+                // **Update Dashboard UI**
+                document.getElementById("userName").textContent = userData.name || "No registrado";
+                document.getElementById("userPhone").textContent = userData.phone || "No registrado";
+                document.getElementById("userDepartment").textContent = userData.department || "No registrado";
+                document.getElementById("userMunicipality").textContent = userData.municipality || "No registrado";
+                document.getElementById("userVehicles").textContent = userData.vehicles ? userData.vehicles.map(v => v.plate).join(", ") : "No registrado";
+                
+                document.getElementById("memberSince").textContent = formatTimestamp(userData.registrationDate);
+                document.getElementById("lastPaymentDate").textContent = formatTimestamp(userData.paymentDate);
+                document.getElementById("nextPayment").textContent = formatTimestamp(userData.nextPaymentDate);
+                document.getElementById("planType").textContent = userData.planType || "No registrado";
+
+            } else {
+                console.warn("⚠ No user data found in Firestore.");
+                alert("⚠ No se encontró información del usuario en la base de datos.");
+            }
+        }).catch((error) => {
+            console.error("❌ Error fetching user data:", error);
+            alert("❌ Error al cargar los datos del usuario. Intenta de nuevo.");
+        });
+    });
+
+    // **🔹 Fallback: Force Load User Data If Firebase is Slow**
+    setTimeout(() => {
+        if (!firebase.auth().currentUser) {
+            console.warn("⚠ Firebase Auth taking too long... reloading.");
+            window.location.reload();
+        }
+    }, 5000); // After 5 seconds, retry if needed
+
+    function formatTimestamp(timestamp) {
+        if (!timestamp) return "No disponible";
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return date.toLocaleDateString("es-ES");
+    }
+});
 
         console.log(`✅ Logged in as: ${user.email}`);
 
