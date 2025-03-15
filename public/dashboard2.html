@@ -373,16 +373,8 @@ function updateUserInfo(userData) {
     </section>
 
       
-  <script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM fully loaded!");
-
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Firebase env.js not loaded.");
-        alert("❌ Firebase is not initialized. Check env.js.");
-        return;
-    }
-
+    <script>
+       // ✅ Initialize Firebase
     const firebaseConfig = {
         apiKey: window._env_.FIREBASE_API_KEY,
         authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
@@ -402,71 +394,73 @@ document.addEventListener("DOMContentLoaded", function () {
     const db = firebase.firestore();
 
     auth.onAuthStateChanged((user) => {
-        if (!user) {
-            console.warn("⚠ No user logged in. Redirecting to login...");
-            setTimeout(() => {
-                window.location.href = "login.html";
-            }, 100);
-            return;
+        if (user) {
+            console.log("✅ User logged in:", user.email);
+
+            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+
+            // Fetch user profile using UID instead of email
+            db.collection("users").doc(user.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        updateUserInfo(userData);
+                    } else {
+                        console.error("❌ User profile not found in Firestore.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("❌ Error fetching user profile:", error);
+                });
+        } else {
+            console.log("❌ No authenticated user. Redirecting to login...");
+            window.location.href = 'login.html';
         }
-
-        console.log(`✅ Logged in as: ${user.email}`);
-        loadUserProfile(user.uid);
     });
+});
 
-    function loadUserProfile(uid) {
-        db.collection("users").doc(uid).get().then((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                console.log("✅ User data retrieved:", userData);
+function logoutUser() {
+    const auth = firebase.auth();
 
-                document.getElementById("userName").textContent = userData.name || "No registrado";
-                document.getElementById("userPhone").textContent = userData.phone || "No registrado";
-                document.getElementById("userDepartment").textContent = userData.department || "No registrado";
-                document.getElementById("userMunicipality").textContent = userData.municipality || "No registrado";
-                document.getElementById("userVehicles").textContent = userData.vehicles ? userData.vehicles.map(v => v.plate).join(", ") : "No registrado";
-                
-                document.getElementById("memberSince").textContent = formatTimestamp(userData.registrationDate);
-                document.getElementById("lastPaymentDate").textContent = formatTimestamp(userData.paymentDate);
-                document.getElementById("nextPayment").textContent = formatTimestamp(userData.nextPaymentDate);
-                document.getElementById("planType").textContent = userData.planType || "No registrado";
-            } else {
-                console.warn("⚠ No user data found in Firestore.");
-                alert("⚠ No se encontró información del usuario en la base de datos.");
-            }
-        }).catch((error) => {
-            console.error("❌ Error fetching user data:", error);
-            alert("❌ Error al cargar los datos del usuario. Intenta de nuevo.");
-        });
-    }
-
-    function formatTimestamp(timestamp) {
-        if (!timestamp) return "No disponible";
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        return date.toLocaleDateString("es-ES");
-    }
-
-    function logoutUser() {
-        auth.signOut().then(() => {
+    auth.signOut()
+        .then(() => {
             console.log("✅ User logged out successfully.");
-            sessionStorage.clear();
-            window.location.href = "login.html";
-        }).catch((error) => {
+            sessionStorage.clear(); // Clears session storage to avoid re-login issues
+            window.location.href = "login.html"; // Redirects to login page
+        })
+        .catch((error) => {
             console.error("❌ Error during logout:", error.message);
             alert("❌ Error al cerrar sesión: " + error.message);
         });
+}
+
+// ✅ Attach Logout Function to Button
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.getElementById("logout-btn");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", logoutUser);
     }
+});
 
-    // ✅ Attach the Logout Function to Button
-    document.getElementById("logout-btn").addEventListener("click", logoutUser);
+        
+// ✅ Update User Info in Dashboard
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    
+    // ✅ Correct Schedule Format
+    document.getElementById("current-schedule").innerText = userData.schedule 
+        ? `${userData.schedule.day} - ${userData.schedule.time}`
+        : "No asignado";
 
-    setTimeout(() => {
-        if (!firebase.auth().currentUser) {
-            console.warn("⚠ Firebase Auth taking too long... reloading.");
-            window.location.reload();
-        }
-    }, 10000); // 🔥 Timeout set to 10 seconds
-});   
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+
     // ✅ Vehicles Section
     loadVehicles(userData.vehicles);
 
@@ -547,7 +541,30 @@ function formatTimestamp(timestamp) {
     });
 }
 
+// ✅ Logout Function with Error Handling
+function logoutUser() {
+    const auth = firebase.auth();
+    
+    auth.signOut()
+        .then(() => {
+            console.log("✅ User logged out successfully.");
+            // ✅ Clear session storage and redirect
+            sessionStorage.clear();
+            window.location.href = "login.html";
+        })
+        .catch((error) => {
+            console.error("❌ Error during logout:", error.message);
+            alert("❌ Error al cerrar sesión: " + error.message);
+        });
+}
 
+// ✅ Attach Logout Function to Button
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.getElementById("logout-btn"); // Ensure the button has this ID
+    if (logoutButton) {
+        logoutButton.addEventListener("click", logoutUser);
+    }
+});
 
 
 
