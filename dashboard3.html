@@ -528,9 +528,7 @@ function updateUserInfo(userData) {
 }
 
     
-    let auth, db;
-
-    
+   
     function loadUserProfile(uid) {
         db.collection("users").doc(uid).get().then((doc) => {
             if (doc.exists) {
