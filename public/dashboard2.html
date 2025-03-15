@@ -562,15 +562,11 @@ function formatTimestamp(timestamp) {
 
 // ✅ Logout Function with Error Handling
 function logoutUser() {
-    // ✅ Ensure Firebase is initialized
-    if (!firebase.apps.length) {
-        console.error("❌ Firebase is not initialized.");
-        alert("Firebase no está inicializado. Intenta recargar la página.");
+    if (!auth) {
+        console.error("❌ Firebase Auth is not initialized.");
+        alert("Firebase no está inicializado. Recarga la página.");
         return;
     }
-
-    // ✅ Explicitly Define `auth` to Avoid ReferenceError
-    const auth = firebase.auth();
 
     if (!auth.currentUser) {
         console.warn("⚠ No user is currently logged in.");
@@ -578,22 +574,22 @@ function logoutUser() {
         return;
     }
 
-    console.log("⚡ Attempting to log out:", auth.currentUser.email);
+    console.log("⚡ Logging out user:", auth.currentUser.email);
 
     auth.signOut()
         .then(() => {
             console.log("✅ User logged out successfully.");
-            sessionStorage.clear(); // Clears session storage to prevent issues
+            sessionStorage.clear();
 
-            // 🚀 Walkaround: Force Firebase to update authentication state
+            // 🚀 Walkaround: Ensure Firebase updates auth state
             firebase.auth().onAuthStateChanged((user) => {
                 if (!user) {
-                    console.log("🔄 Auth state updated. Redirecting...");
+                    console.log("🔄 Redirecting...");
                     window.location.href = "login.html";
                 }
             });
 
-            // 🚀 Extra Walkaround: If Firebase doesn't update, force redirect after 2 seconds
+            // 🚀 Extra Walkaround: Force redirect after 2 seconds
             setTimeout(() => {
                 console.warn("⏳ Firebase didn't update. Forcing redirect...");
                 window.location.href = "login.html";
@@ -604,6 +600,19 @@ function logoutUser() {
             alert("❌ Error al cerrar sesión: " + error.message);
         });
 }
+
+// ✅ Attach Logout Function to Button
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.querySelector("button[onclick='logoutUser()']");
+    
+    if (logoutButton) {
+        logoutButton.addEventListener("click", logoutUser);
+        console.log("✅ Logout button detected and event attached.");
+    } else {
+        console.error("❌ Logout button not found in DOM.");
+    }
+});
+
 
 // ✅ Ensure the Logout Button is Recognized
 document.addEventListener("DOMContentLoaded", function () {
