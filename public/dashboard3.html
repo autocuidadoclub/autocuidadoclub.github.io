@@ -201,8 +201,19 @@
         <p></p>
         <p></p>
         
-    <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
-    <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+    <section class="dashboard-section">
+        <div class="card">
+            <h3>Suscripción</h3>
+            <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+              <div id="plan-actions">
+                <button id="upgrade-btn" onclick="upgradePlan()" style="display:none; background:#007bff; color:white; padding:10px 15px; border-radius:5px;">⬆️ Mejorar Plan</button>
+                <button id="downgrade-btn" onclick="downgradePlan()" style="display:none; background:#ff6600; color:white; padding:10px 15px; border-radius:5px;">⬇️ Cambiar a un plan menor</button>
+            </div>
+        </div>
+    </section>
+
 
 
 
@@ -516,6 +527,128 @@ function updateUserInfo(userData) {
     updateLoyaltyCard(userData);
 }
 
+    
+    let auth, db;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!firebase.apps.length) {
+            firebase.initializeApp({
+                apiKey: window._env_.FIREBASE_API_KEY,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                projectId: window._env_.FIREBASE_PROJECT_ID,
+            });
+        }
+        auth = firebase.auth();
+        db = firebase.firestore();
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                loadUserProfile(user.uid);
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    });
+
+    function loadUserProfile(uid) {
+        db.collection("users").doc(uid).get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById("planType").innerText = userData.planType || "N/A";
+                document.getElementById("paymentDate").innerText = userData.paymentDate ? new Date(userData.paymentDate.seconds * 1000).toLocaleDateString() : "N/A";
+                document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate ? new Date(userData.nextPaymentDate.seconds * 1000).toLocaleDateString() : "N/A";
+                checkPlanEligibility(userData);
+            }
+        });
+    }
+
+    function checkPlanEligibility(userData) {
+        const upgradeBtn = document.getElementById("upgrade-btn");
+        const downgradeBtn = document.getElementById("downgrade-btn");
+        const currentDate = new Date();
+        const nextPaymentDate = userData.nextPaymentDate ? new Date(userData.nextPaymentDate.seconds * 1000) : null;
+
+        if (nextPaymentDate && nextPaymentDate > currentDate) {
+            upgradeBtn.style.display = "block"; 
+        } else {
+            downgradeBtn.style.display = "block";
+        }
+    }
+
+    function upgradePlan() {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        db.collection("users").doc(user.uid).get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const newPlan = getUpgradePlan(userData.planType);
+                if (newPlan) {
+                    window.location.href = getPaymentLink(newPlan);
+                }
+            }
+        });
+    }
+
+    function downgradePlan() {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        db.collection("users").doc(user.uid).get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const newPlan = getDowngradePlan(userData.planType);
+                if (!newPlan) return;
+
+                const reason = prompt("¿Por qué deseas cambiar a un plan menor?");
+                if (!reason) return;
+
+                db.collection("users").doc(user.uid).update({
+                    planType: newPlan,
+                    downgradeReason: reason,
+                    lastDowngrade: firebase.firestore.Timestamp.now()
+                }).then(() => {
+                    alert("Tu plan ha sido cambiado con éxito.");
+                    location.reload();
+                });
+            }
+        });
+    }
+
+    function getUpgradePlan(currentPlan) {
+        const upgradeOptions = {
+            "basic3m": "basic6m",
+            "basic6m": "basic12m",
+            "plus3m": "plus6m",
+            "plus6m": "plus12m"
+        };
+        return upgradeOptions[currentPlan] || null;
+    }
+
+    function getDowngradePlan(currentPlan) {
+        const downgradeOptions = {
+            "basic12m": "basic6m",
+            "basic6m": "basic3m",
+            "plus12m": "plus6m",
+            "plus6m": "plus3m"
+        };
+        return downgradeOptions[currentPlan] || null;
+    }
+
+    function getPaymentLink(planType) {
+        const payPalLinks = {
+            "basic3m": "https://www.paypal.com/pay/basic3m",
+            "basic6m": "https://www.paypal.com/pay/basic6m",
+            "basic12m": "https://www.paypal.com/pay/basic12m",
+            "plus3m": "https://www.paypal.com/pay/plus3m",
+            "plus6m": "https://www.paypal.com/pay/plus6m",
+            "plus12m": "https://www.paypal.com/pay/plus12m"
+        };
+        return payPalLinks[planType] || "#";
+    }
+
+
+        
         // ✅ Handle Payment Status
 function handlePaymentStatus(userData) {
     const paymentWarning = document.getElementById("payment-warning");
