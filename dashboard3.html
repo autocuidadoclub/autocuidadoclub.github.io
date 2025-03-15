@@ -162,7 +162,6 @@
         </div>
     </nav>
 
-   
     <!-- Header -->
     <header>
         <div class="header-container">
@@ -202,9 +201,67 @@
         <p></p>
         <p></p>
         
-  <!-- Subscription Section -->
+    <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
+    <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
+
+
+
+    
+<script>
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    
+    console.log("🔥 Debug: userData.planType =", userData.planType);
+    console.log("🔥 Debug: Retrieved User Data =", userData);
+    console.log("🔥 Payment Date:", userData.paymentDate);
+console.log("🔥 Next Payment Date:", userData.nextPaymentDate);
+console.log("🔥 Months Paid:", userData.monthsPaid);
+console.log("🔥 Subscription Status:", userData.subscriptionStatus);
+
+
+
+    // ✅ Define user-friendly plan descriptions
+    const planMessages = {
+        "basic3m": "Plan Básico de 3 meses",
+        "basic6m": "Plan Básico de 6 meses",
+        "basic12m": "Plan Básico de 12 meses",
+        "plus3m": "Plan Plus de 3 meses",
+        "plus6m": "Plan Plus de 6 meses",
+        "plus12m": "Plan Plus de 12 meses"
+    };
+
+    // ✅ Get the plan type from Firebase
+    const planType = userData.planType || "N/A";
+
+    // ✅ Update the UI with the corresponding plan message
+    const planMessageElement = document.getElementById("planMessage");
+    if (planMessageElement) {
+        planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
+        console.log("✅ Plan Seleccionado Actualizado:", planMessageElement.innerText);
+    } else {
+        console.error("❌ Error: No se encontró el elemento con ID 'planMessage'");
+    }
+}
+
+</script>
+        
+   <!-- Message for unpaid users -->
+<div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+    ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
+    Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
+</div>
+
+<!-- Button to complete payment -->
+<div id="complete-payment" style="margin-top: 10px; display: none;">
+    <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+        Completa tu pago ahora 🔗
+    </a>
+</div>
+        
  <div class="card">
-                <h3>Suscripción</h3>
+                <h3>Cambio de Suscripción</h3>
                 <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
                 <label for="new-plan">Selecciona un nuevo plan:</label>
                 <select id="new-plan"></select>
@@ -285,7 +342,135 @@
                 }
             }
         }
+    </script>
+</div>
+
+</div>
+
+
+           
+    <!-- Reschedule Section -->
+    <div class="card reschedule-section">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
+        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+       <button id="save-schedule-btn" onclick="updateSchedule()">
+<input type="hidden" id="selectedDay" name="selectedDay" required>
+<input type="hidden" id="selectedTime" name="selectedTime" required>
+
+    <strong>Guardar Nuevo Horario</strong>
+</button>
+
+    </div>
+
+<p></p>
+    <p></p>
+    <p></p>
+    <p></p>
     
+    <!-- Loyalty Rewards Section -->
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
+            <div class="loyalty-card">
+                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+                <div class="holes">
+                    <div class="hole completed">✔</div>
+                    <p>Proceso de registro completo</p>
+                    <div class="hole completed">✔</div>
+                    <p>Pago inicial procesado en tu suscripción</p>
+                    <div class="hole">○</div>
+                    <p>1er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>3er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>5to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>6to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>7to Mes de suscripción activo</p>
+                    <div class="hole star">★</div>
+                    <p>8to Mes de suscripción activo</p>
+                </div>
+                <div class="description">
+                    <p><strong>Current Progress:</strong></p>
+                </div>
+            </div>
+
+            <!-- Rewards -->
+            <div class="rewards">
+                <h3>Available Rewards</h3>
+                <div class="reward-card">
+                    <div class="reward-icon">🎐</div>
+                    <div class="reward-info">
+                        <h4>Recarga de A/C</h4>
+                        <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">🚗</div>
+                    <div class="reward-info">
+                        <h4>Carwash gratis</h4>
+                        <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">📝</div>
+                    <div class="reward-info">
+                        <h4>Revisión extra del mes en curso</h4>
+                        <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+      
+    <script>
+
         // ✅ Define auth & db globally
 let auth;
 let db;
@@ -397,139 +582,7 @@ function loadUserProfile(uid) {
             console.error("❌ Error fetching user profile:", error);
         });
 }
-    document.addEventListener("DOMContentLoaded", function () {
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            loadUserProfile(user.uid);
-        }
-    });
-});
-
-function loadUserProfile(uid) {
-    db.collection("users").doc(uid).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            document.getElementById("planType").innerText = userData.planType || "N/A";
-            document.getElementById("paymentDate").innerText = userData.paymentDate ? formatTimestamp(userData.paymentDate) : "N/A";
-            document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate ? formatTimestamp(userData.nextPaymentDate) : "N/A";
-
-            // ✅ Set current plan in dropdown
-            const planSelection = document.getElementById("planSelection");
-            if (planSelection) {
-                planSelection.value = userData.planType || "basic3m"; // Default if not found
-            }
-
-            // ✅ Check eligibility for upgrade/downgrade
-            checkPlanEligibility(userData);
-        }
-    }).catch((error) => {
-        console.error("❌ Error fetching user profile:", error);
-    });
-}
-
-function checkPlanEligibility(userData) {
-    const upgradeBtn = document.getElementById("upgrade-btn");
-    const downgradeBtn = document.getElementById("downgrade-btn");
-    const currentPlan = userData.planType;
-    const availablePlans = ["basic3m", "basic6m", "basic12m", "plus3m", "plus6m", "plus12m"];
-    const nextPaymentDate = userData.nextPaymentDate ? new Date(userData.nextPaymentDate.seconds * 1000) : null;
-    const currentDate = new Date();
-
-    if (nextPaymentDate && nextPaymentDate > currentDate) {
-        upgradeBtn.style.display = "block"; 
-        downgradeBtn.style.display = "block";
-    }
-
-    // ✅ Hide downgrade button if already at the lowest plan
-    if (currentPlan === "basic3m" || currentPlan === "plus3m") {
-        downgradeBtn.style.display = "none";
-    }
-
-    // ✅ Hide upgrade button if already at the highest plan
-    if (currentPlan === "basic12m" || currentPlan === "plus12m") {
-        upgradeBtn.style.display = "none";
-    }
-}
-
-function processPlanChange(action) {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const newPlan = document.getElementById("planSelection").value;
-    if (!newPlan) {
-        alert("❌ Debes seleccionar un plan.");
-        return;
-    }
-
-    db.collection("users").doc(user.uid).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            const currentPlan = userData.planType;
-
-            if (action === "upgrade" && isUpgradeValid(currentPlan, newPlan)) {
-                window.location.href = getPaymentLink(newPlan);
-            } else if (action === "downgrade" && isDowngradeValid(currentPlan, newPlan)) {
-                const reason = prompt("¿Por qué deseas cambiar a un plan menor?");
-                if (!reason) return;
-
-                db.collection("users").doc(user.uid).update({
-                    planType: newPlan,
-                    downgradeReason: reason,
-                    lastDowngrade: firebase.firestore.Timestamp.now()
-                }).then(() => {
-                    alert("✅ Tu plan ha sido cambiado con éxito.");
-                    location.reload();
-                });
-            } else {
-                alert("❌ Selecciona un plan válido para la acción deseada.");
-            }
-        }
-    });
-}
-
-function isUpgradeValid(currentPlan, newPlan) {
-    const upgradeOptions = {
-        "basic3m": ["basic6m", "basic12m", "plus3m", "plus6m", "plus12m"],
-        "basic6m": ["basic12m", "plus3m", "plus6m", "plus12m"],
-        "basic12m": ["plus3m", "plus6m", "plus12m"],
-        "plus3m": ["plus6m", "plus12m"],
-        "plus6m": ["plus12m"]
-    };
-    return upgradeOptions[currentPlan] && upgradeOptions[currentPlan].includes(newPlan);
-}
-
-function isDowngradeValid(currentPlan, newPlan) {
-    const downgradeOptions = {
-        "basic12m": ["basic6m", "basic3m"],
-        "basic6m": ["basic3m"],
-        "plus12m": ["plus6m", "plus3m"],
-        "plus6m": ["plus3m"]
-    };
-    return downgradeOptions[currentPlan] && downgradeOptions[currentPlan].includes(newPlan);
-}
-
-function getPaymentLink(planType) {
-    const payPalLinks = {
-        "basic3m": "https://www.paypal.com/pay/basic3m",
-        "basic6m": "https://www.paypal.com/pay/basic6m",
-        "basic12m": "https://www.paypal.com/pay/basic12m",
-        "plus3m": "https://www.paypal.com/pay/plus3m",
-        "plus6m": "https://www.paypal.com/pay/plus6m",
-        "plus12m": "https://www.paypal.com/pay/plus12m"
-    };
-    return payPalLinks[planType] || "#";
-}
-
-function formatTimestamp(timestamp) {
-    if (!timestamp) return "N/A";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-}
-    
+        
 
 // ✅ Update User Info on Dashboard
 function updateUserInfo(userData) {
@@ -804,9 +857,38 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
 
+    
+     <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
+   
+ <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
+        crossorigin="anonymous"></script>
     
     </footer>
 </body>
