@@ -562,22 +562,40 @@ function formatTimestamp(timestamp) {
 
 // ✅ Logout Function with Error Handling
 function logoutUser() {
+    if (!firebase.apps.length) {
+        console.error("❌ Firebase not initialized.");
+        alert("Firebase no está inicializado. Intenta recargar la página.");
+        return;
+    }
+
     const auth = firebase.auth();
 
     if (!auth.currentUser) {
         console.warn("⚠ No user is currently logged in.");
+        alert("⚠ No hay usuario autenticado.");
         return;
     }
+
+    console.log("⚡ Attempting to log out:", auth.currentUser.email);
 
     auth.signOut()
         .then(() => {
             console.log("✅ User logged out successfully.");
-            sessionStorage.clear(); // Clear session to prevent re-login issues
+            sessionStorage.clear(); // Clears session storage to prevent issues
 
-            // 🚀 Walkaround: Force Firebase to reload authentication state
+            // 🚀 Walkaround: Force Firebase to update authentication state
+            firebase.auth().onAuthStateChanged((user) => {
+                if (!user) {
+                    console.log("🔄 Auth state updated. Redirecting...");
+                    window.location.href = "login.html";
+                }
+            });
+
+            // 🚀 Extra Walkaround: If Firebase doesn't update, force redirect after 2 seconds
             setTimeout(() => {
-                window.location.href = "login.html"; // Redirect to login page
-            }, 1000);
+                console.warn("⏳ Firebase didn't update. Forcing redirect...");
+                window.location.href = "login.html";
+            }, 2000);
         })
         .catch((error) => {
             console.error("❌ Error during logout:", error.message);
@@ -585,7 +603,7 @@ function logoutUser() {
         });
 }
 
-// ✅ Ensure the button is correctly assigned
+// ✅ Ensure the Logout Button is Recognized
 document.addEventListener("DOMContentLoaded", function () {
     const logoutButton = document.querySelector("button[onclick='logoutUser()']");
     
@@ -596,6 +614,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("❌ Logout button not found in DOM.");
     }
 });
+
 
     // Load user profile data
     function loadUserProfile(email) {
