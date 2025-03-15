@@ -5,146 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - AutoCuidado Club</title>
     <link rel="stylesheet" href="/styles.css">
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-     <!-- Load Environment Variables -->
+
+    <!-- Load Environment Variables -->
     <script src="env.js"></script>
-    
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-  <style>
-        /* Styles for Loyalty Card */
-        .loyalty-card {
-            text-align: center;
-            padding: 20px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
 
-        .holes {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            justify-items: center;
-            margin-bottom: 20px;
-        }
+    <!-- Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
-        .hole {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s ease-in-out;
-            border: 2px dashed #ccc;
-            background-color: #fff;
-            color: #ccc;
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
-
-        .hole.completed {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-        }
-
-        .hole.star {
-            font-size: 24px;
-            color: gold;
-        }
-
-        .hole.star.completed {
-            background-color: #4caf50;
-            color: white;
-        }
-
-        .rewards {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
-        .reward-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        
+        .navbar {
+            background-color: #003366;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .reward-card:hover {
-            background-color: #e6f7e6;
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
         }
 
-        .reward-icon {
-            font-size: 24px;
+        .nav-links li {
             margin-right: 15px;
         }
 
-        .reward-info h4 {
-            margin: 0;
-            font-size: 18px;
-            color: #333;
-        }
-
-        .reward-info p {
-            margin: 5px 0 0;
-            font-size: 14px;
-            color: #777;
-        }
-
-        .reward-status {
-            font-size: 14px;
+        .nav-links a {
+            color: white;
+            text-decoration: none;
             font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 4px;
         }
 
-        .reward-status.locked {
-            background-color: #ccc;
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            background: #ffffff;
+            margin-bottom: 20px;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight-text {
+            color: #FF6600;
+            font-weight: bold;
+        }
+
+        .payment-warning {
+            background-color: #ffebe6;
+            color: red;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .floating-contact-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff6600;
             color: white;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, transform 0.2s;
         }
 
-        .reward-status.unlocked {
-            background-color: #4caf50;
-            color: white;
+        .floating-contact-button:hover {
+            background-color: #cc5500;
+            transform: scale(1.05);
         }
-      .floating-contact-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff6600;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s, transform 0.2s;
-}
-
-.floating-contact-button:hover {
-    background-color: #cc5500;
-    transform: scale(1.05);
-}
-
     </style>
 </head>
 <body>
@@ -157,64 +104,50 @@
             <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
             <li><a href="contacto.html">Contacto</a></li>
         </ul>
-        <div class="logo-container">
-            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-        </div>
     </nav>
 
-   
-    <!-- Header -->
     <header>
-        <div class="header-container">
-            <h2 id="user-info">Cargando usuario...</h2>
-            <button onclick="logoutUser()">Cerrar Sesión</button>
-        </div>
+        <h2 id="user-info">Cargando usuario...</h2>
+        <button onclick="logoutUser()">Cerrar Sesión</button>
     </header>
 
-    <!-- Dashboard Content -->
-<section class="dashboard-section">
-    <!-- User Info -->
-    <div class="dashboard-grid">
+    <!-- User Dashboard -->
+    <section class="dashboard-section">
         <div class="card">
             <h3><i class="fas fa-user"></i> Información del Usuario</h3>
             <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
             <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
-            <P><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
             <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
             <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
-            <p><strong>Vehiculos: </strong> <span id="vehicles-list">Cargando...</span></p>
+            <p><strong>Plan Actual:</strong> <span id="planType">Cargando...</span></p>
         </div>
 
-        <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-    <i class="fas fa-headset"></i> Contactar Staff
-</button>
-
-
-    <div class="card">
-    <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-    <p><strong>Miembro Desde:</strong></p>
-    <p><span id="memberSince">Cargando...</span></p>   
-    <p><strong>Fecha del último pago de su suscripción:</strong> </p>
-    <p><span id="paymentDate">Cargando...</span></p>
-    <p><strong>Próximo Pago:</strong></p>
-    <p><span id="nextPaymentDate">Cargando...</span></p>
-
-        <p></p>
-        <p></p>
-        
-  <!-- Subscription Section -->
- <div class="card">
-                <h3>Suscripción</h3>
-                <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
-                <label for="new-plan">Selecciona un nuevo plan:</label>
-                <select id="new-plan"></select>
-                <button onclick="upgradePlan()">Mejorar Plan</button>
-                <p>¿Quieres cambiar a un plan menor? <a href="contacto.html">Contacta con nuestro equipo</a></p>
+        <div class="card">
+            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+            <p><strong>Fecha del Último Pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+            <div id="payment-warning" class="payment-warning" style="display: none;">
+                ¡Estamos esperándote! ⚠️ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
+                <a id="payment-link" href="#">Completa tu pago ahora 🔥</a>
             </div>
         </div>
+
+        <div class="card">
+            <h3>Suscripción</h3>
+            <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
+            <button onclick="upgradePlan()">Mejorar Plan</button>
+        </div>
     </section>
+
+    <!-- Floating Contact Button -->
+    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+        <i class="fas fa-headset"></i> Contactar Staff
+    </button>
+
     <script>
         let auth, db;
+
+        // Initialize Firebase
         document.addEventListener("DOMContentLoaded", function () {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
@@ -240,11 +173,10 @@
                     document.getElementById("user-department").innerText = userData.department || "Desconocido";
                     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
                     document.getElementById("planType").innerText = userData.planType || "N/A";
-                    document.getElementById("paymentDate").innerText = userData.paymentDate || "Pendiente";
-                    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
-                    document.getElementById("memberSince").innerText = userData.registrationDate || "Desconocido";
+                    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
+                    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate);
+                    
                     handlePaymentStatus(userData);
-                    updatePlanOptions(userData.planType);
                 }
             });
         }
@@ -260,554 +192,22 @@
             const payPalLinks = {
                 "basic3m": "https://www.paypal.com/pay/basic3m",
                 "basic6m": "https://www.paypal.com/pay/basic6m",
-                "basic12m": "https://www.paypal.com/pay/basic12m",
-                "plus3m": "https://www.paypal.com/pay/plus3m",
-                "plus6m": "https://www.paypal.com/pay/plus6m",
-                "plus12m": "https://www.paypal.com/pay/plus12m"
+                "basic12m": "https://www.paypal.com/pay/basic12m"
             };
             return payPalLinks[planType] || "#";
         }
 
-        function updatePlanOptions(currentPlan) {
-            const allPlans = {
-                "basic3m": "Plan Básico - 3 meses",
-                "basic6m": "Plan Básico - 6 meses",
-                "basic12m": "Plan Básico - 12 meses",
-                "plus3m": "Plan Plus - 3 meses",
-                "plus6m": "Plan Plus - 6 meses",
-                "plus12m": "Plan Plus - 12 meses"
-            };
-            const select = document.getElementById("new-plan");
-            select.innerHTML = "";
-            for (let key in allPlans) {
-                if (key !== currentPlan) {
-                    select.innerHTML += `<option value="${key}">${allPlans[key]}</option>`;
-                }
-            }
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return "N/A";
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+            return date.toLocaleDateString("es-ES");
         }
-    
-        // ✅ Define auth & db globally
-let auth;
-let db;
 
-// ✅ Firebase Configuration
-const firebaseConfig = {
-    apiKey: window._env_.FIREBASE_API_KEY,
-    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-    databaseURL: window._env_.FIREBASE_DATABASE_URL,
-    projectId: window._env_.FIREBASE_PROJECT_ID,
-    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-    appId: window._env_.FIREBASE_APP_ID,
-    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-};
-
-// ✅ Initialize Firebase on DOM Load
-document.addEventListener("DOMContentLoaded", function () {
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Firebase env.js not loaded.");
-        alert("❌ Firebase is not initialized. Check env.js.");
-        return;
-    }
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ Document Loaded");
-    updateUserInfo(userData);
-});
-
-    
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase initialized successfully!");
-    }
-
-    auth = firebase.auth(); // ✅ Set global auth
-    db = firebase.firestore(); // ✅ Set global Firestore instance
-
-    // ✅ Check Authentication State
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log(`✅ User logged in: ${user.email}`);
-            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-            loadUserProfile(user.uid);
-        } else {
-            console.warn("⚠ No authenticated user. Redirecting to login...");
-            window.location.href = 'login.html';
-        }
-    });
-
-    // ✅ Attach Logout Event
-    const logoutButton = document.getElementById("logout-btn");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", logoutUser);
-        console.log("✅ Logout button detected and event attached.");
-    } else {
-        console.error("❌ Logout button not found.");
-    }
-});
-
-// ✅ Logout Function (Fixed)
-function logoutUser() {
-    if (!auth) {
-        console.error("❌ Firebase Auth is not initialized.");
-        alert("Firebase no está inicializado. Recarga la página.");
-        return;
-    }
-
-    if (!auth.currentUser) {
-        console.warn("⚠ No user is currently logged in.");
-        alert("⚠ No hay usuario autenticado.");
-        return;
-    }
-
-    console.log("⚡ Logging out user:", auth.currentUser.email);
-
-    auth.signOut()
-        .then(() => {
-            console.log("✅ User logged out successfully.");
-            sessionStorage.clear();
-            firebase.auth().onAuthStateChanged((user) => {
-                if (!user) {
-                    console.log("🔄 Redirecting...");
-                    window.location.href = "login.html";
-                }
-            });
-            setTimeout(() => {
-                console.warn("⏳ Firebase didn't update. Forcing redirect...");
+        function logoutUser() {
+            auth.signOut().then(() => {
                 window.location.href = "login.html";
-            }, 2000);
-        })
-        .catch((error) => {
-            console.error("❌ Error during logout:", error.message);
-            alert("❌ Error al cerrar sesión: " + error.message);
-        });
-}
-
-// ✅ Load User Profile from Firestore
-function loadUserProfile(uid) {
-    db.collection("users").doc(uid).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                updateUserInfo(userData);
-            } else {
-                console.error("❌ User profile not found in Firestore.");
-            }
-        })
-        .catch((error) => {
-            console.error("❌ Error fetching user profile:", error);
-        });
-}
-    document.addEventListener("DOMContentLoaded", function () {
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            loadUserProfile(user.uid);
-        }
-    });
-});
-
-function loadUserProfile(uid) {
-    db.collection("users").doc(uid).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            document.getElementById("planType").innerText = userData.planType || "N/A";
-            document.getElementById("paymentDate").innerText = userData.paymentDate ? formatTimestamp(userData.paymentDate) : "N/A";
-            document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate ? formatTimestamp(userData.nextPaymentDate) : "N/A";
-
-            // ✅ Set current plan in dropdown
-            const planSelection = document.getElementById("planSelection");
-            if (planSelection) {
-                planSelection.value = userData.planType || "basic3m"; // Default if not found
-            }
-
-            // ✅ Check eligibility for upgrade/downgrade
-            checkPlanEligibility(userData);
-        }
-    }).catch((error) => {
-        console.error("❌ Error fetching user profile:", error);
-    });
-}
-
-function checkPlanEligibility(userData) {
-    const upgradeBtn = document.getElementById("upgrade-btn");
-    const downgradeBtn = document.getElementById("downgrade-btn");
-    const currentPlan = userData.planType;
-    const availablePlans = ["basic3m", "basic6m", "basic12m", "plus3m", "plus6m", "plus12m"];
-    const nextPaymentDate = userData.nextPaymentDate ? new Date(userData.nextPaymentDate.seconds * 1000) : null;
-    const currentDate = new Date();
-
-    if (nextPaymentDate && nextPaymentDate > currentDate) {
-        upgradeBtn.style.display = "block"; 
-        downgradeBtn.style.display = "block";
-    }
-
-    // ✅ Hide downgrade button if already at the lowest plan
-    if (currentPlan === "basic3m" || currentPlan === "plus3m") {
-        downgradeBtn.style.display = "none";
-    }
-
-    // ✅ Hide upgrade button if already at the highest plan
-    if (currentPlan === "basic12m" || currentPlan === "plus12m") {
-        upgradeBtn.style.display = "none";
-    }
-}
-
-function processPlanChange(action) {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const newPlan = document.getElementById("planSelection").value;
-    if (!newPlan) {
-        alert("❌ Debes seleccionar un plan.");
-        return;
-    }
-
-    db.collection("users").doc(user.uid).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            const currentPlan = userData.planType;
-
-            if (action === "upgrade" && isUpgradeValid(currentPlan, newPlan)) {
-                window.location.href = getPaymentLink(newPlan);
-            } else if (action === "downgrade" && isDowngradeValid(currentPlan, newPlan)) {
-                const reason = prompt("¿Por qué deseas cambiar a un plan menor?");
-                if (!reason) return;
-
-                db.collection("users").doc(user.uid).update({
-                    planType: newPlan,
-                    downgradeReason: reason,
-                    lastDowngrade: firebase.firestore.Timestamp.now()
-                }).then(() => {
-                    alert("✅ Tu plan ha sido cambiado con éxito.");
-                    location.reload();
-                });
-            } else {
-                alert("❌ Selecciona un plan válido para la acción deseada.");
-            }
-        }
-    });
-}
-
-function isUpgradeValid(currentPlan, newPlan) {
-    const upgradeOptions = {
-        "basic3m": ["basic6m", "basic12m", "plus3m", "plus6m", "plus12m"],
-        "basic6m": ["basic12m", "plus3m", "plus6m", "plus12m"],
-        "basic12m": ["plus3m", "plus6m", "plus12m"],
-        "plus3m": ["plus6m", "plus12m"],
-        "plus6m": ["plus12m"]
-    };
-    return upgradeOptions[currentPlan] && upgradeOptions[currentPlan].includes(newPlan);
-}
-
-function isDowngradeValid(currentPlan, newPlan) {
-    const downgradeOptions = {
-        "basic12m": ["basic6m", "basic3m"],
-        "basic6m": ["basic3m"],
-        "plus12m": ["plus6m", "plus3m"],
-        "plus6m": ["plus3m"]
-    };
-    return downgradeOptions[currentPlan] && downgradeOptions[currentPlan].includes(newPlan);
-}
-
-function getPaymentLink(planType) {
-    const payPalLinks = {
-        "basic3m": "https://www.paypal.com/pay/basic3m",
-        "basic6m": "https://www.paypal.com/pay/basic6m",
-        "basic12m": "https://www.paypal.com/pay/basic12m",
-        "plus3m": "https://www.paypal.com/pay/plus3m",
-        "plus6m": "https://www.paypal.com/pay/plus6m",
-        "plus12m": "https://www.paypal.com/pay/plus12m"
-    };
-    return payPalLinks[planType] || "#";
-}
-
-function formatTimestamp(timestamp) {
-    if (!timestamp) return "N/A";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-}
-    
-
-// ✅ Update User Info on Dashboard
-function updateUserInfo(userData) {
-    document.getElementById("name").innerText = userData.name || "N/A";
-    document.getElementById("phone").innerText = userData.phone || "N/A";
-    document.getElementById("planType").innerText = userData.planType || "N/A";
-    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
-    document.getElementById("user-department").innerText = userData.department || "Desconocido";
-    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-
-    loadVehicles(userData.vehicles);
-    handlePaymentStatus(userData);
-    updateLoyaltyCard(userData);
-}
-
-        // ✅ Handle Payment Status
-function handlePaymentStatus(userData) {
-    const paymentWarning = document.getElementById("payment-warning");
-    const completePayment = document.getElementById("complete-payment");
-    const paymentLink = document.getElementById("payment-link");
-
-    if (userData.paymentStatus === "Pending") {
-        paymentWarning.style.display = "block";
-
-        // ✅ Get PayPal link based on plan
-        let payPalURL = getPaypalLink(userData.planType);
-        if (payPalURL) {
-            paymentLink.href = payPalURL;
-            completePayment.style.display = "block";
-        } else {
-            console.error("❌ No PayPal link found for plan:", userData.planType);
-        }
-    } else {
-        paymentWarning.style.display = "none";
-        completePayment.style.display = "none";
-    }
-}
-
-// ✅ Get PayPal Link Based on Plan Type
-function getPaypalLink(planType) {
-    const payPalLinks = {
-        "basic3m": "https://www.paypal.com/pay/basic3m",
-        "basic6m": "https://www.paypal.com/pay/basic6m",
-        "basic12m": "https://www.paypal.com/pay/basic12m",
-        "plus3m": "https://www.paypal.com/pay/plus3m",
-        "plus6m": "https://www.paypal.com/pay/plus6m",
-        "plus12m": "https://www.paypal.com/pay/plus12m"
-    };
-    return payPalLinks[planType] || null;
-}
-
-        function selectScheduleBox(cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-
-    // Validate the clicked cell
-    const timeBlock = cell.innerText.trim();
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("❌ Por favor, seleccione un horario válido.");
-        return;
-    }
-
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
-
-    // Get the corresponding day from the table header
-    const dayIndex = cell.cellIndex;
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-    // ✅ Update the hidden input fields
-    document.getElementById("selectedDay").value = day;
-    document.getElementById("selectedTime").value = timeBlock;
-
-    console.log(`✅ Horario seleccionado: ${day} - ${timeBlock}`);
-}
-
-
-function updateSchedule() {
-    const selectedCell = document.querySelector(".schedule-table td.selected-box");
-    
-    if (!selectedCell) {
-        alert("❌ Por favor selecciona un horario.");
-        return;
-    }
-
-    const timeBlock = selectedCell.innerText.trim();
-    const dayIndex = selectedCell.cellIndex;
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
-        alert("❌ Por favor selecciona un horario válido.");
-        return;
-    }
-
-    // Ensure Firebase authentication is initialized
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        console.error("❌ No authenticated user.");
-        alert("Debes estar autenticado para cambiar el horario.");
-        return;
-    }
-
-    const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date();
-
-    // 🔥 Get user document from Firestore using UID instead of email
-    const userRef = db.collection("users").doc(user.uid);
-
-    userRef.get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
-
-            // 🚨 Prevent multiple reschedules in the same month
-            if (lastReschedule) {
-                const rescheduleMonth = lastReschedule.getMonth();
-                const currentMonth = currentDate.getMonth();
-                const rescheduleYear = lastReschedule.getFullYear();
-                const currentYear = currentDate.getFullYear();
-
-                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                    const lastRescheduleDate = lastReschedule.toLocaleDateString("es-ES", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
-                    return;
-                }
-            }
-
-            // ✅ Update Firestore with new schedule
-            userRef.update({
-                selectedSchedule: newSchedule,
-                lastReschedule: firebase.firestore.Timestamp.now(),
-            }).then(() => {
-                alert(`✅ Horario actualizado correctamente a: ${newSchedule}`);
-                document.getElementById("current-schedule").innerText = newSchedule; // Update UI
-            }).catch((error) => {
-                console.error("❌ Error al actualizar el horario:", error);
-                alert("❌ Error al actualizar el horario. Inténtalo de nuevo.");
             });
-
-        } else {
-            console.error("❌ Usuario no encontrado en Firestore.");
-            alert("❌ Error: No se encontró tu perfil en la base de datos.");
         }
-    }).catch((error) => {
-        console.error("❌ Error al obtener el perfil del usuario:", error);
-    });
-}
-
-        
-// ✅ Update Loyalty Card Progress
-function updateLoyaltyCard(userData) {
-    console.log("🔥 Updating loyalty card with data:", userData);
-
-    const holes = document.querySelectorAll('.hole');
-    let progress = 0; // Start from 0
-
-    // ✅ Step 1: Registration Completed
-    if (userData.registrationDate) {
-        console.log("✅ Registration complete.");
-        holes[0].classList.add('completed');
-        progress++;
-    }
-
-    // ✅ Step 2: Initial Payment Confirmed (Only if payment date > registration date)
-    if (userData.paymentDate) {
-        const registrationDate = userData.registrationDate.toDate ? userData.registrationDate.toDate() : new Date(userData.registrationDate.seconds * 1000);
-        const paymentDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
-
-        if (paymentDate > registrationDate) {
-            console.log("✅ Initial payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
-            holes[1].classList.add('completed');
-            progress++;
-        } else {
-            console.warn("⚠ Payment date is not later than registration date. Not filling hole 2.");
-        }
-    }
-
-    // ✅ Step 3+: Monthly Subscription Tracking (Consecutive Months)
-    if (userData.subscriptionStatus === "active" && userData.monthsPaid > 0) {
-        console.log("📅 Subscription active. Consecutive months paid:", userData.monthsPaid);
-
-        // Ensure only **consecutive months** count towards progress
-        let consecutiveMonths = userData.monthsPaid;
-        if (userData.lastMissedPayment) {
-            console.warn("⚠ A missed payment was detected. Resetting consecutive months.");
-            consecutiveMonths = 0; // Reset progress if a payment was skipped
-        }
-
-        // **Start filling holes from hole 3 onwards**
-        for (let i = 0; i < consecutiveMonths; i++) {
-            if (progress + 1 < holes.length) {
-                console.log(`✅ Filling hole ${progress + 1}`);
-                holes[progress + 1].classList.add('completed');
-                progress++;
-            }
-        }
-    } else {
-        console.warn("⚠ Subscription is inactive or no months paid yet.");
-    }
-
-    console.log("✅ Calculated progress:", progress);
-
-    // ✅ Update UI Description
-    const progressDescription = document.querySelector('.description p strong');
-    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
-
-    console.log("🎯 Loyalty card UI updated.");
-}
-
-// ✅ Load Vehicles into UI
-function loadVehicles(vehicles) {
-    const vehiclesList = document.getElementById("vehicles-list");
-    vehiclesList.innerHTML = "";
-
-    if (!vehicles || vehicles.length === 0) {
-        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
-        return;
-    }
-
-    vehicles.forEach((vehicle, index) => {
-        vehiclesList.innerHTML += `
-            <div class="vehicle-card">
-                <h4>Vehículo ${index + 1}</h4>
-                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-            </div>
-        `;
-    });
-}
-
-// ✅ Format Firestore Timestamp
-function formatTimestamp(timestamp) {
-    if (!timestamp) return "N/A";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-}
-
-// ✅ Add CSS for Loyalty Card Progress
-document.addEventListener("DOMContentLoaded", function () {
-    const style = document.createElement("style");
-    style.innerHTML = `
-        .schedule-table tbody td.selected-box {
-            background-color: #FF6600 !important;
-            color: white !important;
-            font-weight: bold;
-        }
-        .hole.completed {
-            background-color: #4caf50 !important;
-            color: white !important;
-        }
-    `;
-    document.head.appendChild(style);
-});
-
-</script>
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
-
-    
-    </footer>
+    </script>
 </body>
 </html>
