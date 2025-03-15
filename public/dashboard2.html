@@ -404,7 +404,12 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("❌ Firebase is not initialized. Check env.js.");
         return;
     }
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ Document Loaded");
+    updateUserInfo(userData);
+});
 
+    
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
         console.log("✅ Firebase initialized successfully!");
