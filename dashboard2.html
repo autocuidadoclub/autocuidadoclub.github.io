@@ -501,43 +501,62 @@ function updateUserInfo(userData) {
 
 // ✅ Update Loyalty Card Progress
 function updateLoyaltyCard(userData) {
-    console.log("Updating loyalty card with data:", userData);
-    const holes = document.querySelectorAll('.hole');
-    let progress = 1; // Registration is always step 1.
+    console.log("🔥 Updating loyalty card with data:", userData);
 
+    const holes = document.querySelectorAll('.hole');
+    let progress = 0; // Start from 0
+
+    // ✅ Step 1: Registration Completed
     if (userData.registrationDate) {
+        console.log("✅ Registration complete.");
         holes[0].classList.add('completed');
         progress++;
     }
 
+    // ✅ Step 2: Initial Payment Confirmed (Only if payment date > registration date)
     if (userData.paymentDate) {
+        const registrationDate = userData.registrationDate.toDate ? userData.registrationDate.toDate() : new Date(userData.registrationDate.seconds * 1000);
         const paymentDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
-        if (!isNaN(paymentDate.getTime())) {
+
+        if (paymentDate > registrationDate) {
+            console.log("✅ Initial payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
             holes[1].classList.add('completed');
             progress++;
-        }
-    }
-
-    if (userData.subscriptionStatus === "active") {
-        progress += userData.monthsPaid || 0;
-    }
-
-    if (userData.planType === "basic12m" || userData.planType === "plus12m") {
-        progress = 8;
-    } else if (progress >= 6 && userData.monthsPaid >= 6) {
-        progress = Math.min(progress + 1, 8);
-    }
-
-    holes.forEach((hole, index) => {
-        if (index < progress) {
-            hole.classList.add('completed');
         } else {
-            hole.classList.remove('completed');
+            console.warn("⚠ Payment date is not later than registration date. Not filling hole 2.");
         }
-    });
+    }
 
+    // ✅ Step 3+: Monthly Subscription Tracking (Consecutive Months)
+    if (userData.subscriptionStatus === "active" && userData.monthsPaid > 0) {
+        console.log("📅 Subscription active. Consecutive months paid:", userData.monthsPaid);
+
+        // Ensure only **consecutive months** count towards progress
+        let consecutiveMonths = userData.monthsPaid;
+        if (userData.lastMissedPayment) {
+            console.warn("⚠ A missed payment was detected. Resetting consecutive months.");
+            consecutiveMonths = 0; // Reset progress if a payment was skipped
+        }
+
+        // **Start filling holes from hole 3 onwards**
+        for (let i = 0; i < consecutiveMonths; i++) {
+            if (progress + 1 < holes.length) {
+                console.log(`✅ Filling hole ${progress + 1}`);
+                holes[progress + 1].classList.add('completed');
+                progress++;
+            }
+        }
+    } else {
+        console.warn("⚠ Subscription is inactive or no months paid yet.");
+    }
+
+    console.log("✅ Calculated progress:", progress);
+
+    // ✅ Update UI Description
     const progressDescription = document.querySelector('.description p strong');
     progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+
+    console.log("🎯 Loyalty card UI updated.");
 }
 
 // ✅ Load Vehicles into UI
