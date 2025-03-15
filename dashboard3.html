@@ -200,12 +200,24 @@
 
         <p></p>
         <p></p>
-        
+    <!-- Message for unpaid users -->
+<div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+    ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
+    Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
+</div>
+
+<!-- Button to complete payment -->
+<div id="complete-payment" style="margin-top: 10px; display: none;">
+    <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+        Completa tu pago ahora 🔗
+    </a>
+</div>
+
     <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
     <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
 
 <div class="card">
-                <h3>Cambio de Suscripción</h3>
+                <h3>¿Te gustaría Mejorar de Suscripción?</h3>
                 <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
                 <label for="new-plan">Selecciona un nuevo plan:</label>
                 <select id="new-plan"></select>
@@ -256,19 +268,7 @@ console.log("🔥 Subscription Status:", userData.subscriptionStatus);
 
 </script>
         
-   <!-- Message for unpaid users -->
-<div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-    ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
-    Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
-</div>
-
-<!-- Button to complete payment -->
-<div id="complete-payment" style="margin-top: 10px; display: none;">
-    <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
-        Completa tu pago ahora 🔗
-    </a>
-</div>
-
+   
 </div>
 
 
