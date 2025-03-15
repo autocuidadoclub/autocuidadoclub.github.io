@@ -203,136 +203,89 @@
         <p></p>
         
   <!-- Subscription Section -->
-<div class="card">
-    <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
-    <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
-    
-    <!-- Upgrade Plan Section -->
-    <div id="upgrade-section">
-        <p><strong>Selecciona un nuevo plan:</strong></p>
-        <select id="upgrade-plan-options"></select>
-        <button id="upgrade-btn" onclick="upgradePlan()" style="background:#007bff; color:white; padding:10px 15px; border-radius:5px; margin-top:10px;">
-            ⬆️ Mejorar Plan
-        </button>
-    </div>
-    
-    <!-- Downgrade Section (Contact Staff) -->
-    <div id="downgrade-section">
-        <p>¿Quieres cambiar a un plan menor? Contacta con nuestro equipo.</p>
-        <button onclick="window.open('contacto.html', '_blank');" style="background:#ff6600; color:white; padding:10px 15px; border-radius:5px;">
-            📞 Contactar Staff
-        </button>
-    </div>
-    
-    <!-- Payment Button -->
-    <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-        ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo.
-    </div>
-    <div id="complete-payment" style="margin-top: 10px; display: none;">
-        <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
-            Completa tu pago ahora 🔗
-        </a>
-    </div>
-</div>
+ <div class="card">
+                <h3>Suscripción</h3>
+                <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
+                <label for="new-plan">Selecciona un nuevo plan:</label>
+                <select id="new-plan"></select>
+                <button onclick="upgradePlan()">Mejorar Plan</button>
+                <p>¿Quieres cambiar a un plan menor? <a href="contacto.html">Contacta con nuestro equipo</a></p>
+            </div>
+        </div>
+    </section>
+    <script>
+        let auth, db;
+        document.addEventListener("DOMContentLoaded", function () {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
 
-<script>
-// Populate Upgrade Options
-function populateUpgradeOptions(userPlan) {
-    const upgradeOptions = {
-        "basic3m": "basic6m",
-        "basic6m": "basic12m",
-        "plus3m": "plus6m",
-        "plus6m": "plus12m"
-    };
-    
-    const selectElement = document.getElementById("upgrade-plan-options");
-    selectElement.innerHTML = ""; // Clear previous options
-    
-    for (const [currentPlan, upgradePlan] of Object.entries(upgradeOptions)) {
-        if (userPlan === currentPlan) {
-            let option = document.createElement("option");
-            option.value = upgradePlan;
-            option.textContent = `Plan ${upgradePlan.replace(/[a-z]/g, '')} meses`;
-            selectElement.appendChild(option);
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    loadUserProfile(user.uid);
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+
+        function loadUserProfile(uid) {
+            db.collection("users").doc(uid).get().then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    document.getElementById("name").innerText = userData.name || "N/A";
+                    document.getElementById("phone").innerText = userData.phone || "N/A";
+                    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+                    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+                    document.getElementById("planType").innerText = userData.planType || "N/A";
+                    document.getElementById("paymentDate").innerText = userData.paymentDate || "Pendiente";
+                    document.getElementById("nextPaymentDate").innerText = userData.nextPaymentDate || "No asignado";
+                    document.getElementById("memberSince").innerText = userData.registrationDate || "Desconocido";
+                    handlePaymentStatus(userData);
+                    updatePlanOptions(userData.planType);
+                }
+            });
         }
-    }
-}
 
-// Upgrade Plan Function
-function upgradePlan() {
-    const user = auth.currentUser;
-    if (!user) return;
+        function handlePaymentStatus(userData) {
+            if (userData.paymentStatus === "Pending") {
+                document.getElementById("payment-warning").style.display = "block";
+                document.getElementById("payment-link").href = getPaypalLink(userData.planType);
+            }
+        }
+
+        function getPaypalLink(planType) {
+            const payPalLinks = {
+                "basic3m": "https://www.paypal.com/pay/basic3m",
+                "basic6m": "https://www.paypal.com/pay/basic6m",
+                "basic12m": "https://www.paypal.com/pay/basic12m",
+                "plus3m": "https://www.paypal.com/pay/plus3m",
+                "plus6m": "https://www.paypal.com/pay/plus6m",
+                "plus12m": "https://www.paypal.com/pay/plus12m"
+            };
+            return payPalLinks[planType] || "#";
+        }
+
+        function updatePlanOptions(currentPlan) {
+            const allPlans = {
+                "basic3m": "Plan Básico - 3 meses",
+                "basic6m": "Plan Básico - 6 meses",
+                "basic12m": "Plan Básico - 12 meses",
+                "plus3m": "Plan Plus - 3 meses",
+                "plus6m": "Plan Plus - 6 meses",
+                "plus12m": "Plan Plus - 12 meses"
+            };
+            const select = document.getElementById("new-plan");
+            select.innerHTML = "";
+            for (let key in allPlans) {
+                if (key !== currentPlan) {
+                    select.innerHTML += `<option value="${key}">${allPlans[key]}</option>`;
+                }
+            }
+        }
     
-    const newPlan = document.getElementById("upgrade-plan-options").value;
-    if (!newPlan) {
-        alert("❌ No hay planes disponibles para mejorar.");
-        return;
-    }
-    
-    db.collection("users").doc(user.uid).update({ planType: newPlan }).then(() => {
-        alert("✅ Tu plan ha sido actualizado con éxito.");
-        location.reload();
-    }).catch((error) => {
-        console.error("❌ Error al actualizar el plan:", error);
-        alert("❌ Hubo un error. Inténtalo de nuevo.");
-    });
-}
-
-// Handle Payment Status
-function handlePaymentStatus(userData) {
-    const paymentWarning = document.getElementById("payment-warning");
-    const completePayment = document.getElementById("complete-payment");
-    const paymentLink = document.getElementById("payment-link");
-    
-    if (userData.paymentStatus === "Pending") {
-        paymentWarning.style.display = "block";
-        paymentLink.href = getPaypalLink(userData.planType);
-        completePayment.style.display = "block";
-    }
-}
-
-// Get Payment Link
-function getPaypalLink(planType) {
-    const payPalLinks = {
-        "basic3m": "https://www.paypal.com/pay/basic3m",
-        "basic6m": "https://www.paypal.com/pay/basic6m",
-        "basic12m": "https://www.paypal.com/pay/basic12m",
-        "plus3m": "https://www.paypal.com/pay/plus3m",
-        "plus6m": "https://www.paypal.com/pay/plus6m",
-        "plus12m": "https://www.paypal.com/pay/plus12m"
-    };
-    return payPalLinks[planType] || "#";
-}
-</script>
-
-
-         <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="nosotros.html">Quiénes Somos</a></li>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-             <li><a href="tac.html">Términos y Condiciones</a></li>
-        </ul>
-   
- <div class="social-container" style="text-align: center; margin-top: 20px;">
-    <p><strong>Síguenos en nuestras redes sociales</strong></p>
-    <div class="social-buttons">
-        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-            <i class="fab fa-instagram fa-3x"></i>
-        </a>
-        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
-            <i class="fab fa-facebook-f fa-3x"></i>
-        </a>
-        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-            <i class="fab fa-twitter fa-3x"></i>
-        </a>
-    </div>
-</div>
-  <script>
-
         // ✅ Define auth & db globally
 let auth;
 let db;
