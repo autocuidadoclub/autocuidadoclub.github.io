@@ -562,12 +562,14 @@ function formatTimestamp(timestamp) {
 
 // ✅ Logout Function with Error Handling
 function logoutUser() {
+    // ✅ Ensure Firebase is initialized
     if (!firebase.apps.length) {
-        console.error("❌ Firebase not initialized.");
+        console.error("❌ Firebase is not initialized.");
         alert("Firebase no está inicializado. Intenta recargar la página.");
         return;
     }
 
+    // ✅ Explicitly Define `auth` to Avoid ReferenceError
     const auth = firebase.auth();
 
     if (!auth.currentUser) {
@@ -602,6 +604,19 @@ function logoutUser() {
             alert("❌ Error al cerrar sesión: " + error.message);
         });
 }
+
+// ✅ Ensure the Logout Button is Recognized
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.querySelector("button[onclick='logoutUser()']");
+    
+    if (logoutButton) {
+        logoutButton.addEventListener("click", logoutUser);
+        console.log("✅ Logout button detected and event attached.");
+    } else {
+        console.error("❌ Logout button not found in DOM.");
+    }
+});
+
 
 // ✅ Ensure the Logout Button is Recognized
 document.addEventListener("DOMContentLoaded", function () {
