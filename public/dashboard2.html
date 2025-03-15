@@ -8,386 +8,71 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-     <!-- Load Environment Variables -->
+
+    <!-- Load Environment Variables -->
     <script src="env.js"></script>
     
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-  <style>
-        /* Styles for Loyalty Card */
-        .loyalty-card {
-            text-align: center;
-            padding: 20px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
-        .holes {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            justify-items: center;
-            margin-bottom: 20px;
-        }
-
-        .hole {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s ease-in-out;
-            border: 2px dashed #ccc;
-            background-color: #fff;
-            color: #ccc;
-        }
-
-        .hole.completed {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-        }
-
-        .hole.star {
-            font-size: 24px;
-            color: gold;
-        }
-
-        .hole.star.completed {
-            background-color: #4caf50;
-            color: white;
-        }
-
-        .rewards {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
-        .reward-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .reward-card:hover {
-            background-color: #e6f7e6;
-        }
-
-        .reward-icon {
-            font-size: 24px;
-            margin-right: 15px;
-        }
-
-        .reward-info h4 {
-            margin: 0;
-            font-size: 18px;
-            color: #333;
-        }
-
-        .reward-info p {
-            margin: 5px 0 0;
-            font-size: 14px;
-            color: #777;
-        }
-
-        .reward-status {
-            font-size: 14px;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-
-        .reward-status.locked {
-            background-color: #ccc;
-            color: white;
-        }
-
-        .reward-status.unlocked {
-            background-color: #4caf50;
-            color: white;
-        }
-      .floating-contact-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff6600;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s, transform 0.2s;
-}
-
-.floating-contact-button:hover {
-    background-color: #cc5500;
-    transform: scale(1.05);
-}
-
-    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <ul class="nav-links">
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-        </ul>
-        <div class="logo-container">
-            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-        </div>
-    </nav>
 
-    <!-- Header -->
-    <header>
-        <header>
+<!-- Navigation -->
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+    </ul>
+    <div class="logo-container">
+        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+    </div>
+</nav>
+
+<!-- Header -->
+<header>
     <div class="header-container">
         <h2 id="user-info">Cargando usuario...</h2>
-        <button id="logout-btn">Cerrar Sesión</button> <!-- Added the ID here -->
+        <button id="logout-btn">Cerrar Sesión</button>
     </div>
 </header>
 
-    </header>
-
-    <!-- Dashboard Content -->
+<!-- Dashboard Content -->
 <section class="dashboard-section">
-    <!-- User Info -->
     <div class="dashboard-grid">
         <div class="card">
-            <h3><i class="fas fa-user"></i> Información del Usuario</h3>
-            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
-            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
-            <P><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
-            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
-            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
-            <p><strong>Vehiculos: </strong> <span id="vehicles-list">Cargando...</span></p>
+            <h3>Información del Usuario</h3>
+            <p><strong>Nombre:</strong> <span id="userName">Cargando...</span></p>
+            <p><strong>Teléfono:</strong> <span id="userPhone">Cargando...</span></p>
+            <p><strong>Departamento:</strong> <span id="userDepartment">Cargando...</span></p>
+            <p><strong>Municipio:</strong> <span id="userMunicipality">Cargando...</span></p>
+            <p><strong>Vehículos:</strong> <span id="userVehicles">Cargando...</span></p>
         </div>
 
-        <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-    <i class="fas fa-headset"></i> Contactar Staff
-</button>
-
-
-    <div class="card">
-    <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-    <p><strong>Miembro Desde:</strong></p>
-    <p><span id="memberSince">Cargando...</span></p>   
-    <p><strong>Fecha del último pago de su suscripción:</strong> </p>
-    <p><span id="paymentDate">Cargando...</span></p>
-    <p><strong>Próximo Pago:</strong></p>
-    <p><span id="nextPaymentDate">Cargando...</span></p>
-
-        <p></p>
-        <p></p>
-        
-    <h3><i class="fas fa-credit-card"></i> Suscripción</h3>
-    <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
-
-
-
-    
-<script>
-function updateUserInfo(userData) {
-    document.getElementById("name").innerText = userData.name || "N/A";
-    document.getElementById("phone").innerText = userData.phone || "N/A";
-    document.getElementById("planType").innerText = userData.planType || "N/A";
-    
-    console.log("🔥 Debug: userData.planType =", userData.planType);
-
-    // ✅ Define user-friendly plan descriptions
-    const planMessages = {
-        "basic3m": "Plan Básico de 3 meses",
-        "basic6m": "Plan Básico de 6 meses",
-        "basic12m": "Plan Básico de 12 meses",
-        "plus3m": "Plan Plus de 3 meses",
-        "plus6m": "Plan Plus de 6 meses",
-        "plus12m": "Plan Plus de 12 meses"
-    };
-
-    // ✅ Get the plan type from Firebase
-    const planType = userData.planType || "N/A";
-
-    // ✅ Update the UI with the corresponding plan message
-    const planMessageElement = document.getElementById("planMessage");
-    if (planMessageElement) {
-        planMessageElement.innerText = planMessages[planType] || "Tipo de plan desconocido";
-        console.log("✅ Plan Seleccionado Actualizado:", planMessageElement.innerText);
-    } else {
-        console.error("❌ Error: No se encontró el elemento con ID 'planMessage'");
-    }
-}
-
-</script>
-        
-    <!-- Message for unpaid users -->
-    <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-        ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
-        Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
-    </div>
-
-    <!-- Button to complete payment -->
-    <div id="complete-payment" style="margin-top: 10px; display: none;">
-        <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
-            Completa tu pago ahora 🔗
-        </a>
-    </div>
-</div>
-
-
-           
-    <!-- Reschedule Section -->
-    <div class="card reschedule-section">
-        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
-        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
-        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
-        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
-            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
-        </div>
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Horario</th>
-                    <th>Lunes</th>
-                    <th>Miércoles</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Bloque 1</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 2</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 3</td>
-                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                </tr>
-            </tbody>
-        </table>
-       <button id="save-schedule-btn" onclick="updateSchedule()">
-    <strong>Guardar Nuevo Horario</strong>
-</button>
-
-    </div>
-
-<p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    
-    <!-- Loyalty Rewards Section -->
         <div class="card">
-            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
-            <div class="loyalty-card">
-                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
-                <div class="holes">
-                    <div class="hole completed">✔</div>
-                    <p>Proceso de registro completo</p>
-                    <div class="hole completed">✔</div>
-                    <p>Pago inicial procesado en tu suscripción</p>
-                    <div class="hole">○</div>
-                    <p>1er Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>3er Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>5to Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>6to Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>7to Mes de suscripción activo</p>
-                    <div class="hole star">★</div>
-                    <p>8to Mes de suscripción activo</p>
-                </div>
-                <div class="description">
-                    <p><strong>Current Progress:</strong></p>
-                </div>
-            </div>
-
-            <!-- Rewards -->
-            <div class="rewards">
-                <h3>Available Rewards</h3>
-                <div class="reward-card">
-                    <div class="reward-icon">🎐</div>
-                    <div class="reward-info">
-                        <h4>Recarga de A/C</h4>
-                        <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
-                    </div>
-                    <span class="reward-status locked">Locked</span>
-                </div>
-                <div class="reward-card">
-                    <div class="reward-icon">🚗</div>
-                    <div class="reward-info">
-                        <h4>Carwash gratis</h4>
-                        <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
-                    </div>
-                    <span class="reward-status locked">Locked</span>
-                </div>
-                <div class="reward-card">
-                    <div class="reward-icon">📝</div>
-                    <div class="reward-info">
-                        <h4>Revisión extra del mes en curso</h4>
-                        <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
-                    </div>
-                    <span class="reward-status locked">Locked</span>
-                </div>
-            </div>
+            <h3>Estado de Pago</h3>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+            <p><strong>Último Pago:</strong> <span id="lastPaymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPayment">Cargando...</span></p>
+            <p><strong>Tipo de Plan:</strong> <span id="planType">Cargando...</span></p>
         </div>
-    </section>
+    </div>
+</section>
 
-      
-   <script>
-    // ✅ Ensure Firebase is initialized globally
-let auth, db;
-
+<script>
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded!");
+
     if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
         console.error("❌ Error: Firebase env.js not loaded.");
         alert("❌ Firebase is not initialized. Check env.js.");
         return;
     }
 
-    // ✅ Initialize Firebase if not already initialized
     const firebaseConfig = {
         apiKey: window._env_.FIREBASE_API_KEY,
         authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
@@ -403,532 +88,77 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("✅ Firebase initialized successfully!");
     }
 
-    // ✅ Assign auth & db globally
-    auth = firebase.auth();
-    db = firebase.firestore();
-});
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        const auth = firebase.auth();
-
-        // ✅ Ensure the logout button is attached
-        const logoutButton = document.getElementById("logout-btn");
-        if (logoutButton) {
-            logoutButton.addEventListener("click", function () {
-                auth.signOut()
-                    .then(() => {
-                        console.log("✅ User logged out successfully.");
-                        sessionStorage.clear(); // Clear session to prevent re-login issues
-                        window.location.href = "login.html";
-                    })
-                    .catch((error) => {
-                        console.error("❌ Error during logout:", error.message);
-                        alert("❌ Error al cerrar sesión: " + error.message);
-                    });
-            });
-        } else {
-            console.error("❌ Error: Logout button not found.");
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            console.warn("⚠ No user logged in. Redirecting to login...");
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2000);
+            return;
         }
-    });
-// ✅ Update User Info in Dashboard
-function updateUserInfo(userData) {
-    document.getElementById("name").innerText = userData.name || "N/A";
-    document.getElementById("phone").innerText = userData.phone || "N/A";
-    document.getElementById("planType").innerText = userData.planType || "N/A";
-    
-    // ✅ Correct Schedule Format
-    document.getElementById("current-schedule").innerText = userData.schedule 
-        ? `${userData.schedule.day} - ${userData.schedule.time}`
-        : "No asignado";
 
-    document.getElementById("user-department").innerText = userData.department || "Desconocido";
-    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-
-    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-
-    // ✅ Vehicles Section
-    loadVehicles(userData.vehicles);
-
-    // ✅ Payment Handling
-    handlePaymentStatus(userData);
-
-    // ✅ Update Loyalty Card
-    updateLoyaltyCard(userData);
-}
-
-// ✅ Load User Vehicles
-function loadVehicles(vehicles) {
-    const vehiclesList = document.getElementById("vehicles-list");
-    vehiclesList.innerHTML = ""; // Clear existing content
-
-    if (!vehicles || vehicles.length === 0) {
-        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
-        return;
-    }
-
-    vehicles.forEach((vehicle, index) => {
-        vehiclesList.innerHTML += `
-            <div class="vehicle-card">
-                <h4>Vehículo ${index + 1}</h4>
-                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-            </div>
-        `;
-    });
-}
-
-// ✅ Handle Payment Status
-function handlePaymentStatus(userData) {
-    const paymentWarning = document.getElementById("payment-warning");
-    const completePayment = document.getElementById("complete-payment");
-    const paymentLink = document.getElementById("payment-link");
-
-    if (userData.paymentStatus === "Pending") {
-        paymentWarning.style.display = "block";
-
-        // ✅ Get PayPal link based on plan
-        let payPalURL = getPaypalLink(userData.planType);
-        if (payPalURL) {
-            paymentLink.href = payPalURL;
-            completePayment.style.display = "block";
-        } else {
-            console.error("❌ No PayPal link found for plan:", userData.planType);
-        }
-    } else {
-        paymentWarning.style.display = "none";
-        completePayment.style.display = "none";
-    }
-}
-
-// ✅ Get PayPal Link Based on Plan Type
-function getPaypalLink(planType) {
-    const payPalLinks = {
-        "basic3m": "https://www.paypal.com/pay/basic3m",
-        "basic6m": "https://www.paypal.com/pay/basic6m",
-        "basic12m": "https://www.paypal.com/pay/basic12m",
-        "plus3m": "https://www.paypal.com/pay/plus3m",
-        "plus6m": "https://www.paypal.com/pay/plus6m",
-        "plus12m": "https://www.paypal.com/pay/plus12m"
-    };
-    return payPalLinks[planType] || null;
-}
-
-// ✅ Format Firestore Timestamp
-function formatTimestamp(timestamp) {
-    if (!timestamp) return "N/A";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-}
-
-// ✅ Logout Function with Error Handling
-function logoutUser() {
-    if (!auth) {
-        console.error("❌ Firebase Auth is not initialized!");
-        alert("Error: Firebase Auth is not initialized.");
-        return;
-    }
-
-    auth.signOut()
-        .then(() => {
-            console.log("✅ User logged out successfully.");
-            sessionStorage.clear(); // Clear session
-            window.location.href = "login.html"; // Redirect to login page
-        })
-        .catch((error) => {
-            console.error("❌ Error during logout:", error.message);
-            alert("❌ Error al cerrar sesión: " + error.message);
-        });
-}
-
-// ✅ Ensure Logout Button Works
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutButton = document.getElementById("logout-btn");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", logoutUser);
-    }
-});
-
-
-// ✅ Attach Logout Function to Button
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutButton = document.getElementById("logout-btn"); // Ensure the button has this ID
-    if (logoutButton) {
-        logoutButton.addEventListener("click", logoutUser);
-    }
-});
-
-// ✅ Attach Logout Function to Button
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutButton = document.getElementById("logout-btn"); // Ensure the button has this ID
-    if (logoutButton) {
-        logoutButton.addEventListener("click", logoutUser);
-    }
-});
-
-
-
-    // Load user profile data
-    function loadUserProfile(email) {
-        db.collection("users").doc(email).get()
-            .then((doc) => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                      document.getElementById("name").innerText = userData.name || "N/A";
-                document.getElementById("phone").innerText = userData.phone || "N/A";
-                document.getElementById("planType").innerText = userData.planType || "N/A";
-                document.getElementById("current-schedule").innerText = userData.selectedSchedule || "No asignado";
-                document.getElementById("user-department").innerText = userData.department || "Desconocido";
-                document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-                document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-                document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-                document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-              document.getElementById("vehicles-list").innerText = userData.vehicles && userData.vehicles.length > 0 ? userData.vehicles.map(vehicle => vehicle.plate || "N/A").join(", ") : "No hay vehículos registrados.";
-            
-
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(() => {
-        console.log("Authentication persistence set to LOCAL.");
-    })
-    .catch((error) => {
-        console.error("Error setting authentication persistence:", error.message);
+        console.log(`✅ Logged in as: ${user.email}`);
+        loadUserProfile(user.uid);
     });
 
-            
-                    // Dynamically update loyalty card based on subscription status
-                    if (userData.subscriptionStatus === "active") {
-                        updateLoyaltyCard({
-                            hasRegistered: true,
-                            subscriptionPlan: userData.planType || "N/A",
-                            carsRegistered: userData.vehicles ? userData.vehicles.length : 1,
-                            monthsPaid: userData.monthsPaid || 0
-                        });
-                    } else {
-                        resetLoyaltyCard(); // Reset progress if subscription is inactive
-                    }
-                } else {
-                    console.error("User profile not found.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error loading user profile:", error);
-            });
-    }
+    function loadUserProfile(uid) {
+        db.collection("users").doc(uid).get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                console.log("✅ User data retrieved:", userData);
 
-function loadVehicles(vehicles) {
-    const vehiclesList = document.getElementById("vehicles-list");
-    vehiclesList.innerHTML = ""; // Clear existing content
-
-    if (vehicles.length === 0) {
-        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
-        return;
-    }
-
-    vehicles.forEach((vehicle, index) => {
-        const vehicleHTML = `
-            <div class="vehicle-card">
-                <h4>Vehículo ${index + 1}</h4>
-                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-            </div>
-        `;
-        vehiclesList.innerHTML += vehicleHTML;
-    });
-}
-
-        function selectScheduleBox(cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-
-    // Validate the clicked cell
-    const timeBlock = cell.innerText.trim();
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("❌ Por favor, seleccione un horario válido.");
-        return;
-    }
-
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
-
-    // Get the corresponding day from the table header
-    const dayIndex = cell.cellIndex;
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-    console.log(`✅ Horario seleccionado: ${day} - ${timeBlock}`);
-}
-
-
-function updateSchedule() {
-    const selectedCell = document.querySelector(".schedule-table td.selected-box");
-    
-    if (!selectedCell) {
-        alert("❌ Por favor selecciona un horario.");
-        return;
-    }
-
-    const timeBlock = selectedCell.innerText.trim();
-    const dayIndex = selectedCell.cellIndex;
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
-        alert("❌ Por favor selecciona un horario válido.");
-        return;
-    }
-
-    // Ensure Firebase authentication is initialized
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        console.error("❌ No authenticated user.");
-        alert("Debes estar autenticado para cambiar el horario.");
-        return;
-    }
-
-    const newSchedule = `${day} - ${timeBlock}`;
-    const currentDate = new Date();
-
-    // 🔥 Get user document from Firestore using UID instead of email
-    const userRef = db.collection("users").doc(user.uid);
-
-    userRef.get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
-
-            // 🚨 Prevent multiple reschedules in the same month
-            if (lastReschedule) {
-                const rescheduleMonth = lastReschedule.getMonth();
-                const currentMonth = currentDate.getMonth();
-                const rescheduleYear = lastReschedule.getFullYear();
-                const currentYear = currentDate.getFullYear();
-
-                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
-                    const lastRescheduleDate = lastReschedule.toLocaleDateString("es-ES", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
-                    return;
-                }
+                document.getElementById("userName").textContent = userData.name || "No registrado";
+                document.getElementById("userPhone").textContent = userData.phone || "No registrado";
+                document.getElementById("userDepartment").textContent = userData.department || "No registrado";
+                document.getElementById("userMunicipality").textContent = userData.municipality || "No registrado";
+                document.getElementById("userVehicles").textContent = userData.vehicles ? userData.vehicles.map(v => v.plate).join(", ") : "No registrado";
+                
+                document.getElementById("memberSince").textContent = formatTimestamp(userData.registrationDate);
+                document.getElementById("lastPaymentDate").textContent = formatTimestamp(userData.paymentDate);
+                document.getElementById("nextPayment").textContent = formatTimestamp(userData.nextPaymentDate);
+                document.getElementById("planType").textContent = userData.planType || "No registrado";
+            } else {
+                console.warn("⚠ No user data found in Firestore.");
+                alert("⚠ No se encontró información del usuario en la base de datos.");
             }
-
-            // ✅ Update Firestore with new schedule
-            userRef.update({
-                selectedSchedule: newSchedule,
-                lastReschedule: firebase.firestore.Timestamp.now(),
-            }).then(() => {
-                alert(`✅ Horario actualizado correctamente a: ${newSchedule}`);
-                document.getElementById("current-schedule").innerText = newSchedule; // Update UI
-            }).catch((error) => {
-                console.error("❌ Error al actualizar el horario:", error);
-                alert("❌ Error al actualizar el horario. Inténtalo de nuevo.");
-            });
-
-        } else {
-            console.error("❌ Usuario no encontrado en Firestore.");
-            alert("❌ Error: No se encontró tu perfil en la base de datos.");
-        }
-    }).catch((error) => {
-        console.error("❌ Error al obtener el perfil del usuario:", error);
-    });
-}
-
-
-
-// Add CSS for selected schedule cells
-document.addEventListener("DOMContentLoaded", function () {
-    const style = document.createElement("style");
-    style.innerHTML = `
-        .schedule-table tbody td.selected-box {
-            background-color: #FF6600 !important;
-            color: white !important;
-            font-weight: bold;
-        }
-    `;
-    document.head.appendChild(style);
-});
-
-
-// Format Firestore timestamp
-function formatTimestamp(timestamp) {
-    if (!timestamp) return "N/A";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-}
-        
-function updateLoyaltyCard(userData) {
-    console.log("Updating loyalty card with data:", userData);
-
-    const holes = document.querySelectorAll('.hole');
-    let progress = 1; // Registration is always step 1.
-
-    // Check if registration is complete
-    if (userData.registrationDate) {
-        console.log("Registration complete.");
-        holes[0].classList.add('completed');
-        progress++;
-    }
-
-   // Check if payment is confirmed
-if (userData.paymentDate) {
-    const paymentDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
-
-    if (!isNaN(paymentDate.getTime())) { // Ensure paymentDate is valid
-        console.log("Payment confirmed on:", paymentDate.toLocaleDateString("es-ES"));
-        holes[1].classList.add('completed');
-        progress++;
-    } else {
-        console.error("Invalid paymentDate found:", userData.paymentDate);
-    }
-} else {
-    console.log("Payment date not available.");
-}
-    
-    // Calculate progress based on subscription months
-    if (userData.subscriptionStatus === "active") {
-        console.log("Subscription active. Months paid:", userData.monthsPaid);
-        progress += userData.monthsPaid || 0;
-    }
-
-    // Check for prepaid 12-month subscription
-    if (userData.planType === "basic12m" || userData.planType === "plus12m") {
-        console.log("12-month subscription detected.");
-        progress = 8;
-    } else if (progress >= 6 && userData.monthsPaid >= 6) {
-        console.log("7th month paid; filling 8th hole.");
-        progress = Math.min(progress + 1, 8);
-    }
-
-    console.log("Calculated progress:", progress);
-
-    // Update UI holes
-    holes.forEach((hole, index) => {
-        if (index < progress) {
-            console.log(`Filling hole ${index + 1}`);
-            hole.classList.add('completed');
-        } else {
-            hole.classList.remove('completed');
-        }
-    });
-
-    // Update progress description
-    const progressDescription = document.querySelector('.description p strong');
-    progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
-
-    console.log("Loyalty card UI updated.");
-}
-
-        
-    function resetLoyaltyCard() {
-        const holes = document.querySelectorAll('.hole');
-        const rewardStatusElements = document.querySelectorAll('.reward-status');
-        const acRewards = document.getElementById('ac-rewards');
-        const carwashRewards = document.getElementById('carwash-rewards');
-        const reviewRewards = document.getElementById('review-rewards');
-
-        // Reset all holes
-        holes.forEach((hole) => hole.classList.remove('completed'));
-
-        // Reset reward multipliers
-        acRewards.textContent = `0x`;
-        carwashRewards.textContent = `0x`;
-        reviewRewards.textContent = `0x`;
-
-        // Lock all rewards
-        rewardStatusElements.forEach((status) => {
-            status.textContent = "Locked";
-            status.classList.add("locked");
-            status.classList.remove("unlocked");
+        }).catch((error) => {
+            console.error("❌ Error fetching user data:", error);
+            alert("❌ Error al cargar los datos del usuario. Intenta de nuevo.");
         });
-
-        // Update progress description
-        const progressDescription = document.querySelector('.description p strong');
-        progressDescription.textContent = `Current Progress: 0 of 8 steps completed.`;
     }
 
-    function logoutUser() {
-    if (!auth) {
-        console.error("❌ Firebase Auth is not initialized!");
-        alert("Error: Firebase Auth is not initialized.");
-        return;
+    function formatTimestamp(timestamp) {
+        if (!timestamp) return "No disponible";
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return date.toLocaleDateString("es-ES");
     }
 
-    auth.signOut()
-        .then(() => {
+    document.getElementById("logout-btn").addEventListener("click", function () {
+        auth.signOut().then(() => {
             console.log("✅ User logged out successfully.");
-            sessionStorage.clear(); // Clear session
-            window.location.href = "login.html"; // Redirect to login page
-        })
-        .catch((error) => {
+            sessionStorage.clear();
+            window.location.href = "login.html";
+        }).catch((error) => {
             console.error("❌ Error during logout:", error.message);
             alert("❌ Error al cerrar sesión: " + error.message);
         });
-}
+    });
 
-// ✅ Ensure Logout Button Works
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutButton = document.getElementById("logout-btn");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", logoutUser);
-    }
+    setTimeout(() => {
+        if (!firebase.auth().currentUser) {
+            console.warn("⚠ Firebase Auth taking too long... reloading.");
+            window.location.reload();
+        }
+    }, 5000);
 });
-
 </script>
 
-    
-     <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="nosotros.html">Quiénes Somos</a></li>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-             <li><a href="tac.html">Términos y Condiciones</a></li>
-        </ul>
-   
- <div class="social-container" style="text-align: center; margin-top: 20px;">
-    <p><strong>Síguenos en nuestras redes sociales</strong></p>
-    <div class="social-buttons">
-        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-            <i class="fab fa-instagram fa-3x"></i>
-        </a>
-        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
-            <i class="fab fa-facebook-f fa-3x"></i>
-        </a>
-        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-            <i class="fab fa-twitter fa-3x"></i>
-        </a>
-    </div>
-</div>
+<footer>
+    <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+</footer>
 
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
-        integrity="sha384-6e7nA5mhBVXnMIAtGPETl10C7oipDhu2IN/lyxyjAJG+KzNtRLqrqFJN5wJ+6/qU"
-        crossorigin="anonymous"></script>
-
-
-
-
-    
-    </footer>
 </body>
 </html>
