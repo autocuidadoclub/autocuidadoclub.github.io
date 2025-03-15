@@ -240,18 +240,19 @@ function updateUserInfo(userData) {
 
 </script>
         
-    <!-- Message for unpaid users -->
-    <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-        ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
-        Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
-    </div>
+   <!-- Message for unpaid users -->
+<div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+    ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 
+    Activa tu suscripción y disfruta de nuestro servicio sin preocupaciones. 🚗🔧
+</div>
 
-    <!-- Button to complete payment -->
-    <div id="complete-payment" style="margin-top: 10px; display: none;">
-        <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
-            Completa tu pago ahora 🔗
-        </a>
-    </div>
+<!-- Button to complete payment -->
+<div id="complete-payment" style="margin-top: 10px; display: none;">
+    <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+        Completa tu pago ahora 🔗
+    </a>
+</div>
+
 </div>
 
 
@@ -481,6 +482,7 @@ function loadUserProfile(uid) {
             console.error("❌ Error fetching user profile:", error);
         });
 }
+        
 
 // ✅ Update User Info on Dashboard
 function updateUserInfo(userData) {
@@ -499,6 +501,121 @@ function updateUserInfo(userData) {
     updateLoyaltyCard(userData);
 }
 
+        // ✅ Handle Payment Status
+function handlePaymentStatus(userData) {
+    const paymentWarning = document.getElementById("payment-warning");
+    const completePayment = document.getElementById("complete-payment");
+    const paymentLink = document.getElementById("payment-link");
+
+    if (userData.paymentStatus === "Pending") {
+        paymentWarning.style.display = "block";
+
+        // ✅ Get PayPal link based on plan
+        let payPalURL = getPaypalLink(userData.planType);
+        if (payPalURL) {
+            paymentLink.href = payPalURL;
+            completePayment.style.display = "block";
+        } else {
+            console.error("❌ No PayPal link found for plan:", userData.planType);
+        }
+    } else {
+        paymentWarning.style.display = "none";
+        completePayment.style.display = "none";
+    }
+}
+
+// ✅ Get PayPal Link Based on Plan Type
+function getPaypalLink(planType) {
+    const payPalLinks = {
+        "basic3m": "https://www.paypal.com/pay/basic3m",
+        "basic6m": "https://www.paypal.com/pay/basic6m",
+        "basic12m": "https://www.paypal.com/pay/basic12m",
+        "plus3m": "https://www.paypal.com/pay/plus3m",
+        "plus6m": "https://www.paypal.com/pay/plus6m",
+        "plus12m": "https://www.paypal.com/pay/plus12m"
+    };
+    return payPalLinks[planType] || null;
+}
+
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    
+    if (!selectedCell) {
+        alert("❌ Por favor selecciona un horario.");
+        return;
+    }
+
+    const timeBlock = selectedCell.innerText.trim();
+    const dayIndex = selectedCell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    if (!timeBlock || timeBlock === "-" || !day || day === "Día desconocido") {
+        alert("❌ Por favor selecciona un horario válido.");
+        return;
+    }
+
+    // Ensure Firebase authentication is initialized
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        console.error("❌ No authenticated user.");
+        alert("Debes estar autenticado para cambiar el horario.");
+        return;
+    }
+
+    const newSchedule = `${day} - ${timeBlock}`;
+    const currentDate = new Date();
+
+    // 🔥 Get user document from Firestore using UID instead of email
+    const userRef = db.collection("users").doc(user.uid);
+
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+
+            // 🚨 Prevent multiple reschedules in the same month
+            if (lastReschedule) {
+                const rescheduleMonth = lastReschedule.getMonth();
+                const currentMonth = currentDate.getMonth();
+                const rescheduleYear = lastReschedule.getFullYear();
+                const currentYear = currentDate.getFullYear();
+
+                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                    const lastRescheduleDate = lastReschedule.toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Tu última reprogramación fue el ${lastRescheduleDate}.`);
+                    return;
+                }
+            }
+
+            // ✅ Update Firestore with new schedule
+            userRef.update({
+                selectedSchedule: newSchedule,
+                lastReschedule: firebase.firestore.Timestamp.now(),
+            }).then(() => {
+                alert(`✅ Horario actualizado correctamente a: ${newSchedule}`);
+                document.getElementById("current-schedule").innerText = newSchedule; // Update UI
+            }).catch((error) => {
+                console.error("❌ Error al actualizar el horario:", error);
+                alert("❌ Error al actualizar el horario. Inténtalo de nuevo.");
+            });
+
+        } else {
+            console.error("❌ Usuario no encontrado en Firestore.");
+            alert("❌ Error: No se encontró tu perfil en la base de datos.");
+        }
+    }).catch((error) => {
+        console.error("❌ Error al obtener el perfil del usuario:", error);
+    });
+}
+
+        
 // ✅ Update Loyalty Card Progress
 function updateLoyaltyCard(userData) {
     console.log("🔥 Updating loyalty card with data:", userData);
