@@ -395,6 +395,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ Document Loaded");
+    updateUserInfo(userData);
+});
+
     // ✅ Initialize Firebase
     const firebaseConfig = {
         apiKey: window._env_.FIREBASE_API_KEY,
