@@ -195,19 +195,7 @@ for (const [key, plan] of Object.entries(availablePlans)) {
     newPlanSelect.appendChild(option);
 }
 
-            // Populate New Plan Options
-            const newPlanSelect = document.getElementById("new-plan");
-            newPlanSelect.innerHTML = "";
-            for (const [key, value] of Object.entries(planMessages)) {
-                const option = document.createElement("option");
-                option.value = key;
-                option.text = value;
-                if (key === userData.planType) {
-                    option.disabled = true;
-                    option.text += " (Actual)";
-                }
-                newPlanSelect.appendChild(option);
-            }
+           
         }
 
         function handlePaymentStatus(userData) {
