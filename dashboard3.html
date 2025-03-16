@@ -127,7 +127,7 @@
             auth.onAuthStateChanged((user) => {
                 if (user) {
                     document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-                    loadUserProfile(user.uid);
+                    loadUserProfile(user.uid);         loadDailyTip(); // 🟢 Load the tip of the day
                 } else {
                     window.location.href = 'login.html';
                 }
@@ -264,6 +264,40 @@
         function upgradePlan() {
             alert("Funcionalidad para mejorar plan aún no implementada.");
         }
+
+        function loadDailyTip() {
+    const tipElement = document.getElementById("weekly-tip");
+
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+
+    db.collection("car_tips_daily").get().then((querySnapshot) => {
+        const totalTips = querySnapshot.size;
+        if (totalTips === 0) {
+            tipElement.innerText = "No hay tips disponibles.";
+            return;
+        }
+
+        // Calculate which doc to fetch
+        const tipDocNumber = (dayOfYear % totalTips) + 1; // Matches doc IDs starting at 1
+
+        db.collection("car_tips_daily").doc(tipDocNumber.toString()).get().then((doc) => {
+            if (doc.exists) {
+                const tipData = doc.data();
+                tipElement.innerHTML = tipData.tip || "Sin tip hoy.";
+            } else {
+                tipElement.innerText = "No hay tip para hoy.";
+            }
+        }).catch((error) => {
+            console.error("Error obteniendo tip:", error);
+            tipElement.innerText = "Error cargando tip.";
+        });
+    }).catch((error) => {
+        console.error("Error contando tips:", error);
+        tipElement.innerText = "Error cargando tips.";
+    });
+}
+
     </script>
 
     <!-- Footer -->
