@@ -273,45 +273,6 @@
             <p>Tú sigues con tu rutina, nosotros nos encargamos del resto.</p>
         </section>
 
-   <button id="install-button" style="display:none;">Install AutoCuidado Club</button>
-<div id="ios-message" style="display:none; margin-top:10px; text-align:center;">
-    📱 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca <strong>Compartir</strong> y selecciona <strong>'Agregar a pantalla de inicio'</strong>.
-</div>
-
-<script>
-let deferredPrompt;
-
-// Android - Install Prompt
-window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredPrompt = event;
-
-    // Delay display to prevent immediate pop-up
-    setTimeout(() => {
-        if (navigator.userAgent.toLowerCase().includes("android")) {
-            document.getElementById("install-button").style.display = "block";
-        }
-    }, 3000);
-});
-
-// Android - Install Button Click
-document.getElementById("install-button").addEventListener("click", () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-    }
-});
-
-// iOS - Detect and Show Message
-window.addEventListener("load", () => {
-    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isInStandaloneMode = ("standalone" in window.navigator) && window.navigator.standalone;
-
-    if (isIos && !isInStandaloneMode) {
-        document.getElementById("ios-message").style.display = "block";
-    }
-});
-</script>
-        
     </header>
 
     <!-- Intro Section -->
@@ -721,7 +682,44 @@ function showInstallPrompt() {
         .cta-button:hover { background-color: #0056b3; }
     </style>
 
+   <button id="install-button" style="display:none;">Install AutoCuidado Club</button>
+<div id="ios-message" style="display:none; margin-top:10px; text-align:center;">
+    📱 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca <strong>Compartir</strong> y selecciona <strong>'Agregar a pantalla de inicio'</strong>.
+</div>
 
+<script>
+let deferredPrompt;
+
+// Android - Install Prompt
+window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+
+    // Delay display to prevent immediate pop-up
+    setTimeout(() => {
+        if (navigator.userAgent.toLowerCase().includes("android")) {
+            document.getElementById("install-button").style.display = "block";
+        }
+    }, 3000);
+});
+
+// Android - Install Button Click
+document.getElementById("install-button").addEventListener("click", () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+    }
+});
+
+// iOS - Detect and Show Message
+window.addEventListener("load", () => {
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const isInStandaloneMode = ("standalone" in window.navigator) && window.navigator.standalone;
+
+    if (isIos && !isInStandaloneMode) {
+        document.getElementById("ios-message").style.display = "block";
+    }
+});
+</script>
 
      <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
