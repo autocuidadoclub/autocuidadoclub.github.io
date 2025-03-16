@@ -164,7 +164,34 @@
     </nav>
 
     
-    <!-- Payment Status Card -->
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <h2 id="user-info">Cargando usuario...</h2>
+            <button onclick="logoutUser()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="dashboard-grid">
+            <!-- User Info Card -->
+            <div class="card">
+                <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+                <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+                <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+                <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
+                <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
+                <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+                <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
+            </div>
+
+            <!-- Contact Button -->
+            <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+                <i class="fas fa-headset"></i> Contactar Staff
+            </button>
+
+            <!-- Payment Status Card -->
             <div class="card">
                 <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
                 <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
@@ -181,6 +208,90 @@
                 </div>
             </div>
 
+            <!-- Plan Upgrade Card -->
+            <div class="card">
+                <h3>¿Te gustaría Mejorar de Suscripción?</h3>
+                <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
+                <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
+                <label for="new-plan">Selecciona un nuevo plan:</label>
+                <select id="new-plan"></select>
+                <button onclick="upgradePlan()">Mejorar Plan</button>
+            </div>
+            
+<div class="card">
+    <h3>🚗✨ Tip del mes</h3>
+
+    <p><strong>🧐 ¿Sabías que?</strong> Mantener la presión correcta de tus llantas no solo mejora el rendimiento del combustible ⛽️, también extiende la vida útil de tus neumáticos y garantiza tu seguridad al conducir. Pero no te preocupes, ¡nosotros revisamos todo eso por ti en cada servicio! 😉</p>
+
+    <p><strong>🔧 Consejo experto:</strong> En AutoCuidado Club no vendemos repuestos ni aceites, te damos algo mejor: <strong>asesoría experta y sin estrés</strong>. Nuestro staff certificado te avisa exactamente cuándo cambiar aceite, filtros, o cualquier pieza. Te recomendamos solo las mejores marcas, en la tienda adecuada y al mejor precio. Y aún mejor: ¡nosotros nos encargamos de ir por las piezas, cambiarlas en el momento indicado y coordinamos todo el proceso por ti! 💪✨</p>
+
+    <p><strong>❄️ Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
+</div>
+
+
+    </section>
+
+
+           
+    <!-- Reschedule Section -->
+    <div class="card reschedule-section">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
+        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+       <button id="save-schedule-btn" onclick="updateSchedule()">
+<input type="hidden" id="selectedDay" name="selectedDay" required>
+<input type="hidden" id="selectedTime" name="selectedTime" required>
+
+    <strong>Guardar Nuevo Horario</strong>
+</button>
+
+    </div>
+
+<p></p>
+    <p></p>
+    <p></p>
+    <p></p>
     
     <!-- Loyalty Rewards Section -->
         <div class="card">
@@ -268,23 +379,109 @@ document.addEventListener("DOMContentLoaded", function () {
     auth = firebase.auth();
     db = firebase.firestore();
 
-// Update User Info (shows dates)
+    // Auth State Check
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+            loadUserProfile(user.uid);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+});
+
+// Logout Function
+function logoutUser() {
+    auth.signOut().then(() => {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    }).catch((error) => {
+        alert("Error al cerrar sesión: " + error.message);
+    });
+}
+
+// Load User Profile
+function loadUserProfile(uid) {
+    db.collection("users").doc(uid).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            updateUserInfo(userData);
+        } else {
+            console.error("❌ No se encontró perfil.");
+        }
+    }).catch((error) => console.error("❌ Error:", error));
+}
+
+// Update User Info in Dashboard
 function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
     document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
     document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    loadVehicles(userData.vehicles);
+    handlePaymentStatus(userData);
+    updateLoyaltyCard(userData);
 
-    handlePaymentStatus(userData); // 👈 Controls payment status
+    // 🔥 Plan Descriptions
+    const availablePlans = {
+        "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
+        "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
+        "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
+        "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
+        "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
+        "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
+    };
+
+    // Actual plan
+    const currentPlanType = userData.planType;
+    const currentPlan = availablePlans[currentPlanType];
+
+    // Set description
+    const planMessageElement = document.getElementById("planMessage");
+    if (currentPlan) {
+        planMessageElement.innerText = currentPlan.name;
+    } else {
+        planMessageElement.innerText = "Tipo de plan desconocido";
+    }
+
+    // Populate the select options
+    const newPlanSelect = document.getElementById("new-plan");
+    newPlanSelect.innerHTML = ""; // Clear first
+    const currentLevel = currentPlan ? currentPlan.level : 0;
+
+    let optionsAdded = false;
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (plan.level > currentLevel) { // Only higher plans
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+            optionsAdded = true;
+        }
+    }
+
+    if (!optionsAdded) {
+        const option = document.createElement("option");
+        option.text = "No hay planes superiores disponibles";
+        option.disabled = true;
+        option.selected = true;
+        newPlanSelect.appendChild(option);
+    }
 }
 
-    
-// Handles warning and PayPal link
+
+// Payment Status Function
 function handlePaymentStatus(userData) {
     const paymentWarning = document.getElementById("payment-warning");
     const completePayment = document.getElementById("complete-payment");
     const paymentLink = document.getElementById("payment-link");
 
-    if (userData.paymentStatus === "Pending") { // Show warning if payment pending
+    if (userData.paymentStatus === "Pending") {
         paymentWarning.style.display = "block";
         let payPalURL = getPaypalLink(userData.planType);
         if (payPalURL) {
@@ -297,7 +494,7 @@ function handlePaymentStatus(userData) {
     }
 }
 
-// Returns PayPal link based on plan
+// PayPal Links
 function getPaypalLink(planType) {
     const payPalLinks = {
         "basic3m": "https://www.paypal.com/pay/basic3m",
@@ -310,19 +507,107 @@ function getPaypalLink(planType) {
     return payPalLinks[planType] || null;
 }
 
-function loadUserProfile(uid) {
-    db.collection("users").doc(uid).get().then((doc) => {
-        if (doc.exists) {
-            console.log("✅ User Data Found:", doc.data());
-            const userData = doc.data();
-            updateUserInfo(userData);
-        } else {
-            console.error("❌ No se encontró perfil.");
-        }
-    }).catch((error) => console.error("❌ Error:", error));
+// Load Vehicles Function
+function loadVehicles(vehicles) {
+    const vehiclesList = document.getElementById("vehicles-list");
+    vehiclesList.innerHTML = "";
+
+    if (!vehicles || vehicles.length === 0) {
+        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+        return;
+    }
+
+    vehicles.forEach((vehicle, index) => {
+        vehiclesList.innerHTML += `
+            <div class="vehicle-card">
+                <h4>Vehículo ${index + 1}</h4>
+                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+            </div>
+        `;
+    });
 }
 
-    
+// Format Timestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+}
+
+// Schedule Selection
+function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("❌ Selecciona un horario válido.");
+        return;
+    }
+    cells.forEach((c) => c.classList.remove("selected-box"));
+    cell.classList.add("selected-box");
+    const dayIndex = cell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = timeBlock;
+}
+
+// Update Schedule
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    if (!selectedCell) {
+        alert("❌ Por favor selecciona un horario.");
+        return;
+    }
+
+    const dayIndex = selectedCell.cellIndex;
+    const timeBlock = selectedCell.innerText.trim();
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para cambiar el horario.");
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+            const currentDate = new Date();
+
+            if (lastReschedule) {
+                const rescheduleMonth = lastReschedule.getMonth();
+                const currentMonth = currentDate.getMonth();
+                const rescheduleYear = lastReschedule.getFullYear();
+                const currentYear = currentDate.getFullYear();
+                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastReschedule.toLocaleDateString("es-ES")}`);
+                    return;
+                }
+            }
+
+            userRef.update({
+                selectedSchedule: `${day} - ${timeBlock}`,
+                lastReschedule: firebase.firestore.Timestamp.now(),
+            }).then(() => {
+                alert(`✅ Horario actualizado correctamente a: ${day} - ${timeBlock}`);
+                document.getElementById("current-schedule").innerText = `${day} - ${timeBlock}`;
+            }).catch((error) => {
+                alert("❌ Error al actualizar el horario.");
+            });
+        } else {
+            alert("❌ Perfil no encontrado.");
+        }
+    }).catch((error) => {
+        console.error("❌ Error al obtener perfil:", error);
+    });
+}
+
 // Loyalty Card
 function updateLoyaltyCard(userData) {
     const holes = document.querySelectorAll('.hole');
@@ -359,67 +644,42 @@ function updateLoyaltyCard(userData) {
         progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
     }
 }
-            
-  // Format Timestamp
-function formatTimestamp(timestamp) {
-    if (!timestamp) return "N/A";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-}
 
-// Payment Status Function
-function handlePaymentStatus(userData) {
-    const paymentWarning = document.getElementById("payment-warning");
-    const completePayment = document.getElementById("complete-payment");
-    const paymentLink = document.getElementById("payment-link");
+</script>
 
-    if (userData.paymentStatus === "Pending") {
-        paymentWarning.style.display = "block";
-        let payPalURL = getPaypalLink(userData.planType);
-        if (payPalURL) {
-            paymentLink.href = payPalURL;
-            completePayment.style.display = "block";
-        }
-    } else {
-        paymentWarning.style.display = "none";
-        completePayment.style.display = "none";
-    }
-}
-
-// PayPal Links (for payment link)
-function getPaypalLink(planType) {
-    const payPalLinks = {
-        "basic3m": "https://www.paypal.com/pay/basic3m",
-        "basic6m": "https://www.paypal.com/pay/basic6m",
-        "basic12m": "https://www.paypal.com/pay/basic12m",
-        "plus3m": "https://www.paypal.com/pay/plus3m",
-        "plus6m": "https://www.paypal.com/pay/plus6m",
-        "plus12m": "https://www.paypal.com/pay/plus12m"
-    };
-    return payPalLinks[planType] || null;
-}
-
-// Load User Info → Includes Payment Section
-function updateUserInfo(userData) {
-    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-
-    handlePaymentStatus(userData); // <- important call
-}
-
-// Load User Profile
-function loadUserProfile(uid) {
-    db.collection("users").doc(uid).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            updateUserInfo(userData); // <- Updates Estado de Pago section
-        } else {
-            console.error("❌ No se encontró perfil.");
-        }
-    }).catch((error) => console.error("❌ Error:", error));
-}
-  
+    
+     <footer>
+        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
    
+ <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+        
+    </footer>
+    
+
 </body>
 </html>
