@@ -8,35 +8,162 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+     <!-- Load Environment Variables -->
     <script src="env.js"></script>
+    
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <style>
-        /* Loyalty Card and button styles (your existing styles remain unchanged) */
-        .floating-contact-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #ff6600;
-            color: white;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
+  <style>
+        /* Styles for Loyalty Card */
+        .loyalty-card {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s, transform 0.2s;
+            margin-top: 20px;
         }
-        .floating-contact-button:hover {
-            background-color: #cc5500;
-            transform: scale(1.05);
+
+        .holes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            justify-items: center;
+            margin-bottom: 20px;
         }
+
+        .hole {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease-in-out;
+            border: 2px dashed #ccc;
+            background-color: #fff;
+            color: #ccc;
+        }
+
+        .hole.completed {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+        }
+
+        .hole.star {
+            font-size: 24px;
+            color: gold;
+        }
+
+        .hole.star.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .rewards {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .reward-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .reward-card:hover {
+            background-color: #e6f7e6;
+        }
+
+        .reward-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .reward-info h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .reward-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .reward-status {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .reward-status.locked {
+            background-color: #ccc;
+            color: white;
+        }
+
+        .reward-status.unlocked {
+            background-color: #4caf50;
+            color: white;
+        }
+      .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <body>
     <!-- Header -->
     <header>
         <div class="header-container">
@@ -104,71 +231,189 @@
 
     </section>
 
-    <!-- Firebase and App Scripts -->
-    <script>
-        let auth, db;
-        const firebaseConfig = {
-            apiKey: window._env_.FIREBASE_API_KEY,
-            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-            databaseURL: window._env_.FIREBASE_DATABASE_URL,
-            projectId: window._env_.FIREBASE_PROJECT_ID,
-            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-            appId: window._env_.FIREBASE_APP_ID,
-            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-        };
 
-      document.addEventListener("DOMContentLoaded", () => {
+           
+    <!-- Reschedule Section -->
+    <div class="card reschedule-section">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
+        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+       <button id="save-schedule-btn" onclick="updateSchedule()">
+<input type="hidden" id="selectedDay" name="selectedDay" required>
+<input type="hidden" id="selectedTime" name="selectedTime" required>
+
+    <strong>Guardar Nuevo Horario</strong>
+</button>
+
+    </div>
+
+<p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    
+    <!-- Loyalty Rewards Section -->
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
+            <div class="loyalty-card">
+                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+                <div class="holes">
+                    <div class="hole completed">✔</div>
+                    <p>Proceso de registro completo</p>
+                    <div class="hole completed">✔</div>
+                    <p>Pago inicial procesado en tu suscripción</p>
+                    <div class="hole">○</div>
+                    <p>1er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>3er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>5to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>6to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>7to Mes de suscripción activo</p>
+                    <div class="hole star">★</div>
+                    <p>8to Mes de suscripción activo</p>
+                </div>
+                <div class="description">
+                    <p><strong>Current Progress:</strong></p>
+                </div>
+            </div>
+
+            <!-- Rewards -->
+            <div class="rewards">
+                <h3>Available Rewards</h3>
+                <div class="reward-card">
+                    <div class="reward-icon">🎐</div>
+                    <div class="reward-info">
+                        <h4>Recarga de A/C</h4>
+                        <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">🚗</div>
+                    <div class="reward-info">
+                        <h4>Carwash gratis</h4>
+                        <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+                <div class="reward-card">
+                    <div class="reward-icon">📝</div>
+                    <div class="reward-info">
+                        <h4>Revisión extra del mes en curso</h4>
+                        <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
+                    </div>
+                    <span class="reward-status locked">Locked</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+      
+  
+<script>
+// Global variables
+let auth, db;
+
+// Firebase Config
+const firebaseConfig = {
+    apiKey: window._env_.FIREBASE_API_KEY,
+    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+    databaseURL: window._env_.FIREBASE_DATABASE_URL,
+    projectId: window._env_.FIREBASE_PROJECT_ID,
+    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+    appId: window._env_.FIREBASE_APP_ID,
+    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+};
+
+// Initialize Firebase
+document.addEventListener("DOMContentLoaded", function () {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
+        console.log("✅ Firebase initialized.");
     }
     auth = firebase.auth();
     db = firebase.firestore();
 
+    // Auth State Check
     auth.onAuthStateChanged((user) => {
         if (user) {
             document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             loadUserProfile(user.uid);
-            showMonthlyTip(); // Hardcoded tip
         } else {
             window.location.href = 'login.html';
         }
     });
 });
 
-function showMonthlyTip() {
-    const tips = [
-        `<div class='card'><h3>Tip del mes</h3><p><strong>¿Sabías que?</strong> Revisa la presión de tus llantas una vez al mes para mejorar el rendimiento del combustible y prolongar su vida útil.</p></div>`,
-        `<div class='card'><h3>Tip del mes</h3><p><strong>Consejo:</strong> Cambia el aceite de tu motor según las recomendaciones del fabricante para evitar daños costosos.</p></div>`,
-        `<div class='card'><h3>Tip del mes</h3><p><strong>Mantenimiento:</strong> No olvides revisar el nivel del refrigerante para prevenir sobrecalentamientos.</p></div>`
-    ];
-
-    const month = new Date().getMonth(); // 0 = January
-    const tipIndex = month % tips.length;
-    document.getElementById("weekly-tip").innerHTML = tips[tipIndex];
+// Logout Function
+function logoutUser() {
+    auth.signOut().then(() => {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    }).catch((error) => {
+        alert("Error al cerrar sesión: " + error.message);
+    });
 }
 
-
-        
-        function logoutUser() {
-            auth.signOut().then(() => {
-                sessionStorage.clear();
-                window.location.href = "login.html";
-            }).catch((error) => {
-                alert("Error al cerrar sesión: " + error.message);
-            });
+// Load User Profile
+function loadUserProfile(uid) {
+    db.collection("users").doc(uid).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            updateUserInfo(userData);
+        } else {
+            console.error("❌ No se encontró perfil.");
         }
+    }).catch((error) => console.error("❌ Error:", error));
+}
 
-        function loadUserProfile(uid) {
-            db.collection("users").doc(uid).get().then((doc) => {
-                if (doc.exists) {
-                    updateUserInfo(doc.data());
-                }
-            }).catch((error) => console.error(error));
-        }
-
-        
-           function updateUserInfo(userData) {
+// Update User Info in Dashboard
+function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
     document.getElementById("phone").innerText = userData.phone || "N/A";
     document.getElementById("planType").innerText = userData.planType || "N/A";
@@ -180,112 +425,183 @@ function showMonthlyTip() {
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
     loadVehicles(userData.vehicles);
     handlePaymentStatus(userData);
+    updateLoyaltyCard(userData);
+}
 
-    // Plans Logic
-    const availablePlans = {
-        "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
-        "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
-        "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
-        "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
-        "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
-        "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
+// Payment Status Function
+function handlePaymentStatus(userData) {
+    const paymentWarning = document.getElementById("payment-warning");
+    const completePayment = document.getElementById("complete-payment");
+    const paymentLink = document.getElementById("payment-link");
+
+    if (userData.paymentStatus === "Pending") {
+        paymentWarning.style.display = "block";
+        let payPalURL = getPaypalLink(userData.planType);
+        if (payPalURL) {
+            paymentLink.href = payPalURL;
+            completePayment.style.display = "block";
+        }
+    } else {
+        paymentWarning.style.display = "none";
+        completePayment.style.display = "none";
+    }
+}
+
+// PayPal Links
+function getPaypalLink(planType) {
+    const payPalLinks = {
+        "basic3m": "https://www.paypal.com/pay/basic3m",
+        "basic6m": "https://www.paypal.com/pay/basic6m",
+        "basic12m": "https://www.paypal.com/pay/basic12m",
+        "plus3m": "https://www.paypal.com/pay/plus3m",
+        "plus6m": "https://www.paypal.com/pay/plus6m",
+        "plus12m": "https://www.paypal.com/pay/plus12m"
     };
+    return payPalLinks[planType] || null;
+}
 
-    document.getElementById("planMessage").innerText = availablePlans[userData.planType]
-        ? availablePlans[userData.planType].name
-        : "Unknown Plan";
+// Load Vehicles Function
+function loadVehicles(vehicles) {
+    const vehiclesList = document.getElementById("vehicles-list");
+    vehiclesList.innerHTML = "";
 
-    const currentPlanLevel = availablePlans[userData.planType] ? availablePlans[userData.planType].level : 0;
-    const newPlanSelect = document.getElementById("new-plan");
-    newPlanSelect.innerHTML = "";
-
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.level > currentPlanLevel) { // Only higher plans
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-        }
+    if (!vehicles || vehicles.length === 0) {
+        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+        return;
     }
 
-    if (newPlanSelect.options.length === 0) {
-        const option = document.createElement("option");
-        option.text = "No higher plans available";
-        option.disabled = true;
-        newPlanSelect.appendChild(option);
+    vehicles.forEach((vehicle, index) => {
+        vehiclesList.innerHTML += `
+            <div class="vehicle-card">
+                <h4>Vehículo ${index + 1}</h4>
+                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
+                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
+                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
+                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
+            </div>
+        `;
+    });
+}
+
+// Format Timestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+}
+
+// Schedule Selection
+function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("❌ Selecciona un horario válido.");
+        return;
+    }
+    cells.forEach((c) => c.classList.remove("selected-box"));
+    cell.classList.add("selected-box");
+    const dayIndex = cell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = timeBlock;
+}
+
+// Update Schedule
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    if (!selectedCell) {
+        alert("❌ Por favor selecciona un horario.");
+        return;
     }
 
-} // ✅ CLOSE FUNCTION HERE!
+    const dayIndex = selectedCell.cellIndex;
+    const timeBlock = selectedCell.innerText.trim();
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para cambiar el horario.");
+        return;
+    }
 
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+            const currentDate = new Date();
 
-        function handlePaymentStatus(userData) {
-            const paymentWarning = document.getElementById("payment-warning");
-            const completePayment = document.getElementById("complete-payment");
-            const paymentLink = document.getElementById("payment-link");
-
-            if (userData.paymentStatus === "Pending") {
-                paymentWarning.style.display = "block";
-                let payPalURL = getPaypalLink(userData.planType);
-                if (payPalURL) {
-                    paymentLink.href = payPalURL;
-                    completePayment.style.display = "block";
+            if (lastReschedule) {
+                const rescheduleMonth = lastReschedule.getMonth();
+                const currentMonth = currentDate.getMonth();
+                const rescheduleYear = lastReschedule.getFullYear();
+                const currentYear = currentDate.getFullYear();
+                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastReschedule.toLocaleDateString("es-ES")}`);
+                    return;
                 }
-            } else {
-                paymentWarning.style.display = "none";
-                completePayment.style.display = "none";
-            }
-        }
-
-        function getPaypalLink(planType) {
-            const payPalLinks = {
-                "basic3m": "https://www.paypal.com/pay/basic3m",
-                "basic6m": "https://www.paypal.com/pay/basic6m",
-                "basic12m": "https://www.paypal.com/pay/basic12m",
-                "plus3m": "https://www.paypal.com/pay/plus3m",
-                "plus6m": "https://www.paypal.com/pay/plus6m",
-                "plus12m": "https://www.paypal.com/pay/plus12m"
-            };
-            return payPalLinks[planType] || null;
-        }
-
-        function loadVehicles(vehicles) {
-            const vehiclesList = document.getElementById("vehicles-list");
-            vehiclesList.innerHTML = "";
-
-            if (!vehicles || vehicles.length === 0) {
-                vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
-                return;
             }
 
-            vehicles.forEach((vehicle, index) => {
-                vehiclesList.innerHTML += `
-                    <div class="vehicle-card">
-                        <h4>Vehículo ${index + 1}</h4>
-                        <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                        <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                        <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                        <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-                    </div>
-                `;
+            userRef.update({
+                selectedSchedule: `${day} - ${timeBlock}`,
+                lastReschedule: firebase.firestore.Timestamp.now(),
+            }).then(() => {
+                alert(`✅ Horario actualizado correctamente a: ${day} - ${timeBlock}`);
+                document.getElementById("current-schedule").innerText = `${day} - ${timeBlock}`;
+            }).catch((error) => {
+                alert("❌ Error al actualizar el horario.");
             });
+        } else {
+            alert("❌ Perfil no encontrado.");
         }
+    }).catch((error) => {
+        console.error("❌ Error al obtener perfil:", error);
+    });
+}
 
-        function formatTimestamp(timestamp) {
-            if (!timestamp) return "N/A";
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-            return date.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+// Loyalty Card
+function updateLoyaltyCard(userData) {
+    const holes = document.querySelectorAll('.hole');
+    let progress = 0;
+
+    if (userData.registrationDate) {
+        holes[0].classList.add('completed');
+        progress++;
+    }
+
+    if (userData.paymentDate) {
+        const regDate = userData.registrationDate.toDate ? userData.registrationDate.toDate() : new Date(userData.registrationDate.seconds * 1000);
+        const payDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
+        if (payDate > regDate) {
+            holes[1].classList.add('completed');
+            progress++;
         }
+    }
 
-        function upgradePlan() {
-            alert("Funcionalidad para mejorar plan aún no implementada.");
+    if (userData.subscriptionStatus === "active" && userData.monthsPaid > 0) {
+        let consecutiveMonths = userData.monthsPaid;
+        if (userData.lastMissedPayment) consecutiveMonths = 0;
+
+        for (let i = 0; i < consecutiveMonths; i++) {
+            if (progress + 1 < holes.length) {
+                holes[progress + 1].classList.add('completed');
+                progress++;
+            }
         }
+    }
 
-      
-    </script>
+    const progressDescription = document.querySelector('.description p strong');
+    if (progressDescription) {
+        progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
+    }
+}
 
-    <!-- Footer -->
-    <footer>
+</script>
+
+    
+     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
         <ul>
             <li><a href="nosotros.html">Quiénes Somos</a></li>
@@ -293,23 +609,32 @@ function showMonthlyTip() {
             <li><a href="suscripciones.html">Suscripciones</a></li>
             <li><a href="contacto.html">Contacto</a></li>
             <li><a href="login.html">Ingresa a tu cuenta</a></li>
-            <li><a href="tac.html">Términos y Condiciones</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
         </ul>
-        <div class="social-container" style="text-align: center; margin-top: 20px;">
-            <p><strong>Síguenos en nuestras redes sociales</strong></p>
-            <div class="social-buttons">
-                <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-                    <i class="fab fa-instagram fa-3x"></i>
-                </a>
-                <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
-                    <i class="fab fa-facebook-f fa-3x"></i>
-                </a>
-                <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-                    <i class="fab fa-twitter fa-3x"></i>
-                </a>
-            </div>
-        </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
+   
+ <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
+        crossorigin="anonymous"></script>
+
+
+
+    
     </footer>
 </body>
 </html>
