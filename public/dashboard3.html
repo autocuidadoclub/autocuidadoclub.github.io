@@ -117,74 +117,39 @@
             measurementId: window._env_.FIREBASE_MEASUREMENT_ID
         };
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded",  () {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
             }
             auth = firebase.auth();
             db = firebase.firestore();
 
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-                    loadUserProfile(user.uid);         loadDailyTip(); // 🟢 Load the tip of the day
-                } else {
-                    window.location.href = 'login.html';
-                }
-            });
-        });
-function loadDailyTip() {
-    const today = new Date();
-    const day = today.getDate().toString(); // e.g., "1"
+           auth.onAuthStateChanged((user) => {
+    if (user) {
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+        loadUserProfile(user.uid);
+        loadMonthlyTip(); // 🟢 Use local tips
+    } else {
+        window.location.href = 'login.html';
+    }
+});
 
-    db.collection("car_tips_daily").doc(day).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const tipHTML = doc.data().tip;
-                document.getElementById("weekly-tip").innerHTML = tipHTML;
-            } else {
-                document.getElementById("weekly-tip").innerText = "No tip available for today.";
-            }
-        })
-        .catch((error) => {
-            console.error("❌ Error fetching daily tip:", error);
-            document.getElementById("weekly-tip").innerText = "Error cargando tips.";
-        });
+
+function loadMonthlyTip() {
+    const tips = [
+        `<div class='card'><h3>Tip del mes</h3><p><strong>¿Sabías que?</strong> Revisa la presión de tus llantas una vez al mes para mejorar el rendimiento del combustible y prolongar su vida útil.</p></div>`,
+        `<div class='card'><h3>Tip del mes</h3><p><strong>Consejo:</strong> Cambia el aceite de tu motor según las recomendaciones del fabricante para evitar daños costosos.</p></div>`,
+        `<div class='card'><h3>Tip del mes</h3><p><strong>Mantenimiento:</strong> No olvides revisar el nivel del refrigerante para prevenir sobrecalentamientos.</p></div>`
+    ];
+
+    // Choose which tip to show based on month (0 = Jan, 1 = Feb...)
+    const month = new Date().getMonth();
+    const tipIndex = month % tips.length; // cycles through 3 tips
+    
+    document.getElementById("weekly-tip").innerHTML = tips[tipIndex];
 }
 
-
-            // Step 2: Get day of the year
-            const now = new Date();
-            const start = new Date(now.getFullYear(), 0, 0);
-            const diff = now - start;
-            const oneDay = 1000 * 60 * 60 * 24;
-            const dayOfYear = Math.floor(diff / oneDay);
-
-            // Step 3: Calculate which document to fetch
-            const tipDocNumber = (dayOfYear % totalTips) + 1;
-
-            // Step 4: Fetch and display tip
-            db.collection("car_tips_daily").doc(tipDocNumber.toString()).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const tipData = doc.data();
-                        tipElement.innerHTML = tipData.tip || "Sin tip hoy.";
-                    } else {
-                        tipElement.innerText = "No hay tip para hoy.";
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error obteniendo tip:", error);
-                    tipElement.innerText = "Error cargando tip.";
-                });
-
-        })
-        .catch((error) => {
-            console.error("Error contando tips:", error);
-            tipElement.innerText = "Error cargando tips.";
-        });
-}
-
+        
         function logoutUser() {
             auth.signOut().then(() => {
                 sessionStorage.clear();
