@@ -196,11 +196,19 @@ for (const [key, plan] of Object.entries(availablePlans)) {
 }
 
 // Optional: Show message if there are no higher plans available
-if (newPlanSelect.options.length === 0) {
-    const option = document.createElement("option");
-    option.text = "No higher plans available";
-    option.disabled = true;
-    newPlanSelect.appendChild(option);
+function updateUserInfo(userData) {
+    // (All user data handling here)
+
+    // Populate higher plans dropdown...
+
+    if (newPlanSelect.options.length === 0) {
+        const option = document.createElement("option");
+        option.text = "No higher plans available";
+        option.disabled = true;
+        newPlanSelect.appendChild(option);
+    }
+
+// 🔥 ADD THIS to CLOSE the function:
 }
 
 
