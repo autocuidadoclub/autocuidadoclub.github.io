@@ -117,37 +117,36 @@
             measurementId: window._env_.FIREBASE_MEASUREMENT_ID
         };
 
-        document.addEventListener("DOMContentLoaded",  () {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
-
-           auth.onAuthStateChanged((user) => {
-    if (user) {
-        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-        loadUserProfile(user.uid);
-        loadMonthlyTip(); // 🟢 Use local tips
-    } else {
-        window.location.href = 'login.html';
+      document.addEventListener("DOMContentLoaded", () => {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
     }
+    auth = firebase.auth();
+    db = firebase.firestore();
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+            loadUserProfile(user.uid);
+            showMonthlyTip(); // Hardcoded tip
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
 });
 
-
-function loadMonthlyTip() {
+function showMonthlyTip() {
     const tips = [
         `<div class='card'><h3>Tip del mes</h3><p><strong>¿Sabías que?</strong> Revisa la presión de tus llantas una vez al mes para mejorar el rendimiento del combustible y prolongar su vida útil.</p></div>`,
         `<div class='card'><h3>Tip del mes</h3><p><strong>Consejo:</strong> Cambia el aceite de tu motor según las recomendaciones del fabricante para evitar daños costosos.</p></div>`,
         `<div class='card'><h3>Tip del mes</h3><p><strong>Mantenimiento:</strong> No olvides revisar el nivel del refrigerante para prevenir sobrecalentamientos.</p></div>`
     ];
 
-    // Choose which tip to show based on month (0 = Jan, 1 = Feb...)
-    const month = new Date().getMonth();
-    const tipIndex = month % tips.length; // cycles through 3 tips
-    
+    const month = new Date().getMonth(); // 0 = January
+    const tipIndex = month % tips.length;
     document.getElementById("weekly-tip").innerHTML = tips[tipIndex];
 }
+
 
         
         function logoutUser() {
