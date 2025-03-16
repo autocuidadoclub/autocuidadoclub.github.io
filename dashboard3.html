@@ -619,16 +619,22 @@ function updateLoyaltyCard(userData) {
     const holes = document.querySelectorAll('.hole');
     let progress = 0;
 
+    // First hole - Registration complete
     if (userData.registrationDate) {
         holes[0].classList.add('completed');
         progress++;
     }
 
-  if (userData.paymentStatus === "Completed" && userData.paymentDate) {
-    holes[1].classList.add('completed');
-    progress++;
-}
+    // Second hole - Payment processed ONLY if paymentStatus Completed AND paymentDate ≠ registrationDate
+    const regDate = userData.registrationDate?.toDate ? userData.registrationDate.toDate() : (userData.registrationDate ? new Date(userData.registrationDate.seconds * 1000) : null);
+    const payDate = userData.paymentDate?.toDate ? userData.paymentDate.toDate() : (userData.paymentDate ? new Date(userData.paymentDate.seconds * 1000) : null);
 
+    if (userData.paymentStatus === "Completed" && payDate && regDate && payDate.getTime() !== regDate.getTime()) {
+        holes[1].classList.add('completed');
+        progress++;
+    }
+
+    // Consecutive paid months
     if (userData.subscriptionStatus === "active" && userData.monthsPaid > 0) {
         let consecutiveMonths = userData.monthsPaid;
         if (userData.lastMissedPayment) consecutiveMonths = 0;
@@ -641,6 +647,7 @@ function updateLoyaltyCard(userData) {
         }
     }
 
+    // Update Progress Text
     const progressDescription = document.querySelector('.description p strong');
     if (progressDescription) {
         progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
