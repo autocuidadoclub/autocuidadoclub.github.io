@@ -90,6 +90,30 @@
                 <select id="new-plan"></select>
                 <button onclick="upgradePlan()">Mejorar Plan</button>
             </div>
+            
+<!-- Monthly Tip -->
+<div class="card">
+    <h3>Tip del mes</h3>
+    <p id="monthly-tip">Cargando...</p>
+</div>
+
+<script>
+function showMonthlyTip() {
+    const tips = [
+        `<strong>¿Sabías que?</strong> Revisa la presión de tus llantas una vez al mes para mejorar el rendimiento del combustible y prolongar su vida útil.`,
+        `<strong>Consejo:</strong> Cambia el aceite de tu motor según las recomendaciones del fabricante para evitar daños costosos.`,
+        `<strong>Mantenimiento:</strong> No olvides revisar el nivel del refrigerante para prevenir sobrecalentamientos.`
+    ];
+
+    const month = new Date().getMonth(); // 0 = January
+    const tipIndex = month % tips.length;
+    document.getElementById("monthly-tip").innerHTML = tips[tipIndex];
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    showMonthlyTip();
+});
+</script>
 
           
     </section>
