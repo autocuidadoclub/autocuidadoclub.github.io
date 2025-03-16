@@ -277,6 +277,7 @@ function updateUserInfo(userData) {
     handlePaymentStatus(userData); // 👈 Controls payment status
 }
 
+    
 // Handles warning and PayPal link
 function handlePaymentStatus(userData) {
     const paymentWarning = document.getElementById("payment-warning");
@@ -309,7 +310,19 @@ function getPaypalLink(planType) {
     return payPalLinks[planType] || null;
 }
 
+function loadUserProfile(uid) {
+    db.collection("users").doc(uid).get().then((doc) => {
+        if (doc.exists) {
+            console.log("✅ User Data Found:", doc.data());
+            const userData = doc.data();
+            updateUserInfo(userData);
+        } else {
+            console.error("❌ No se encontró perfil.");
+        }
+    }).catch((error) => console.error("❌ Error:", error));
+}
 
+    
 // Loyalty Card
 function updateLoyaltyCard(userData) {
     const holes = document.querySelectorAll('.hole');
