@@ -174,29 +174,35 @@
     "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
 };
 
-// Get current plan level
+// Show Plan Description
+document.getElementById("planMessage").innerText = availablePlans[userData.planType] 
+    ? availablePlans[userData.planType].name 
+    : "Unknown Plan";
+
+// Get current level
 const currentPlanLevel = availablePlans[userData.planType] ? availablePlans[userData.planType].level : 0;
 
-// Populate dropdown
+// Populate dropdown with ONLY higher plans
 const newPlanSelect = document.getElementById("new-plan");
 newPlanSelect.innerHTML = "";
 
 for (const [key, plan] of Object.entries(availablePlans)) {
-    const option = document.createElement("option");
-    option.value = key;
-    option.text = plan.name;
-
-    // Disable if it's same or lower level
-    if (plan.level <= currentPlanLevel) {
-        option.disabled = true;
-        option.text += key === userData.planType ? " (Actual)" : " (No disponible)";
+    if (plan.level > currentPlanLevel) { // Only higher level plans
+        const option = document.createElement("option");
+        option.value = key;
+        option.text = plan.name;
+        newPlanSelect.appendChild(option);
     }
+}
 
+// Optional: Show message if there are no higher plans available
+if (newPlanSelect.options.length === 0) {
+    const option = document.createElement("option");
+    option.text = "No higher plans available";
+    option.disabled = true;
     newPlanSelect.appendChild(option);
 }
 
-           
-        }
 
         function handlePaymentStatus(userData) {
             const paymentWarning = document.getElementById("payment-warning");
