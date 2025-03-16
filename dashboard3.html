@@ -133,6 +133,50 @@
                 }
             });
         });
+function loadDailyTip() {
+    const tipElement = document.getElementById("weekly-tip");
+
+    // Step 1: Count total tips in Firestore collection
+    db.collection("car_tips_daily").get()
+        .then((querySnapshot) => {
+            const totalTips = querySnapshot.size;
+
+            if (totalTips === 0) {
+                tipElement.innerText = "No hay tips disponibles.";
+                return;
+            }
+
+            // Step 2: Get day of the year
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = now - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+
+            // Step 3: Calculate which document to fetch
+            const tipDocNumber = (dayOfYear % totalTips) + 1;
+
+            // Step 4: Fetch and display tip
+            db.collection("car_tips_daily").doc(tipDocNumber.toString()).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const tipData = doc.data();
+                        tipElement.innerHTML = tipData.tip || "Sin tip hoy.";
+                    } else {
+                        tipElement.innerText = "No hay tip para hoy.";
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error obteniendo tip:", error);
+                    tipElement.innerText = "Error cargando tip.";
+                });
+
+        })
+        .catch((error) => {
+            console.error("Error contando tips:", error);
+            tipElement.innerText = "Error cargando tips.";
+        });
+}
 
         function logoutUser() {
             auth.signOut().then(() => {
@@ -265,39 +309,7 @@
             alert("Funcionalidad para mejorar plan aún no implementada.");
         }
 
-        function loadDailyTip() {
-    const tipElement = document.getElementById("weekly-tip");
-
-    const today = new Date();
-    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-
-    db.collection("car_tips_daily").get().then((querySnapshot) => {
-        const totalTips = querySnapshot.size;
-        if (totalTips === 0) {
-            tipElement.innerText = "No hay tips disponibles.";
-            return;
-        }
-
-        // Calculate which doc to fetch
-        const tipDocNumber = (dayOfYear % totalTips) + 1; // Matches doc IDs starting at 1
-
-        db.collection("car_tips_daily").doc(tipDocNumber.toString()).get().then((doc) => {
-            if (doc.exists) {
-                const tipData = doc.data();
-                tipElement.innerHTML = tipData.tip || "Sin tip hoy.";
-            } else {
-                tipElement.innerText = "No hay tip para hoy.";
-            }
-        }).catch((error) => {
-            console.error("Error obteniendo tip:", error);
-            tipElement.innerText = "Error cargando tip.";
-        });
-    }).catch((error) => {
-        console.error("Error contando tips:", error);
-        tipElement.innerText = "Error cargando tips.";
-    });
-}
-
+      
     </script>
 
     <!-- Footer -->
