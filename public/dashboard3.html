@@ -164,7 +164,23 @@
     </nav>
 
     
-   
+    <!-- Payment Status Card -->
+            <div class="card">
+                <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+                <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+                <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+                <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+
+                <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+                    ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
+                </div>
+                <div id="complete-payment" style="margin-top: 10px; display: none;">
+                    <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+                        Completa tu pago ahora 🔗
+                    </a>
+                </div>
+            </div>
+
     
     <!-- Loyalty Rewards Section -->
         <div class="card">
@@ -252,7 +268,32 @@ document.addEventListener("DOMContentLoaded", function () {
     auth = firebase.auth();
     db = firebase.firestore();
 
+// Load User Profile
+function loadUserProfile(uid) {
+    db.collection("users").doc(uid).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            updateUserInfo(userData);
+        } else {
+            console.error("❌ No se encontró perfil.");
+        }
+    }).catch((error) => console.error("❌ Error:", error));
+}
 
+// Update User Info in Dashboard
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    loadVehicles(userData.vehicles);
+    handlePaymentStatus(userData);
+    updateLoyaltyCard(userData);
 
 // Loyalty Card
 function updateLoyaltyCard(userData) {
