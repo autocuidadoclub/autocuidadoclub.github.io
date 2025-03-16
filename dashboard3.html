@@ -134,22 +134,23 @@
             });
         });
 function loadDailyTip() {
-    const tipElement = document.getElementById("weekly-tip");
+    const today = new Date();
+    const day = today.getDate().toString(); // e.g., "1"
 
-    // Step 1: Count total tips in Firestore collection
-   db.collection("car_tips_daily").doc("1").get()
-    .then((doc) => {
-        if (doc.exists) {
-            const tipHTML = doc.data().tip;
-            document.getElementById("weekly-tip").innerHTML = tipHTML;
-        } else {
-            document.getElementById("weekly-tip").innerText = "No tip available for today.";
-        }
-    })
-    .catch((error) => {
-        console.error("❌ Error fetching daily tip:", error);
-        document.getElementById("weekly-tip").innerText = "Error cargando tips.";
-    });
+    db.collection("car_tips_daily").doc(day).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const tipHTML = doc.data().tip;
+                document.getElementById("weekly-tip").innerHTML = tipHTML;
+            } else {
+                document.getElementById("weekly-tip").innerText = "No tip available for today.";
+            }
+        })
+        .catch((error) => {
+            console.error("❌ Error fetching daily tip:", error);
+            document.getElementById("weekly-tip").innerText = "Error cargando tips.";
+        });
+}
 
 
             // Step 2: Get day of the year
