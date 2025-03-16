@@ -165,15 +165,35 @@
             handlePaymentStatus(userData);
 
             // Set Plan Description
-            const planMessages = {
-                "basic3m": "Plan Básico de 3 meses",
-                "basic6m": "Plan Básico de 6 meses",
-                "basic12m": "Plan Básico de 12 meses",
-                "plus3m": "Plan Plus de 3 meses",
-                "plus6m": "Plan Plus de 6 meses",
-                "plus12m": "Plan Plus de 12 meses"
-            };
-            document.getElementById("planMessage").innerText = planMessages[userData.planType] || "Tipo de plan desconocido";
+           const availablePlans = {
+    "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
+    "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
+    "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
+    "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
+    "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
+    "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
+};
+
+// Get current plan level
+const currentPlanLevel = availablePlans[userData.planType] ? availablePlans[userData.planType].level : 0;
+
+// Populate dropdown
+const newPlanSelect = document.getElementById("new-plan");
+newPlanSelect.innerHTML = "";
+
+for (const [key, plan] of Object.entries(availablePlans)) {
+    const option = document.createElement("option");
+    option.value = key;
+    option.text = plan.name;
+
+    // Disable if it's same or lower level
+    if (plan.level <= currentPlanLevel) {
+        option.disabled = true;
+        option.text += key === userData.planType ? " (Actual)" : " (No disponible)";
+    }
+
+    newPlanSelect.appendChild(option);
+}
 
             // Populate New Plan Options
             const newPlanSelect = document.getElementById("new-plan");
