@@ -115,6 +115,83 @@
             #preventive-maintenance h2 { font-size: 1.4em; }
             .benefits-list { font-size: 1em; }
         }
+       
+        /* Logo y navegación responsive */
+.navbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    background-color: #002F6C;
+    padding: 10px;
+    text-align: center;
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.nav-links li {
+    margin: 8px 12px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.logo-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.logo {
+    width: 120px;
+    height: auto;
+    max-width: 100%;
+}
+
+/* Header Text */
+.header-container {
+    background-color: #002F6C;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.header-text h1 {
+    color: white;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.header-text p {
+    color: white;
+    font-size: 1em;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    .header-text h1 {
+        font-size: 1.6em;
+    }
+    .header-text p {
+        font-size: 0.95em;
+    }
+    .nav-links a {
+        font-size: 0.95em;
+    }
+    .logo {
+        width: 100px;
+    }
+}
+
     </style>
 </head>
 
