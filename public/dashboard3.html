@@ -420,8 +420,14 @@ function updateUserInfo(userData) {
     document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+    if (!userData.paymentDate || userData.paymentStatus === "Pending") {
+    document.getElementById("paymentDate").innerText = "Pendiente de pago";
+    document.getElementById("nextPaymentDate").innerText = "No asignado";
+} else {
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
     document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+}
+
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
     loadVehicles(userData.vehicles);
     handlePaymentStatus(userData);
@@ -618,14 +624,10 @@ function updateLoyaltyCard(userData) {
         progress++;
     }
 
-    if (userData.paymentDate) {
-        const regDate = userData.registrationDate.toDate ? userData.registrationDate.toDate() : new Date(userData.registrationDate.seconds * 1000);
-        const payDate = userData.paymentDate.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
-        if (payDate > regDate) {
-            holes[1].classList.add('completed');
-            progress++;
-        }
-    }
+  if (userData.paymentStatus === "Completed" && userData.paymentDate) {
+    holes[1].classList.add('completed');
+    progress++;
+}
 
     if (userData.subscriptionStatus === "active" && userData.monthsPaid > 0) {
         let consecutiveMonths = userData.monthsPaid;
