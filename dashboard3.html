@@ -151,55 +151,46 @@
             }).catch((error) => console.error(error));
         }
 
-        function updateUserInfo(userData) {
-            document.getElementById("name").innerText = userData.name || "N/A";
-            document.getElementById("phone").innerText = userData.phone || "N/A";
-            document.getElementById("planType").innerText = userData.planType || "N/A";
-            document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
-            document.getElementById("user-department").innerText = userData.department || "Desconocido";
-            document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-            document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
-            document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-            document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-            loadVehicles(userData.vehicles);
-            handlePaymentStatus(userData);
+        
+           function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    loadVehicles(userData.vehicles);
+    handlePaymentStatus(userData);
 
-            // Set Plan Description
-           const availablePlans = {
-    "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
-    "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
-    "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
-    "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
-    "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
-    "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
-};
+    // Plans Logic
+    const availablePlans = {
+        "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
+        "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
+        "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
+        "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
+        "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
+        "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
+    };
 
-// Show Plan Description
-document.getElementById("planMessage").innerText = availablePlans[userData.planType] 
-    ? availablePlans[userData.planType].name 
-    : "Unknown Plan";
+    document.getElementById("planMessage").innerText = availablePlans[userData.planType]
+        ? availablePlans[userData.planType].name
+        : "Unknown Plan";
 
-// Get current level
-const currentPlanLevel = availablePlans[userData.planType] ? availablePlans[userData.planType].level : 0;
+    const currentPlanLevel = availablePlans[userData.planType] ? availablePlans[userData.planType].level : 0;
+    const newPlanSelect = document.getElementById("new-plan");
+    newPlanSelect.innerHTML = "";
 
-// Populate dropdown with ONLY higher plans
-const newPlanSelect = document.getElementById("new-plan");
-newPlanSelect.innerHTML = "";
-
-for (const [key, plan] of Object.entries(availablePlans)) {
-    if (plan.level > currentPlanLevel) { // Only higher level plans
-        const option = document.createElement("option");
-        option.value = key;
-        option.text = plan.name;
-        newPlanSelect.appendChild(option);
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (plan.level > currentPlanLevel) { // Only higher plans
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+        }
     }
-}
-
-// Optional: Show message if there are no higher plans available
-function updateUserInfo(userData) {
-    // (All user data handling here)
-
-    // Populate higher plans dropdown...
 
     if (newPlanSelect.options.length === 0) {
         const option = document.createElement("option");
@@ -208,8 +199,8 @@ function updateUserInfo(userData) {
         newPlanSelect.appendChild(option);
     }
 
-// 🔥 ADD THIS to CLOSE the function:
-}
+} // ✅ CLOSE FUNCTION HERE!
+
 
 
         function handlePaymentStatus(userData) {
