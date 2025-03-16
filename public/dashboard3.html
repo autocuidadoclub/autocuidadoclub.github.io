@@ -268,32 +268,47 @@ document.addEventListener("DOMContentLoaded", function () {
     auth = firebase.auth();
     db = firebase.firestore();
 
-// Load User Profile
-function loadUserProfile(uid) {
-    db.collection("users").doc(uid).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            updateUserInfo(userData);
-        } else {
-            console.error("❌ No se encontró perfil.");
-        }
-    }).catch((error) => console.error("❌ Error:", error));
-}
-
-// Update User Info in Dashboard
+// Update User Info (shows dates)
 function updateUserInfo(userData) {
-    document.getElementById("name").innerText = userData.name || "N/A";
-    document.getElementById("phone").innerText = userData.phone || "N/A";
-    document.getElementById("planType").innerText = userData.planType || "N/A";
-    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
-    document.getElementById("user-department").innerText = userData.department || "Desconocido";
-    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
     document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate) || "Pendiente";
     document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-    loadVehicles(userData.vehicles);
-    handlePaymentStatus(userData);
-    updateLoyaltyCard(userData);
+
+    handlePaymentStatus(userData); // 👈 Controls payment status
+}
+
+// Handles warning and PayPal link
+function handlePaymentStatus(userData) {
+    const paymentWarning = document.getElementById("payment-warning");
+    const completePayment = document.getElementById("complete-payment");
+    const paymentLink = document.getElementById("payment-link");
+
+    if (userData.paymentStatus === "Pending") { // Show warning if payment pending
+        paymentWarning.style.display = "block";
+        let payPalURL = getPaypalLink(userData.planType);
+        if (payPalURL) {
+            paymentLink.href = payPalURL;
+            completePayment.style.display = "block";
+        }
+    } else {
+        paymentWarning.style.display = "none";
+        completePayment.style.display = "none";
+    }
+}
+
+// Returns PayPal link based on plan
+function getPaypalLink(planType) {
+    const payPalLinks = {
+        "basic3m": "https://www.paypal.com/pay/basic3m",
+        "basic6m": "https://www.paypal.com/pay/basic6m",
+        "basic12m": "https://www.paypal.com/pay/basic12m",
+        "plus3m": "https://www.paypal.com/pay/plus3m",
+        "plus6m": "https://www.paypal.com/pay/plus6m",
+        "plus12m": "https://www.paypal.com/pay/plus12m"
+    };
+    return payPalLinks[planType] || null;
+}
+
 
 // Loyalty Card
 function updateLoyaltyCard(userData) {
