@@ -1539,3 +1539,56 @@ button[type="submit"]:hover {
     border-radius: 8px;
     max-width: 1200px;
 }
+/* Fix nav bar to remove space */
+nav {
+    background-color: #003366;
+    color: white;
+    padding: 10px 0; /* reduce padding top-bottom */
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-links {
+    list-style-type: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links li {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-links li a:hover {
+    color: #ff6600;
+}
+
+/* Logo stays at the right */
+.logo-container {
+    margin-right: 15px;
+}
+
+.logo-container img {
+    width: 100px;
+    height: auto;
+}
+
+/* Header container */
+.header-container {
+    background-color: #003366;
+    padding: 10px 0; /* reduce padding */
+    text-align: center;
+}
+
+.header-text h1, .header-text p {
+    color: white;
+}
