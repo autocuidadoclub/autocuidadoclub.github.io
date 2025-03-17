@@ -604,14 +604,6 @@ for (const [key, plan] of Object.entries(availablePlans)) {
     }
 }
 
-// Disable dropdown if no valid upgrade
-if (!optionsAdded) {
-    const option = document.createElement("option");
-    option.text = "No hay planes superiores disponibles";
-    option.disabled = true;
-    option.selected = true;
-    newPlanSelect.appendChild(option);
-}
 
 // Payment Status Function
 function handlePaymentStatus(userData) {
