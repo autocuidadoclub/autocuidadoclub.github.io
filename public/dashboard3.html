@@ -515,6 +515,65 @@ if (userData.lastReschedule) {
 
   const currentPlanType = userData.planType;
   const currentPlan = availablePlans[currentPlanType];
+    const upgradeClicked = sessionStorage.getItem("upgradeClicked");
+
+if (currentPlanType === "basic3m") {
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (upgradeClicked === "true" && plan.type === "plus" && plan.duration > 3) {
+            // After clicking → Plus 6m and 12m
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+        } else if (upgradeClicked !== "true" && plan.type === "basic" && plan.duration > 3) {
+            // Before clicking → Basic 6m and 12m
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+        }
+    }
+} else if (currentPlanType === "basic6m") {
+    // Basic 6m → Plus 6m and Plus 12m
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (plan.type === "plus" && (plan.duration === 6 || plan.duration === 12)) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+        }
+    }
+} else if (currentPlanType === "basic12m") {
+    // Basic 12m → Plus 12m only
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (plan.type === "plus" && plan.duration === 12) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+        }
+    }
+} else if (currentPlanType.startsWith("plus")) {
+    // Plus → Higher Plus plans only
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (plan.level > currentPlan.level && plan.type === "plus") {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+        }
+    }
+}
+
+// No options case
+if (newPlanSelect.options.length === 0) {
+    const option = document.createElement("option");
+    option.text = "No hay planes superiores disponibles";
+    option.disabled = true;
+    option.selected = true;
+    newPlanSelect.appendChild(option);
+}
+
     const planMessageElement = document.getElementById("planMessage");
 if (currentPlan) {
     planMessageElement.innerText = currentPlan.name;
