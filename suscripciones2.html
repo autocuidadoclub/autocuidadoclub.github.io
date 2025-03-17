@@ -978,11 +978,11 @@ document.addEventListener("DOMContentLoaded", function () {
     name,
     email,
     phone,
-    planType: selectedPlanType, 
+    planType: selectedPlanType,
     department,
     municipality,
     registrationDate: firebase.firestore.Timestamp.now(),
-    lastUpgradeDate: firebase.firestore.Timestamp.now(), // ✅ ADDED
+    lastUpgradeDate: firebase.firestore.Timestamp.now(), // ✅ Aquí debes agregarlo
     schedule: { 
         day: selectedDay, 
         time: selectedTime 
@@ -990,9 +990,10 @@ document.addEventListener("DOMContentLoaded", function () {
     paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
     nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
     paymentStatus: "Pending",
-    monthsPaid: 0, // ✅ ADDED
+    monthsPaid: 0, // ✅ También agregar aquí
     vehicles
 });
+
 
     })  // ✅ Ensure this bracket properly closes .then()
 
