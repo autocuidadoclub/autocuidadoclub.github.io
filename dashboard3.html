@@ -481,42 +481,7 @@ function updateUserInfo(userData) {
    // After updating schedule info
 document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
 
-// Check if user already reprogrammed
-const rescheduleInfo = document.getElementById("reschedule-info");
-if (userData.lastReschedule) {
-    const lastRescheduleDate = userData.lastReschedule.toDate();
-    const currentDate = new Date();
-
-    if (
-        lastRescheduleDate.getMonth() === currentDate.getMonth() &&
-        lastRescheduleDate.getFullYear() === currentDate.getFullYear()
-    ) {
-        rescheduleInfo.style.display = "block";
-        rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
-    } else {
-        rescheduleInfo.style.display = "none";
-    }
-}
-
-    
-    loadVehicles(userData.vehicles);
-    handlePaymentStatus(userData);
-    updateLoyaltyCard(userData);
-
-    // 🔥 Plan Descriptions
-   const availablePlans = {
-    "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic", duration: 3 },
-    "basic6m": { name: "Plan Básico de 6 meses", level: 2, type: "basic", duration: 6 },
-    "basic12m": { name: "Plan Básico de 12 meses", level: 3, type: "basic", duration: 12 },
-    "plus3m": { name: "Plan Plus de 3 meses", level: 4, type: "plus", duration: 3 },
-    "plus6m": { name: "Plan Plus de 6 meses", level: 5, type: "plus", duration: 6 },
-    "plus12m": { name: "Plan Plus de 12 meses", level: 6, type: "plus", duration: 12 }
-  };
-
-  const currentPlanType = userData.planType;
-  const currentPlan = availablePlans[currentPlanType];
-    const upgradeClicked = sessionStorage.getItem("upgradeClicked");
-
+// BASIC 3m special logic:
 if (currentPlanType === "basic3m") {
     for (const [key, plan] of Object.entries(availablePlans)) {
         if (upgradeClicked === "true" && plan.type === "plus" && plan.duration > 3) {
@@ -564,21 +529,107 @@ if (currentPlanType === "basic3m") {
         }
     }
 }
+    
+// Check if user already reprogrammed
+const rescheduleInfo = document.getElementById("reschedule-info");
+if (userData.lastReschedule) {
+    const lastRescheduleDate = userData.lastReschedule.toDate();
+    const currentDate = new Date();
 
-// No options case
-if (newPlanSelect.options.length === 0) {
-    const option = document.createElement("option");
-    option.text = "No hay planes superiores disponibles";
-    option.disabled = true;
-    option.selected = true;
-    newPlanSelect.appendChild(option);
+    if (
+        lastRescheduleDate.getMonth() === currentDate.getMonth() &&
+        lastRescheduleDate.getFullYear() === currentDate.getFullYear()
+    ) {
+        rescheduleInfo.style.display = "block";
+        rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
+    } else {
+        rescheduleInfo.style.display = "none";
+    }
 }
 
-    const planMessageElement = document.getElementById("planMessage");
-if (currentPlan) {
-    planMessageElement.innerText = currentPlan.name;
-} else {
-    planMessageElement.innerText = "Tipo de plan desconocido";
+    
+    loadVehicles(userData.vehicles);
+    handlePaymentStatus(userData);
+    updateLoyaltyCard(userData);
+
+    // 🔥 Plan Descriptions
+   // Inside updateUserInfo()
+
+const availablePlans = {
+  "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic", duration: 3 },
+  "basic6m": { name: "Plan Básico de 6 meses", level: 2, type: "basic", duration: 6 },
+  "basic12m": { name: "Plan Básico de 12 meses", level: 3, type: "basic", duration: 12 },
+  "plus3m": { name: "Plan Plus de 3 meses", level: 4, type: "plus", duration: 3 },
+  "plus6m": { name: "Plan Plus de 6 meses", level: 5, type: "plus", duration: 6 },
+  "plus12m": { name: "Plan Plus de 12 meses", level: 6, type: "plus", duration: 12 }
+};
+
+const currentPlanType = userData.planType;
+const currentPlan = availablePlans[currentPlanType];
+
+// Dropdown
+const newPlanSelect = document.getElementById("new-plan");
+newPlanSelect.innerHTML = "";
+
+// Upgrade Flag
+const upgradeClicked = sessionStorage.getItem("upgradeClicked");
+
+// BASIC 3m Special Logic
+if (currentPlanType === "basic3m") {
+  for (const [key, plan] of Object.entries(availablePlans)) {
+    if (upgradeClicked === "true" && plan.type === "plus" && plan.duration > 3) {
+      // After clicking → Plus 6m & 12m
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    } else if (upgradeClicked !== "true" && plan.type === "basic" && plan.duration > 3) {
+      // Before clicking → Basic 6m & 12m
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    }
+  }
+} else if (currentPlanType === "basic6m") {
+  // Basic 6m → Plus 6m & 12m
+  for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.type === "plus" && (plan.duration === 6 || plan.duration === 12)) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    }
+  }
+} else if (currentPlanType === "basic12m") {
+  // Basic 12m → Plus 12m only
+  for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.type === "plus" && plan.duration === 12) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    }
+  }
+} else if (currentPlanType.startsWith("plus")) {
+  // Plus plans → Higher Plus only
+  for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.level > currentPlan.level && plan.type === "plus") {
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    }
+  }
+}
+
+// If no valid plans
+if (newPlanSelect.options.length === 0) {
+  const option = document.createElement("option");
+  option.text = "No hay planes superiores disponibles";
+  option.disabled = true;
+  option.selected = true;
+  newPlanSelect.appendChild(option);
 }
 
 
@@ -658,54 +709,6 @@ function upgradePlan() {
   });
 }
     
-// BASIC 3m special logic:
-if (currentPlanType === "basic3m") {
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (upgradeClicked === "true" && plan.type === "plus" && plan.duration > 3) {
-            // After clicking → Plus 6m and 12m
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-        } else if (upgradeClicked !== "true" && plan.type === "basic" && plan.duration > 3) {
-            // Before clicking → Basic 6m and 12m
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-        }
-    }
-} else if (currentPlanType === "basic6m") {
-    // Basic 6m → Plus 6m and Plus 12m
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.type === "plus" && (plan.duration === 6 || plan.duration === 12)) {
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-        }
-    }
-} else if (currentPlanType === "basic12m") {
-    // Basic 12m → Plus 12m only
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.type === "plus" && plan.duration === 12) {
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-        }
-    }
-} else if (currentPlanType.startsWith("plus")) {
-    // Plus → Higher Plus plans only
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.level > currentPlan.level && plan.type === "plus") {
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-        }
-    }
-}
 
 // No options case
 if (newPlanSelect.options.length === 0) {
