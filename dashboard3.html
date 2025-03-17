@@ -213,6 +213,7 @@
                 <h3>¿Te gustaría Mejorar de Suscripción?</h3>
                 <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
                 <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
+                <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
                 <label for="new-plan">Selecciona un nuevo plan:</label>
                 <select id="new-plan"></select>
                 <button onclick="upgradePlan()">Mejorar Plan</button>
@@ -503,6 +504,25 @@ if (userData.lastReschedule) {
     // Actual plan
     const currentPlanType = userData.planType;
     const currentPlan = availablePlans[currentPlanType];
+
+    // Motivational Message Logic
+const motivationalDiv = document.getElementById("motivational-message");
+let motivationalText = "";
+
+if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "basic12m") {
+    motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
+} else if (currentPlanType === "plus12m") {
+    motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
+}
+
+if (motivationalText) {
+    motivationalDiv.innerHTML = motivationalText;
+    motivationalDiv.style.display = "block";
+}
 
     // Set description
     const planMessageElement = document.getElementById("planMessage");
