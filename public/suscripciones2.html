@@ -175,6 +175,7 @@
     department,
     municipality,
     registrationDate: firebase.firestore.Timestamp.now(),
+    lastUpgradeDate: firebase.firestore.Timestamp.now(),
     schedule: { 
         day: selectedDay, 
         time: selectedTime 
@@ -973,26 +974,23 @@ document.addEventListener("DOMContentLoaded", function () {
         nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
         return db.collection("users").doc(userId).set({
-    uid: userId,
-    name,
-    email,
-    phone,
-    planType: selectedPlanType, // ✅ Plan type
-    department,
-    municipality,
-    registrationDate: firebase.firestore.Timestamp.now(),
-    lastUpgradeDate: firebase.firestore.Timestamp.now(), // ✅ NEW FIELD HERE
-    schedule: { 
-        day: selectedDay, 
-        time: selectedTime 
-    },
-    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-    paymentStatus: "Pending",
-    monthsPaid: 0, // 🔥 You should also keep this field, helps track loyalty progress
-    vehicles
-});
-
+            uid: userId,
+            name,
+            email,
+            phone,
+            planType: selectedPlanType, // ✅ Ensure the plan type is stored
+            department,
+            municipality,
+            registrationDate: firebase.firestore.Timestamp.now(),
+            schedule: { 
+                day: selectedDay, 
+                time: selectedTime 
+            },
+            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+            paymentStatus: "Pending",
+            vehicles
+        });
     })  // ✅ Ensure this bracket properly closes .then()
 
         .then(() => {  // ❌ This might be causing a syntax error
