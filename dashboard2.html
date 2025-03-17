@@ -215,7 +215,15 @@
     <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
     
     <!-- 🔥 Motivational Message Placeholder -->
-    <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px; color:red; font-weight:bold;"></div>
+<div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+
+<!-- Dedicated Add Vehicles Button -->
+<div id="add-vehicles-button" style="margin-top:10px; display:none;">
+    <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+        Añade más vehículos: Mejora a Plan Plus 🚗✨
+    </button>
+</div>
+
 
     <label for="new-plan">Selecciona un nuevo plan:</label>
     <select id="new-plan"></select>
@@ -527,6 +535,24 @@ if (motivationalText) {
     motivationalDiv.style.display = "block";
 }
 
+    // Dedicated Add Vehicles Button
+const addVehiclesButton = document.getElementById("add-vehicles-button");
+
+// Logic
+if (currentPlanType === "basic3m") {
+    addVehiclesButton.style.display = "block";
+    addVehiclesButton.setAttribute("data-target-plan", "plus3m");
+} else if (currentPlanType === "basic6m") {
+    addVehiclesButton.style.display = "block";
+    addVehiclesButton.setAttribute("data-target-plan", "plus6m");
+} else if (currentPlanType === "basic12m") {
+    addVehiclesButton.style.display = "block";
+    addVehiclesButton.setAttribute("data-target-plan", "plus12m");
+} else {
+    addVehiclesButton.style.display = "none"; // Already Plus, no need
+}
+
+    
     // Set description
     const planMessageElement = document.getElementById("planMessage");
     if (currentPlan) {
@@ -616,6 +642,31 @@ function loadVehicles(vehicles) {
     });
 }
 
+function upgradeToPlus() {
+    const targetPlan = document.getElementById("add-vehicles-button").getAttribute("data-target-plan");
+    if (!targetPlan) return;
+
+    if (!confirm(`¿Quieres añadir más vehículos y mejorar a ${targetPlan}?`)) return;
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para mejorar el plan.");
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.update({
+        planType: targetPlan
+    }).then(() => {
+        alert(`✅ ¡Ahora tienes acceso para añadir más vehículos! Plan actualizado a: ${targetPlan}`);
+        loadUserProfile(user.uid); // Refresh
+    }).catch((error) => {
+        console.error("❌ Error al actualizar el plan:", error);
+        alert("Ocurrió un error al actualizar. Intenta nuevamente.");
+    });
+}
+
+    
 // Format Timestamp
 function formatTimestamp(timestamp) {
     if (!timestamp) return "N/A";
@@ -640,6 +691,8 @@ function selectScheduleBox(cell) {
     document.getElementById("selectedTime").value = timeBlock;
 }
 
+
+    
 // Update Schedule
 function updateSchedule() {
     const selectedCell = document.querySelector(".schedule-table td.selected-box");
