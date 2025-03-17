@@ -491,35 +491,87 @@ if (userData.lastReschedule) {
     updateLoyaltyCard(userData);
 
     // 🔥 Plan Descriptions
-    const availablePlans = {
-        "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
-        "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
-        "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
-        "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
-        "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
-        "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
-    };
+const availablePlans = {
+    "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic" },
+    "basic6m": { name: "Plan Básico de 6 meses", level: 2, type: "basic" },
+    "basic12m": { name: "Plan Básico de 12 meses", level: 3, type: "basic" },
+    "plus3m": { name: "Plan Plus de 3 meses", level: 4, type: "plus" },
+    "plus6m": { name: "Plan Plus de 6 meses", level: 5, type: "plus" },
+    "plus12m": { name: "Plan Plus de 12 meses", level: 6, type: "plus" }
+};
 
-    // Actual plan
-    const currentPlanType = userData.planType;
-    const currentPlan = availablePlans[currentPlanType];
+const currentPlanType = userData.planType;
+const currentPlan = availablePlans[currentPlanType];
 
-    // Set description
-    const planMessageElement = document.getElementById("planMessage");
-    if (currentPlan) {
-        planMessageElement.innerText = currentPlan.name;
-    } else {
-        planMessageElement.innerText = "Tipo de plan desconocido";
+// ✅ Mensaje Motivacional
+// Available Plans Configuration
+const availablePlans = {
+    "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic" },
+    "basic6m": { name: "Plan Básico de 6 meses", level: 2, type: "basic" },
+    "basic12m": { name: "Plan Básico de 12 meses", level: 3, type: "basic" },
+    "plus3m": { name: "Plan Plus de 3 meses", level: 4, type: "plus" },
+    "plus6m": { name: "Plan Plus de 6 meses", level: 5, type: "plus" },
+    "plus12m": { name: "Plan Plus de 12 meses", level: 6, type: "plus" }
+};
+
+const currentPlanType = userData.planType;
+const currentPlan = availablePlans[currentPlanType];
+
+// ✅ Motivational Message Section
+const motivationalMessage = document.createElement("div");
+motivationalMessage.style.padding = "15px";
+motivationalMessage.style.border = "2px solid #003366";
+motivationalMessage.style.borderRadius = "8px";
+motivationalMessage.style.backgroundColor = "#f0f8ff";
+motivationalMessage.style.fontWeight = "bold";
+motivationalMessage.style.marginTop = "15px";
+
+// Logic for motivational messages:
+if (currentPlanType === "basic12m") {
+    motivationalMessage.innerHTML = "🎉 ¡Felicidades! <strong>Nivel máximo alcanzado</strong> con el Plan Básico de 12 meses. ¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "plus12m") {
+    motivationalMessage.innerHTML = "🚀 ¡Eres nuestro PRO! <strong>Nivel máximo alcanzado</strong> con el Plan Plus de 12 meses. ¡Gracias por confiar en nosotros!";
+} else if (currentPlan.type === "basic") {
+    motivationalMessage.innerHTML = "✨ ¡A un paso del máximo nivel! Mejora al plan de cobertura de 12 meses y desbloquea todos los beneficios. 🚗🔥 ¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlan.type === "plus") {
+    motivationalMessage.innerHTML = "✨ ¡A un paso del máximo nivel! Mejora al plan Plus de cobertura de 12 meses y desbloquea todos los beneficios. 🚗🔥";
+}
+
+document.querySelector(".dashboard-grid").prepend(motivationalMessage);
+
+// ✅ Current Plan Description
+const planMessageElement = document.getElementById("planMessage");
+planMessageElement.innerText = currentPlan ? currentPlan.name : "Tipo de plan desconocido";
+
+// ✅ Upgrade Options Logic
+const newPlanSelect = document.getElementById("new-plan");
+newPlanSelect.innerHTML = ""; // Clear existing options
+
+let optionsAdded = false;
+
+for (const [key, plan] of Object.entries(availablePlans)) {
+    // BASIC Plans Logic
+    if (currentPlan.type === "basic") {
+        // Suggest Basic 12m if not already there
+        if (key === "basic12m" && currentPlanType !== "basic12m") {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = plan.name;
+            newPlanSelect.appendChild(option);
+            optionsAdded = true;
+        }
+        // Suggest moving to PLUS plans for more vehicles
+        if (plan.type === "plus") {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = `${plan.name} (Para más vehículos)`;
+            newPlanSelect.appendChild(option);
+            optionsAdded = true;
+        }
     }
-
-    // Populate the select options
-    const newPlanSelect = document.getElementById("new-plan");
-    newPlanSelect.innerHTML = ""; // Clear first
-    const currentLevel = currentPlan ? currentPlan.level : 0;
-
-    let optionsAdded = false;
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.level > currentLevel) { // Only higher plans
+    // PLUS Plans Logic
+    else if (currentPlan.type === "plus") {
+        if (key === "plus12m" && currentPlanType !== "plus12m") {
             const option = document.createElement("option");
             option.value = key;
             option.text = plan.name;
@@ -527,16 +579,16 @@ if (userData.lastReschedule) {
             optionsAdded = true;
         }
     }
-
-    if (!optionsAdded) {
-        const option = document.createElement("option");
-        option.text = "No hay planes superiores disponibles";
-        option.disabled = true;
-        option.selected = true;
-        newPlanSelect.appendChild(option);
-    }
 }
 
+// If no available upgrades
+if (!optionsAdded) {
+    const option = document.createElement("option");
+    option.text = "No hay planes superiores disponibles";
+    option.disabled = true;
+    option.selected = true;
+    newPlanSelect.appendChild(option);
+}
 
 // Payment Status Function
 function handlePaymentStatus(userData) {
