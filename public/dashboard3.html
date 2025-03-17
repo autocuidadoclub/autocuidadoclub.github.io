@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -563,56 +562,30 @@ if (currentPlanType === "basic3m") {
     }
 
     // Populate the select options
-   const newPlanSelect = document.getElementById("new-plan");
-newPlanSelect.innerHTML = ""; // Clear first
-const currentLevel = currentPlan ? currentPlan.level : 0;
+    const newPlanSelect = document.getElementById("new-plan");
+    newPlanSelect.innerHTML = ""; // Clear first
+    const currentLevel = currentPlan ? currentPlan.level : 0;
 
     let optionsAdded = false;
-for (const [key, plan] of Object.entries(availablePlans)) {
-    if (currentPlanType.startsWith("basic")) {
-        // Basic 3m case
-        if (currentPlanType === "basic3m" && key.startsWith("plus")) {
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (plan.level > currentLevel) { // Only higher plans
             const option = document.createElement("option");
             option.value = key;
             option.text = plan.name;
             newPlanSelect.appendChild(option);
             optionsAdded = true;
         }
-        // Basic 6m case
-        else if (currentPlanType === "basic6m" && (key === "plus6m" || key === "plus12m")) {
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-            optionsAdded = true;
-        }
-        // Basic 12m case
-        else if (currentPlanType === "basic12m" && key === "plus12m") {
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = plan.name;
-            newPlanSelect.appendChild(option);
-            optionsAdded = true;
-        }
-    } 
-    // Plus plans: only allow higher level upgrades
-    else if (plan.level > currentLevel && key.startsWith("plus")) {
+    }
+
+    if (!optionsAdded) {
         const option = document.createElement("option");
-        option.value = key;
-        option.text = plan.name;
+        option.text = "No hay planes superiores disponibles";
+        option.disabled = true;
+        option.selected = true;
         newPlanSelect.appendChild(option);
-        optionsAdded = true;
     }
 }
 
-// Disable dropdown if no valid upgrade
-if (!optionsAdded) {
-    const option = document.createElement("option");
-    option.text = "No hay planes superiores disponibles";
-    option.disabled = true;
-    option.selected = true;
-    newPlanSelect.appendChild(option);
-}
 
 // Payment Status Function
 function handlePaymentStatus(userData) {
