@@ -441,7 +441,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // Logout Function
 function logoutUser() {
     auth.signOut().then(() => {
-        sessionStorage.clear();
+        sessionStorage.clear(); // Clears upgradeClicked too!
         window.location.href = "login.html";
     }).catch((error) => {
         alert("Error al cerrar sesión: " + error.message);
