@@ -515,6 +515,13 @@ if (userData.lastReschedule) {
 
   const currentPlanType = userData.planType;
   const currentPlan = availablePlans[currentPlanType];
+    const planMessageElement = document.getElementById("planMessage");
+if (currentPlan) {
+    planMessageElement.innerText = currentPlan.name;
+} else {
+    planMessageElement.innerText = "Tipo de plan desconocido";
+}
+
 
   // Motivational message (same logic)
 
