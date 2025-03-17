@@ -491,19 +491,6 @@ if (userData.lastReschedule) {
     updateLoyaltyCard(userData);
 
     // 🔥 Plan Descriptions
-const availablePlans = {
-    "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic" },
-    "basic6m": { name: "Plan Básico de 6 meses", level: 2, type: "basic" },
-    "basic12m": { name: "Plan Básico de 12 meses", level: 3, type: "basic" },
-    "plus3m": { name: "Plan Plus de 3 meses", level: 4, type: "plus" },
-    "plus6m": { name: "Plan Plus de 6 meses", level: 5, type: "plus" },
-    "plus12m": { name: "Plan Plus de 12 meses", level: 6, type: "plus" }
-};
-
-const currentPlanType = userData.planType;
-const currentPlan = availablePlans[currentPlanType];
-
-// ✅ Mensaje Motivacional
 // Available Plans Configuration
 const availablePlans = {
     "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic" },
