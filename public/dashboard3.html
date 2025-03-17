@@ -669,7 +669,6 @@ function loadVehicles(vehicles) {
     });
 }
 
-// Modified upgradeToPlus() function
 function upgradeToPlus() {
     const targetPlan = document.getElementById("add-vehicles-button").getAttribute("data-target-plan");
     if (!targetPlan) return;
@@ -686,7 +685,7 @@ function upgradeToPlus() {
     userRef.update({
         planType: targetPlan
     }).then(() => {
-        sessionStorage.setItem("upgradeClicked", "true"); // ✅ Mark as clicked
+        sessionStorage.setItem("upgradeClicked", "true"); // ✅ Set BEFORE reload
         alert(`✅ ¡Ahora tienes acceso para añadir más vehículos! Plan actualizado a: ${targetPlan}`);
         loadUserProfile(user.uid); // Refresh to reload dropdown
     }).catch((error) => {
@@ -694,6 +693,7 @@ function upgradeToPlus() {
         alert("Ocurrió un error al actualizar. Intenta nuevamente.");
     });
 }
+
 
     
 // Format Timestamp
