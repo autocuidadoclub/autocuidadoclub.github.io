@@ -210,25 +210,25 @@
 
             <!-- Plan Upgrade Card -->
             <div class="card">
+    
+    <!-- 🔥 Motivational Message Placeholder -->
+<div class="card">
     <h3>¿Te gustaría Mejorar de Suscripción?</h3>
     <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
     <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
-    
-    <!-- 🔥 Motivational Message Placeholder -->
-<div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
-<!-- Dedicated Add Vehicles Button -->
-<div id="add-vehicles-button" style="margin-top:10px; display:none;">
-    <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+    <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+
+    <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+      <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
         Añade más vehículos: Mejora a Plan Plus 🚗✨
-    </button>
-</div>
-
+      </button>
+    </div>
 
     <label for="new-plan">Selecciona un nuevo plan:</label>
     <select id="new-plan"></select>
     <button onclick="upgradePlan()">Mejorar Plan</button>
-</div>
+  </div>
             
 <div class="card">
     <h3>🚗✨ Tip del mes</h3>
@@ -510,51 +510,87 @@ if (userData.lastReschedule) {
     "plus3m": { name: "Plan Plus de 3 meses", level: 4, type: "plus", duration: 3 },
     "plus6m": { name: "Plan Plus de 6 meses", level: 5, type: "plus", duration: 6 },
     "plus12m": { name: "Plan Plus de 12 meses", level: 6, type: "plus", duration: 12 }
-};
+  };
 
-const currentPlanType = userData.planType;
-const currentPlan = availablePlans[currentPlanType];
+  const currentPlanType = userData.planType;
+  const currentPlan = availablePlans[currentPlanType];
 
-// Motivational Message Logic
-const motivationalDiv = document.getElementById("motivational-message");
-let motivationalText = "";
+  // Motivational message (same logic)
 
-if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
-    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-} else if (currentPlanType === "basic12m") {
-    motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-} else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
-    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
-} else if (currentPlanType === "plus12m") {
-    motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
-}
-
-if (motivationalText) {
-    motivationalDiv.innerHTML = motivationalText;
-    motivationalDiv.style.display = "block";
-}
-
-// Dedicated Add Vehicles Button
-const addVehiclesButton = document.getElementById("add-vehicles-button");
-
-if (currentPlanType === "basic3m") {
+  // Handle add vehicles button
+  const addVehiclesButton = document.getElementById("add-vehicles-button");
+  if (currentPlanType === "basic3m") {
     addVehiclesButton.style.display = "block";
-    addVehiclesButton.setAttribute("data-target-plan", "plus3m");
-    sessionStorage.setItem("upgradeClicked", "false"); // default not clicked
-} else {
+  } else {
     addVehiclesButton.style.display = "none";
+  }
+
+  // Populate dropdown based on flag
+  const newPlanSelect = document.getElementById("new-plan");
+  newPlanSelect.innerHTML = "";
+
+  if (currentPlanType === "basic3m") {
+  const isUpgradingToPlus = sessionStorage.getItem("upgradeClicked") === "true";
+
+  for (const [key, plan] of Object.entries(availablePlans)) {
+    if (isUpgradingToPlus && plan.type === "plus" && plan.duration > 3) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    } else if (!isUpgradingToPlus && plan.type === "basic" && plan.duration > 3) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    }
+  }
+} else {
+  for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.level > currentPlan.level) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.text = plan.name;
+      newPlanSelect.appendChild(option);
+    }
+  }
 }
 
-// Set current plan description
-document.getElementById("planType").innerText = currentPlanType || "N/A";
-document.getElementById("planMessage").innerText = currentPlan ? currentPlan.name : "Tipo de plan desconocido";
 
-// Populate dropdown
-const newPlanSelect = document.getElementById("new-plan");
-newPlanSelect.innerHTML = "";
+  if (newPlanSelect.options.length === 0) {
+    const option = document.createElement("option");
+    option.text = "No hay planes superiores disponibles";
+    option.disabled = true;
+    option.selected = true;
+    newPlanSelect.appendChild(option);
+  }
+}
 
-const upgradeClicked = sessionStorage.getItem("upgradeClicked");
+function upgradeToPlus() {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+  if (!confirm("¿Quieres añadir más vehículos y mejorar a Plus 3m?")) return;
+  db.collection("users").doc(user.uid).update({ planType: "plus3m" }).then(() => {
+    sessionStorage.setItem("upgradeClicked", "true");
+    alert("✅ Plan actualizado a: Plus 3m");
+    loadUserProfile(user.uid);
+  });
+}
 
+const upgradeClicked = sessionStorage.getItem("upgradeClicked"); // Add this!
+
+    
+function upgradePlan() {
+  const selectedPlan = document.getElementById("new-plan").value;
+  const user = firebase.auth().currentUser;
+  if (!user || !selectedPlan) return;
+  db.collection("users").doc(user.uid).update({ planType: selectedPlan }).then(() => {
+    sessionStorage.removeItem("upgradeClicked");
+    alert("✅ Plan mejorado exitosamente");
+    loadUserProfile(user.uid);
+  });
+}
+    
 // BASIC 3m special logic:
 if (currentPlanType === "basic3m") {
     for (const [key, plan] of Object.entries(availablePlans)) {
