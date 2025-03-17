@@ -392,6 +392,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+    function upgradePlan() {
+    const selectedPlan = document.getElementById("new-plan").value;
+    if (!selectedPlan) {
+        alert("❌ Por favor selecciona un nuevo plan válido.");
+        return;
+    }
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para mejorar el plan.");
+        return;
+    }
+
+    // Confirm with user
+    if (!confirm(`¿Estás seguro que deseas cambiar tu suscripción a: ${selectedPlan}?`)) {
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+
+    // Update Firestore
+    userRef.update({
+        planType: selectedPlan
+    }).then(() => {
+        alert(`✅ ¡Tu plan ha sido actualizado exitosamente a: ${selectedPlan}!`);
+        // Reload user profile to refresh info
+        loadUserProfile(user.uid);
+    }).catch((error) => {
+        console.error("❌ Error al actualizar el plan:", error);
+        alert("Ocurrió un error al actualizar tu plan. Por favor, intenta nuevamente.");
+    });
+}
+
+    
 // Logout Function
 function logoutUser() {
     auth.signOut().then(() => {
