@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Centro de Ayuda | AutoCuidado Club</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -28,8 +27,18 @@
       background-color: white;
       border-radius: 8px;
     }
-    .search-bar {
+    nav {
+      text-align: center;
       margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #1c3d5a;
+      font-weight: bold;
+    }
+    .search-bar {
+      margin: 20px 0;
       text-align: center;
     }
     .search-bar input {
@@ -38,23 +47,25 @@
       border-radius: 4px;
       border: 1px solid #ccc;
     }
-    .category {
-      margin: 20px 0;
+    section {
+      margin-bottom: 40px;
     }
-    .category h2 {
+    section h2 {
       color: #1c3d5a;
-      margin-bottom: 10px;
+      border-bottom: 2px solid #1c3d5a;
+      padding-bottom: 5px;
     }
-    .category ul {
-      list-style: none;
-      padding: 0;
+    .faq {
+      margin-top: 15px;
     }
-    .category ul li {
-      margin: 8px 0;
-    }
-    .category ul li a {
-      text-decoration: none;
+    .faq h3 {
       color: #ff6600;
+      cursor: pointer;
+      margin-bottom: 5px;
+    }
+    .faq p {
+      display: none;
+      margin-top: 5px;
     }
     footer {
       text-align: center;
@@ -69,67 +80,134 @@
 
   <header>
     <h1>Centro de Ayuda</h1>
-    <p>Encuentra respuestas rápidas sobre AutoCuidado Club</p>
+    <p>¿Tienes dudas? Aquí encuentras todas las respuestas.</p>
   </header>
 
   <div class="container">
+
+    <!-- Navigation Links to Sections -->
+    <nav>
+      <a href="#planes">Planes y Suscripciones</a>
+      <a href="#pagos">Pagos y Facturación</a>
+      <a href="#inspecciones">Reprogramar Inspecciones</a>
+      <a href="#recompensas">Recompensas</a>
+      <a href="#faq">FAQs</a>
+    </nav>
+
+    <!-- Search Bar -->
     <div class="search-bar">
       <input type="text" placeholder="Buscar en el Centro de Ayuda..." />
     </div>
 
-    <div class="category">
+    <!-- Section: Planes -->
+    <section id="planes">
       <h2>Planes y Suscripciones</h2>
-      <ul>
-        <li><a href="#">¿Cómo funciona AutoCuidado Club?</a></li>
-        <li><a href="#">Diferencias entre Plan Básico y Plan Plus</a></li>
-        <li><a href="#">¿Cómo mejorar mi plan?</a></li>
-      </ul>
-    </div>
 
-    <div class="category">
+      <div class="faq">
+        <h3>¿Cómo funciona AutoCuidado Club?</h3>
+        <p>AutoCuidado Club es un servicio de mantenimiento preventivo por suscripción. Nuestros expertos llegan hasta donde tú estés para asegurarte que tu vehículo esté siempre al día, sin estrés ni citas en el taller.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cuál es la diferencia entre Plan Básico y Plan Plus?</h3>
+        <p>El Plan Básico cubre 1 vehículo con visitas programadas, mientras que el Plan Plus te permite añadir múltiples vehículos y obtener beneficios adicionales como recompensas exclusivas.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cómo puedo mejorar mi plan?</h3>
+        <p>Desde tu panel de control, sección “Mejorar Suscripción”, elige un plan superior según tus necesidades. Puedes hacerlo en cualquier momento.</p>
+      </div>
+    </section>
+
+    <!-- Section: Pagos -->
+    <section id="pagos">
       <h2>Pagos y Facturación</h2>
-      <ul>
-        <li><a href="#">Métodos de pago disponibles</a></li>
-        <li><a href="#">¿Cómo actualizar mi método de pago?</a></li>
-        <li><a href="#">Fechas de pago y renovaciones</a></li>
-      </ul>
-    </div>
 
-    <div class="category">
+      <div class="faq">
+        <h3>¿Qué métodos de pago aceptan?</h3>
+        <p>Aceptamos PayPal, tarjetas de crédito/débito, y transferencias. También ofrecemos opciones de pago recurrente para mayor comodidad.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cómo actualizo mi método de pago?</h3>
+        <p>Accede al panel, sección “Método de Pago” y actualiza tus datos fácilmente.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cuándo se realizan los cobros?</h3>
+        <p>Los cobros se efectúan mensualmente o según la duración de tu plan. Puedes verificar tu próxima fecha en el panel de control.</p>
+      </div>
+    </section>
+
+    <!-- Section: Reprogramar -->
+    <section id="inspecciones">
       <h2>Reprogramar Inspecciones</h2>
-      <ul>
-        <li><a href="#">¿Cómo reagendar mi inspección?</a></li>
-        <li><a href="#">¿Qué pasa si no puedo estar presente?</a></li>
-      </ul>
-    </div>
 
-    <div class="category">
+      <div class="faq">
+        <h3>¿Cómo reagendo una inspección?</h3>
+        <p>En tu panel, entra a “Reagendar”, selecciona una nueva fecha y confirma.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Qué pasa si no puedo estar presente?</h3>
+        <p>Nos puedes avisar con anticipación para reagendar sin costo adicional. Queremos adaptarnos a tu rutina.</p>
+      </div>
+    </section>
+
+    <!-- Section: Recompensas -->
+    <section id="recompensas">
       <h2>Recompensas y Beneficios</h2>
-      <ul>
-        <li><a href="#">¿Cómo funciona la tarjeta de recompensas?</a></li>
-        <li><a href="#">Beneficios exclusivos para suscriptores</a></li>
-      </ul>
-    </div>
 
-    <div class="category">
-      <h2>Preguntas Frecuentes</h2>
-      <ul>
-        <li><a href="#">¿Qué cubre AutoCuidado Club?</a></li>
-        <li><a href="#">¿Puedo cancelar mi suscripción?</a></li>
-        <li><a href="#">¿Cómo añadir más vehículos?</a></li>
-      </ul>
-    </div>
+      <div class="faq">
+        <h3>¿Cómo funciona la tarjeta de recompensas?</h3>
+        <p>Por cada mes pagado y completado consecutivamente, marcamos un avance. Al completar 6 meses, recibes recompensas exclusivas.</p>
+      </div>
 
-    <div class="category">
-      <h2>¿Necesitas más ayuda?</h2>
-      <p>Contáctanos vía <a href="contacto.html">WhatsApp o Formulario</a></p>
-    </div>
+      <div class="faq">
+        <h3>¿Qué beneficios obtengo con el Plan Plus?</h3>
+        <p>Acceso a mejores recompensas, posibilidad de incluir más vehículos y beneficios adicionales diseñados para profesionales.</p>
+      </div>
+    </section>
+
+    <!-- Section: FAQs -->
+    <section id="faq">
+      <h2>Preguntas Frecuentes (FAQs)</h2>
+
+      <div class="faq">
+        <h3>¿Puedo cancelar mi suscripción en cualquier momento?</h3>
+        <p>Sí, puedes cancelar antes de tu siguiente ciclo de pago sin penalizaciones.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Qué cubre el mantenimiento preventivo?</h3>
+        <p>Revisión de fluidos, chequeo visual, asesoría para compra de repuestos y coordinación de servicios, sin necesidad de trasladar tu vehículo.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cómo añado más vehículos?</h3>
+        <p>Actualiza a un Plan Plus y podrás registrar varios vehículos desde tu panel.</p>
+      </div>
+
+    </section>
+
+    <p style="text-align:center; margin-top:20px;">¿Aún necesitas ayuda? <a href="contacto.html">Contáctanos aquí</a>.</p>
 
   </div>
 
   <footer>
     &copy; 2025 AutoCuidado Club - Todos los derechos reservados.
   </footer>
+
+  <script>
+    // Simple accordion effect
+    const faqs = document.querySelectorAll('.faq h3');
+    faqs.forEach(faq => {
+      faq.addEventListener('click', () => {
+        const p = faq.nextElementSibling;
+        p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+      });
+    });
+  </script>
 
 </body>
 </html>
