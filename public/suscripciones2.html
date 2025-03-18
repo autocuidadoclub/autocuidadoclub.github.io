@@ -1012,32 +1012,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
+// ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
 function updateVehicleFields(planType) {
     const vehicleContainer = document.getElementById("vehicle-container");
     vehicleContainer.innerHTML = ""; // Clear previous entries
 
-    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
-
-    for (let i = 0; i < maxVehicles; i++) {
+    for (let i = 0; i < 3; i++) {
         const vehicleEntry = document.createElement("div");
         vehicleEntry.classList.add("vehicle-entry");
+
+        // ✅ Hide extra vehicles if Basic plan
+        if (!planType.includes("plus") && i > 0) {
+            vehicleEntry.style.display = "none"; // Hidden by default
+        }
+
         vehicleEntry.innerHTML = `
             <h4>Vehículo ${i + 1}</h4>
             <label>Placa:</label>
-            <input type="text" class="plate" required>
+            <input type="text" class="plate">
 
             <label>Modelo:</label>
-            <input type="text" class="model" required>
+            <input type="text" class="model">
 
             <label>Marca:</label>
-            <input type="text" class="brand" required>
+            <input type="text" class="brand">
 
             <label>Año:</label>
-            <input type="number" class="year" required>
+            <input type="number" class="year">
         `;
         vehicleContainer.appendChild(vehicleEntry);
     }
+
+    console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 saved)"}`);
 }
+
             </script>
 </body>
 </html>
