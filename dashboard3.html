@@ -220,20 +220,24 @@
     <!-- Motivational Message -->
     <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
-    <!-- Add More Vehicles Button -->
-    <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-        <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-            Añade más vehículos: Mejora a Plan Plus 🚗✨
-        </button>
-    </div>
-
-    <!-- Plan Upgrade Dropdown -->
+       <!-- Plan Upgrade Dropdown -->
     <label for="new-plan">Selecciona un nuevo plan:</label>
     <select id="new-plan">
         <!-- Options populated dynamically -->
     </select>
     <button onclick="upgradePlan()">Mejorar Plan</button>
 </div>
+
+                <div id="add-vehicles-form" style="display:none; margin-top:10px;">
+    <h4>Registrar Vehículos Adicionales 🚗✨</h4>
+    <div id="vehicles-container">
+        <!-- New vehicle fields will appear here -->
+    </div>
+    <button onclick="addVehicleField()" style="background-color:#4caf50; color:white; margin-top:10px;">+ Añadir otro vehículo</button>
+    <button onclick="saveAdditionalVehicles()" style="background-color:#ff6600; color:white; margin-top:10px;">Guardar Vehículos</button>
+</div>
+
+                
             </div>
             
 <div class="card">
@@ -597,16 +601,92 @@ function upgradeToPlus() {
 const upgradeClicked = sessionStorage.getItem("upgradeClicked"); // Add this!
 
     
-function upgradePlan() {
-  const selectedPlan = document.getElementById("new-plan").value;
-  const user = firebase.auth().currentUser;
-  if (!user || !selectedPlan) return;
-  db.collection("users").doc(user.uid).update({ planType: selectedPlan }).then(() => {
-    sessionStorage.removeItem("upgradeClicked");
-    alert("✅ Plan mejorado exitosamente");
-    loadUserProfile(user.uid);
-  });
+function upgradeToPlus() {
+    const targetPlan = document.getElementById("add-vehicles-button").getAttribute("data-target-plan");
+    if (!targetPlan) return;
+
+    if (!confirm(`¿Quieres añadir más vehículos y mejorar a ${targetPlan}?`)) return;
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para mejorar el plan.");
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.update({
+        planType: targetPlan
+    }).then(() => {
+        alert(`✅ ¡Ahora tienes acceso para añadir más vehículos! Plan actualizado a: ${targetPlan}`);
+        // Show the add vehicle form
+        document.getElementById("add-vehicles-form").style.display = "block";
+    }).catch((error) => {
+        console.error("❌ Error al actualizar el plan:", error);
+        alert("Ocurrió un error al actualizar. Intenta nuevamente.");
+    });
 }
+
+    function addVehicleField() {
+    const container = document.getElementById("vehicles-container");
+    const index = container.children.length;
+
+    const vehicleHTML = `
+        <div class="vehicle-input-card" style="border:1px solid #ccc; padding:10px; margin-top:10px; border-radius:5px;">
+            <h5>Vehículo ${index + 1}</h5>
+            <input type="text" placeholder="Placa" id="plate-${index}" required><br>
+            <input type="text" placeholder="Marca" id="brand-${index}" required><br>
+            <input type="text" placeholder="Modelo" id="model-${index}" required><br>
+            <input type="number" placeholder="Año" id="year-${index}" required><br>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', vehicleHTML);
+}
+
+    function saveAdditionalVehicles() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para guardar los vehículos.");
+        return;
+    }
+
+    const vehiclesContainer = document.getElementById("vehicles-container");
+    const vehicleCards = vehiclesContainer.querySelectorAll('.vehicle-input-card');
+    const newVehicles = [];
+
+    vehicleCards.forEach((card, index) => {
+        const plate = document.getElementById(`plate-${index}`).value;
+        const brand = document.getElementById(`brand-${index}`).value;
+        const model = document.getElementById(`model-${index}`).value;
+        const year = document.getElementById(`year-${index}`).value;
+
+        if (plate && brand && model && year) {
+            newVehicles.push({ plate, brand, model, year });
+        }
+    });
+
+    if (newVehicles.length === 0) {
+        alert("❌ Debes ingresar al menos un vehículo válido.");
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+
+    // Merge with existing vehicles
+    userRef.get().then((doc) => {
+        const existingVehicles = doc.data().vehicles || [];
+        const updatedVehicles = existingVehicles.concat(newVehicles);
+
+        userRef.update({
+            vehicles: updatedVehicles
+        }).then(() => {
+            alert("✅ Vehículos adicionales guardados exitosamente.");
+            loadUserProfile(user.uid); // Reload
+        }).catch((error) => {
+            console.error("❌ Error al guardar vehículos:", error);
+        });
+    });
+}
+
  
 // Payment Status Function
 function handlePaymentStatus(userData) {
