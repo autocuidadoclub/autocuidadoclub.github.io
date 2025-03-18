@@ -217,6 +217,12 @@
     <!-- 🔥 Motivational Message Placeholder -->
 <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
+
+    <label for="new-plan">Selecciona un nuevo plan:</label>
+    <select id="new-plan"></select>
+    <button onclick="upgradePlan()">Mejorar Plan</button>
+</div>
+                
 <!-- Dedicated Add Vehicles Button -->
 <div id="add-vehicles-button" style="margin-top:10px; display:none;">
     <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
@@ -224,11 +230,16 @@
     </button>
 </div>
 
-
-    <label for="new-plan">Selecciona un nuevo plan:</label>
-    <select id="new-plan"></select>
-    <button onclick="upgradePlan()">Mejorar Plan</button>
+<!-- New Section: Only appears when Plan is Plus & Payment Completed -->
+<div class="card" id="add-vehicle-section" style="display:none;">
+    <h3>¿Quieres agregar nuevos vehículos? 🚗</h3>
+    <div id="new-vehicle-container"></div>
+    <button onclick="showAddVehicleForm()">Añadir Nuevo Vehículo</button>
+    <button onclick="saveNewVehicles()">Guardar Vehículos</button>
 </div>
+
+            
+
             
 <div class="card">
     <h3>🚗✨ Tip del mes</h3>
@@ -497,6 +508,14 @@ function updateUserInfo(userData) {
     loadVehicles(userData.vehicles);
     handlePaymentStatus(userData);
     updateLoyaltyCard(userData);
+  
+    // Display "Add Vehicle" section based on plan type and payment status
+    if (userData.planType && userData.planType.startsWith("plus") && userData.paymentStatus === "Completed") {
+        document.getElementById("add-vehicle-section").style.display = "block";
+    } else {
+        document.getElementById("add-vehicle-section").style.display = "none";
+    }
+}
 
     // 🔥 Plan Descriptions
     const availablePlans = {
@@ -647,6 +666,56 @@ function upgradeToPlus() {
     }).catch((error) => {
         console.error("❌ Error al actualizar el plan:", error);
         alert("Ocurrió un error al actualizar. Intenta nuevamente.");
+    });
+}
+
+    function showAddVehicleForm() {
+    const container = document.getElementById("new-vehicle-container");
+    container.innerHTML = ""; // Clear
+
+    for (let i = 0; i < 2; i++) { // 2 new vehicles max (since 1 was already added in registration)
+        const vehicleEntry = document.createElement("div");
+        vehicleEntry.classList.add("vehicle-entry");
+
+        vehicleEntry.innerHTML = `
+            <h4>Nuevo Vehículo ${i + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label>Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label>Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label>Año:</label>
+            <input type="number" class="year" required>
+        `;
+        container.appendChild(vehicleEntry);
+    }
+}
+
+function saveNewVehicles() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const newVehicles = [];
+    document.querySelectorAll("#new-vehicle-container .vehicle-entry").forEach(entry => {
+        newVehicles.push({
+            plate: entry.querySelector(".plate").value || "",
+            model: entry.querySelector(".model").value || "",
+            brand: entry.querySelector(".brand").value || "",
+            year: entry.querySelector(".year").value || ""
+        });
+    });
+
+    db.collection("users").doc(user.uid).update({
+        vehicles: firebase.firestore.FieldValue.arrayUnion(...newVehicles)
+    }).then(() => {
+        alert("✅ Vehículos añadidos correctamente.");
+        loadUserProfile(user.uid); // Refresh
+    }).catch((error) => {
+        console.error("❌ Error al actualizar vehículos:", error);
     });
 }
 
