@@ -211,25 +211,29 @@
             <!-- Plan Upgrade Card -->
             <div class="card">
     
- <div class="card">
-    <!-- 🔥 Motivational Message Placeholder -->
-    <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
-
-    <!-- ✅ Plan Description -->
+<!-- Plan Upgrade Card -->
+<div class="card">
+    <h3>¿Te gustaría Mejorar de Suscripción?</h3>
+    <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
     <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
 
-    <!-- Dedicated Add Vehicles Button -->
+    <!-- Motivational Message -->
+    <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+
+    <!-- Add More Vehicles Button -->
     <div id="add-vehicles-button" style="margin-top:10px; display:none;">
         <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
             Añade más vehículos: Mejora a Plan Plus 🚗✨
         </button>
     </div>
 
+    <!-- Plan Upgrade Dropdown -->
     <label for="new-plan">Selecciona un nuevo plan:</label>
-    <select id="new-plan"></select>
+    <select id="new-plan">
+        <!-- Options populated dynamically -->
+    </select>
     <button onclick="upgradePlan()">Mejorar Plan</button>
 </div>
-            </div>
 
             
 <div class="card">
