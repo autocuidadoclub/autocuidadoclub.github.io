@@ -223,12 +223,6 @@
     <button onclick="upgradePlan()">Mejorar Plan</button>
 </div>
                 
-<!-- Dedicated Add Vehicles Button -->
-<div id="add-vehicles-button" style="margin-top:10px; display:none;">
-    <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-        Añade más vehículos: Mejora a Plan Plus 🚗✨
-    </button>
-</div>
 
 <!-- New Section: Only appears when Plan is Plus & Payment Completed -->
 <div class="card" id="add-vehicle-section" style="display:none;">
@@ -480,6 +474,7 @@ function updateUserInfo(userData) {
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
 
+    // Payment info
     if (!userData.paymentDate || userData.paymentStatus === "Pending") {
         document.getElementById("paymentDate").innerText = "Pendiente de pago";
         document.getElementById("nextPaymentDate").innerText = "No asignado";
@@ -490,12 +485,11 @@ function updateUserInfo(userData) {
 
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
 
-    // Check reschedule
+    // Reschedule info
     const rescheduleInfo = document.getElementById("reschedule-info");
     if (userData.lastReschedule) {
         const lastRescheduleDate = userData.lastReschedule.toDate();
         const currentDate = new Date();
-
         if (lastRescheduleDate.getMonth() === currentDate.getMonth() &&
             lastRescheduleDate.getFullYear() === currentDate.getFullYear()) {
             rescheduleInfo.style.display = "block";
@@ -505,19 +499,23 @@ function updateUserInfo(userData) {
         }
     }
 
+    // Vehicles
     loadVehicles(userData.vehicles);
+
+    // Payment Status
     handlePaymentStatus(userData);
+
+    // Loyalty Card
     updateLoyaltyCard(userData);
-  
-    // Display "Add Vehicle" section based on plan type and payment status
+
+    // ✅ Check if Plan is Plus AND Payment Completed → Show Add Vehicle Section
     if (userData.planType && userData.planType.startsWith("plus") && userData.paymentStatus === "Completed") {
         document.getElementById("add-vehicle-section").style.display = "block";
     } else {
         document.getElementById("add-vehicle-section").style.display = "none";
     }
-}
 
-    // 🔥 Plan Descriptions
+    // 🔥 Plan Descriptions & Motivational Messages
     const availablePlans = {
         "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic", duration: 3 },
         "basic6m": { name: "Plan Básico de 6 meses", level: 2, type: "basic", duration: 6 },
@@ -530,7 +528,7 @@ function updateUserInfo(userData) {
     const currentPlanType = userData.planType;
     const currentPlan = availablePlans[currentPlanType];
 
-    // ✅ Motivational Message Logic
+    // Motivational Message
     const motivationalDiv = document.getElementById("motivational-message");
     let motivationalText = "";
 
@@ -549,7 +547,7 @@ function updateUserInfo(userData) {
         motivationalDiv.style.display = "block";
     }
 
-    // ✅ Dedicated Add Vehicles Button
+    // ✅ Dedicated Add Vehicles Button (for Basic users only)
     const addVehiclesButton = document.getElementById("add-vehicles-button");
     if (currentPlanType.startsWith("basic")) {
         addVehiclesButton.style.display = "block";
@@ -558,7 +556,7 @@ function updateUserInfo(userData) {
         addVehiclesButton.style.display = "none";
     }
 
-    // ✅ Description
+    // Description
     const planMessageElement = document.getElementById("planMessage");
     if (currentPlan) {
         planMessageElement.innerText = currentPlan.name;
@@ -566,7 +564,7 @@ function updateUserInfo(userData) {
         planMessageElement.innerText = "Tipo de plan desconocido";
     }
 
-    // ✅ Populate Dropdown
+    // Populate Dropdown
     const newPlanSelect = document.getElementById("new-plan");
     newPlanSelect.innerHTML = "";
 
@@ -589,6 +587,7 @@ function updateUserInfo(userData) {
         newPlanSelect.appendChild(option);
     }
 }
+
 
 // Payment Status Function
 function handlePaymentStatus(userData) {
