@@ -217,23 +217,18 @@
     <!-- 🔥 Motivational Message Placeholder -->
 <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
+<!-- Dedicated Add Vehicles Button -->
+<div id="add-vehicles-button" style="margin-top:10px; display:none;">
+    <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+        Añade más vehículos: Mejora a Plan Plus 🚗✨
+    </button>
+</div>
+
 
     <label for="new-plan">Selecciona un nuevo plan:</label>
     <select id="new-plan"></select>
     <button onclick="upgradePlan()">Mejorar Plan</button>
 </div>
-                
-
-<!-- New Section: Only appears when Plan is Plus & Payment Completed -->
-<div class="card" id="add-vehicle-section" style="display:none;">
-    <h3>¿Quieres agregar nuevos vehículos? 🚗</h3>
-    <div id="new-vehicle-container"></div>
-    <button onclick="showAddVehicleForm()">Añadir Nuevo Vehículo</button>
-    <button onclick="saveNewVehicles()">Guardar Vehículos</button>
-</div>
-
-            
-
             
 <div class="card">
     <h3>🚗✨ Tip del mes</h3>
@@ -473,90 +468,92 @@ function updateUserInfo(userData) {
     document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-
-    // Payment info
     if (!userData.paymentDate || userData.paymentStatus === "Pending") {
-        document.getElementById("paymentDate").innerText = "Pendiente de pago";
-        document.getElementById("nextPaymentDate").innerText = "No asignado";
-    } else {
-        document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
-        document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-    }
+    document.getElementById("paymentDate").innerText = "Pendiente de pago";
+    document.getElementById("nextPaymentDate").innerText = "No asignado";
+} else {
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+}
 
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+   // After updating schedule info
+document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
 
-    // Reschedule info
-    const rescheduleInfo = document.getElementById("reschedule-info");
-    if (userData.lastReschedule) {
-        const lastRescheduleDate = userData.lastReschedule.toDate();
-        const currentDate = new Date();
-        if (lastRescheduleDate.getMonth() === currentDate.getMonth() &&
-            lastRescheduleDate.getFullYear() === currentDate.getFullYear()) {
-            rescheduleInfo.style.display = "block";
-            rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
-        } else {
-            rescheduleInfo.style.display = "none";
-        }
+// Check if user already reprogrammed
+const rescheduleInfo = document.getElementById("reschedule-info");
+if (userData.lastReschedule) {
+    const lastRescheduleDate = userData.lastReschedule.toDate();
+    const currentDate = new Date();
+
+    if (
+        lastRescheduleDate.getMonth() === currentDate.getMonth() &&
+        lastRescheduleDate.getFullYear() === currentDate.getFullYear()
+    ) {
+        rescheduleInfo.style.display = "block";
+        rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
+    } else {
+        rescheduleInfo.style.display = "none";
     }
+}
 
-    // Vehicles
+    
     loadVehicles(userData.vehicles);
-
-    // Payment Status
     handlePaymentStatus(userData);
-
-    // Loyalty Card
     updateLoyaltyCard(userData);
 
-    // ✅ Check if Plan is Plus AND Payment Completed → Show Add Vehicle Section
-    if (userData.planType && userData.planType.startsWith("plus") && userData.paymentStatus === "Completed") {
-        document.getElementById("add-vehicle-section").style.display = "block";
-    } else {
-        document.getElementById("add-vehicle-section").style.display = "none";
-    }
-
-    // 🔥 Plan Descriptions & Motivational Messages
+    // 🔥 Plan Descriptions
     const availablePlans = {
-        "basic3m": { name: "Plan Básico de 3 meses", level: 1, type: "basic", duration: 3 },
-        "basic6m": { name: "Plan Básico de 6 meses", level: 2, type: "basic", duration: 6 },
-        "basic12m": { name: "Plan Básico de 12 meses", level: 3, type: "basic", duration: 12 },
-        "plus3m": { name: "Plan Plus de 3 meses", level: 4, type: "plus", duration: 3 },
-        "plus6m": { name: "Plan Plus de 6 meses", level: 5, type: "plus", duration: 6 },
-        "plus12m": { name: "Plan Plus de 12 meses", level: 6, type: "plus", duration: 12 }
+        "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
+        "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
+        "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
+        "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
+        "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
+        "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
     };
 
+    // Actual plan
     const currentPlanType = userData.planType;
     const currentPlan = availablePlans[currentPlanType];
 
-    // Motivational Message
-    const motivationalDiv = document.getElementById("motivational-message");
-    let motivationalText = "";
+    // Motivational Message Logic
+const motivationalDiv = document.getElementById("motivational-message");
+let motivationalText = "";
 
-    if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
-        motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-    } else if (currentPlanType === "basic12m") {
-        motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-    } else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
-        motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
-    } else if (currentPlanType === "plus12m") {
-        motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
-    }
+if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "basic12m") {
+    motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
+} else if (currentPlanType === "plus12m") {
+    motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
+}
 
-    if (motivationalText) {
-        motivationalDiv.innerHTML = motivationalText;
-        motivationalDiv.style.display = "block";
-    }
+if (motivationalText) {
+    motivationalDiv.innerHTML = motivationalText;
+    motivationalDiv.style.display = "block";
+}
 
-    // ✅ Dedicated Add Vehicles Button (for Basic users only)
-    const addVehiclesButton = document.getElementById("add-vehicles-button");
-    if (currentPlanType.startsWith("basic")) {
-        addVehiclesButton.style.display = "block";
-        addVehiclesButton.setAttribute("data-target-plan", `plus${currentPlan.duration}m`);
-    } else {
-        addVehiclesButton.style.display = "none";
-    }
+    // Dedicated Add Vehicles Button
+const addVehiclesButton = document.getElementById("add-vehicles-button");
 
-    // Description
+// Logic
+if (currentPlanType === "basic3m") {
+    addVehiclesButton.style.display = "block";
+    addVehiclesButton.setAttribute("data-target-plan", "plus3m");
+} else if (currentPlanType === "basic6m") {
+    addVehiclesButton.style.display = "block";
+    addVehiclesButton.setAttribute("data-target-plan", "plus6m");
+} else if (currentPlanType === "basic12m") {
+    addVehiclesButton.style.display = "block";
+    addVehiclesButton.setAttribute("data-target-plan", "plus12m");
+} else {
+    addVehiclesButton.style.display = "none"; // Already Plus, no need
+}
+
+    
+    // Set description
     const planMessageElement = document.getElementById("planMessage");
     if (currentPlan) {
         planMessageElement.innerText = currentPlan.name;
@@ -564,13 +561,14 @@ function updateUserInfo(userData) {
         planMessageElement.innerText = "Tipo de plan desconocido";
     }
 
-    // Populate Dropdown
+    // Populate the select options
     const newPlanSelect = document.getElementById("new-plan");
-    newPlanSelect.innerHTML = "";
+    newPlanSelect.innerHTML = ""; // Clear first
+    const currentLevel = currentPlan ? currentPlan.level : 0;
 
     let optionsAdded = false;
     for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.type === currentPlan.type && plan.duration > currentPlan.duration) {
+        if (plan.level > currentLevel) { // Only higher plans
             const option = document.createElement("option");
             option.value = key;
             option.text = plan.name;
@@ -665,56 +663,6 @@ function upgradeToPlus() {
     }).catch((error) => {
         console.error("❌ Error al actualizar el plan:", error);
         alert("Ocurrió un error al actualizar. Intenta nuevamente.");
-    });
-}
-
-    function showAddVehicleForm() {
-    const container = document.getElementById("new-vehicle-container");
-    container.innerHTML = ""; // Clear
-
-    for (let i = 0; i < 2; i++) { // 2 new vehicles max (since 1 was already added in registration)
-        const vehicleEntry = document.createElement("div");
-        vehicleEntry.classList.add("vehicle-entry");
-
-        vehicleEntry.innerHTML = `
-            <h4>Nuevo Vehículo ${i + 1}</h4>
-            <label>Placa:</label>
-            <input type="text" class="plate" required>
-
-            <label>Modelo:</label>
-            <input type="text" class="model" required>
-
-            <label>Marca:</label>
-            <input type="text" class="brand" required>
-
-            <label>Año:</label>
-            <input type="number" class="year" required>
-        `;
-        container.appendChild(vehicleEntry);
-    }
-}
-
-function saveNewVehicles() {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
-
-    const newVehicles = [];
-    document.querySelectorAll("#new-vehicle-container .vehicle-entry").forEach(entry => {
-        newVehicles.push({
-            plate: entry.querySelector(".plate").value || "",
-            model: entry.querySelector(".model").value || "",
-            brand: entry.querySelector(".brand").value || "",
-            year: entry.querySelector(".year").value || ""
-        });
-    });
-
-    db.collection("users").doc(user.uid).update({
-        vehicles: firebase.firestore.FieldValue.arrayUnion(...newVehicles)
-    }).then(() => {
-        alert("✅ Vehículos añadidos correctamente.");
-        loadUserProfile(user.uid); // Refresh
-    }).catch((error) => {
-        console.error("❌ Error al actualizar vehículos:", error);
     });
 }
 
