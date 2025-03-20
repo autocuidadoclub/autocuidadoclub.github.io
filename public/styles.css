@@ -1593,4 +1593,15 @@ nav {
     color: white;
 }
 
+.plan-button {
+    background-color: #003366;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+.plan-button:hover {
+    background-color: #FF6600;
+}
 
