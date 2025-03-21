@@ -1094,15 +1094,15 @@ hr.separator {
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
-    align-items: stretch; /* ⬅️ KEY: Stretch all items */
+    align-items: stretch;
 }
 
 .plan-item {
     width: 320px;
+    min-height: 750px; /* Fixed height */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 750px; /* ✅ Force all boxes same height */
     padding: 20px;
     box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
     border-radius: 8px;
@@ -1114,11 +1114,16 @@ hr.separator {
     flex-direction: column;
     flex-grow: 1;
 }
-
 .plan-benefits {
-    flex-grow: 1; /* Pushes content to stretch */
+    flex-grow: 1;
+}
+button.plan-button {
+    margin-top: auto;
 }
 
-button.plan-button {
-    margin-top: auto; /* Forces button to bottom */
+.plan-image {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    margin-bottom: 10px;
 }
