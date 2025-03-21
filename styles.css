@@ -1113,3 +1113,59 @@ hr.separator {
         flex: 1 1 100%;
     }
 }
+
+.plan-item {
+    flex: 1 1 320px; /* consistent width */
+    max-width: 320px;
+    min-height: 650px; /* consistent height for all boxes */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: var(--gray-lighter);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: var(--shadow);
+    padding: 20px; /* Ensure enough spacing */
+}
+
+.plan-item:hover {
+    transform: scale(1.05);
+}
+
+.plan-option {
+    flex-grow: 1; /* Ensures all inner content stretches evenly */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.plan-image {
+    border-radius: 5px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.plan-benefits {
+    text-align: left;
+    margin: 10px 0;
+    font-size: 0.9em;
+    flex-grow: 1; /* Benefits take available space */
+}
+
+.plan-button {
+    background-color: var(--blue-dark);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 15px;
+    transition: var(--transition);
+}
+
+.plan-button:hover {
+    background-color: var(--orange);
+}
