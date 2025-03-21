@@ -337,25 +337,33 @@
 
            <!-- Rewards -->
 <div class="rewards">
-    <h3><i class="fas fa-gift"></i> Premios Disponibles <span class="reward-status locked"><i class="fas fa-lock"></i> Bloqueado</span></h3>
+    <h3><i class="fas fa-gift"></i> Premios Disponibles 
+        <span class="reward-status locked" style="margin-left:10px;"><i class="fas fa-lock"></i> Bloqueado</span>
+    </h3>
     
-    <div class="rewards-row">
+    <div class="reward-row"> <!-- FLEX ROW CONTAINER -->
         <div class="reward-card">
             <div class="reward-icon">🎐</div>
-            <div class="reward-title">Recarga de A/C</div>
-            <div class="reward-desc">1x por cada vehículo registrado</div>
+            <div class="reward-info">
+                <h4>Recarga de A/C</h4>
+                <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
         </div>
         <div class="reward-card">
             <div class="reward-icon">🚗</div>
-            <div class="reward-title">Carwash gratis</div>
-            <div class="reward-desc">1x por cada vehículo registrado</div>
+            <div class="reward-info">
+                <h4>Carwash gratis</h4>
+                <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
         </div>
         <div class="reward-card">
             <div class="reward-icon">📝</div>
-            <div class="reward-title">Revisión extra del mes</div>
-            <div class="reward-desc">1x por cada vehículo registrado</div>
+            <div class="reward-info">
+                <h4>Revisión extra del mes en curso</h4>
+                <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
         </div>
-    </div>
+    </div> <!-- End Flex Row -->
 </div>
 
             
