@@ -1091,29 +1091,34 @@ hr.separator {
 
 .subscription-row {
     display: flex;
-    justify-content: center;
-    gap: 20px;
     flex-wrap: wrap;
-    align-items: stretch; /* ⭐ Ensures same height */
+    gap: 20px;
+    justify-content: center;
+    align-items: stretch; /* ⬅️ KEY: Stretch all items */
 }
 
 .plan-item {
-    flex: 1 1 320px; /* Consistent width */
+    width: 320px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Pushes button to bottom */
-    min-height: 700px; /* ⬅️ Set fixed min-height, adjust as needed */
-    max-width: 320px;
-    background-color: var(--gray-lighter);
-    border-radius: 10px;
+    justify-content: space-between;
+    min-height: 750px; /* ✅ Force all boxes same height */
     padding: 20px;
-    box-shadow: var(--shadow);
-    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    position: relative;
 }
 
 .plan-option {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     flex-grow: 1;
+}
+
+.plan-benefits {
+    flex-grow: 1; /* Pushes content to stretch */
+}
+
+button.plan-button {
+    margin-top: auto; /* Forces button to bottom */
 }
