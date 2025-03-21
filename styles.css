@@ -1089,3 +1089,27 @@ hr.separator {
     color: #777;
 }
 
+.dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.dashboard-box {
+    flex: 1 1 calc(50% - 20px); /* 2 per row, minus gap */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    min-width: 300px; /* prevent too small */
+    max-width: 500px;
+}
+
+/* Optional: for smaller screens */
+@media (max-width: 768px) {
+    .dashboard-box {
+        flex: 1 1 100%;
+    }
+}
