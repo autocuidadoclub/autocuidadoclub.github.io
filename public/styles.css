@@ -419,21 +419,6 @@ html {
     flex-wrap: wrap;
 }
 
-.plan-item {
-    flex: 1 1 300px;
-    max-width: 300px;
-    text-align: center;
-    position: relative;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: var(--gray-lighter);
-    transition: transform 0.3s ease-in-out;
-    box-shadow: var(--shadow);
-}
-
-.plan-item:hover {
-    transform: scale(1.05);
-}
 
 .plan-image {
     border-radius: 5px;
