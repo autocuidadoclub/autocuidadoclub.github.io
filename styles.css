@@ -1631,3 +1631,68 @@ nav {
     margin: 10px 0;
     font-size: 15px;
 }
+
+.reward-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.reward-card:hover {
+    background-color: #e6f7e6;
+    transform: scale(1.02);
+}
+
+.reward-icon {
+    font-size: 28px;
+    margin-right: 20px;
+}
+
+.reward-info h4 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.reward-info p {
+    margin: 5px 0 0;
+    font-size: 15px;
+    color: #666;
+}
+
+.reward-status {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.reward-status.locked {
+    background-color: #ccc;
+    color: white;
+}
+
+.reward-status.unlocked {
+    background-color: #4caf50;
+    color: white;
+}
+
+.reward-status.locked::before {
+    content: "🔒";
+    margin-right: 6px;
+}
+
+.reward-status.unlocked::before {
+    content: "🔓";
+    margin-right: 6px;
+}
+
