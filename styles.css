@@ -1897,3 +1897,63 @@ nav {
     margin-left: 10px;
     font-size: 0.9em;
 }
+
+/* Steps Container Improvements */
+.steps-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.step-box {
+    flex: 1 1 200px;
+    max-width: 250px;
+    min-width: 200px;
+    height: 250px; /* Fixed height */
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.step-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Header */
+.step-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-height: 80px; /* Consistent height for header */
+}
+
+.step-icon {
+    font-size: 2em;
+    color: #FF6600;
+}
+
+.step-box h3 {
+    font-size: 1.1em;
+    color: #003366;
+    margin: 0;
+    min-height: 50px; /* Force same height for all titles */
+}
+
+/* Text */
+.step-box p {
+    font-size: 0.95em;
+    color: #555;
+    margin: 0;
+    min-height: 50px; /* Force same height for description */
+}
+
