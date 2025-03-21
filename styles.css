@@ -1008,3 +1008,43 @@ hr.separator {
     border-radius: 8px;
     color: #155724;
 }
+
+.rewards-row {
+    display: flex;
+    flex-wrap: wrap; /* Responsive */
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.reward-card {
+    flex: 1 1 250px; /* All cards same width */
+    max-width: 300px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.reward-card:hover {
+    transform: translateY(-5px);
+}
+
+.reward-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.reward-title {
+    font-weight: bold;
+    margin: 10px 0 5px;
+    color: #333;
+}
+
+.reward-desc {
+    font-size: 0.9em;
+    color: #666;
+}
