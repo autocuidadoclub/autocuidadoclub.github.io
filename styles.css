@@ -1750,3 +1750,48 @@ nav {
     background-color: #4caf50;
     color: white;
 }
+
+.reward-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reward-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.reward-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.reward-icon {
+    font-size: 2em;
+    margin-right: 15px;
+}
+
+.reward-info {
+    flex-grow: 1;
+}
+
+.reward-status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.reward-status.locked {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.reward-status.unlocked {
+    background-color: #d4edda;
+    color: #155724;
+}
+
