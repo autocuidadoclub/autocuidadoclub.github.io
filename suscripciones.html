@@ -145,14 +145,14 @@
         const selectedTime = document.getElementById("selectedTime").value;
 
         const vehicles = [];
-        document.querySelectorAll(".vehicle-entry").forEach(entry => {
-            vehicles.push({
-                plate: entry.querySelector(".plate").value,
-                model: entry.querySelector(".model").value,
-                brand: entry.querySelector(".brand").value,
-                year: entry.querySelector(".year").value
-            });
-        });
+document.querySelectorAll(".vehicle-entry").forEach(entry => {
+    vehicles.push({
+        plate: entry.querySelector(".plate").value || "",
+        model: entry.querySelector(".model").value || "",
+        brand: entry.querySelector(".brand").value || "",
+        year: entry.querySelector(".year").value || ""
+    });
+});
 
         if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
             alert("❌ Todos los campos son obligatorios.");
@@ -427,74 +427,88 @@ button:hover {
 
     <!-- Discount & Subscription Comparison Table -->
     <section>
-        <h2>📊 Comparación de Planes y Descuentos</h2>
-        <table class="subscription-table">
-            <thead>
-                <tr>
-                    <th>Tipo de Suscripción</th>
-                    <th>3 Meses (por vehículo)</th>
-                    <th>6 Meses (por vehículo)</th>
-                    <th>12 Meses (por vehículo)</th>
-                    <th>Descuento vs. plan básico de 3 meses</th>
-                    <th>Ahorro Total</th>
-                    <th colspan="2">Beneficios adicionales</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><b>Basic (1 vehículo)</b></td>
-                    <td>$34.99</td>
-                    <td class="highlight-cell">$32.50</td>
-                    <td class="highlight-cell">$30.00</td>
-                    <td><p>7% (6m)</p> <p>14% (12m)</p></td>
-                    <td colspan="2" class="merged-cell">Hasta <b>$60/año</b> 🏆 <b>Equivalente a 1.8 meses gratis</b></td>
-                    <td>✔ Accede a beneficios después de 8 meses</td>
-                </tr>
-                <tr>
-                    <td><b>Plus (3 vehículos)</b></td>
-                    <td class="highlight-cell">$23.50</td>
-                    <td class="highlight-cell">$22.00</td>
-                    <td class="highlight-cell">$20.00</td>
-                    <td><p>33% (3m)</p> <p>38% (6m)</p> <p>42% (12m)</p></td>
-                    <td colspan="2" class="merged-cell">Hasta <b>$180/año</b> 🏆 <b>Equivalente a 5.5 meses gratis</b></td>
-                    <td>✔ Accede a beneficios después de 8 meses</td>
-                </tr>
-            </tbody>
-        </table>
+       <h2>📊 Comparación de Planes y Descuentos</h2>
+<table class="subscription-table">
+    <thead>
+        <tr>
+            <th>Tipo de Suscripción</th>
+            <th>3 Meses <br> (Precio/vehículo)</th>
+            <th>6 Meses <br> (Precio/vehículo)</th>
+            <th>12 Meses <br> (Precio/vehículo)</th>
+            <th>Descuento</th>
+            <th>Ahorro Total</th>
+            <th>Vehículos</th>
+            <th>Beneficios Adicionales</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><b>Basic</b></td>
+            <td><div class="highlight-cell">$34.99</div></td>
+            <td><div class="highlight-cell">$32.50</div></td>
+            <td><div class="highlight-cell">$30.00</div></td>
+            <td>7% (6m) <br>14% (12m)</td>
+            <td><b>$60/año</b><br></td>
+            <td>1 vehículo</td>
+            <td>✔ Recompensas después de 8 meses</td>
+        </tr>
+        <tr>
+            <td><b>Plus</b></td>
+            <td><div class="highlight-cell">$23.50</div></td>
+            <td><div class="highlight-cell">$22.00</div></td>
+            <td><div class="highlight-cell">$20.00</div></td>
+            <td>33% (3m)<br>38% (6m)<br>42% (12m)</td>
+            <td><b>$180/año</b><br></td>
+            <td>3 vehículos</td>
+            <td>✔ Recompensas después de 8 meses</td>
+        </tr>
+    </tbody>
+</table>
+
     </section>
 
+    <h2>🔥 ¿Por qué elegir los planes de 12 meses?</h2>
     <!-- Loyalty Program & Explanation -->
-    <section>
-        <h2>🔥 ¿Por qué elegir los planes de 12 meses?</h2>
-        <div class="benefits-list">
-            <h3>💎 Plan de 12 Meses PLUS = Mayor Beneficio</h3>
-            <p>📢 **Obtén más valor y beneficios al pagar 12 meses de una sola vez.**</p>
-            <ul>
-                <li>💰 **Pagar 12 meses significa que cada vehículo recibe el servicio por el equivalente a pagar solo 8.5 meses en comparación con planes más cortos.**</li>
-                <li>📌 **Ahorro total de $180/año y acceso inmediato a recompensas exclusivas en el mes 8.**</li>
-                <li>🎁 **Equivalente a recibir 5.5 meses de servicio gratis en comparación con el plan de 3 meses.**</li>
-            </ul>
-        </div>
-        <div class="benefits-list">
-            <h3>💰 Plan de 12 Meses BASIC = Oportunidad Única</h3>
-            <p>📢 **Paga 12 meses y obtén más por tu dinero.**</p>
-            <ul>
-                <li>💰 **Cada mes cuesta menos, lo que equivale a pagar solo 10 meses en comparación con el plan de 3 meses.**</li>
-                <li>🎁 **Ahorro total de $60/año + acceso a recompensas en el mes 8.**</li>
-            </ul>
-        </div>
-        <div>
-        <h3 class="warning-text">🚀 ¿Cuál elegirás? ¡Elige la mejor opción y empieza a ahorrar HOY! </h3>
+    <section style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;">
+       
+    <!-- Box Plan PLUS -->
+    <div class="comparison-box">
+        <h3>💎 Plan 12 Meses PLUS</h3>
+        <ul>
+            <li>💰 <strong>Ahorra $180/año</strong></li>
+            <li>✅ <strong>5.5 meses gratis</strong></li>
+            <li>✔ Servicio para <strong>3 vehículos</strong></li>
+            <li>🎁 Recompensas al mes 8</li>
+        </ul>
     </div>
-    </section>
-<p></p>
-    <p></p>
+
+    <!-- Box Plan BASIC -->
+    <div class="comparison-box">
+        <h3>💰 Plan 12 Meses BASIC</h3>
+        <ul>
+            <li>💰 <strong>Ahorra $60/año</strong></li>
+            <li>✅ <strong>1.8 meses gratis</strong></li>
+            <li>✔ Servicio para <strong>1 vehículo</strong></li>
+            <li>🎁 Recompensas al mes 8</li>
+        </ul>
+    </div>
+
+    <!-- Box Cómo alcanzar recompensas -->
+    <div class="comparison-box" style="background-color: #fff3e6;">
+        <h3>🎯 ¿Cómo alcanzar tus recompensas?</h3>
+        <ul>
+            <li>🔁 3 renovaciones de <strong>3 meses</strong></li>
+            <li>🔁 2 renovaciones de <strong>6 meses</strong></li>
+            <li>🎉 1 contratación de <strong>12 meses</strong></li>
+        </ul>
+    </div>
+
+</section>
+
     
     <!-- Subscription Plans -->
     <section>
-     <!-- Subscription Plans -->
-    <section>
-        
+             
  <h2>Planes de Suscripciones Básicas (cobertura: 1 vehículo)</h2>
         <div class="subscription-row">
  <!-- 3-Month Plan -->
@@ -509,7 +523,14 @@ button:hover {
                 <li><strong>Ideal para:</strong> Clientes nuevos que buscan flexibilidad.</li>
             </ul>
             <p class="limited-time">Promoción válida solo en Febrero, ¡aprovecha hoy mismo!</p>
-            <button class="plan-button" data-plan="basic3m">Basic 3M</button>
+           <!-- 🟢 BOTÓN MEJORADO -->
+            <button class="plan-button" data-plan="basic3m">¡Quiero este plan!</button>
+            
+            <!-- 🔗 LINK PEQUEÑO -->
+            <p style="margin-top:10px; font-size:14px;">
+                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+            </p>
         </div>
     </div>
 
@@ -525,7 +546,12 @@ button:hover {
                 <li><strong>Ideal para:</strong> Clientes que buscan equilibrio entre compromiso y flexibilidad.</li>
             </ul>
             <p class="limited-time">Promoción válida solo en Febrero, ¡aprovecha hoy mismo!</p>
-             <button class="plan-button" data-plan="basic6m">Basic 6M</button>
+             <button class="plan-button" data-plan="basic6m">¡Quiero este plan!</button>
+            
+            <!-- 🔗 LINK PEQUEÑO -->
+            <p style="margin-top:10px; font-size:14px;">
+                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
         </div>
     </div>
 
@@ -599,7 +625,12 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
                         <li><strong>Descuento: </strong> 14% de descuento en comparación con el plan básico de 3 meses.</li>
                         </ul>
-                      <button class="plan-button" data-plan="basic12m">Basic 12M</button>
+                      <button class="plan-button" data-plan="basic12m">¡Quiero este plan!</button>
+            
+            <!-- 🔗 LINK PEQUEÑO -->
+            <p style="margin-top:10px; font-size:14px;">
+                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
             </div>
         </div>
             </div>
@@ -616,7 +647,12 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
                         <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         </ul>
-                     <button class="plan-button" data-plan="plus3m">Plus 3M</button>
+                     <button class="plan-button" data-plan="plus3m">¡Quiero este plan!</button>
+            
+            <!-- 🔗 LINK PEQUEÑO -->
+            <p style="margin-top:10px; font-size:14px;">
+                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
                 </div>
             </div>
             <div class="plan-item">
@@ -629,7 +665,12 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
                         <li><strong>Descuento: </strong> 38% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         </ul>
-                    <button class="plan-button" data-plan="plus6m">Plus 6M</button>
+                    <button class="plan-button" data-plan="plus6m">¡Quiero este plan!</button>
+            
+            <!-- 🔗 LINK PEQUEÑO -->
+            <p style="margin-top:10px; font-size:14px;">
+                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
                 </div>
             </div>
              <div class="plan-item">       
@@ -642,7 +683,12 @@ button:hover {
                         <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
                         <li><strong>Descuento: </strong> 42% de descuento en comparación con el plan básico de 3 meses por vehículo, <strong>Equivalente a 5.5 meses gratis</strong></li>
                         </ul>
-                    <button class="plan-button" data-plan="plus12m">Plus 12M</button>
+                    <button class="plan-button" data-plan="plus12m">¡Quiero este plan!</button>
+            
+            <!-- 🔗 LINK PEQUEÑO -->
+            <p style="margin-top:10px; font-size:14px;">
+                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
                 </div>
             </div>
         </div>
@@ -694,6 +740,7 @@ button:hover {
         <!-- Schedule Section -->
     <section id="schedule-section" class="schedule-section">
         <h2>Selecciona tu Horario</h2>
+        <p>Ten en cuenta que puedes cambiar el dia y la hora de tu inspección desde el tablero de usuario ingresando a tu cuenta luego de finalizar este registro</p>
         <table class="schedule-table">
             <thead>
                 <tr>
@@ -707,7 +754,7 @@ button:hover {
             </thead>
             <tbody>
                 <tr>
-                    <td>Bloque 1</td>
+                    <td></td>
                     <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
                     <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
                     <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
@@ -715,7 +762,7 @@ button:hover {
                     <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
                 </tr>
                 <tr>
-                    <td>Bloque 2</td>
+                    <td></td>
                     <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
                     <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
                     <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
@@ -723,7 +770,7 @@ button:hover {
                     <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
                 </tr>
                 <tr>
-                    <td>Bloque 3</td>
+                    <td></td>
                     <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
                     <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
                     <td onclick="selectScheduleBox(this)">-</td>
@@ -873,7 +920,12 @@ button:hover {
             <p></p>
             
         <button type="submit">Registrarse</button>
+    
+        </div>
+    </section>
     </form>
+    </div>
+    
  <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
@@ -1012,32 +1064,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
+// ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
 function updateVehicleFields(planType) {
     const vehicleContainer = document.getElementById("vehicle-container");
     vehicleContainer.innerHTML = ""; // Clear previous entries
 
-    let maxVehicles = (planType.includes("plus")) ? 3 : 1; // Plus plans allow 3, Basic allows 1
-
-    for (let i = 0; i < maxVehicles; i++) {
+    for (let i = 0; i < 3; i++) {
         const vehicleEntry = document.createElement("div");
         vehicleEntry.classList.add("vehicle-entry");
+
+        // ✅ Hide extra vehicles if Basic plan
+        if (!planType.includes("plus") && i > 0) {
+            vehicleEntry.style.display = "none"; // Hidden by default
+        }
+
         vehicleEntry.innerHTML = `
             <h4>Vehículo ${i + 1}</h4>
             <label>Placa:</label>
-            <input type="text" class="plate" required>
+            <input type="text" class="plate">
 
             <label>Modelo:</label>
-            <input type="text" class="model" required>
+            <input type="text" class="model">
 
             <label>Marca:</label>
-            <input type="text" class="brand" required>
+            <input type="text" class="brand">
 
             <label>Año:</label>
-            <input type="number" class="year" required>
+            <input type="number" class="year">
         `;
         vehicleContainer.appendChild(vehicleEntry);
     }
+
+    console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 saved)"}`);
 }
+
             </script>
 </body>
 </html>
