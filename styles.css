@@ -727,18 +727,17 @@ input:focus, select:focus {
 }
 
 .dashboard-grid {
-    display: flex; /* Change from grid to flex */
+    display: flex;
     flex-wrap: wrap;
-    gap: 20px; /* Space between cards */
-    justify-content: space-between; /* Optional: distribute evenly */
+    gap: 20px;
+    justify-content: space-between;
 }
 
 .card {
     flex: 1 1 calc(25% - 20px); /* 4 cards per row */
     box-sizing: border-box;
-    min-width: 300px; /* Prevent too small cards on smaller screens */
+    min-width: 250px; /* Adjust to prevent overflow */
 }
-
 
 .card h3 {
     margin-top: 0;
