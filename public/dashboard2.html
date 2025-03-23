@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -146,6 +147,64 @@
     transform: scale(1.05);
 }
 
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 0 20px; /* optional: to align with Reprogramar box padding */
+    box-sizing: border-box;
+}
+
+.dashboard-section {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+      .orange-button {
+    padding: 10px 15px;
+    background-color: #ff6600;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.orange-button:hover {
+    background-color: #cc5500;
+}
+
+.reschedule-section p {
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.reschedule-section {
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+      .reschedule-section p {
+    margin: 5px 0; /* reduces unnecessary vertical spacing */
+    line-height: 1.4; /* clean look */
+}
+
+.reschedule-warning {
+    color: red;
+    font-weight: bold;
+}
+
     </style>
 </head>
 <body>
@@ -161,100 +220,103 @@
         <div class="logo-container">
             <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
+        
     </nav>
 
     
     <!-- Header -->
     <header>
-        <div class="header-container">
-            <h2 id="user-info">Cargando usuario...</h2>
-            <button onclick="logoutUser()">Cerrar Sesión</button>
-        </div>
-    </header>
+    <div class="header-container">
+        <h2 id="user-info">Cargando usuario...</h2>
+          </div>
+        </header>
+    
+        <button class="orange-button" onclick="logoutUser()" style="margin-left: 10px;">Cerrar Sesión</button>
 
-    <!-- Dashboard Content -->
-    <section class="dashboard-section">
-        <div class="dashboard-grid">
-            <!-- User Info Card -->
-            <div class="card">
-                <h3><i class="fas fa-user"></i> Información del Usuario</h3>
-                <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
-                <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
-                <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
-                <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
-                <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
-                <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
-            </div>
 
-            <!-- Contact Button -->
+     <!-- Contact Button -->
             <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
                 <i class="fas fa-headset"></i> Contactar Staff
             </button>
 
-            <!-- Payment Status Card -->
-            <div class="card">
-                <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-                <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-                <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-                <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
 
-                <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-                    ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
-                </div>
-                <div id="complete-payment" style="margin-top: 10px; display: none;">
-                    <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
-                        Completa tu pago ahora 🔗
-                    </a>
-                </div>
+    <!-- Dashboard Content -->
+  <!-- Dashboard Content -->
+<section class="dashboard-section">
+
+    <!-- Grid Start -->
+    <div class="dashboard-grid">
+
+        <!-- User Info Card -->
+        <div class="card">
+            <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+            <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
+            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
+            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+            <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
+        </div>
+
+          <!-- Tip del Mes Card -->
+        <div class="card">
+            <h3>🚗✨ Tip del mes</h3>
+            <p><strong>🔧 Consejo experto:</strong> En AutoCuidado Club no vendemos repuestos ni aceites, te damos algo mejor: <strong>asesoría experta y sin estrés</strong>. Nuestro staff certificado te avisa exactamente cuándo cambiar aceite, filtros, o cualquier pieza. Te recomendamos solo las mejores marcas, en la tienda adecuada y al mejor precio. Y aún mejor: ¡nosotros nos encargamos de ir por las piezas, cambiarlas en el momento indicado y coordinamos todo el proceso por ti! 💪✨</p>
+            <p><strong>❄️ Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
+        </div>
+
+        
+        <!-- Payment Status Card -->
+        <div class="card">
+            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+
+            <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+                ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
+            </div>
+            <div id="complete-payment" style="margin-top: 10px; display: none;">
+                <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+                    Completa tu pago ahora 🔗
+                </a>
+            </div>
+        </div>
+
+        <!-- Plan Upgrade Card -->
+        <div class="card">
+            <h3>¿Te gustaría Mejorar de Suscripción?</h3>
+            <p><strong>Tipo de Plan Actual:</strong></p>
+            <p></p><span id="planType">Cargando...</span></p>
+            <p><strong>Descripción:</strong></p>
+            <p></p><span id="planMessage">Cargando...</span></p>
+
+            <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+
+            <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+                <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+                    Añade más vehículos: Mejora a Plan Plus 🚗✨
+                </button>
             </div>
 
-            <!-- Plan Upgrade Card -->
-            <div class="card">
-    <h3>¿Te gustaría Mejorar de Suscripción?</h3>
-    <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
-    <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
-    
-    <!-- 🔥 Motivational Message Placeholder -->
-<div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
-
-<!-- Dedicated Add Vehicles Button -->
-<div id="add-vehicles-button" style="margin-top:10px; display:none;">
-    <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-        Añade más vehículos: Mejora a Plan Plus 🚗✨
-    </button>
-</div>
-
-
-    <label for="new-plan">Selecciona un nuevo plan:</label>
-    <select id="new-plan"></select>
-    <button onclick="upgradePlan()">Mejorar Plan</button>
-</div>
-            
-<div class="card">
-    <h3>🚗✨ Tip del mes</h3>
-
-    <p><strong>🧐 ¿Sabías que?</strong> Mantener la presión correcta de tus llantas no solo mejora el rendimiento del combustible ⛽️, también extiende la vida útil de tus neumáticos y garantiza tu seguridad al conducir. Pero no te preocupes, ¡nosotros revisamos todo eso por ti en cada servicio! 😉</p>
-
-    <p><strong>🔧 Consejo experto:</strong> En AutoCuidado Club no vendemos repuestos ni aceites, te damos algo mejor: <strong>asesoría experta y sin estrés</strong>. Nuestro staff certificado te avisa exactamente cuándo cambiar aceite, filtros, o cualquier pieza. Te recomendamos solo las mejores marcas, en la tienda adecuada y al mejor precio. Y aún mejor: ¡nosotros nos encargamos de ir por las piezas, cambiarlas en el momento indicado y coordinamos todo el proceso por ti! 💪✨</p>
-
-    <p><strong>❄️ Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
-</div>
-
-
-    </section>
-
+            <label for="new-plan">Selecciona un nuevo plan:</label>
+            <select id="new-plan"></select>
+            <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
+        </div>
+    </div> <!-- End Grid -->
+      
+</section>
 
            
     <!-- Reschedule Section -->
     <div class="card reschedule-section">
         <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
         <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
-        <p style="color: red;><strong> Ten en cuanta por favor, que solo puedes reprogramar una vez al mes.</p></strong>
         <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
-            Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
         </div>
-    <div id="reschedule-info" style="color: orange; font-weight: bold; margin-top: 10px; display: none;">
-</div>
+            <div id="reschedule-info" style="color: orange; font-weight: bold; margin-top: 10px; display: none;">
+    </div>
         <table class="schedule-table">
             <thead>
                 <tr>
@@ -299,19 +361,14 @@
 
     <strong>Guardar Nuevo Horario</strong>
 </button>
-
     </div>
 
-<p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    
+   
     <!-- Loyalty Rewards Section -->
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
             <div class="loyalty-card">
-                <p>Stay subscribed and fill all 8 holes to unlock rewards!</p>
+                <p>Completa 8 meses continuos y desbloquea los beneficios🔥</p>
                 <div class="holes">
                    <div class="hole">○</div>
                     <p>Proceso de registro completo</p>
@@ -331,12 +388,12 @@
                     <p>8to Mes de suscripción activo</p>
                 </div>
                 <div class="description">
-                    <p><strong>Current Progress:</strong></p>
+                    <p><strong>Progreso atual:</strong></p>
                 </div>
             </div>
 
-            <!-- Rewards -->
-            <div class="rewards">
+           <!-- Rewards -->
+<div class="rewards">
     <h3><i class="fas fa-gift"></i> Premios Disponibles 
         <span class="reward-status locked" style="margin-left:10px;"><i class="fas fa-lock"></i> Bloqueado</span>
     </h3>
@@ -365,10 +422,8 @@
         </div>
     </div> <!-- End Flex Row -->
 </div>
-    </section>
 
-      
-  
+            
 <script>
 // Global variables
 let auth, db;
@@ -783,9 +838,10 @@ function updateLoyaltyCard(userData) {
 
     // Update Progress Text
     const progressDescription = document.querySelector('.description p strong');
-    if (progressDescription) {
-        progressDescription.textContent = `Current Progress: ${progress} of 8 steps completed.`;
-    }
+if (progressDescription) {
+    progressDescription.textContent = `Progreso Actual: ${progress} de 8 pasos completados.`;
+}
+
 }
 
 </script>
