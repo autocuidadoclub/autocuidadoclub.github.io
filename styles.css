@@ -1127,3 +1127,21 @@ button.plan-button {
     object-fit: cover;
     margin-bottom: 10px;
 }
+
+.logout-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ff6600; /* Same orange */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
+.logout-btn:hover {
+  background-color: #e65c00; /* Slightly darker on hover */
+}
