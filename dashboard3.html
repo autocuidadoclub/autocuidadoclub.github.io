@@ -174,83 +174,49 @@
 
     <!-- Dashboard Content -->
   <section class="dashboard-section">
+  <div class="dashboard-grid">
 
-    <!-- First Row: User Info & Payment -->
-    <div class="dashboard-grid">
-        <!-- User Info Card -->
-        <div class="card">
-            <h3><i class="fas fa-user"></i> Información del Usuario</h3>
-            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
-            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
-            <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
-            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
-            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
-            <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
-        </div>
+    <!-- Información del Usuario -->
+    <div class="card">
+      <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+      <p><strong>Nombre:</strong> <span id="userName"></span></p>
+      <p><strong>Teléfono:</strong> <span id="userPhone"></span></p>
+      <p><strong>Horario Actual:</strong> <span id="userSchedule"></span></p>
+      <p><strong>Departamento:</strong> <span id="userDepartment"></span></p>
+      <p><strong>Municipio:</strong> <span id="userMunicipality"></span></p>
+      <p><strong>Vehículos:</strong></p>
+      <div id="vehicleList"></div>
+    </div>
 
-        <!-- Payment Status Card -->
-        <div class="card">
-            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+    <!-- Estado de Pago -->
+    <div class="card">
+      <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+      <p><strong>Miembro Desde:</strong> <span id="registrationDate"></span></p>
+      <p><strong>Fecha del último pago:</strong> <span id="lastPaymentDate"></span></p>
+      <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate"></span></p>
+    </div>
 
-            <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-                ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
-            </div>
-            <div id="complete-payment" style="margin-top: 10px; display: none;">
-                <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
-                    Completa tu pago ahora 🔗
-                </a>
-            </div>
-        </div>
-    </div> <!-- End of First Row -->
+    <!-- ¿Te gustaría mejorar la suscripción? -->
+    <div class="card">
+      <h3><i class="fas fa-arrow-up"></i> ¿Te gustaría mejorar la suscripción?</h3>
+      <p id="currentPlanDesc"></p>
+      <button class="orange-action-button" id="upgradePlusBtn">Añade más vehículos: Mejora a Plan Plus 🚗✨</button>
+      <label for="newPlanSelect">Selecciona el nuevo plan:</label>
+      <select id="newPlanSelect"></select>
+      <button id="upgradePlanBtn" class="btn">Guardar</button>
+    </div>
 
-    <!-- Second Row: Plan Upgrade & Tip -->
-    <div class="dashboard-grid">
-        <!-- Plan Upgrade Card -->
-        <div class="card">
-            <h3>¿Te gustaría Mejorar de Suscripción?</h3>
-            <p><strong>Tipo de Plan Actual:</strong> <span id="planType">Cargando...</span></p>
-            <p><strong>Descripción:</strong> <span id="planMessage">Cargando...</span></p>
+    <!-- Tip del Mes -->
+    <div class="card">
+      <h3>🚗✨ Tip del mes</h3>
+      <div id="carTipContent">
+        <p>🧐 <strong>¿Sabías que?</strong> Mantener la presión correcta de tus llantas no solo mejora el rendimiento del combustible ⛽️, también extiende la vida útil de tus neumáticos y garantiza tu seguridad al conducir. Pero no te preocupes, ¡nosotros revisamos todo eso por ti en cada servicio! 😉</p>
+        <p>❄️ <strong>Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
+      </div>
+    </div>
 
-            <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
-
-            <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-                <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-                    Añade más vehículos: Mejora a Plan Plus 🚗✨
-                </button>
-            </div>
-
-            <label for="new-plan">Selecciona un nuevo plan:</label>
-            <select id="new-plan"></select>
-
-            <button onclick="upgradePlan()" style="
-                padding: 10px 15px;
-                background-color: #ff6600;
-                color: white;
-                border-radius: 5px;
-                border: none;
-                text-decoration: none;
-                font-weight: bold;
-                display: inline-block;
-                margin-top: 10px;
-                cursor: pointer;
-            ">
-                Mejorar Plan 🚀
-            </button>
-        </div>
-
-        <!-- Tip del Mes Card -->
-        <div class="card">
-            <h3>🚗✨ Tip del mes</h3>
-            <p><strong>🧐 ¿Sabías que?</strong> Mantener la presión correcta de tus llantas no solo mejora el rendimiento del combustible ⛽️, también extiende la vida útil de tus neumáticos y garantiza tu seguridad al conducir. Pero no te preocupes, ¡nosotros revisamos todo eso por ti en cada servicio! 😉</p>
-            <p><strong>❄️ Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
-        </div>
-    </div> <!-- End of Second Row -->
-
+  </div>
 </section>
-
            
     <!-- Reschedule Section -->
     <div class="card reschedule-section">
