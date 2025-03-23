@@ -1249,3 +1249,37 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
     transform: scale(1.05); /* Zoom effect */
 }
 
+.register-promo-container {
+    background-color: #f0f8ff; /* Soft light blue */
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 40px auto;
+    text-align: center;
+    max-width: 700px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.register-promo-text {
+    font-size: 1.1em;
+    color: #003366;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.register-promo-button {
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.register-promo-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
