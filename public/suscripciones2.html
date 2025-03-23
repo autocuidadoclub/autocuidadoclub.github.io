@@ -1051,10 +1051,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
     })  // ✅ Ensure this bracket properly closes .then()
 
-        .then(() => {  // ❌ This might be causing a syntax error
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
+       .then(() => {
+    // Create a full-screen overlay
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+    overlay.style.display = "flex";
+    overlay.style.flexDirection = "column";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.zIndex = "9999";
+    overlay.innerHTML = `
+        <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+        <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+        <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // CSS Spinner Animation
+    const style = document.createElement("style");
+    style.innerHTML = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Redirect after 2.5s
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 2500);
+})
+
         .catch((error) => {
             console.error("❌ Error en el registro:", error.message);
             alert("❌ Error en el registro: " + error.message);
