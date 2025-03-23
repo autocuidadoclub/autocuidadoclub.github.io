@@ -1180,3 +1180,55 @@ button.plan-button {
 .orange-action-button:hover {
     background-color: #cc5500;
 }
+
+/* Standard Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* Force two-column layout for mobile */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr); /* Keep two columns on mobile */
+    }
+    .dashboard-section {
+        padding: 0 10px;
+    }
+    .card {
+        margin: 5px;
+        padding: 15px;
+    }
+    .reschedule-section, .rewards, .loyalty-card {
+        padding: 15px;
+    }
+    .reward-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .reward-info h4 {
+        font-size: 16px;
+    }
+}
+
+/* Fix Logout + Navbar buttons alignment */
+.navbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .orange-button {
+    margin-top: 10px;
+}
+
+/* Optional: Fix reschedule spacing */
+.reschedule-section p {
+    margin-bottom: 3px;
+    line-height: 1.3;
+}
