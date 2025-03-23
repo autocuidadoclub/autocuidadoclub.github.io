@@ -166,7 +166,7 @@ document.querySelectorAll(".vehicle-entry").forEach(entry => {
             const nextPaymentDate = new Date();
             nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-         return db.collection("users").doc(userId).set({
+       return db.collection("users").doc(userId).set({
     uid: userId,
     name,
     email,
@@ -183,9 +183,11 @@ document.querySelectorAll(".vehicle-entry").forEach(entry => {
     paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
     nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
     paymentStatus: "Pending",
-    monthsPaid: 0, // 🔥 Added field here!
+    subscriptionStatus: "active", // ✅ ADD THIS LINE
+    monthsPaid: 0,
     vehicles
 });
+
 
 
         })
