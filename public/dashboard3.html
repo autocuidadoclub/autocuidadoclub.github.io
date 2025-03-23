@@ -167,11 +167,16 @@
     
     <!-- Header -->
     <header>
-        <div class="header-container">
-            <h2 id="user-info">Cargando usuario...</h2>
-            <button onclick="logoutUser()">Cerrar Sesión</button>
-        </div>
-    </header>
+    <div class="header-container">
+        <h2 id="user-info">Cargando usuario...</h2>
+    </div>
+</header>
+
+<!-- Floating Logout Button -->
+<button class="floating-logout-button" onclick="logoutUser()">
+    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+</button>
+
 
     <!-- Dashboard Content -->
     <section class="dashboard-section">
