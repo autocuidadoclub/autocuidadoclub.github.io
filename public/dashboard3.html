@@ -169,6 +169,23 @@
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+      .orange-button {
+    padding: 10px 15px;
+    background-color: #ff6600;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.orange-button:hover {
+    background-color: #cc5500;
+}
+
+      
     </style>
 </head>
 <body>
@@ -184,6 +201,8 @@
         <div class="logo-container">
             <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
+        <button class="orange-button" onclick="logoutUser()" style="margin-left: 10px;">Cerrar Sesión</button>
+
     </nav>
 
     
@@ -245,7 +264,7 @@
 
             <label for="new-plan">Selecciona un nuevo plan:</label>
             <select id="new-plan"></select>
-            <button onclick="upgradePlan()">Mejorar Plan</button>
+            <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
         </div>
 
         <!-- Tip del Mes Card -->
