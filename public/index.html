@@ -252,6 +252,48 @@
         font-size: 1.2em;
         line-height: 1.6;
     }   
+
+         .styled-list {
+        list-style: none; /* Remove default bullets */
+        padding: 0;
+    }
+
+    .styled-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px; /* Add spacing between items */
+        font-size: 1.1em;
+    }
+
+    .styled-list i {
+        color: #007bff; /* Icon color */
+        margin-right: 10px; /* Space between icon and text */
+        font-size: 1.5em; /* Make icons larger */
+    }
+
+    .styled-list strong {
+        color: #0056b3; /* Emphasize important text */
+    }
+
+    .nested-list {
+        list-style: none; /* Remove bullets for nested list */
+        margin-left: 30px; /* Indent nested items */
+        padding: 0;
+    }
+
+    .nested-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+
+    .nested-list i {
+        color: #FF6600; /* Icon color for nested items */
+        margin-right: 8px;
+        font-size: 1.2em; /* Slightly smaller icons */
+    }
+        
     </style>
 </head>
 
@@ -379,11 +421,11 @@
             <i class="fas fa-exclamation-triangle"></i> 
            <strong>¿Te ha pasado cuando llevas el auto al taller?</strong> 
             <ul class="nested-list">
-                <li><i class="fas fa-angle-right"></i> Trabajos costosos.</li>
-                <li><i class="fas fa-angle-right"></i> Invertir tiempo libre en reparaciones.</li>
-                <li><i class="fas fa-angle-right"></i> Soportar tráfico para llegar al taller.</li>
-                <li><i class="fas fa-angle-right"></i> Prácticas poco éticas como el uso indebido de vehículos.</li>
-                <li><i class="fas fa-angle-right"></i> Intercambio de piezas sin autorización.</li>
+                <li> Trabajos costosos.</li>
+                <li> Invertir tiempo libre en reparaciones.</li>
+                <li> Soportar tráfico para llegar al taller.</li>
+                <li> Prácticas poco éticas como el uso indebido de vehículos.</li>
+                <li> Intercambio de piezas sin autorización.</li>
             </ul>
         </li>
         <li>
@@ -393,78 +435,39 @@
     </ul>
 </div>
 
-<style>
-    .styled-list {
-        list-style: none; /* Remove default bullets */
-        padding: 0;
-    }
-
-    .styled-list li {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 15px; /* Add spacing between items */
-        font-size: 1.1em;
-    }
-
-    .styled-list i {
-        color: #007bff; /* Icon color */
-        margin-right: 10px; /* Space between icon and text */
-        font-size: 1.5em; /* Make icons larger */
-    }
-
-    .styled-list strong {
-        color: #0056b3; /* Emphasize important text */
-    }
-
-    .nested-list {
-        list-style: none; /* Remove bullets for nested list */
-        margin-left: 30px; /* Indent nested items */
-        padding: 0;
-    }
-
-    .nested-list li {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 10px;
-        font-size: 1em;
-    }
-
-    .nested-list i {
-        color: #FF6600; /* Icon color for nested items */
-        margin-right: 8px;
-        font-size: 1.2em; /* Slightly smaller icons */
-    }
-</style>
 
 <div class="tab-content" id="tab2" style="display: none;">
     <ul class="styled-list">
         <li>
             <i class="fas fa-balance-scale"></i> 
-            <strong>Política de transparencia:</strong><br>
-            Sin letras pequeñas, sin cargos ocultos y con <a href="#" style="color:#007bff;">descuentos exclusivos garantizados</a> solo para nuestros socios.<br>
-            <em>Queremos que siempre sepas exactamente lo que pagas y recibes.</em>
+            <strong>Política de transparencia:</strong>
+            Sin letras pequeñas, sin cargos ocultos y con descuentos exclusivos garantizados solo para nuestros socios.
+            Queremos que siempre sepas exactamente lo que pagas y recibes.
         </li>
         <li>
             <i class="fas fa-handshake"></i> 
             <strong>Suscripción automotriz accesible:</strong><br>
-            Eliminamos incentivos para prácticas deshonestas. Aquí no ganamos más cuando tú gastas más—<em>ganamos cuando tú confías.</em>
+            Eliminamos incentivos para prácticas deshonestas. Aquí ganamos cuando tú inviertes solo en lo necesario de tu vehículo.
         </li>
         <li>
             <i class="fas fa-tools"></i> 
             <strong>Recursos optimizados:</strong><br>
-            Te ayudamos a identificar solo las piezas que realmente necesitas cambiar, en el momento justo y de forma gradual. Evita grandes inversiones y aprovecha nuestros <a href="#" style="color:#007bff;">códigos de descuento en los principales almacenes de repuestos.</a>
+            Te ayudamos a identificar solo las piezas que realmente necesitas cambiar, en el momento justo y de forma gradual. Evita grandes inversiones y aprovecha nuestros códigos de descuento en los principales almacenes de repuestos.
         </li>
         <li>
             <i class="fas fa-heart"></i> 
             <strong>Tu tranquilidad es nuestra prioridad:</strong><br>
-            Nos encargamos de que tu vehículo esté siempre en óptimas condiciones, <em>sin estrés, sin sorpresas y sin interrupciones en tu rutina.</em>
+            Nos encargamos de que tu vehículo esté siempre en óptimas condiciones, sin estrés, sin sorpresas y sin interrupciones en tu rutina.
         </li>
     </ul>
 </div>
 
-            
             <div class="tab-content" id="tab1" style="display: none;">
-                <p>Con una suscripción mensual, accedes a un plan de mantenimiento personalizado que asegura la longevidad de tu vehículo y la tranquilidad de tu inversión.</p>
+           <li>
+            <i class="fas fa-tools"></i> 
+            <strong>Con una suscripción mensual, accedes a un plan de mantenimiento personalizado que asegura la longevidad de tu vehículo y la tranquilidad de tu inversión.</p></strong><br>
+            </li>
+        <li>
             </div>
         </div>
     </section>
