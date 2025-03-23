@@ -727,20 +727,18 @@ input:focus, select:focus {
 }
 
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    display: flex; /* Change from grid to flex */
+    flex-wrap: wrap;
+    gap: 20px; /* Space between cards */
+    justify-content: space-between; /* Optional: distribute evenly */
 }
 
 .card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    padding: 20px;
-    margin-bottom: 20px;
-    transition: var(--transition);
+    flex: 1 1 calc(25% - 20px); /* 4 cards per row */
+    box-sizing: border-box;
+    min-width: 300px; /* Prevent too small cards on smaller screens */
 }
+
 
 .card h3 {
     margin-top: 0;
