@@ -1283,3 +1283,9 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
     background-color: #cc5500;
     transform: scale(1.05);
 }
+
+.register-promo-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
