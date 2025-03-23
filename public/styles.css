@@ -1289,3 +1289,55 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
     margin-top: 30px;
 }
 
+.styled-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.styled-list li {
+    display: flex;
+    flex-direction: column; /* Force icon, title, and nested list to be in column */
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border-left: 5px solid #007bff;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.styled-list i {
+    color: #007bff;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+}
+
+.styled-list strong {
+    color: #003366;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.nested-list {
+    list-style: none;
+    margin: 0;
+    padding-left: 25px; /* Indent all subpoints equally */
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between subitems */
+}
+
+.nested-list li {
+    position: relative;
+    font-size: 1em;
+    color: #555;
+}
+
+.nested-list li:before {
+    content: "\f105";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: #FF6600;
+    margin-right: 8px;
+    position: absolute;
+    left: -20px; /* Align all icons in same vertical line */
+}
