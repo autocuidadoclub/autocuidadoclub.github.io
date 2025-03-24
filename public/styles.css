@@ -1341,3 +1341,64 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
     position: absolute;
     left: -20px; /* Align all icons in same vertical line */
 }
+
+/* General styling for schedule section */
+.schedule-section {
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 900px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-section h2 {
+    color: #003366;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.schedule-section p {
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+/* Styling for the schedule table */
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.schedule-table th {
+    background-color: #003366;
+    color: white;
+}
+
+.schedule-table td:first-child {
+    background-color: #FF6600;
+    color: white;
+    font-weight: bold;
+}
+
+.schedule-table tr:nth-child(even) td:not(:first-child) {
+    background-color: #f2f2f2;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .schedule-table th,
+    .schedule-table td {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+}
