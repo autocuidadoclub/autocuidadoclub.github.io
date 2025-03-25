@@ -100,6 +100,20 @@
     transform: scale(1.05);
 }
 
+        .subscription-disclaimer {
+  background-color: #f8f9fa; /* Fondo claro */
+  border: 1px solid #ddd;     /* Borde gris claro */
+  border-radius: 6px;         /* Bordes redondeados */
+  padding: 15px;
+  margin-top: 20px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #333;
+}
+.subscription-disclaimer strong {
+  font-weight: bold;
+}
+
     </style>
 </head>
 <body>
@@ -168,9 +182,12 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
     
 
 <!-- Disclaimer Section -->
-<section class="disclaimer-section">
-    <p><strong>Nota importante:</strong> Nuestros servicios están disponibles exclusivamente para motores de gasolina, reforzando nuestro compromiso con una movilidad más limpia y responsable.</p>
-</section>
+<div class="subscription-disclaimer">
+  <p>
+    <strong>Nota:</strong> Los servicios de AutoCuidado Club están diseñados exclusivamente para motores de gasolina. Esto está alineado con nuestro compromiso de ofrecer movilidad con una huella de carbono más baja. Según la Agencia Europea de Medio Ambiente (EEA), los motores diésel son responsables de hasta 20 veces más contaminación que los de gasolina.
+  </p>
+</div>
+
 <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
     <i class="fas fa-headset"></i> Contactar Staff
 </button>
