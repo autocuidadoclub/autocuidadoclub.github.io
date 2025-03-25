@@ -1,3 +1,4 @@
+
 /* ====== ROOT VARIABLES ====== */
 :root {
     --blue-dark: #003366;
@@ -1402,14 +1403,3 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
         font-size: 0.9em;
     }
 }
-
-.full-width-box {
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  box-sizing: border-box;
-  padding: 30px 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-
