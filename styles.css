@@ -1425,3 +1425,51 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
 .header-text strong {
     color: #FFCC00; /* Amarillo */
 }
+
+/* ====== FLOATING CONTACT BUTTON ====== */
+.floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+    z-index: 999;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
+/* ====== INSTALL BANNER FOR iOS ====== */
+#install-banner {
+    display: none;
+    background-color: var(--blue-darker);
+    color: var(--white);
+    text-align: center;
+    padding: 10px;
+    font-size: 0.95em;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 999;
+}
+
+#install-banner button {
+    background: var(--white);
+    color: var(--blue-dark);
+    border: none;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
