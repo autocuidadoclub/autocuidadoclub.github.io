@@ -243,6 +243,14 @@ resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(quer
         <div id="inspectionResults"></div>
     </div>
   </section>
+
+    <h2>Notificaciones Personalizadas</h2>
+<div id="user-buttons" class="user-button-grid"></div>
+
+<h2>Notificación Global</h2>
+<textarea id="globalMessage" placeholder="Escribe aquí el mensaje para todos"></textarea><br>
+<button onclick="sendGlobalNotification()">Enviar Notificación Global</button>
+
     
     
     
@@ -371,6 +379,75 @@ function logout() {
 
 }
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  // tu config aquí
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const serverKey = "YOUR_SERVER_KEY"; // Replace with your FCM server key
+
+async function loadUsersAndCreateButtons() {
+  const querySnapshot = await getDocs(collection(db, "users"));
+  querySnapshot.forEach((doc) => {
+    const user = doc.data();
+    if (user.pushToken && user.selectedSchedule) {
+      createPushButton(user.name, user.pushToken, user.selectedSchedule);
+    }
+  });
+}
+
+function createPushButton(name, token, schedule) {
+  const button = document.createElement("button");
+  button.innerText = `Recordar a ${name}`;
+  button.onclick = () => {
+    const msg = `Hola ${name}, elegiste tu inspección el ${schedule}. ¿Todo bien o quieres reprogramarla?`;
+    sendPushNotification(token, msg);
+  };
+  document.getElementById("user-buttons").appendChild(button);
+}
+
+function sendPushNotification(token, message) {
+  fetch("https://fcm.googleapis.com/fcm/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "key=" + serverKey
+    },
+    body: JSON.stringify({
+      to: token,
+      notification: {
+        title: "AutoCuidado Club",
+        body: message,
+        icon: "/logo192.png"
+      }
+    })
+  }).then(response => {
+    console.log("Push sent", response);
+  }).catch(error => {
+    console.error("Error sending push", error);
+  });
+}
+
+function sendGlobalNotification() {
+  const message = document.getElementById("globalMessage").value;
+  if (!message) return alert("Escribe un mensaje primero");
+
+  getDocs(collection(db, "users")).then((snapshot) => {
+    snapshot.forEach((doc) => {
+      const user = doc.data();
+      if (user.pushToken) {
+        sendPushNotification(user.pushToken, message);
+      }
+    });
+  });
+}
+
+window.onload = loadUsersAndCreateButtons;
 
        function findRescheduledUsers() {
     const startDateValue = document.getElementById("rescheduleStartDate").value;
