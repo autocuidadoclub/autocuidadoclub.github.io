@@ -1629,3 +1629,38 @@ header {
 .regresar-button:hover {
     background-color: var(--blue-darker);
 }
+
+.centered-value-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+    background-color: var(--gray-lighter);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.centered-value-section h2 {
+    color: var(--blue-dark);
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+.centered-value-section p {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: var(--gray-dark);
+}
+
+.centered-value-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.centered-value-section ul li {
+    font-size: 1.1em;
+    margin: 10px 0;
+    color: var(--green);
+    font-weight: bold;
+}
