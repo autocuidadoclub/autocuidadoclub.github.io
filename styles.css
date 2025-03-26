@@ -1500,3 +1500,6 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
     text-align: center;
 }
 
+.login-section {
+  transition: opacity 0.4s ease;
+}
