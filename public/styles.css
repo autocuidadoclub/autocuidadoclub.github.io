@@ -50,45 +50,63 @@ button {
 
 /* ====== NAVIGATION ====== */
 .navbar {
-    background-color: var(--blue-dark);
+    background: linear-gradient(to right, #002F6C, #003366); /* two-tone blue */
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    align-items: center;
+    padding: 10px 30px;
+    flex-wrap: wrap;
+}
+
+.nav-left {
+    flex: 1;
 }
 
 .nav-links {
     display: flex;
+    flex-wrap: wrap;
+    list-style: none;
     gap: 15px;
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
 .nav-links li a {
-    color: var(--white);
+    color: white;
     font-weight: bold;
-    transition: var(--transition);
+    font-size: 1em;
+    transition: color 0.3s;
 }
 
 .nav-links li a:hover {
-    color: var(--orange);
+    color: #FF6600;
 }
 
-.logo-container img {
-    width: 100px;
+.logo-container {
+    flex-shrink: 0;
+}
+
+.logo-container img.logo {
+    width: 90px;
     height: auto;
-    border-radius: 10px;
+    border-radius: 12px;
 }
 
 /* Responsive Navbar */
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;
-        text-align: center;
+        align-items: flex-start;
     }
+
     .nav-links {
         flex-direction: column;
+        gap: 10px;
+    }
+
+    .logo-container {
+        align-self: flex-end;
+        margin-top: 10px;
     }
 }
 
