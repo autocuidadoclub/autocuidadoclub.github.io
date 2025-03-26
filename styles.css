@@ -1403,3 +1403,7 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
         font-size: 0.9em;
     }
 }
+
+.header-text strong {
+    color: #FFCC00; /* Amarillo */
+}
