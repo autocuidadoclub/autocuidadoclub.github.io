@@ -1539,3 +1539,71 @@ header {
         font-size: 1rem;
     }
 }
+
+/* ================= SUBSCRIPTION TABLE STYLES ================= */
+.subscription-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.subscription-table th, .subscription-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.subscription-table th {
+    background: var(--orange);
+    color: white;
+    font-weight: bold;
+}
+
+.highlight-cell {
+    font-weight: bold;
+    color: var(--orange);
+}
+
+.warning-text {
+    color: red;
+    font-weight: bold;
+}
+
+.benefits-list {
+    background: var(--gray-lighter);
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* ================= DISCOUNT BADGE & PRICE ================= */
+.discount-badge {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background-color: var(--orange);
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.discounted-price {
+    color: var(--orange);
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* ================= LIMITED-TIME MESSAGE ================= */
+.limited-time {
+    color: var(--orange);
+    font-size: 0.95em;
+    font-style: italic;
+    margin-top: 10px;
+}
