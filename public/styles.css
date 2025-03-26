@@ -1479,3 +1479,24 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
     padding: 15px;
   }
 }
+
+.form-container {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
+}
+
+.form-container h2 {
+    text-align: center;
+    color: var(--blue-dark);
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.text-center {
+    text-align: center;
+}
+
