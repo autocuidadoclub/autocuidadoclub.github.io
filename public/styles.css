@@ -1473,3 +1473,9 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
     border-radius: 5px;
     font-weight: bold;
 }
+
+@media (max-width: 480px) {
+  .contact-form-container {
+    padding: 15px;
+  }
+}
