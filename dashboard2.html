@@ -868,7 +868,28 @@ if (progressDescription) {
 
         
     </footer>
-    
+  <div id="install-banner" style="display: none; ...">
+  📲 Para instalar AutoCuidado Club en iPhone...
+  <button onclick="dismissBanner()">X</button>
+</div>
+
+<div id="install-banner" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center; font-size: 14px; position: fixed; top: 0; width: 100%; z-index: 1000;">
+    📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
+    <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
+</div>
+
+<script>
+function dismissBanner() {
+    document.getElementById("install-banner").style.display = "none";
+}
+
+// ✅ More robust iOS check
+if ((/iPad|iPhone|iPod/.test(navigator.userAgent)) && !window.MSStream) {
+    document.getElementById("install-banner").style.display = "block";
+}
+</script>
+
+  
 
 </body>
 </html>
