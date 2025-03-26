@@ -1503,3 +1503,39 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
 .login-section {
   transition: opacity 0.4s ease;
 }
+
+header {
+    background-color: #002b5c; /* Dark blue for branding */
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header-text h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.header-text p {
+    font-size: 1.2rem;
+    margin-top: 5px;
+}
+
+.header-text {
+    max-width: 800px;
+    margin: 0 auto;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+    .header-text h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-text p {
+        font-size: 1rem;
+    }
+}
