@@ -209,5 +209,23 @@
     });
   </script>
 
+  <div id="install-banner">
+  ¿Quieres instalar AutoCuidado Club en tu pantalla de inicio?
+  <button id="install-btn">Instalar</button>
+</div>
+
+  <script>
+  const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+  if (isIos && !isInStandaloneMode) {
+    document.getElementById('install-banner').style.display = 'block';
+  }
+
+  document.getElementById('install-btn').addEventListener('click', () => {
+    alert('Para instalar, presiona el botón de compartir y elige "Agregar a pantalla de inicio".');
+  });
+</script>
+
 </body>
 </html>
