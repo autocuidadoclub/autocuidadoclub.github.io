@@ -1708,3 +1708,24 @@ header {
     max-width: 850px;
     margin: 0 auto;
 }
+
+.bullet-subpoints {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.bullet-subpoints li {
+    font-size: 0.95em;
+    color: #444;
+    margin: 4px 0;
+    position: relative;
+    padding-left: 20px;
+}
+
+.bullet-subpoints li::before {
+    content: "✅";
+    position: absolute;
+    left: 0;
+}
+
