@@ -1664,3 +1664,46 @@ header {
     color: var(--green);
     font-weight: bold;
 }
+
+/* Reduce spacing in tab content section */
+.tab-content ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.tab-content li {
+    margin-bottom: 6px;
+    font-size: 1em;
+}
+
+.nested-list {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.tab-content strong {
+    font-weight: 600;
+}
+
+.tab-content i {
+    margin-right: 6px;
+    color: #007bff;
+}
+
+.tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+.styled-list, .nested-list {
+    max-width: 850px;
+    margin: 0 auto;
+}
