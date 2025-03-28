@@ -25,6 +25,35 @@
   <section id="restricted-content" style="display: none;">
     <h2>Panel de Gestión para el Staff</h2>
 
+    <h3 class="section-title">Buscar Usuarios por Fecha</h3>
+<div class="form-control">
+  <label for="startDate">Desde:</label>
+  <input type="date" id="startDate">
+</div>
+<div class="form-control">
+  <label for="endDate">Hasta:</label>
+  <input type="date" id="endDate">
+</div>
+<button onclick="findUsersByDate()">Buscar Usuarios</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Usuario</th>
+      <th>Email</th>
+      <th>Teléfono</th>
+      <th>Fecha de Registro</th>
+      <th>Horario Seleccionado</th>
+      <th>Fecha de Pago</th>
+      <th>Estado del Pago</th>
+      <th>Próximo Pago</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="paymentTable"></tbody>
+</table>
+
+
     <div>
       <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
       <div class="form-control">
@@ -95,6 +124,75 @@
         window.location.href = "login.html";
       }
     });
+function findUsersByDate() {
+  const startDate = new Date(document.getElementById("startDate").value);
+  const endDate = new Date(document.getElementById("endDate").value);
+  endDate.setDate(endDate.getDate() + 1); // Para incluir el día completo
+
+  const table = document.getElementById("paymentTable");
+  table.innerHTML = "";
+
+  db.collection("users")
+    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+    .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        alert("No se encontraron usuarios en el rango de fechas.");
+        return;
+      }
+      snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
+    })
+    .catch(error => {
+      console.error("Error al buscar usuarios:", error);
+      alert("Error al buscar usuarios.");
+    });
+}
+
+function updatePaymentTable(user, userId) {
+  const table = document.getElementById("paymentTable");
+  const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+  const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
+  const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+  const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+  const pushBtn = user.pushToken
+    ? `<button onclick="sendPushNotification('${user.pushToken}', 'Hola ${user.name}, tu inspección es ${schedule}.')">Push</button>`
+    : "No token";
+
+  table.innerHTML += `
+    <tr>
+      <td>${user.name}</td>
+      <td>${user.email}</td>
+      <td>${user.phone || "No disponible"}</td>
+      <td>${registrationDate}</td>
+      <td>${schedule}</td>
+      <td>${paymentDate}</td>
+      <td>${user.paymentStatus || "Pendiente"}</td>
+      <td>${nextPaymentDate}</td>
+      <td>
+        <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
+        ${pushBtn}
+      </td>
+    </tr>`;
+}
+
+function confirmPayment(userId) {
+  const paymentDate = new Date();
+  const nextPaymentDate = new Date();
+  nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+  db.collection("users").doc(userId).update({
+    paymentStatus: "Confirmado",
+    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+  }).then(() => {
+    alert("Pago confirmado");
+    findUsersByDate();
+  }).catch(error => {
+    console.error("Error al confirmar pago:", error);
+    alert("Error al actualizar el pago.");
+  });
+}
 
     function sendPushNotification(token, message) {
       fetch("https://fcm.googleapis.com/fcm/send", {
