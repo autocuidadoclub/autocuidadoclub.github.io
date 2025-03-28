@@ -1742,3 +1742,27 @@ header {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
+.section-container {
+    text-align: center;
+    padding: 30px 15px;
+}
+
+.section-container p,
+.section-container ul,
+.section-container ol {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px; /* Opcional para que el texto no se vea tan largo */
+    text-align: center;
+}
+
+.section-container .tip,
+.section-container .steps-list,
+.section-container .rewards-list,
+.section-container .offer-benefits {
+    text-align: center;
+}
+
+.section-container li {
+    list-style-position: inside; /* Asegura que las viñetas estén centradas */
+}
