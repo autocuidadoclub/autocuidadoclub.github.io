@@ -89,6 +89,22 @@
   <textarea id="globalMessage" placeholder="Escribe aquí el mensaje para todos"></textarea><br />
   <button onclick="sendGlobalNotification()">Enviar Notificación Global</button>
 
+  <div id="paymentHistoryBox" class="card" style="display:none; margin-top: 20px;">
+  <h3>📜 Historial de Pago del Cliente</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Método</th>
+        <th>Monto</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="paymentHistoryTable"></tbody>
+  </table>
+</div>
+
+
   <script src="env.js"></script>
   <script>
     const firebaseConfig = {
@@ -124,6 +140,7 @@
         window.location.href = "login.html";
       }
     });
+    
 function findUsersByDate() {
   const startDate = new Date(document.getElementById("startDate").value);
   const endDate = new Date(document.getElementById("endDate").value);
@@ -172,10 +189,49 @@ function updatePaymentTable(user, userId) {
       <td>
         <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
         ${pushBtn}
+        <button onclick="viewPaymentHistory('${userId}')">Ver Historial</button>
+
       </td>
     </tr>`;
 }
 
+    function viewPaymentHistory(userId) {
+  const table = document.getElementById("paymentHistoryTable");
+  const box = document.getElementById("paymentHistoryBox");
+  table.innerHTML = ""; // Clear previous
+
+  db.collection("users").doc(userId).get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      const history = data.paymentHistory || [];
+
+      if (history.length === 0) {
+        table.innerHTML = "<tr><td colspan='4'>Sin historial registrado.</td></tr>";
+      } else {
+        history.forEach(entry => {
+          const date = entry.date?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+          table.innerHTML += `
+            <tr>
+              <td>${date}</td>
+              <td>${entry.method || "-"}</td>
+              <td>$${entry.amount || "N/A"}</td>
+              <td>${entry.status || "N/A"}</td>
+            </tr>`;
+        });
+      }
+
+      box.style.display = "block";
+      window.scrollTo({ top: box.offsetTop, behavior: "smooth" });
+    } else {
+      alert("❌ Usuario no encontrado.");
+    }
+  }).catch(err => {
+    console.error("❌ Error al obtener historial:", err);
+    alert("Error al cargar historial.");
+  });
+}
+
+    
 async function confirmPayment(userId) {
   try {
     console.log("🔍 Confirming payment for:", userId);
