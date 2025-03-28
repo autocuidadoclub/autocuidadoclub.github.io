@@ -351,6 +351,45 @@ async function confirmPayment(userId) {
           alert("Error al buscar reprogramaciones.");
         });
     }
+
+    function viewPaymentHistory(userId) {
+  const body = document.getElementById("staffHistoryBody");
+  const table = document.getElementById("staffHistoryTable");
+  body.innerHTML = "";
+
+  db.collection("users").doc(userId).get().then(doc => {
+    if (!doc.exists) {
+      body.innerHTML = '<tr><td colspan="4">Usuario no encontrado.</td></tr>';
+      table.style.display = "table";
+      return;
+    }
+
+    const data = doc.data();
+    const history = data.paymentHistory || [];
+
+    if (history.length === 0) {
+      body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
+    } else {
+      history.forEach(entry => {
+        const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
+        body.innerHTML += `
+          <tr>
+            <td>${date}</td>
+            <td>$${entry.amount || "N/A"}</td>
+            <td>${entry.method || "-"}</td>
+            <td>${entry.status || "-"}</td>
+          </tr>`;
+      });
+    }
+
+    table.style.display = "table";
+  }).catch(err => {
+    console.error("❌ Error al cargar historial:", err);
+    alert("Error al mostrar historial.");
+  });
+}
+
+    
   </script>
 </body>
 </html>
