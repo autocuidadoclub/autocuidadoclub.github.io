@@ -15,121 +15,26 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
  
 
-      <script>
-        document.addEventListener("DOMContentLoaded", function () {
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Firebase env.js not loaded.");
-        alert("❌ Firebase is not initialized. Check env.js.");
-        return;
-    }
-
+     <script>
+document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
-    const firebaseConfig = {
-        apiKey: window._env_.FIREBASE_API_KEY,
-        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-        projectId: window._env_.FIREBASE_PROJECT_ID,
-        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-        appId: window._env_.FIREBASE_APP_ID,
-        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase initialized successfully!");
-    }
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    let selectedPlanType = "";
-
-    // Ensure registration container is found
     const registrationContainer = document.getElementById("registration-container");
-    if (!registrationContainer) {
-        console.error("❌ Error: No se encontró el contenedor de registro.");
-        return;
-    }
-
     const planButtons = document.querySelectorAll(".plan-button");
+    let selectedPlanType = null;
 
-    // ✅ Attach event listeners to all plan buttons
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
-            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+            selectedPlanType = this.getAttribute("data-plan");
+            registrationContainer.style.display = "block";
+            registrationContainer.scrollIntoView({ behavior: "smooth" });
             console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-
-            updateVehicleFields(selectedPlanType); // ✅ Update vehicle input fields
-
-            registrationContainer.style.display = "block"; // ✅ Show form
-            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
         });
     });
 
-    // ✅ Function to Update Vehicle Fields Based on Plan Type
-    function updateVehicleFields(planType) {
-        const vehicleContainer = document.getElementById("vehicle-container");
-        vehicleContainer.innerHTML = ""; // ✅ Clear previous entries
-
-        let maxVehicles = planType.includes("plus") ? 3 : 1; // ✅ Plus plans allow 3, Basic allows 1
-
-        for (let i = 0; i < maxVehicles; i++) {
-            const vehicleEntry = document.createElement("div");
-            vehicleEntry.classList.add("vehicle-entry");
-            vehicleEntry.innerHTML = `
-                <h4>Vehículo ${i + 1}</h4>
-                <label>Placa:</label>
-                <input type="text" class="plate" required>
-
-                <label>Modelo:</label>
-                <input type="text" class="model" required>
-
-                <label>Marca:</label>
-                <input type="text" class="brand" required>
-
-                <label>Año:</label>
-                <input type="number" class="year" required>
-            `;
-            vehicleContainer.appendChild(vehicleEntry);
-        }
-
-        console.log(`✅ Mostrando ${maxVehicles} campos de vehículos para plan: ${planType}`);
-    }
-
-    // ✅ Function to Select a Schedule Box
-    window.selectScheduleBox = function(cell) {
-        const cells = document.querySelectorAll(".schedule-table tbody td");
-
-        // Get the clicked cell's text
-        const timeBlock = cell.innerText.trim();
-
-        // Validate the clicked cell
-        if (timeBlock === "-" || timeBlock === "") {
-            alert("Por favor, seleccione un horario válido.");
-            return; // Do not allow selection of invalid cells
-        }
-
-        // Remove selection from all other cells
-        cells.forEach((c) => c.classList.remove("selected-box"));
-
-        // Highlight the selected cell
-        cell.classList.add("selected-box");
-
-        // Get the corresponding day from the column header
-        const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-        const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-        // Update the hidden input fields
-        document.getElementById("selectedDay").value = day;
-        document.getElementById("selectedTime").value = timeBlock;
-
-        console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
-    };
-
-    // ✅ Attach Event Listener for Registration Form
-    document.getElementById("registerForm").addEventListener("submit", function (event) {
+    window.registerUser = function (event) {
         event.preventDefault();
+
         if (!selectedPlanType) {
             alert("❌ Debes seleccionar un plan antes de registrarte.");
             return;
@@ -145,14 +50,14 @@
         const selectedTime = document.getElementById("selectedTime").value;
 
         const vehicles = [];
-document.querySelectorAll(".vehicle-entry").forEach(entry => {
-    vehicles.push({
-        plate: entry.querySelector(".plate").value || "",
-        model: entry.querySelector(".model").value || "",
-        brand: entry.querySelector(".brand").value || "",
-        year: entry.querySelector(".year").value || ""
-    });
-});
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
+            });
+        });
 
         if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
             alert("❌ Todos los campos son obligatorios.");
@@ -160,72 +65,138 @@ document.querySelectorAll(".vehicle-entry").forEach(entry => {
         }
 
         auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            const paymentDate = new Date();
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+            .then((userCredential) => {
+                const userId = userCredential.user.uid;
+                const paymentDate = new Date();
+                const nextPaymentDate = new Date();
+                nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-       return db.collection("users").doc(userId).set({
-    uid: userId,
-    name,
-    email,
-    phone,
-    planType: selectedPlanType,
-    department,
-    municipality,
-    registrationDate: firebase.firestore.Timestamp.now(),
-    lastUpgradeDate: firebase.firestore.Timestamp.now(),
-    schedule: { 
-        day: selectedDay, 
-        time: selectedTime 
-    },
-    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-    paymentStatus: "Pending",
-    subscriptionStatus: "active", // ✅ ADD THIS LINE
-    monthsPaid: 0,
-    vehicles
-});
+                const messaging = firebase.messaging();
+                messaging.getToken({
+                    vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
+                }).then((token) => {
+                    const pushToken = token || null;
 
+                    return db.collection("users").doc(userId).set({
+                        uid: userId,
+                        name,
+                        email,
+                        phone,
+                        planType: selectedPlanType,
+                        department,
+                        municipality,
+                        registrationDate: firebase.firestore.Timestamp.now(),
+                        lastUpgradeDate: firebase.firestore.Timestamp.now(),
+                        schedule: {
+                            day: selectedDay,
+                            time: selectedTime
+                        },
+                        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                        paymentStatus: "Pending",
+                        subscriptionStatus: "active",
+                        monthsPaid: 0,
+                        vehicles,
+                        pushToken
+                    }).then(() => {
+                        // ✅ Log initial completed payment in history
+                        const user = firebase.auth().currentUser;
+                        if (user) {
+                            const userRef = db.collection("users").doc(user.uid);
+                            userRef.update({
+                                paymentStatus: "Completed",
+                                paymentDate: firebase.firestore.Timestamp.now(),
+                                nextPaymentDate: firebase.firestore.Timestamp.fromDate(getNextMonthDate()),
+                                paymentHistory: firebase.firestore.FieldValue.arrayUnion({
+                                    date: firebase.firestore.Timestamp.now(),
+                                    amount: 20,
+                                    method: "PayPal",
+                                    status: "Completed"
+                                })
+                            });
+                        }
 
+                        // ✅ Show overlay
+                        const overlay = document.createElement("div");
+                        overlay.style.position = "fixed";
+                        overlay.style.top = "0";
+                        overlay.style.left = "0";
+                        overlay.style.width = "100%";
+                        overlay.style.height = "100%";
+                        overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+                        overlay.style.display = "flex";
+                        overlay.style.flexDirection = "column";
+                        overlay.style.justifyContent = "center";
+                        overlay.style.alignItems = "center";
+                        overlay.style.zIndex = "9999";
+                        overlay.innerHTML = `
+                            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+                        `;
+                        document.body.appendChild(overlay);
 
-        })
-        .then(() => {
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
-    });
+                        const style = document.createElement("style");
+                        style.innerHTML = `
+                            @keyframes spin {
+                                0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); }
+                            }
+                        `;
+                        document.head.appendChild(style);
 
-}); // ✅ Closing brace at the correct place
+                        setTimeout(() => {
+                            window.location.href = "login.html";
+                        }, 2500);
+                    });
+                }).catch((err) => {
+                    console.error("❌ Error obteniendo pushToken:", err);
+                    alert("Error al obtener token de notificación.");
+                });
+            })
+            .catch((error) => {
+                console.error("❌ Error en el registro:", error.message);
+                alert("❌ Error en el registro: " + error.message);
+            });
+    };
 
-        // ✅ Function to Update Vehicle Fields Based on Plan Type
-        function updateVehicleFields(planType) {
-            const vehicleContainer = document.getElementById("vehicle-container");
-            vehicleContainer.innerHTML = "";
-            let maxVehicles = (planType.includes("plus")) ? 3 : 1;
-            for (let i = 0; i < maxVehicles; i++) {
-                const vehicleEntry = document.createElement("div");
-                vehicleEntry.classList.add("vehicle-entry");
-                vehicleEntry.innerHTML = `
-                    <h4>Vehículo ${i + 1}</h4>
-                    <label>Placa:</label>
-                    <input type="text" class="plate" required>
-                    <label>Modelo:</label>
-                    <input type="text" class="model" required>
-                    <label>Marca:</label>
-                    <input type="text" class="brand" required>
-                    <label>Año:</label>
-                    <input type="number" class="year" required>
-                `;
-                vehicleContainer.appendChild(vehicleEntry);
+    function getNextMonthDate() {
+        const date = new Date();
+        date.setMonth(date.getMonth() + 1);
+        return date;
+    }
+
+    function updateVehicleFields(planType) {
+        const vehicleContainer = document.getElementById("vehicle-container");
+        vehicleContainer.innerHTML = "";
+
+        for (let i = 0; i < 3; i++) {
+            const vehicleEntry = document.createElement("div");
+            vehicleEntry.classList.add("vehicle-entry");
+
+            if (!planType.includes("plus") && i > 0) {
+                vehicleEntry.style.display = "none";
             }
+
+            vehicleEntry.innerHTML = `
+                <h4>Vehículo ${i + 1}</h4>
+                <label>Placa:</label>
+                <input type="text" class="plate">
+                <label>Modelo:</label>
+                <input type="text" class="model">
+                <label>Marca:</label>
+                <input type="text" class="brand">
+                <label>Año:</label>
+                <input type="number" class="year">
+            `;
+            vehicleContainer.appendChild(vehicleEntry);
         }
-    </script>
+
+        console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 guardados)"}`);
+    }
+});
+</script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
