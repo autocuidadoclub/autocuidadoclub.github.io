@@ -258,7 +258,7 @@ resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(quer
 <script src="env.js"></script>
 
 <script>
-  // Initialize Firebase using dynamically loaded environment variables
+  // Firebase initialization using env.js
   const firebaseConfig = {
     apiKey: window._env_.FIREBASE_API_KEY,
     authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
@@ -270,316 +270,134 @@ resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(quer
     measurementId: window._env_.FIREBASE_MEASUREMENT_ID
   };
 
-  // Initialize Firebase
   if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
   }
 
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  const serverKey = "YOUR_SERVER_KEY_HERE"; // Replace with your FCM key
 
-        gapi.load('client:auth2', () => {
-    gapi.client.init({
-        apiKey: 'YOUR_API_KEY', // Replace with your Google API key
-        clientId: 'YOUR_CLIENT_ID', // Replace with your Google Client ID
-        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-        scope: "https://www.googleapis.com/auth/calendar.events"
-    }).then(() => {
-        console.log("Google Calendar API Loaded");
-    }).catch((error) => {
-        console.error("Error loading Google Calendar API:", error);
-    });
-});
-
-        
-        auth.onAuthStateChanged(async (user) => {
+  auth.onAuthStateChanged(async (user) => {
     if (user) {
-        console.log("🔹 Usuario autenticado:", user.email, "UID:", user.uid);
-
-        const userDoc = await db.collection("users").doc(user.uid).get();
-
-        if (userDoc.exists) {
-            console.log("✅ Documento Firestore encontrado:", userDoc.data());
-            if (userDoc.data().role === "staff") {
-                document.getElementById("restricted-content").style.display = "block";
-            } else {
-                alert("⚠️ No tienes permiso para acceder a staff.html");
-                window.location.href = "login.html";
-            }
-        } else {
-            console.log("❌ No existe el documento en Firestore para este UID.");
-            alert("⚠️ No tienes permiso para acceder.");
-            window.location.href = "login.html";
-        }
-    } else {
-        console.log("⚠️ Usuario no autenticado.");
-        alert("Por favor, inicia sesión.");
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      if (userDoc.exists && userDoc.data().role === "staff") {
+        document.getElementById("restricted-content").style.display = "block";
+      } else {
+        alert("No tienes permiso para acceder a staff.html");
         window.location.href = "login.html";
+      }
+    } else {
+      alert("Por favor, inicia sesión.");
+      window.location.href = "login.html";
     }
-});
+  });
 
-
-       
-function logout() {
-    const auth = firebase.auth();
-    
+  function logout() {
     auth.signOut().then(() => {
-        console.log("Usuario ha cerrado sesión correctamente.");
-        alert("Has cerrado sesión correctamente.");
-        window.location.href = "login.html"; // Redirect to login page
+      alert("Has cerrado sesión correctamente.");
+      window.location.href = "login.html";
     }).catch((error) => {
-        console.error("Error al cerrar sesión:", error);
-        alert("Error al cerrar sesión.");
+      alert("Error al cerrar sesión.");
     });
-}
+  }
 
-
-       function findUsersByDate() {
-    const startDateValue = document.getElementById("startDate").value;
-    const endDateValue = document.getElementById("endDate").value;
-
-    if (!startDateValue || !endDateValue) {
-        alert("Por favor, seleccione ambas fechas.");
-        return;
-    }
-
-    const startDate = new Date(startDateValue);
-    const endDate = new Date(endDateValue);
-    endDate.setDate(endDate.getDate() + 1); // Include full last day
-
-    const paymentTable = document.getElementById("paymentTable");
-    paymentTable.innerHTML = ""; // Clear table
-
-    db.collection("users")
-    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-    .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
-    .limit(1000)  // ✅ Ensures you fetch up to 1000 users
-    .get()
-        db.collection("users")
-    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-    .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
-    .limit(1000) 
-    .get()
-    .then((querySnapshot) => {
-        console.log(`📊 Total users found: ${querySnapshot.size}`);
-
-        querySnapshot.forEach((doc) => {
-            console.log("👤 User found:", doc.id, doc.data());
-        });
-
-        if (querySnapshot.empty) {
-            alert("No se encontraron usuarios en el rango de fechas.");
+  function sendPushNotification(token, message) {
+    fetch("https://fcm.googleapis.com/fcm/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "key=" + serverKey
+      },
+      body: JSON.stringify({
+        to: token,
+        notification: {
+          title: "AutoCuidado Club",
+          body: message,
+          icon: "https://www.autocuidadoclub.com/assets/logo-noti.png"
         }
-    })
-    .catch((error) => {
-        console.error("❌ Error fetching users:", error);
-        alert("Error al buscar usuarios.");
+      })
+    }).then(response => {
+      alert("Notificación enviada con éxito.");
+    }).catch(error => {
+      alert("Error al enviar la notificación");
     });
+  }
 
-}
+  function sendGlobalNotification() {
+    const message = document.getElementById("globalMessage").value;
+    if (!message) return alert("Escribe un mensaje primero");
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  // tu config aquí
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const serverKey = "YOUR_SERVER_KEY"; // Replace with your FCM server key
-
-async function loadUsersAndCreateButtons() {
-  const querySnapshot = await getDocs(collection(db, "users"));
-  querySnapshot.forEach((doc) => {
-    const user = doc.data();
-    if (user.pushToken && user.selectedSchedule) {
-      createPushButton(user.name, user.pushToken, user.selectedSchedule);
-    }
-  });
-}
-
-function createPushButton(name, token, schedule) {
-  const button = document.createElement("button");
-  button.innerText = `Recordar a ${name}`;
-  button.onclick = () => {
-    const msg = `Hola ${name}, elegiste tu inspección el ${schedule}. ¿Todo bien o quieres reprogramarla?`;
-    sendPushNotification(token, msg);
-  };
-  document.getElementById("user-buttons").appendChild(button);
-}
-
-function sendPushNotification(token, message) {
-  fetch("https://fcm.googleapis.com/fcm/send", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "key=" + serverKey
-    },
-    body: JSON.stringify({
-      to: token,
-      notification: {
-        title: "AutoCuidado Club",
-        body: message,
-        icon: "/logo192.png"
-      }
-    })
-  }).then(response => {
-    console.log("Push sent", response);
-  }).catch(error => {
-    console.error("Error sending push", error);
-  });
-}
-
-function sendGlobalNotification() {
-  const message = document.getElementById("globalMessage").value;
-  if (!message) return alert("Escribe un mensaje primero");
-
-  getDocs(collection(db, "users")).then((snapshot) => {
-    snapshot.forEach((doc) => {
-      const user = doc.data();
-      if (user.pushToken) {
-        sendPushNotification(user.pushToken, message);
-      }
+    db.collection("users").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const user = doc.data();
+        if (user.pushToken) {
+          sendPushNotification(user.pushToken, message);
+        }
+      });
     });
-  });
-}
+  }
 
-window.onload = loadUsersAndCreateButtons;
+  function updatePaymentTable(user, userId) {
+    const table = document.getElementById("paymentTable");
+    const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+    const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
+    const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+    const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+    const pushBtn = user.pushToken ? `<button onclick=\"sendPushNotification('${user.pushToken}', 'Hola ${user.name}, tu inspección es ${schedule}.')\">Push</button>` : "No token";
 
-       function findRescheduledUsers() {
-    const startDateValue = document.getElementById("rescheduleStartDate").value;
-    const endDateValue = document.getElementById("rescheduleEndDate").value;
+    table.innerHTML += `
+      <tr>
+        <td>${user.name}</td>
+        <td>${user.email}</td>
+        <td>${user.phone || "No disponible"}</td>
+        <td>${registrationDate}</td>
+        <td>${schedule}</td>
+        <td>${paymentDate}</td>
+        <td>${user.paymentStatus || "Pendiente"}</td>
+        <td>${nextPaymentDate}</td>
+        <td>
+          <button onclick=\"confirmPayment('${userId}')\">Confirmar Pago</button><br>
+          ${pushBtn}
+        </td>
+      </tr>`;
+  }
 
-    if (!startDateValue || !endDateValue) {
-        alert("Por favor, seleccione ambas fechas.");
-        return;
-    }
-
-    const startDate = new Date(startDateValue);
-    const endDate = new Date(endDateValue);
+  function findUsersByDate() {
+    const startDate = new Date(document.getElementById("startDate").value);
+    const endDate = new Date(document.getElementById("endDate").value);
     endDate.setDate(endDate.getDate() + 1);
 
-    const rescheduleTable = document.getElementById("rescheduleTable");
-    rescheduleTable.innerHTML = ""; // Clear previous results
+    const table = document.getElementById("paymentTable");
+    table.innerHTML = "";
 
     db.collection("users")
-        .where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-        .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
-        .get()
-        .then((querySnapshot) => {
-            if (querySnapshot.empty) {
-                alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
-                return;
-            }
-            querySnapshot.forEach((doc) => {
-                const user = doc.data();
-                const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
+      .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+      .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
+        if (snapshot.empty) alert("No se encontraron usuarios en el rango de fechas.");
+      })
+      .catch(error => alert("Error al buscar usuarios."));
+  }
 
-                rescheduleTable.innerHTML += `
-                    <tr>
-                        <td>${user.name}</td>
-                        <td>${user.email}</td>
-                        <td>${user.phone || "No disponible"}</td>
-                        <td>${user.schedule?.day || "No asignado"}, ${user.schedule?.time || "No asignado"}</td>
-                        <td>${lastReschedule}</td>
-                    </tr>`;
-            });
-        })
-        .catch((error) => {
-            console.error("Error fetching rescheduled users:", error);
-            alert("Error al buscar reprogramaciones. Inténtalo nuevamente.");
-        });
-}
-
-
-        function updateInspection(userId, selectedSchedule) {
-            if (!selectedSchedule) {
-                alert("No se ha definido un horario seleccionado para este usuario.");
-                return;
-            }
-
-            const newInspectionDate = prompt(`Ingrese la nueva fecha de inspección para el horario '${selectedSchedule}' (YYYY-MM-DD):`);
-
-            if (!newInspectionDate) {
-                alert("Fecha no válida.");
-                return;
-            }
-
-            const newDate = new Date(newInspectionDate);
-
-            db.collection("users").doc(userId).update({
-                nextInspectionDate: firebase.firestore.Timestamp.fromDate(newDate),
-            }).then(() => {
-                alert("Calendario de inspección actualizado.");
-                findRescheduledUsers();
-            }).catch((error) => {
-                console.error("Error updating inspection date:", error);
-                alert("Error al actualizar la inspección. Inténtalo nuevamente.");
-            });
-        }
-
-       function updatePaymentTable(user, userId) {
-    const paymentTable = document.getElementById("paymentTable");
-    const registrationDate = user.registrationDate ? user.registrationDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
-    const selectedSchedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
-    const paymentDate = user.paymentDate ? user.paymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
-    const nextPaymentDate = user.nextPaymentDate ? user.nextPaymentDate.toDate().toLocaleDateString("es-ES") : "Sin fecha";
-
-    paymentTable.innerHTML += `
-        <tr>
-            <td>${user.name}</td>
-            <td>${user.email}</td>
-            <td>${user.phone || "No disponible"}</td>
-            <td>${registrationDate}</td>
-            <td>${selectedSchedule}</td>
-            <td>${paymentDate}</td> 
-            <td>${user.paymentStatus || "Pendiente"}</td> 
-            <td>${nextPaymentDate}</td>
-            <td>
-                <button onclick="confirmPayment('${userId}')">Confirmar Pago</button>
-            </td>
-        </tr>`;
-}
-
-
-       function confirmPayment(userId) {
+  function confirmPayment(userId) {
     const paymentDate = new Date();
     const nextPaymentDate = new Date();
     nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
     db.collection("users").doc(userId).update({
-        paymentStatus: "Confirmado",
-        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+      paymentStatus: "Confirmado",
+      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
     }).then(() => {
-        alert("Pago confirmado.");
-        findUsersByDate(); // Refresh table
-    }).catch((error) => {
-        console.error("Error al confirmar el pago:", error);
-        alert("Error al actualizar el pago.");
-    });
-}
+      alert("Pago confirmado");
+      findUsersByDate();
+    }).catch(() => alert("Error al actualizar el pago."));
+  }
+</script>
 
-
-        function sendEmail(email, name) {
-            const subject = `Consulta para ${name}`;
-            const body = `Estimado/a ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
-            const zohoMailUrl = `https://mail.zoho.com/zm/#compose?to=${email}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(zohoMailUrl, '_blank');
-        }
-
-        function sendWhatsApp(phone, name) {
-            if (!phone) {
-                alert("Número de teléfono no disponible.");
-                return;
-            }
-            const message = `Hola ${name}, Bienvenido al club del cuidado automotriz, nos enorgullece que formes parte de AutoCuidado Club.`;
-            const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, '_blank');
-        }
-    </script>
 </body>
 </html>
