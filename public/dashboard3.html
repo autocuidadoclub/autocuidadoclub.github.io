@@ -421,7 +421,25 @@
     </div> <!-- End Flex Row -->
 </div>
 
-            
+      // Place this in the HTML part of dashboard3.html (maybe below Estado de Pago)
+<div class="card" style="margin-top: 20px;">
+  <h3>📜 Historial de Pagos</h3>
+  <button onclick="loadPaymentHistory()" class="orange-button">Ver Historial</button>
+  <table id="customerHistoryTable" style="margin-top: 15px; display: none;">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Monto</th>
+        <th>Método</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="customerHistoryBody"></tbody>
+  </table>
+</div>
+
+
+     
 <script>
 // Global variables
 let auth, db;
@@ -842,6 +860,39 @@ if (progressDescription) {
 
 }
 
+    // Place this in the JS script block of dashboard3.html
+function loadPaymentHistory() {
+  const user = firebase.auth().currentUser;
+  const body = document.getElementById("customerHistoryBody");
+  const table = document.getElementById("customerHistoryTable");
+  body.innerHTML = "";
+
+  if (!user) return;
+
+  db.collection("users").doc(user.uid).get().then(doc => {
+    const data = doc.data();
+    const history = data.paymentHistory || [];
+
+    if (history.length === 0) {
+      body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
+    } else {
+      history.forEach(entry => {
+        const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
+        body.innerHTML += `
+          <tr>
+            <td>${date}</td>
+            <td>$${entry.amount || "N/A"}</td>
+            <td>${entry.method || "-"}</td>
+            <td>${entry.status || "-"}</td>
+          </tr>
+        `;
+      });
+    }
+
+    table.style.display = "table";
+  });
+} // end loadPaymentHistory
+    
 </script>
 
     
