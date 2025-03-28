@@ -178,6 +178,8 @@ function updatePaymentTable(user, userId) {
 
 async function confirmPayment(userId) {
   try {
+    console.log("🔍 Confirming payment for:", userId);
+
     const paymentDate = new Date();
     const nextPaymentDate = new Date();
     nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
