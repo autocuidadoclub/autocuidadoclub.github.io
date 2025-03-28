@@ -176,23 +176,26 @@ function updatePaymentTable(user, userId) {
     </tr>`;
 }
 
-function confirmPayment(userId) {
-  const paymentDate = new Date();
-  const nextPaymentDate = new Date();
-  nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+async function confirmPayment(userId) {
+  try {
+    const paymentDate = new Date();
+    const nextPaymentDate = new Date();
+    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-  db.collection("users").doc(userId).update({
-    paymentStatus: "Confirmado",
-    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-  }).then(() => {
-    alert("Pago confirmado");
-    findUsersByDate();
-  }).catch(error => {
-    console.error("Error al confirmar pago:", error);
-    alert("Error al actualizar el pago.");
-  });
+    await db.collection("users").doc(userId).update({
+      paymentStatus: "Confirmado",
+      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+    });
+
+    alert("✅ Pago confirmado.");
+    findUsersByDate(); // Refresh table
+  } catch (error) {
+    console.error("❌ Error al actualizar el pago:", error);
+    alert("❌ Error al actualizar el pago. Revisa la consola.");
+  }
 }
+
 
    async function sendPushNotification(token, message) {
   try {
