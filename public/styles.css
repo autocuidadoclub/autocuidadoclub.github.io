@@ -1731,13 +1731,14 @@ header {
 
 .styled-box {
     background-color: #f9f9f9;
-    border-left: 5px solid #007bff;
+    border-left: 5px solid #339CFF; /* Light blue border */
     padding: 15px 20px;
     margin: 20px auto;
-    border-radius: 8px;
+    border-radius: 10px;
     max-width: 850px;
     color: #333;
     font-size: 1.05em;
     line-height: 1.6;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
+
