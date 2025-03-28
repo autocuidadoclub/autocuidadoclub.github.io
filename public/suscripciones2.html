@@ -930,6 +930,7 @@ button:hover {
     </section>
     </form>
     </div>
+
     
  <!-- Footer -->
     <footer>
@@ -1069,6 +1070,31 @@ messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzo
       monthsPaid: 0,
       vehicles,
       pushToken // ✅ store token in Firestore
+
+
+        function getNextMonthDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+}
+
+// Then, inside the PayPal success logic or registration confirmation:
+const user = firebase.auth().currentUser;
+if (user) {
+  const userRef = db.collection("users").doc(user.uid);
+  userRef.update({
+    paymentStatus: "Completed",
+    paymentDate: firebase.firestore.Timestamp.now(),
+    nextPaymentDate: firebase.firestore.Timestamp.fromDate(getNextMonthDate()),
+    paymentHistory: firebase.firestore.FieldValue.arrayUnion({
+      date: firebase.firestore.Timestamp.now(),
+      amount: 20,
+      method: "PayPal",
+      status: "Completed"
+    })
+  });
+}
+        
     });
   });
 
