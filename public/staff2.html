@@ -1,403 +1,181 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Clientes - AutoCuidado Club</title>
-    <link rel="stylesheet" href="/styles.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
-
-     <script>
-        const webAppUrl = "YOUR_WEB_APP_URL"; // Replace with the actual deployed Apps Script Web App URL
-
-        async function fetchInspectionData() {
-            const query = document.getElementById("queryInput").value.trim();
-            const resultsDiv = document.getElementById("inspectionResults");
-            resultsDiv.innerHTML = ""; // Clear previous results
-
-            try {
-                const response = await fetch(`${webAppUrl}?query=${encodeURIComponent(query)}`);
-                const data = await response.json();
-
-                if (data.error) {
-                    resultsDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
-                    return;
-                }
-
-                if (data.length > 0) {
-                    const table = document.createElement("table");
-                    table.border = "1";
-                    table.style.width = "100%";
-
-                    // Create table headers
-                    const headers = Object.keys(data[0]);
-                    const thead = document.createElement("thead");
-                    const trHead = document.createElement("tr");
-
-                    headers.forEach(header => {
-                        const th = document.createElement("th");
-                        th.textContent = header;
-                        trHead.appendChild(th);
-                    });
-                    thead.appendChild(trHead);
-                    table.appendChild(thead);
-
-                    // Populate table rows
-                    const tbody = document.createElement("tbody");
-                    data.forEach(row => {
-                        const tr = document.createElement("tr");
-                        headers.forEach(header => {
-                            const td = document.createElement("td");
-                            td.textContent = row[header] || "N/A";
-                            tr.appendChild(td);
-                        });
-                        tbody.appendChild(tr);
-                    });
-                    table.appendChild(tbody);
-
-                    resultsDiv.appendChild(table);
-                } else {
-                    function escapeHTML(str) {
-    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-              .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}
-resultsDiv.textContent = `No se encontraron inspecciones para "${escapeHTML(query)}".`;
-
-                }
-            } catch (error) {
-                console.error("Error fetching inspection data:", error);
-                resultsDiv.innerHTML = `<p>Error al obtener datos. Inténtalo nuevamente.</p>`;
-            }
-        }
-    </script>
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .navbar {
-            background-color: #007bff;
-            padding: 10px;
-        }
-        .navbar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: space-around;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        header {
-            background-color: #f4f4f4;
-            padding: 20px;
-            text-align: center;
-        }
-        #restricted-content {
-            padding: 20px;
-        }
-        .section-title {
-            margin-top: 20px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .form-control {
-            margin-bottom: 15px;
-        }
-        .form-control label {
-            font-weight: bold;
-            display: block;
-        }
-        .form-control input, .form-control select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Clientes - AutoCuidado Club</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <ul>
-            <li><a href="calendar.html">Calendar</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="logout.html">Cerrar Sesión</a></li>
-        </ul>
-    </nav>
+  <nav class="navbar">
+    <ul>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="logout.html">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
 
-    <header>
-        <h1>Gestión de Clientes</h1>
-    </header>
+  <header>
+    <h1>Gestión de Clientes</h1>
+  </header>
 
+  <section id="restricted-content" style="display: none;">
+    <h2>Panel de Gestión para el Staff</h2>
 
-    
-    <section id="restricted-content" style="display: none;">
-        <h2>Panel de Gestión para el Staff</h2>
+    <div>
+      <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
+      <div class="form-control">
+        <label for="rescheduleStartDate">Desde:</label>
+        <input type="date" id="rescheduleStartDate" />
+      </div>
+      <div class="form-control">
+        <label for="rescheduleEndDate">Hasta:</label>
+        <input type="date" id="rescheduleEndDate" />
+      </div>
+      <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
 
-        <!-- Finder Section -->
-        <div>
-            <h3 class="section-title">Buscar Usuarios por Fecha</h3>
-            <div class="form-control">
-                <label for="startDate">Desde:</label>
-                <input type="date" id="startDate">
-            </div>
-            <div class="form-control">
-                <label for="endDate">Hasta:</label>
-                <input type="date" id="endDate">
-            </div>
-            <button onclick="findUsersByDate()">Buscar Usuarios</button>
-            <ul id="userResults"></ul>
-
-          <table>
-  <thead>
-    <tr>
-      <th>Usuario</th>
-      <th>Email</th>
-      <th>Teléfono</th>
-      <th>Horario Seleccionado</th>
-      <th>Última Reprogramación</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody id="rescheduleTable"></tbody>
-</table>
-
-
-                <tbody id="paymentTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Verify Rescheduled Inspections -->
-        <div>
-            <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
-            <div class="form-control">
-                <label for="rescheduleStartDate">Desde:</label>
-                <input type="date" id="rescheduleStartDate">
-            </div>
-            <div class="form-control">
-                <label for="rescheduleEndDate">Hasta:</label>
-                <input type="date" id="rescheduleEndDate">
-            </div>
-            <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
-            <ul id="rescheduleResults"></ul>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Email</th>
-                        <th>Teléfono</th>
-                        <th>Horario Seleccionado</th>
-                        <th>Última Reprogramación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="rescheduleTable"></tbody>
-            </table>
-      
-</div>
-  
-
- <div class="navbar">Gestión de Inspecciones - AutoCuidado Club</div>
-
-    <div class="container">
-        <h2>Buscar Inspecciones</h2>
-        <input type="text" id="queryInput" placeholder="Buscar por email, fecha, etc.">
-        <button onclick="fetchInspectionData()">Buscar</button>
-
-        <div id="inspectionResults"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Horario Seleccionado</th>
+            <th>Última Reprogramación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="rescheduleTable"></tbody>
+      </table>
     </div>
   </section>
 
-    <h2>Notificaciones Personalizadas</h2>
-<div id="user-buttons" class="user-button-grid"></div>
+  <h2>Notificaciones Personalizadas</h2>
+  <div id="user-buttons" class="user-button-grid"></div>
 
-<h2>Notificación Global</h2>
-<textarea id="globalMessage" placeholder="Escribe aquí el mensaje para todos"></textarea><br>
-<button onclick="sendGlobalNotification()">Enviar Notificación Global</button>
+  <h2>Notificación Global</h2>
+  <textarea id="globalMessage" placeholder="Escribe aquí el mensaje para todos"></textarea><br />
+  <button onclick="sendGlobalNotification()">Enviar Notificación Global</button>
 
-    
-    
-    
-       <!-- Load env.js before initializing Firebase -->
-<script src="env.js"></script>
+  <script src="env.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: window._env_.FIREBASE_API_KEY,
+      authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+      databaseURL: window._env_.FIREBASE_DATABASE_URL,
+      projectId: window._env_.FIREBASE_PROJECT_ID,
+      storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+      appId: window._env_.FIREBASE_APP_ID,
+      measurementId: window._env_.FIREBASE_MEASUREMENT_ID,
+    };
 
-<script>
-  // Firebase initialization using env.js
-  const firebaseConfig = {
-    apiKey: window._env_.FIREBASE_API_KEY,
-    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-    databaseURL: window._env_.FIREBASE_DATABASE_URL,
-    projectId: window._env_.FIREBASE_PROJECT_ID,
-    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-    appId: window._env_.FIREBASE_APP_ID,
-    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-  };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
 
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const serverKey = "YOUR_SERVER_KEY_HERE";
 
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  const serverKey = "YOUR_SERVER_KEY_HERE"; // Replace with your FCM key
-
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      if (userDoc.exists && userDoc.data().role === "staff") {
-        document.getElementById("restricted-content").style.display = "block";
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists && userDoc.data().role === "staff") {
+          document.getElementById("restricted-content").style.display = "block";
+        } else {
+          alert("No tienes permiso para acceder a staff.html");
+          window.location.href = "login.html";
+        }
       } else {
-        alert("No tienes permiso para acceder a staff.html");
+        alert("Por favor, inicia sesión.");
         window.location.href = "login.html";
       }
-    } else {
-      alert("Por favor, inicia sesión.");
-      window.location.href = "login.html";
+    });
+
+    function sendPushNotification(token, message) {
+      fetch("https://fcm.googleapis.com/fcm/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "key=" + serverKey,
+        },
+        body: JSON.stringify({
+          to: token,
+          notification: {
+            title: "AutoCuidado Club",
+            body: message,
+            icon: "/logo192.png",
+          },
+        }),
+      })
+        .then((response) => alert("Notificación enviada con éxito."))
+        .catch((error) => alert("Error al enviar la notificación"));
     }
-  });
 
-  function logout() {
-    auth.signOut().then(() => {
-      alert("Has cerrado sesión correctamente.");
-      window.location.href = "login.html";
-    }).catch((error) => {
-      alert("Error al cerrar sesión.");
-    });
-  }
+    function sendGlobalNotification() {
+      const message = document.getElementById("globalMessage").value;
+      if (!message) return alert("Escribe un mensaje primero");
 
-  function sendPushNotification(token, message) {
-    fetch("https://fcm.googleapis.com/fcm/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "key=" + serverKey
-      },
-      body: JSON.stringify({
-        to: token,
-        notification: {
-          title: "AutoCuidado Club",
-          body: message,
-          icon: "https://www.autocuidadoclub.com/assets/logo-noti.png"
-        }
-      })
-    }).then(response => {
-      alert("Notificación enviada con éxito.");
-    }).catch(error => {
-      alert("Error al enviar la notificación");
-    });
-  }
+      db.collection("users")
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            const user = doc.data();
+            if (user.pushToken) {
+              sendPushNotification(user.pushToken, message);
+            }
+          });
+        });
+    }
 
-  function sendGlobalNotification() {
-    const message = document.getElementById("globalMessage").value;
-    if (!message) return alert("Escribe un mensaje primero");
+    function findRescheduledUsers() {
+      const startDate = new Date(document.getElementById("rescheduleStartDate").value);
+      const endDate = new Date(document.getElementById("rescheduleEndDate").value);
+      endDate.setDate(endDate.getDate() + 1);
+      const rescheduleTable = document.getElementById("rescheduleTable");
+      rescheduleTable.innerHTML = "";
 
-    db.collection("users").get().then(snapshot => {
-      snapshot.forEach(doc => {
-        const user = doc.data();
-        if (user.pushToken) {
-          sendPushNotification(user.pushToken, message);
-        }
-      });
-    });
-  }
+      db.collection("users")
+        .where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get()
+        .then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
+            return;
+          }
 
-  function updatePaymentTable(user, userId) {
-    const table = document.getElementById("paymentTable");
-    const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-    const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
-    const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-    const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-    const pushBtn = user.pushToken ? `<button onclick=\"sendPushNotification('${user.pushToken}', 'Hola ${user.name}, tu inspección es ${schedule}.')\">Push</button>` : "No token";
+          querySnapshot.forEach((doc) => {
+            const user = doc.data();
+            const lastReschedule = user.lastReschedule
+              ? user.lastReschedule.toDate().toLocaleDateString("es-ES")
+              : "No registrada";
+            const schedule = user.schedule
+              ? `${user.schedule.day}, ${user.schedule.time}`
+              : "No asignado";
 
-    table.innerHTML += `
-      <tr>
-        <td>${user.name}</td>
-        <td>${user.email}</td>
-        <td>${user.phone || "No disponible"}</td>
-        <td>${registrationDate}</td>
-        <td>${schedule}</td>
-        <td>${paymentDate}</td>
-        <td>${user.paymentStatus || "Pendiente"}</td>
-        <td>${nextPaymentDate}</td>
-        <td>
-          <button onclick=\"confirmPayment('${userId}')\">Confirmar Pago</button><br>
-          ${pushBtn}
-        </td>
-      </tr>`;
-  }
-
-  function findUsersByDate() {
-    const startDate = new Date(document.getElementById("startDate").value);
-    const endDate = new Date(document.getElementById("endDate").value);
-    endDate.setDate(endDate.getDate() + 1);
-
-    const table = document.getElementById("paymentTable");
-    table.innerHTML = "";
-
-    db.collection("users")
-      .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-      .where("registrationDate", "<=", firebase.firestore.Timestamp.fromDate(endDate))
-      .get()
-      .then(snapshot => {
-        snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
-        if (snapshot.empty) alert("No se encontraron usuarios en el rango de fechas.");
-      })
-      .catch(error => alert("Error al buscar usuarios."));
-  }
-
-  function confirmPayment(userId) {
-    const paymentDate = new Date();
-    const nextPaymentDate = new Date();
-    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-    db.collection("users").doc(userId).update({
-      paymentStatus: "Confirmado",
-      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-    }).then(() => {
-      alert("Pago confirmado");
-      findUsersByDate();
-    }).catch(() => alert("Error al actualizar el pago."));
-  }
-</script>
-
+            rescheduleTable.innerHTML += `
+              <tr>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.phone || "No disponible"}</td>
+                <td>${schedule}</td>
+                <td>${lastReschedule}</td>
+                <td>
+                  ${user.pushToken ? `<button onclick=\"sendPushNotification('${user.pushToken}', 'Hola ${user.name}, ¿deseas reprogramar tu inspección del ${lastReschedule}?')\">Push</button>` : "No token"}
+                </td>
+              </tr>`;
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching reprogramaciones:", error);
+          alert("Error al buscar reprogramaciones.");
+        });
+    }
+  </script>
 </body>
 </html>
