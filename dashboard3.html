@@ -421,9 +421,8 @@
     </div> <!-- End Flex Row -->
 </div>
 
-      <!-- Historial de Pagos -->
-<div class="card">
-  <h3><i class="fas fa-file-invoice-dollar"></i> Historial de Pagos</h3>
+      <div class="card" style="margin-top: 20px;">
+  <h3>📜 Historial de Pagos</h3>
   <button onclick="loadPaymentHistory()" class="orange-button">Ver Historial</button>
   <table id="customerHistoryTable" style="margin-top: 15px; display: none;">
     <thead>
@@ -861,6 +860,7 @@ if (progressDescription) {
 }
 
     // Place this in the JS script block of dashboard3.html
+// 📜 View Payment History Function
 function loadPaymentHistory() {
   const user = firebase.auth().currentUser;
   const body = document.getElementById("customerHistoryBody");
@@ -890,8 +890,12 @@ function loadPaymentHistory() {
     }
 
     table.style.display = "table";
+  }).catch(error => {
+    console.error("❌ Error al cargar historial de pagos:", error);
+    alert("Error al cargar el historial de pagos.");
   });
-} // end loadPaymentHistory
+}
+
     
 </script>
 
