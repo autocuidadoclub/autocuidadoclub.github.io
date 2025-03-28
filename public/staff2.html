@@ -89,20 +89,22 @@
   <textarea id="globalMessage" placeholder="Escribe aquí el mensaje para todos"></textarea><br />
   <button onclick="sendGlobalNotification()">Enviar Notificación Global</button>
 
-  <div id="paymentHistoryBox" class="card" style="display:none; margin-top: 20px;">
-  <h3>📜 Historial de Pago del Cliente</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Método</th>
-        <th>Monto</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody id="paymentHistoryTable"></tbody>
-  </table>
-</div>
+  <h3>📜 Historial de pago por cliente</h3>
+<input type="text" id="searchEmail" placeholder="Buscar por email...">
+<button onclick="getPaymentHistoryByEmail()">Buscar</button>
+
+<table id="staffHistoryTable" style="margin-top: 10px; display: none;">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Monto</th>
+      <th>Método</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody id="staffHistoryBody"></tbody>
+</table>
+
 
 
   <script src="env.js"></script>
@@ -195,40 +197,44 @@ function updatePaymentTable(user, userId) {
     </tr>`;
 }
 
-    function viewPaymentHistory(userId) {
-  const table = document.getElementById("paymentHistoryTable");
-  const box = document.getElementById("paymentHistoryBox");
-  table.innerHTML = ""; // Clear previous
+    function getPaymentHistoryByEmail() {
+  const email = document.getElementById("searchEmail").value.trim();
+  if (!email) return alert("Escribe el correo del cliente.");
 
-  db.collection("users").doc(userId).get().then(doc => {
-    if (doc.exists) {
-      const data = doc.data();
-      const history = data.paymentHistory || [];
+  db.collection("users").where("email", "==", email).get()
+    .then((querySnapshot) => {
+      if (querySnapshot.empty) {
+        alert("No se encontró ningún cliente con ese correo.");
+        return;
+      }
+
+      const doc = querySnapshot.docs[0];
+      const history = doc.data().paymentHistory || [];
+      const body = document.getElementById("staffHistoryBody");
+      const table = document.getElementById("staffHistoryTable");
+      body.innerHTML = "";
 
       if (history.length === 0) {
-        table.innerHTML = "<tr><td colspan='4'>Sin historial registrado.</td></tr>";
+        body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
       } else {
         history.forEach(entry => {
-          const date = entry.date?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-          table.innerHTML += `
+          const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
+          body.innerHTML += `
             <tr>
               <td>${date}</td>
-              <td>${entry.method || "-"}</td>
               <td>$${entry.amount || "N/A"}</td>
-              <td>${entry.status || "N/A"}</td>
+              <td>${entry.method || "-"}</td>
+              <td>${entry.status || "-"}</td>
             </tr>`;
         });
       }
 
-      box.style.display = "block";
-      window.scrollTo({ top: box.offsetTop, behavior: "smooth" });
-    } else {
-      alert("❌ Usuario no encontrado.");
-    }
-  }).catch(err => {
-    console.error("❌ Error al obtener historial:", err);
-    alert("Error al cargar historial.");
-  });
+      table.style.display = "table";
+    })
+    .catch((error) => {
+      console.error("❌ Error buscando historial de pago:", error);
+      alert("Error al buscar historial.");
+    });
 }
 
     
