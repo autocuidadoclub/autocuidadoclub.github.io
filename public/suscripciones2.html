@@ -1019,23 +1019,9 @@ document.addEventListener("DOMContentLoaded", function () {
         nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
     const messaging = firebase.messaging();
-messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
-.then((token) => {
-    if (token) {
-        console.log("✅ pushToken obtenido:", token);
-        // Guardar el token junto con el usuario
-        registrarUsuario(token); // Asegúrate de pasar el token a tu función de registro
-    } else {
-        console.warn("⚠️ No se pudo obtener el token de notificación.");
-        registrarUsuario(null);
-    }
-})
-.catch((err) => {
-    console.error("❌ Error al obtener pushToken:", err);
-    registrarUsuario(null);
-});
-
-  .then(() => {
+          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
+  .then((token) => {
+    console.log("✅ pushToken obtenido:", token);
     return db.collection("users").doc(userId).set({
       uid: userId,
       name,
@@ -1056,7 +1042,9 @@ messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzo
       subscriptionStatus: "active",
       monthsPaid: 0,
       vehicles,
-      pushToken // ✅ store token in Firestore
+      pushToken: token || null
+    });
+  });
 
 
         function getNextMonthDate() {
