@@ -158,10 +158,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     window.location.href = "login.html";
                 }, 2500);
             })
-            .catch((error) => {
-                console.error("❌ Error en el registro:", error.message);
-                alert("❌ Error en el registro: " + error.message);
-            });
+           .catch((error) => {
+        if (error.code === "auth/email-already-in-use") {
+            alert("❌ Este correo ya está registrado. Intenta iniciar sesión o usar otro.");
+        } else {
+            alert("❌ Error en el registro: " + error.message);
+        }
+    });
     }
 
     window.selectScheduleBox = function(cell) {
