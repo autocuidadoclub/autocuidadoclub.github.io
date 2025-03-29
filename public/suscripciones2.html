@@ -15,14 +15,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
  
 
-     <script>
+   <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
-    document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM fully loaded!");
-
-    // 🔧 INICIALIZAR FIREBASE AQUÍ
     if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
         console.error("❌ Error: Firebase env.js no cargado.");
         alert("❌ Firebase no está inicializado. Revisa env.js.");
@@ -46,24 +42,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-    // ✅ El resto del código permanece igual...
-
+    let selectedPlanType = null;
 
     const registrationContainer = document.getElementById("registration-container");
     const planButtons = document.querySelectorAll(".plan-button");
-    let selectedPlanType = null;
 
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
             selectedPlanType = this.getAttribute("data-plan");
+            updateVehicleFields(selectedPlanType); // ✅ dynamically update vehicle fields
             registrationContainer.style.display = "block";
             registrationContainer.scrollIntoView({ behavior: "smooth" });
             console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
         });
     });
 
-    window.registerUser = function (event) {
+    document.getElementById("registerForm").addEventListener("submit", registerUser);
+
+    function registerUser(event) {
         event.preventDefault();
 
         if (!selectedPlanType) {
@@ -83,10 +79,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const vehicles = [];
         document.querySelectorAll(".vehicle-entry").forEach(entry => {
             vehicles.push({
-                plate: entry.querySelector(".plate").value,
-                model: entry.querySelector(".model").value,
-                brand: entry.querySelector(".brand").value,
-                year: entry.querySelector(".year").value
+                plate: entry.querySelector(".plate").value || "",
+                model: entry.querySelector(".model").value || "",
+                brand: entry.querySelector(".brand").value || "",
+                year: entry.querySelector(".year").value || ""
             });
         });
 
@@ -102,12 +98,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 const nextPaymentDate = new Date();
                 nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-                const messaging = firebase.messaging();
-                messaging.getToken({
+                return firebase.messaging().getToken({
                     vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
                 }).then((token) => {
-                    const pushToken = token || null;
-
                     return db.collection("users").doc(userId).set({
                         uid: userId,
                         name,
@@ -128,102 +121,94 @@ document.addEventListener("DOMContentLoaded", function () {
                         subscriptionStatus: "active",
                         monthsPaid: 0,
                         vehicles,
-                        pushToken
-                    }).then(() => {
-                        // ✅ Log initial completed payment in history
-                        const user = firebase.auth().currentUser;
-                        if (user) {
-                            const userRef = db.collection("users").doc(user.uid);
-                            userRef.update({
-                                paymentStatus: "Completed",
-                                paymentDate: firebase.firestore.Timestamp.now(),
-                                nextPaymentDate: firebase.firestore.Timestamp.fromDate(getNextMonthDate()),
-                                paymentHistory: firebase.firestore.FieldValue.arrayUnion({
-                                    date: firebase.firestore.Timestamp.now(),
-                                    amount: 20,
-                                    method: "PayPal",
-                                    status: "Completed"
-                                })
-                            });
-                        }
-
-                        // ✅ Show overlay
-                        const overlay = document.createElement("div");
-                        overlay.style.position = "fixed";
-                        overlay.style.top = "0";
-                        overlay.style.left = "0";
-                        overlay.style.width = "100%";
-                        overlay.style.height = "100%";
-                        overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-                        overlay.style.display = "flex";
-                        overlay.style.flexDirection = "column";
-                        overlay.style.justifyContent = "center";
-                        overlay.style.alignItems = "center";
-                        overlay.style.zIndex = "9999";
-                        overlay.innerHTML = `
-                            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-                            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-                            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-                        `;
-                        document.body.appendChild(overlay);
-
-                        const style = document.createElement("style");
-                        style.innerHTML = `
-                            @keyframes spin {
-                                0% { transform: rotate(0deg); }
-                                100% { transform: rotate(360deg); }
-                            }
-                        `;
-                        document.head.appendChild(style);
-
-                        setTimeout(() => {
-                            window.location.href = "login.html";
-                        }, 2500);
+                        pushToken: token || null
                     });
-                }).catch((err) => {
-                    console.error("❌ Error obteniendo pushToken:", err);
-                    alert("Error al obtener token de notificación.");
                 });
+            })
+            .then(() => {
+                const overlay = document.createElement("div");
+                overlay.style.position = "fixed";
+                overlay.style.top = "0";
+                overlay.style.left = "0";
+                overlay.style.width = "100%";
+                overlay.style.height = "100%";
+                overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+                overlay.style.display = "flex";
+                overlay.style.flexDirection = "column";
+                overlay.style.justifyContent = "center";
+                overlay.style.alignItems = "center";
+                overlay.style.zIndex = "9999";
+                overlay.innerHTML = `
+                    <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                    <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                    <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+                `;
+                document.body.appendChild(overlay);
+
+                const style = document.createElement("style");
+                style.innerHTML = `
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 2500);
             })
             .catch((error) => {
                 console.error("❌ Error en el registro:", error.message);
                 alert("❌ Error en el registro: " + error.message);
             });
-    };
-
-    function getNextMonthDate() {
-        const date = new Date();
-        date.setMonth(date.getMonth() + 1);
-        return date;
     }
+
+    window.selectScheduleBox = function(cell) {
+        const cells = document.querySelectorAll(".schedule-table tbody td");
+        const timeBlock = cell.innerText.trim();
+
+        if (timeBlock === "-" || timeBlock === "") {
+            alert("Por favor, seleccione un horario válido.");
+            return;
+        }
+
+        cells.forEach((c) => c.classList.remove("selected-box"));
+        cell.classList.add("selected-box");
+
+        const dayIndex = cell.cellIndex;
+        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+        const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+        document.getElementById("selectedDay").value = day;
+        document.getElementById("selectedTime").value = timeBlock;
+
+        console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
+    };
 
     function updateVehicleFields(planType) {
         const vehicleContainer = document.getElementById("vehicle-container");
         vehicleContainer.innerHTML = "";
 
-        for (let i = 0; i < 3; i++) {
+        const maxVehicles = planType.includes("plus") ? 3 : 1;
+        for (let i = 0; i < maxVehicles; i++) {
             const vehicleEntry = document.createElement("div");
             vehicleEntry.classList.add("vehicle-entry");
-
-            if (!planType.includes("plus") && i > 0) {
-                vehicleEntry.style.display = "none";
-            }
-
             vehicleEntry.innerHTML = `
                 <h4>Vehículo ${i + 1}</h4>
                 <label>Placa:</label>
-                <input type="text" class="plate">
+                <input type="text" class="plate" required>
                 <label>Modelo:</label>
-                <input type="text" class="model">
+                <input type="text" class="model" required>
                 <label>Marca:</label>
-                <input type="text" class="brand">
+                <input type="text" class="brand" required>
                 <label>Año:</label>
-                <input type="number" class="year">
+                <input type="number" class="year" required>
             `;
             vehicleContainer.appendChild(vehicleEntry);
         }
 
-        console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 guardados)"}`);
+        console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
     }
 });
 </script>
