@@ -44,9 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const db = firebase.firestore();
     let selectedPlanType = null;
 
+    navigator.serviceWorker.register('/firebase-sw.js')
+  .then((registration) => {
+    console.log("✅ Service Worker registered:", registration);
+  })
+  .catch((error) => {
+    console.error("❌ Service Worker registration failed:", error);
+  });
+
     const registrationContainer = document.getElementById("registration-container");
     const planButtons = document.querySelectorAll(".plan-button");
 
+    
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
             selectedPlanType = this.getAttribute("data-plan");
