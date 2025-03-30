@@ -39,19 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         firebase.initializeApp(firebaseConfig);
         console.log("✅ Firebase inicializado correctamente");
     }
-
-    if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-    .then((registration) => {
-      console.log('✅ Service Worker registered with scope:', registration.scope);
-      const messaging = firebase.messaging();
-      messaging.useServiceWorker(registration);
-    })
-    .catch((err) => {
-      console.error('❌ Service Worker registration failed:', err);
-    });
-}
-    
+  
     const auth = firebase.auth();
     const db = firebase.firestore();
     let selectedPlanType = null;
@@ -233,14 +221,13 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
     .then((registration) => {
       console.log('✅ Service Worker registered with scope:', registration.scope);
-      
-      const messaging = firebase.messaging();
-      messaging.useServiceWorker(registration); // 🔥 Tells Firebase to use this SW
+      // No need for messaging.useServiceWorker anymore
     })
     .catch((err) => {
       console.error('❌ Service Worker registration failed:', err);
     });
 }
+
        
 </script>
 
