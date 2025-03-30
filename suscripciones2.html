@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const db = firebase.firestore();
     let selectedPlanType = null;
 
-   navigator.serviceWorker.register('/firebase-messaging-sw-v2.js')
+   navigator.serviceWorker.register('/firebase-sw-fixed.js')
   .then((registration) => {
     console.log("✅ Service Worker registered:", registration);
   })
