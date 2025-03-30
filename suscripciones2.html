@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const db = firebase.firestore();
     let selectedPlanType = null;
 
-    navigator.serviceWorker.register('/firebase-sw.js')
+   navigator.serviceWorker.register('/firebase-worker-sw.js')
   .then((registration) => {
     console.log("✅ Service Worker registered:", registration);
   })
