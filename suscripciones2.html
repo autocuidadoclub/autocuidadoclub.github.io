@@ -47,15 +47,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ Register Firebase Service Worker for Push Messaging AFTER Firebase is initialized
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-            .then((registration) => {
-                console.log('✅ Service Worker registered:', registration);
-                messaging.useServiceWorker(registration);
-            })
-            .catch((err) => {
-                console.error('❌ Service Worker registration failed:', err);
-            });
-    }
+    navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
+        .then((registration) => {
+            console.log('✅ Service Worker registered:', registration);
+            // messaging.useServiceWorker(registration); ← ❌ REMOVE THIS LINE
+        })
+        .catch((err) => {
+            console.error('❌ Service Worker registration failed:', err);
+        });
+}
 
     const registrationContainer = document.getElementById("registration-container");
     const planButtons = document.querySelectorAll(".plan-button");
