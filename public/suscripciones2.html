@@ -103,78 +103,111 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const userId = userCredential.user.uid;
-                const paymentDate = new Date();
-                const nextPaymentDate = new Date();
-                nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+function registerUser(event) {
+    event.preventDefault();
 
-                return messaging.getToken({
-                    vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-                }).then((token) => {
-                    return db.collection("users").doc(userId).set({
-                        uid: userId,
-                        name,
-                        email,
-                        phone,
-                        planType: selectedPlanType,
-                        department,
-                        municipality,
-                        registrationDate: firebase.firestore.Timestamp.now(),
-                        lastUpgradeDate: firebase.firestore.Timestamp.now(),
-                        schedule: {
-                            day: selectedDay,
-                            time: selectedTime
-                        },
-                        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                        paymentStatus: "Pending",
-                        subscriptionStatus: "active",
-                        monthsPaid: 0,
-                        vehicles,
-                        pushToken: token || null
-                    });
-                });
-            })
-            .then(() => {
-                const overlay = document.createElement("div");
-                overlay.style.position = "fixed";
-                overlay.style.top = "0";
-                overlay.style.left = "0";
-                overlay.style.width = "100%";
-                overlay.style.height = "100%";
-                overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-                overlay.style.display = "flex";
-                overlay.style.flexDirection = "column";
-                overlay.style.justifyContent = "center";
-                overlay.style.alignItems = "center";
-                overlay.style.zIndex = "9999";
-                overlay.innerHTML = `
-                    <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-                    <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-                    <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-                `;
-                document.body.appendChild(overlay);
-
-                const style = document.createElement("style");
-                style.innerHTML = `
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                `;
-                document.head.appendChild(style);
-
-                setTimeout(() => {
-                    window.location.href = "login.html";
-                }, 2500);
-            })
-            .catch((error) => {
-                console.error("❌ Error en el registro:", error.message);
-                alert("❌ Error en el registro: " + error.message);
-            });
+    if (!selectedPlanType) {
+        alert("❌ Debes seleccionar un plan antes de registrarte.");
+        return;
     }
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
+
+    const vehicles = [];
+    document.querySelectorAll(".vehicle-entry").forEach(entry => {
+        vehicles.push({
+            plate: entry.querySelector(".plate").value || "",
+            model: entry.querySelector(".model").value || "",
+            brand: entry.querySelector(".brand").value || "",
+            year: entry.querySelector(".year").value || ""
+        });
+    });
+
+    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios.");
+        return;
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            const paymentDate = new Date();
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+            return messaging.getToken({
+                vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
+            }).then((token) => {
+                return db.collection("users").doc(userId).set({
+                    uid: userId,
+                    name,
+                    email,
+                    phone,
+                    planType: selectedPlanType,
+                    department,
+                    municipality,
+                    registrationDate: firebase.firestore.Timestamp.now(),
+                    lastUpgradeDate: firebase.firestore.Timestamp.now(),
+                    schedule: {
+                        day: selectedDay,
+                        time: selectedTime
+                    },
+                    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                    paymentStatus: "Pending",
+                    subscriptionStatus: "active",
+                    monthsPaid: 0,
+                    vehicles,
+                    pushToken: token || null
+                });
+            });
+        })
+        .then(() => {
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = "9999";
+            overlay.innerHTML = `
+                <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+            `;
+            document.body.appendChild(overlay);
+
+            const style = document.createElement("style");
+            style.innerHTML = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2500);
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+}
+
 
     window.selectScheduleBox = function (cell) {
         const cells = document.querySelectorAll(".schedule-table tbody td");
