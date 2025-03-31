@@ -1088,14 +1088,7 @@ if (user) {
   });
 }
         
-    });
-  });
-
-
-
-    })  // ✅ Ensure this bracket properly closes .then()
-
-    // Create a full-screen overlay
+       // Create a full-screen overlay
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
     overlay.style.top = "0";
@@ -1126,21 +1119,15 @@ if (user) {
     `;
     document.head.appendChild(style);
 
-    // Redirect after 2.5s
-    setTimeout(() => {
-        window.location.href = "login.html";
-    }, 2500);
-})
-
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
-    };  
+   // Redirect after 2.5s
+setTimeout(() => {
+    window.location.href = "login.html";
+}, 2500);
+}) // ← this was extra and caused the SyntaxError
+.catch((error) => {
+    console.error("❌ Error en el registro:", error.message);
+    alert("❌ Error en el registro: " + error.message);
 });
-
-
-
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
 // ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
