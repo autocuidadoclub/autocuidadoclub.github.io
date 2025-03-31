@@ -46,16 +46,16 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedPlanType = null;
 
     // ✅ Register Firebase Service Worker for Push Messaging
-   // Check if service worker is supported
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw/firebase-messaging-sw.js', { scope: '/' })
+    navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' })
         .then((registration) => {
-            console.log('Service Worker registered:', registration);
+            console.log('✅ Service Worker registered:', registration);
         })
-        .catch((error) => {
-            console.error('Error registering Service Worker:', error);
+        .catch((err) => {
+            console.error('❌ Service Worker registration failed:', err);
         });
 }
+
 
 
     const registrationContainer = document.getElementById("registration-container");
