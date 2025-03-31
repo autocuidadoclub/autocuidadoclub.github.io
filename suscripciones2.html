@@ -218,14 +218,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
        // ✅ Register Firebase Service Worker for Push Messaging
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-    .then((registration) => {
-      console.log('✅ Service Worker registered with scope:', registration.scope);
-      // No need for messaging.useServiceWorker anymore
-    })
-    .catch((err) => {
-      console.error('❌ Service Worker registration failed:', err);
-    });
+navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  .then((registration) => {
+    console.log('✅ Service Worker registered:', registration);
+    const messaging = firebase.messaging();
+    messaging.useServiceWorker(registration);
+  })
+  .catch((err) => {
+    console.error('❌ Service Worker registration failed:', err);
+  });
+
 }
 
        
