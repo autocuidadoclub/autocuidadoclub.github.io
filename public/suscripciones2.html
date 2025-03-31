@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
  
 
-  <script>
+ <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
@@ -42,20 +42,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const messaging = firebase.messaging(); // ✅ moved up so it's available for use
+    const messaging = firebase.messaging();
     let selectedPlanType = null;
 
-    // ✅ Register Firebase Service Worker for Push Messaging AFTER Firebase is initialized
+    // ✅ Register Firebase Service Worker for Push Messaging
     if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-        .then((registration) => {
-            console.log('✅ Service Worker registered:', registration);
-            // messaging.useServiceWorker(registration); ← ❌ REMOVE THIS LINE
-        })
-        .catch((err) => {
-            console.error('❌ Service Worker registration failed:', err);
-        });
-}
+        navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
+            .then((registration) => {
+                console.log('✅ Service Worker registered:', registration);
+            })
+            .catch((err) => {
+                console.error('❌ Service Worker registration failed:', err);
+            });
+    }
 
     const registrationContainer = document.getElementById("registration-container");
     const planButtons = document.querySelectorAll(".plan-button");
@@ -172,15 +171,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }, 2500);
             })
             .catch((error) => {
-                if (error.code === "auth/email-already-in-use") {
-                    alert("❌ Este correo ya está registrado. Intenta iniciar sesión o usar otro.");
-                } else {
-                    alert("❌ Error en el registro: " + error.message);
-                }
+                console.error("❌ Error en el registro:", error.message);
+                alert("❌ Error en el registro: " + error.message);
             });
     }
 
-    window.selectScheduleBox = function(cell) {
+    window.selectScheduleBox = function (cell) {
         const cells = document.querySelectorAll(".schedule-table tbody td");
         const timeBlock = cell.innerText.trim();
 
@@ -228,6 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 </script>
+
 
 
     <style>
