@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
  
 
-   <script>
+  <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
@@ -39,19 +39,31 @@ document.addEventListener("DOMContentLoaded", function () {
         firebase.initializeApp(firebaseConfig);
         console.log("✅ Firebase inicializado correctamente");
     }
-  
+
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const messaging = firebase.messaging(); // ✅ moved up so it's available for use
     let selectedPlanType = null;
+
+    // ✅ Register Firebase Service Worker for Push Messaging AFTER Firebase is initialized
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
+            .then((registration) => {
+                console.log('✅ Service Worker registered:', registration);
+                messaging.useServiceWorker(registration);
+            })
+            .catch((err) => {
+                console.error('❌ Service Worker registration failed:', err);
+            });
+    }
 
     const registrationContainer = document.getElementById("registration-container");
     const planButtons = document.querySelectorAll(".plan-button");
 
-    
     planButtons.forEach(button => {
         button.addEventListener("click", function () {
             selectedPlanType = this.getAttribute("data-plan");
-            updateVehicleFields(selectedPlanType); // ✅ dynamically update vehicle fields
+            updateVehicleFields(selectedPlanType);
             registrationContainer.style.display = "block";
             registrationContainer.scrollIntoView({ behavior: "smooth" });
             console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
@@ -99,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const nextPaymentDate = new Date();
                 nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-                return firebase.messaging().getToken({
+                return messaging.getToken({
                     vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
                 }).then((token) => {
                     return db.collection("users").doc(userId).set({
@@ -159,13 +171,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     window.location.href = "login.html";
                 }, 2500);
             })
-           .catch((error) => {
-        if (error.code === "auth/email-already-in-use") {
-            alert("❌ Este correo ya está registrado. Intenta iniciar sesión o usar otro.");
-        } else {
-            alert("❌ Error en el registro: " + error.message);
-        }
-    });
+            .catch((error) => {
+                if (error.code === "auth/email-already-in-use") {
+                    alert("❌ Este correo ya está registrado. Intenta iniciar sesión o usar otro.");
+                } else {
+                    alert("❌ Error en el registro: " + error.message);
+                }
+            });
     }
 
     window.selectScheduleBox = function(cell) {
@@ -215,23 +227,8 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
     }
 });
-
-       // ✅ Register Firebase Service Worker for Push Messaging
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-  .then((registration) => {
-    console.log('✅ Service Worker registered:', registration);
-    const messaging = firebase.messaging();
-    messaging.useServiceWorker(registration);
-  })
-  .catch((err) => {
-    console.error('❌ Service Worker registration failed:', err);
-  });
-
-}
-
-       
 </script>
+
 
     <style>
         body {
