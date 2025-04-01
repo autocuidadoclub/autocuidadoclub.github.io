@@ -91,26 +91,7 @@
         // Request notification permission when the button is clicked
         requestNotificationPermission();
     });
-
-    // Handle Token Refresh and Foreground Notifications
-    onMessage(messaging, (payload) => {
-        console.log("Message received: ", payload);
-        // Handle foreground notifications as needed
-    });
-
-    // Background push notification handling
-    messaging.onBackgroundMessage(function(payload) {
-        console.log('[firebase-messaging-sw.js] Received background message ', payload);
-        // Customize notification here
-        const notificationTitle = 'Background Message Title';
-        const notificationOptions = {
-            body: 'Background Message body.',
-            icon: '/firebase-logo.png'
-        };
-
-        self.registration.showNotification(notificationTitle, notificationOptions);
-    });
-
+   
 </script>
 
 </head>
