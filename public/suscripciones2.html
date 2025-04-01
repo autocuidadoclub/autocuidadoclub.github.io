@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,35 +7,7 @@
     <title>Registro en AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
 
-     <!-- ✅ Force Load env.js to Prevent Caching Issues --> i got this from logs  Microsoft Edge is moving towards a new experience that allows users to choose to browse without third-party cookies.
-suscripciones2:1162  Uncaught SyntaxError: Unexpected end of input (at suscripciones2:1162:13)
-suscripciones2:20 ✅ DOM fully loaded!
-suscripciones2:40 ✅ Firebase inicializado correctamente
-suscripciones2:52 ✅ Service Worker registered: ServiceWorkerRegistration {installing: null, waiting: null, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: 'https://www.autocuidadoclub.com/sw/', …}
-suscripciones2:223 ✅ Vehículos preparados: Plan Basic (1)
-suscripciones2:68 ✅ Plan seleccionado: basic3m
-suscripciones2:198 📅 Horario seleccionado: Miércoles - 13:00 - 15:00
-index.ts:113 
-            
-            
-            POST https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCY6BeuJSbUboosMDrvlzQUmeNLb2dJX_0 400 (Bad Request)
-(anonymous) @ index.ts:113
-await in (anonymous)
-te @ index.ts:135
-ee @ index.ts:88
-ne @ index.ts:188
-rt @ sign_up.ts:43
-(anonymous) @ email_and_password.ts:230
-createUserWithEmailAndPassword @ auth.ts:152
-registerUser @ suscripciones2:106
-suscripciones2:174  ❌ Error en el registro: Firebase: The email address is already in use by another account. (auth/email-already-in-use).
-(anonymous) @ suscripciones2:174
-Promise.catch
-registerUser @ suscripciones2:173
-firebase-messaging-sw.js:6  Uncaught ReferenceError: window is not defined
-    at firebase-messaging-sw.js:6:17
-(anonymous) @ firebase-messaging-sw.js:6
-suscripciones2:174  ❌ Error en el registro: Messaging: We are unable to register the default service worker. Failed to register a ServiceWorker for scope ('https://www.autocuidadoclub.com/firebase-cloud-messaging-push-scope') with script ('https://www.autocuidadoclub.com/firebase-messaging-sw.js'): ServiceWorker script evaluation failed (messaging/failed-service-worker-registration). 
+     <!-- ✅ Force Load env.js to Prevent Caching Issues -->
     <script src="env.js?v=1.0"></script>
     
     <!-- Firebase SDK -->
@@ -93,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateVehicleFields(selectedPlanType);
             registrationContainer.style.display = "block";
             registrationContainer.scrollIntoView({ behavior: "smooth" });
-            console.log(✅ Plan seleccionado: ${selectedPlanType});
+            console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
         });
     });
 
@@ -178,20 +151,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 overlay.style.justifyContent = "center";
                 overlay.style.alignItems = "center";
                 overlay.style.zIndex = "9999";
-                overlay.innerHTML = 
+                overlay.innerHTML = `
                     <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
                     <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
                     <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-                ;
+                `;
                 document.body.appendChild(overlay);
 
                 const style = document.createElement("style");
-                style.innerHTML = 
+                style.innerHTML = `
                     @keyframes spin {
                         0% { transform: rotate(0deg); }
                         100% { transform: rotate(360deg); }
                     }
-                ;
+                `;
                 document.head.appendChild(style);
 
                 setTimeout(() => {
@@ -217,13 +190,13 @@ document.addEventListener("DOMContentLoaded", function () {
         cell.classList.add("selected-box");
 
         const dayIndex = cell.cellIndex;
-        const dayHeader = document.querySelector(.schedule-table thead th:nth-child(${dayIndex + 1}));
+        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
         const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
         document.getElementById("selectedDay").value = day;
         document.getElementById("selectedTime").value = timeBlock;
 
-        console.log(📅 Horario seleccionado: ${day} - ${timeBlock});
+        console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
     };
 
     function updateVehicleFields(planType) {
@@ -234,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < maxVehicles; i++) {
             const vehicleEntry = document.createElement("div");
             vehicleEntry.classList.add("vehicle-entry");
-            vehicleEntry.innerHTML = 
+            vehicleEntry.innerHTML = `
                 <h4>Vehículo ${i + 1}</h4>
                 <label>Placa:</label>
                 <input type="text" class="plate" required>
@@ -244,11 +217,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 <input type="text" class="brand" required>
                 <label>Año:</label>
                 <input type="number" class="year" required>
-            ;
+            `;
             vehicleContainer.appendChild(vehicleEntry);
         }
 
-        console.log(✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"});
+        console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
     }
 });
 </script>
@@ -852,16 +825,16 @@ button:hover {
 
     // Get the corresponding day from the column header
     const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(.schedule-table thead th:nth-child(${dayIndex + 1}));
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
     // Update the hidden input field to include both the day and time block
     const scheduleField = document.getElementById("selectedSchedule");
     if (scheduleField) {
-        scheduleField.value = ${day} - ${timeBlock};
+        scheduleField.value = `${day} - ${timeBlock}`;
     }
 
-    console.log(Horario seleccionado: ${day} - ${timeBlock});
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
 }
 
         const locations = {
@@ -919,7 +892,7 @@ button:hover {
 
         const newVehicle = document.createElement("div");
         newVehicle.classList.add("vehicle-entry");
-        newVehicle.innerHTML = 
+        newVehicle.innerHTML = `
             <label for="plate">Placa:</label>
             <input type="text" class="plate" required>
 
@@ -933,7 +906,7 @@ button:hover {
             <input type="number" class="year" required>
 
             <button type="button" onclick="removeVehicle(this)">Eliminar</button>
-        ;
+        `;
         vehicleContainer.appendChild(newVehicle);
     }
 
@@ -1015,7 +988,7 @@ document.addEventListener("DOMContentLoaded", function () {
             registrationContainer.style.display = "block"; // ✅ Show form
             registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
 
-            console.log(✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.);
+            console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
         });
     });
 
@@ -1125,22 +1098,22 @@ if (user) {
     overlay.style.justifyContent = "center";
     overlay.style.alignItems = "center";
     overlay.style.zIndex = "9999";
-    overlay.innerHTML = 
+    overlay.innerHTML = `
         <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
         <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
         <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-    ;
+    `;
 
     document.body.appendChild(overlay);
 
     // CSS Spinner Animation
     const style = document.createElement("style");
-    style.innerHTML = 
+    style.innerHTML = `
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-    ;
+    `;
     document.head.appendChild(style);
 
    // Redirect after 2.5s
@@ -1168,7 +1141,7 @@ function updateVehicleFields(planType) {
             vehicleEntry.style.display = "none"; // Hidden by default
         }
 
-        vehicleEntry.innerHTML = 
+        vehicleEntry.innerHTML = `
             <h4>Vehículo ${i + 1}</h4>
             <label>Placa:</label>
             <input type="text" class="plate">
@@ -1181,11 +1154,11 @@ function updateVehicleFields(planType) {
 
             <label>Año:</label>
             <input type="number" class="year">
-        ;
+        `;
         vehicleContainer.appendChild(vehicleEntry);
     }
 
-    console.log(✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 saved)"});
+    console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 saved)"}`);
 }
             </script>
 </body>
