@@ -15,127 +15,104 @@
 
     <!-- Firebase Modular SDK -->
     <script type="module">
-        importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js');
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+    import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
 
-        // Firebase config object
-        firebase.initializeApp({
-            apiKey: window._env_.FIREBASE_API_KEY,
-            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-            projectId: window._env_.FIREBASE_PROJECT_ID,
-            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-            appId: window._env_.FIREBASE_APP_ID,
-            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-        };
+    // Firebase config object
+    const firebaseConfig = {
+        apiKey: window._env_.FIREBASE_API_KEY,
+        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+        projectId: window._env_.FIREBASE_PROJECT_ID,
+        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+        appId: window._env_.FIREBASE_APP_ID,
+        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
 
-        // Initialize Firebase
-        const messaging = firebase.messaging();
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+    const auth = getAuth(app);
 
-
-        // Initialize Firebase Authentication and Messaging
-        const auth = getAuth(app);
-        const messaging = getMessaging(app);
-
-        // Register Firebase Service Worker for Push Notifications
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-                .then((registration) => {
-                    console.log('✅ Service Worker registered:', registration);
-                })
-                .catch((err) => {
-                    console.error('❌ Service Worker registration failed:', err);
-                });
-        }
-
-        // Request Notification Permission
-        function requestNotificationPermission() {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    console.log("✅ Push notifications granted.");
-                    getTokenForPushNotifications();
-                } else {
-                    console.error("❌ Push notifications permission denied.");
-                    alert("❌ You need to grant permission for push notifications.");
-                }
+    // Register Firebase Service Worker for Push Notifications
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
+            .then((registration) => {
+                console.log('✅ Service Worker registered:', registration);
+            })
+            .catch((err) => {
+                console.error('❌ Service Worker registration failed:', err);
             });
-        }
+    }
 
-        // Get Firebase Push Notification Token
-        function getTokenForPushNotifications() {
-            getToken(messaging, {
-                vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-            }).then((token) => {
-                if (token) {
-                    console.log("✅ Push token obtained:", token);
-                    alert("Push token obtained: " + token);
-                } else {
-                    console.error("❌ Failed to get push token.");
-                    alert("❌ Unable to get push token.");
-                }
-            }).catch((error) => {
-                console.error("❌ Error obtaining push token:", error);
-                alert("❌ Error with push notifications: " + error.message);
-            });
-        }
-
-        // Handle button click to request notification permission
-        document.getElementById("enable-notifications").addEventListener("click", function() {
-            // Check if the user is authenticated
-            const user = auth.currentUser;
-
-            if (!user) {
-                console.error("❌ User is not authenticated.");
-                alert("❌ Please log in to enable notifications.");
-                return;
+    // Request Notification Permission
+    function requestNotificationPermission() {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                console.log("✅ Push notifications granted.");
+                getTokenForPushNotifications();
+            } else {
+                console.error("❌ Push notifications permission denied.");
+                alert("❌ You need to grant permission for push notifications.");
             }
-
-            // Request notification permission when the button is clicked
-            requestNotificationPermission();
         });
+    }
 
-        // Handle Token Refresh and Foreground Notifications
-        onMessage(messaging, (payload) => {
-            console.log("Message received: ", payload);
-            // Handle foreground notifications as needed
-        });
-
-        // Background push notification handling
-messaging.onBackgroundMessage(function(payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  // Customize notification here
-  const notificationTitle = 'Background Message Title';
-  const notificationOptions = {
-    body: 'Background Message body.',
-    icon: '/firebase-logo.png'
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-        // Request permission and then get the push token
-Notification.requestPermission().then(permission => {
-    if (permission === 'granted') {
-        console.log('Push notifications granted.');
-        // Request the token only if permission is granted
-        messaging.getToken({
-            vapidKey: 'YOUR_VAPID_KEY'
+    // Get Firebase Push Notification Token
+    function getTokenForPushNotifications() {
+        getToken(messaging, {
+            vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
         }).then((token) => {
             if (token) {
-                console.log('Push token obtained:', token);
-                // Save the token in the user's profile or perform other actions
+                console.log("✅ Push token obtained:", token);
+                alert("Push token obtained: " + token);
             } else {
-                console.error('Failed to get push token.');
+                console.error("❌ Failed to get push token.");
+                alert("❌ Unable to get push token.");
             }
         }).catch((error) => {
-            console.error('Error obtaining push token:', error);
+            console.error("❌ Error obtaining push token:", error);
+            alert("❌ Error with push notifications: " + error.message);
         });
-    } else {
-        console.error('Push notifications permission denied.');
     }
-});
 
-    </script>
+    // Handle button click to request notification permission
+    document.getElementById("enable-notifications").addEventListener("click", function() {
+        // Check if the user is authenticated
+        const user = auth.currentUser;
+
+        if (!user) {
+            console.error("❌ User is not authenticated.");
+            alert("❌ Please log in to enable notifications.");
+            return;
+        }
+
+        // Request notification permission when the button is clicked
+        requestNotificationPermission();
+    });
+
+    // Handle Token Refresh and Foreground Notifications
+    onMessage(messaging, (payload) => {
+        console.log("Message received: ", payload);
+        // Handle foreground notifications as needed
+    });
+
+    // Background push notification handling
+    messaging.onBackgroundMessage(function(payload) {
+        console.log('[firebase-messaging-sw.js] Received background message ', payload);
+        // Customize notification here
+        const notificationTitle = 'Background Message Title';
+        const notificationOptions = {
+            body: 'Background Message body.',
+            icon: '/firebase-logo.png'
+        };
+
+        self.registration.showNotification(notificationTitle, notificationOptions);
+    });
+
+</script>
+
 </head>
 
 <body>
