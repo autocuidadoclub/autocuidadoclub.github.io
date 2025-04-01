@@ -3,13 +3,13 @@ importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js');
 
 // Initialize Firebase in the service worker
 firebase.initializeApp({
-    apiKey: window._env_.FIREBASE_API_KEY,
-    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-    projectId: window._env_.FIREBASE_PROJECT_ID,
-    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-    appId: window._env_.FIREBASE_APP_ID,
-    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    apiKey: "AIzaSyCY6BeuJSbUboosMDrvlzQUmeNLb2dJX_0",
+  authDomain: "bookings-autocuidad-club.firebaseapp.com",
+  projectId: "bookings-autocuidad-club",
+  storageBucket: "bookings-autocuidad-club.firebasestorage.app",
+  messagingSenderId: "179075180686",
+  appId: "1:179075180686:web:6950b87b7fd6c6f49d01df",
+  measurementId: "G-LXJ50PGESY"
 });
 
 // Retrieve an instance of Firebase Messaging
