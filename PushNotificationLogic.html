@@ -15,12 +15,11 @@
 
     <!-- Firebase Modular SDK -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js";
+        importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js');
 
         // Firebase config object
-        const firebaseConfig = {
+        firebase.initializeApp({
             apiKey: window._env_.FIREBASE_API_KEY,
             authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
             projectId: window._env_.FIREBASE_PROJECT_ID,
@@ -31,7 +30,8 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
 
         // Initialize Firebase Authentication and Messaging
         const auth = getAuth(app);
@@ -99,6 +99,42 @@
             console.log("Message received: ", payload);
             // Handle foreground notifications as needed
         });
+
+        // Background push notification handling
+messaging.onBackgroundMessage(function(payload) {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  // Customize notification here
+  const notificationTitle = 'Background Message Title';
+  const notificationOptions = {
+    body: 'Background Message body.',
+    icon: '/firebase-logo.png'
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+        // Request permission and then get the push token
+Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+        console.log('Push notifications granted.');
+        // Request the token only if permission is granted
+        messaging.getToken({
+            vapidKey: 'YOUR_VAPID_KEY'
+        }).then((token) => {
+            if (token) {
+                console.log('Push token obtained:', token);
+                // Save the token in the user's profile or perform other actions
+            } else {
+                console.error('Failed to get push token.');
+            }
+        }).catch((error) => {
+            console.error('Error obtaining push token:', error);
+        });
+    } else {
+        console.error('Push notifications permission denied.');
+    }
+});
+
     </script>
 </head>
 
