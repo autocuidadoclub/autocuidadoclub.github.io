@@ -1,9 +1,9 @@
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js');
 
-// Initialize Firebase in the service worker
+// Initialize Firebase
 firebase.initializeApp({
-    apiKey: "AIzaSyCY6BeuJSbUboosMDrvlzQUmeNLb2dJX_0",
+  apiKey: "AIzaSyCY6BeuJSbUboosMDrvlzQUmeNLb2dJX_0",
   authDomain: "bookings-autocuidad-club.firebaseapp.com",
   projectId: "bookings-autocuidad-club",
   storageBucket: "bookings-autocuidad-club.firebasestorage.app",
@@ -17,12 +17,12 @@ const messaging = firebase.messaging();
 
 // Handle background push notifications
 messaging.onBackgroundMessage(function(payload) {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    const notificationTitle = 'Background Message Title';
-    const notificationOptions = {
-        body: 'Background Message body.',
-        icon: '/firebase-logo.png'
-    };
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  const notificationTitle = 'Background Message Title';
+  const notificationOptions = {
+    body: 'Background Message body.',
+    icon: '/firebase-logo.png'
+  };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
