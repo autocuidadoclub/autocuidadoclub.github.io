@@ -35,59 +35,55 @@
     const messaging = getMessaging(app);
     const auth = getAuth(app);
 
-    // Register Firebase Service Worker for Push Notifications
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-            .then((registration) => {
-                console.log('✅ Service Worker registered:', registration);
-            })
-            .catch((err) => {
-                console.error('❌ Service Worker registration failed:', err);
-            });
-    }
+   document.addEventListener("DOMContentLoaded", function () {
+  console.log("✅ DOM fully loaded!");
 
-    // Request Notification Permission
-    function requestNotificationPermission() {
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-                console.log("✅ Push notifications granted.");
-                getTokenForPushNotifications();
-            } else {
-                console.error("❌ Push notifications permission denied.");
-                alert("❌ You need to grant permission for push notifications.");
-            }
-        });
-    }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw/firebase-messaging-sw.js', { scope: '/sw/' })
+      .then((registration) => {
+        console.log('✅ Service Worker registered:', registration);
+      })
+      .catch((err) => {
+        console.error('❌ Service Worker registration failed:', err);
+      });
+  }
 
-    // Get Firebase Push Notification Token
-    function getTokenForPushNotifications() {
-        getToken(messaging, {
-            vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-        }).then((token) => {
-            if (token) {
-                console.log("✅ Push token obtained:", token);
-                alert("Push token obtained: " + token);
-            } else {
-                console.error("❌ Failed to get push token.");
-                alert("❌ Unable to get push token.");
-            }
-        }).catch((error) => {
-            console.error("❌ Error obtaining push token:", error);
-            alert("❌ Error with push notifications: " + error.message);
-        });
-    }
+  // Request Notification Permission
+  function requestNotificationPermission() {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        console.log("✅ Push notifications granted.");
+        getTokenForPushNotifications();
+      } else {
+        console.error("❌ Push notifications permission denied.");
+        alert("❌ You need to grant permission for push notifications.");
+      }
+    });
+  }
 
-    // Handle button click to request notification permission
-    document.getElementById("enable-notifications").addEventListener("click", function() {
-        // Check if the user is authenticated
-        const user = auth.currentUser;
+  // Get Firebase Push Notification Token
+  function getTokenForPushNotifications() {
+    messaging.getToken({
+      vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
+    }).then((token) => {
+      if (token) {
+        console.log("✅ Push token obtained:", token);
+        alert("Push token obtained: " + token);
+      } else {
+        console.error("❌ Failed to get push token.");
+        alert("❌ Unable to get push token.");
+      }
+    }).catch((error) => {
+      console.error("❌ Error obtaining push token:", error);
+      alert("❌ Error with push notifications: " + error.message);
+    });
+  }
 
-        if (!user) {
-            console.error("❌ User is not authenticated.");
-            alert("❌ Please log in to enable notifications.");
-            return;
-        }
-
+  // Handle button click to request notification permission
+  document.getElementById("enable-notifications").addEventListener("click", function () {
+    requestNotificationPermission();
+  });
+});
         // Request notification permission when the button is clicked
         requestNotificationPermission();
     });
