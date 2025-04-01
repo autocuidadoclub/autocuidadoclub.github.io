@@ -56,7 +56,7 @@
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
                     console.log("✅ Push notifications granted.");
-                    getTokenForPushNotifications();
+                    getTokenForPushNotifications(); // Call this function after permission is granted
                 } else {
                     console.error("❌ Push notifications permission denied.");
                     alert("❌ You need to grant permission for push notifications.");
@@ -83,72 +83,32 @@
             });
         }
 
-
-        Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-        console.log("Push notifications granted.");
-        // Proceed to get the token
-        getPushToken(); // Make sure this function handles the token retrieval
-    } else {
-        console.error("❌ Push notification permission denied.");
-        alert("❌ You need to allow push notifications.");
-    }
-});
-
-        
         // Call the permission request function when a button is clicked
-       document.getElementById("enableNotificationsButton").addEventListener("click", function() {
-    // Check if the user is authenticated first
-    const user = firebase.auth().currentUser;
-    
-    if (!user) {
-        console.error("❌ User is not authenticated.");
-        alert("❌ Please log in to enable notifications.");
-        return;
-    }
-
-    // Try to get the push token
-    messaging.getToken({
-        vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-    })
-    .then((token) => {
-        if (token) {
-            console.log("✅ Push token obtained:", token);
-            // Save the token to Firestore or handle as needed
+        document.getElementById("enable-notifications").addEventListener("click", function() {
+            // Check if the user is authenticated first
             const user = firebase.auth().currentUser;
-            if (user) {
-                // Save the token to Firestore
-                db.collection("users").doc(user.uid).update({
-                    pushToken: token
-                });
+            
+            if (!user) {
+                console.error("❌ User is not authenticated.");
+                alert("❌ Please log in to enable notifications.");
+                return;
             }
-        } else {
-            console.error("❌ No push token obtained.");
-            alert("❌ Failed to get the push token.");
-        }
-    })
-    .catch((error) => {
-        console.error("❌ Error obtaining push token:", error);
-        alert("❌ Error: " + error.message);
-    });
-});
 
+            // Request notification permission when button is clicked
+            requestNotificationPermission();
+        });
+
+        // Handle Token Refresh
         messaging.onTokenRefresh(() => {
-    messaging.getToken({
-        vapidKey: "your-vapid-key"
-    }).then((refreshedToken) => {
-        console.log('Token refreshed.');
-        // Update the token in Firestore
-        const user = firebase.auth().currentUser;
-        if (user) {
-            db.collection("users").doc(user.uid).update({
-                pushToken: refreshedToken
+            messaging.getToken({
+                vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
+            }).then((refreshedToken) => {
+                console.log('Token refreshed:', refreshedToken);
+                // Save the refreshed token to Firestore or handle as needed
+            }).catch((error) => {
+                console.error('Error refreshing token:', error);
             });
-        }
-    }).catch((err) => {
-        console.log('Unable to retrieve refreshed token ', err);
-    });
-});
+        });
 
     });
     </script>
