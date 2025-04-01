@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Push Notification Test</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- ✅ Force Load env.js to Prevent Caching Issues -->
+    <script src="env.js?v=1.0"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("✅ DOM fully loaded!");
+
+        if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+            console.error("❌ Error: Firebase env.js no cargado.");
+            alert("❌ Firebase no está inicializado. Revisa env.js.");
+            return;
+        }
+
+        const firebaseConfig = {
+            apiKey: window._env_.FIREBASE_API_KEY,
+            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+            projectId: window._env_.FIREBASE_PROJECT_ID,
+            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+            appId: window._env_.FIREBASE_APP_ID,
+            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log("✅ Firebase inicializado correctamente");
+        }
+
+        const messaging = firebase.messaging();
+
+        // ✅ Register Firebase Service Worker for Push Messaging
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
+                .then((registration) => {
+                    console.log('✅ Service Worker registered:', registration);
+                })
+                .catch((err) => {
+                    console.error('❌ Service Worker registration failed:', err);
+                });
+        }
+
+        // Requesting Push Notification Permission
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    console.log("✅ Push notifications granted.");
+                    getTokenForPushNotifications();
+                } else {
+                    console.error("❌ Push notifications permission denied.");
+                    alert("❌ You need to grant permission for push notifications.");
+                }
+            });
+        }
+
+        // Get Firebase Push Notification Token
+        function getTokenForPushNotifications() {
+            messaging.getToken({
+                vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
+            }).then((token) => {
+                if (token) {
+                    console.log("✅ Push token obtained:", token);
+                    // You can save the token in the database if needed
+                    alert("Push token obtained: " + token);
+                } else {
+                    console.error("❌ Failed to get push token.");
+                    alert("❌ Unable to get push token.");
+                }
+            }).catch((error) => {
+                console.error("❌ Error obtaining push token:", error);
+                alert("❌ Error with push notifications: " + error.message);
+            });
+        }
+
+        // Call the permission request function when a button is clicked
+        document.getElementById("enable-notifications").addEventListener("click", requestNotificationPermission);
+    });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        button {
+            background-color: #003366;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #FF6600;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Push Notification Test</h1>
+    <p>Click the button below to enable push notifications:</p>
+
+    <button id="enable-notifications">Enable Notifications</button>
+
+    <div class="message">
+        <p id="status">Status: Push notifications are not enabled.</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 AutoCuidado Club</p>
+    </footer>
+
+    <!-- Firebase messaging service worker -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
+</body>
+</html>
