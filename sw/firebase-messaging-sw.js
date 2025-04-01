@@ -1,5 +1,5 @@
-importScripts("https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js");
+importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: "AIzaSyCY6BeuJSbUboosMDrvlzQUmeNLb2dJX_0",
@@ -13,17 +13,14 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-self.addEventListener('install', (event) => {
-  console.log('✅ Service worker installed');
-});
-
-messaging.onBackgroundMessage((payload) => {
-  console.log('📩 Mensaje en background:', payload);
+// Background message handler
+messaging.onBackgroundMessage(function(payload) {
+  console.log('Received background message: ', payload);
   
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = 'New message!';
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/logo.jpg' // or any icon you want
+    body: payload.data.status,
+    icon: '/images/icon.png',
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
