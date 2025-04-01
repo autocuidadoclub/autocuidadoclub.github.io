@@ -224,7 +224,313 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
     }
 });
-</script>
+
+    function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
+
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
+
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
+}
+
+        const locations = {
+            "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
+            "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
+            "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
+            "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+            "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
+            "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
+            "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+            "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+            "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
+            "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
+            "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
+            "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+            "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
+        };
+        const departmentSelect = document.getElementById("department");
+        const municipalitySelect = document.getElementById("municipality");
+
+        // Populate the departments dropdown
+        function populateDepartments() {
+            for (const department in locations) {
+                const option = document.createElement("option");
+                option.value = department;
+                option.textContent = department;
+                departmentSelect.appendChild(option);
+            }
+        }
+
+        // Update municipalities based on selected department
+        function updateMunicipalities() {
+            const selectedDepartment = departmentSelect.value;
+            municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>'; // Reset municipalities
+
+            if (locations[selectedDepartment]) {
+                locations[selectedDepartment].forEach(municipality => {
+                    const option = document.createElement("option");
+                    option.value = municipality;
+                    option.textContent = municipality;
+                    municipalitySelect.appendChild(option);
+                });
+            }
+        }
+
+        // Initialize departments on page load
+        document.addEventListener("DOMContentLoaded", populateDepartments);
+
+        function addVehicle() {
+        const vehicleContainer = document.getElementById("vehicle-container");
+        if (vehicleContainer.children.length >= 3) {
+            alert("Solo puedes agregar hasta 3 vehículos.");
+            return;
+        }
+
+        const newVehicle = document.createElement("div");
+        newVehicle.classList.add("vehicle-entry");
+        newVehicle.innerHTML = `
+            <label for="plate">Placa:</label>
+            <input type="text" class="plate" required>
+
+            <label for="model">Modelo:</label>
+            <input type="text" class="model" required>
+
+            <label for="brand">Marca:</label>
+            <input type="text" class="brand" required>
+
+            <label for="year">Año:</label>
+            <input type="number" class="year" required>
+
+            <button type="button" onclick="removeVehicle(this)">Eliminar</button>
+        `;
+        vehicleContainer.appendChild(newVehicle);
+    }
+
+    function removeVehicle(button) {
+        button.parentElement.remove();
+    }
+
+                  
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded!");
+
+    const registrationContainer = document.getElementById("registration-container");
+
+    if (!registrationContainer) {
+        console.error("❌ Error: No se encontró el contenedor de registro en el DOM.");
+        return;
+    }
+
+    const planButtons = document.querySelectorAll(".plan-button");
+
+    // ✅ Attach event listeners to all plan buttons
+    planButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+
+            registrationContainer.style.display = "block"; // ✅ Show form
+            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+
+            console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
+        });
+    });
+
+    // ✅ Modify registerUser function to use selectedPlanType
+    window.registerUser = function(event) {
+        event.preventDefault();
+
+        if (!selectedPlanType) {
+            alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
+            return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
+
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
+
+        const vehicles = [];
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
+            });
+        });
+
+        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+    const messaging = firebase.messaging();
+          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
+  .then((token) => {
+    console.log("✅ pushToken obtenido:", token);
+    return db.collection("users").doc(userId).set({
+      uid: userId,
+      name,
+      email,
+      phone,
+      planType: selectedPlanType,
+      department,
+      municipality,
+      registrationDate: firebase.firestore.Timestamp.now(),
+      lastUpgradeDate: firebase.firestore.Timestamp.now(),
+      schedule: {
+        day: selectedDay,
+        time: selectedTime
+      },
+      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+      paymentStatus: "Pending",
+      subscriptionStatus: "active",
+      monthsPaid: 0,
+      vehicles,
+      pushToken: token || null
+    });
+  });
+
+
+        function getNextMonthDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+}
+
+// Then, inside the PayPal success logic or registration confirmation:
+const user = firebase.auth().currentUser;
+if (user) {
+  const userRef = db.collection("users").doc(user.uid);
+  userRef.update({
+    paymentStatus: "Completed",
+    paymentDate: firebase.firestore.Timestamp.now(),
+    nextPaymentDate: firebase.firestore.Timestamp.fromDate(getNextMonthDate()),
+    paymentHistory: firebase.firestore.FieldValue.arrayUnion({
+      date: firebase.firestore.Timestamp.now(),
+      amount: 20,
+      method: "PayPal",
+      status: "Completed"
+    })
+  });
+}
+        
+       // Create a full-screen overlay
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+    overlay.style.display = "flex";
+    overlay.style.flexDirection = "column";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.zIndex = "9999";
+    overlay.innerHTML = `
+        <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+        <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+        <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // CSS Spinner Animation
+    const style = document.createElement("style");
+    style.innerHTML = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+
+   // Redirect after 2.5s
+setTimeout(() => {
+    window.location.href = "login.html";
+}, 2500);
+})
+          .catch((error) => {
+    console.error("❌ Error en el registro:", error.message);
+    alert("❌ Error en el registro: " + error.message);
+});
+
+// ✅ Function to Update Vehicle Fields Based on Plan Type
+// ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
+function updateVehicleFields(planType) {
+    const vehicleContainer = document.getElementById("vehicle-container");
+    vehicleContainer.innerHTML = ""; // Clear previous entries
+
+    for (let i = 0; i < 3; i++) {
+        const vehicleEntry = document.createElement("div");
+        vehicleEntry.classList.add("vehicle-entry");
+
+        // ✅ Hide extra vehicles if Basic plan
+        if (!planType.includes("plus") && i > 0) {
+            vehicleEntry.style.display = "none"; // Hidden by default
+        }
+
+        vehicleEntry.innerHTML = `
+            <h4>Vehículo ${i + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" class="plate">
+
+            <label>Modelo:</label>
+            <input type="text" class="model">
+
+            <label>Marca:</label>
+            <input type="text" class="brand">
+
+            <label>Año:</label>
+            <input type="number" class="year">
+        `;
+        vehicleContainer.appendChild(vehicleEntry);
+    }
+
+    console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 saved)"}`);
+}
+        console.log("Before the error point");
+
+                    
+    </script>
 
 
 
@@ -382,6 +688,8 @@ button:hover {
 </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
 </head>
 
@@ -810,117 +1118,7 @@ button:hover {
     </select>
     
     
-    <script>
-    function selectScheduleBox(cell) {
-    const cells = document.querySelectorAll(".schedule-table tbody td");
-
-    // Get the clicked cell's text
-    const timeBlock = cell.innerText.trim();
-
-    // Validate the clicked cell
-    if (timeBlock === "-" || timeBlock === "") {
-        alert("Por favor, seleccione un horario válido.");
-        return; // Do not allow selection of invalid cells
-    }
-
-    // Remove selection from all other cells
-    cells.forEach((c) => c.classList.remove("selected-box"));
-
-    // Highlight the selected cell
-    cell.classList.add("selected-box");
-
-    // Get the corresponding day from the column header
-    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-    // Update the hidden input field to include both the day and time block
-    const scheduleField = document.getElementById("selectedSchedule");
-    if (scheduleField) {
-        scheduleField.value = `${day} - ${timeBlock}`;
-    }
-
-    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
-}
-
-        const locations = {
-            "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
-            "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
-            "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
-            "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
-            "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
-            "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
-            "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
-            "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
-            "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
-            "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
-            "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
-            "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
-            "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
-        };
-        const departmentSelect = document.getElementById("department");
-        const municipalitySelect = document.getElementById("municipality");
-
-        // Populate the departments dropdown
-        function populateDepartments() {
-            for (const department in locations) {
-                const option = document.createElement("option");
-                option.value = department;
-                option.textContent = department;
-                departmentSelect.appendChild(option);
-            }
-        }
-
-        // Update municipalities based on selected department
-        function updateMunicipalities() {
-            const selectedDepartment = departmentSelect.value;
-            municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>'; // Reset municipalities
-
-            if (locations[selectedDepartment]) {
-                locations[selectedDepartment].forEach(municipality => {
-                    const option = document.createElement("option");
-                    option.value = municipality;
-                    option.textContent = municipality;
-                    municipalitySelect.appendChild(option);
-                });
-            }
-        }
-
-        // Initialize departments on page load
-        document.addEventListener("DOMContentLoaded", populateDepartments);
-
-        function addVehicle() {
-        const vehicleContainer = document.getElementById("vehicle-container");
-        if (vehicleContainer.children.length >= 3) {
-            alert("Solo puedes agregar hasta 3 vehículos.");
-            return;
-        }
-
-        const newVehicle = document.createElement("div");
-        newVehicle.classList.add("vehicle-entry");
-        newVehicle.innerHTML = `
-            <label for="plate">Placa:</label>
-            <input type="text" class="plate" required>
-
-            <label for="model">Modelo:</label>
-            <input type="text" class="model" required>
-
-            <label for="brand">Marca:</label>
-            <input type="text" class="brand" required>
-
-            <label for="year">Año:</label>
-            <input type="number" class="year" required>
-
-            <button type="button" onclick="removeVehicle(this)">Eliminar</button>
-        `;
-        vehicleContainer.appendChild(newVehicle);
-    }
-
-    function removeVehicle(button) {
-        button.parentElement.remove();
-    }
-        
-    </script>
+    
 
 <!-- Checkbox for Terms and Conditions -->
     <div style="margin-top: 35px;">
@@ -966,208 +1164,8 @@ button:hover {
         </a>
     </div>
 </div>
+  
+</footer>
 
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-
-    
-        
-    </footer>
-            <script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM fully loaded!");
-
-    const registrationContainer = document.getElementById("registration-container");
-
-    if (!registrationContainer) {
-        console.error("❌ Error: No se encontró el contenedor de registro en el DOM.");
-        return;
-    }
-
-    const planButtons = document.querySelectorAll(".plan-button");
-
-    // ✅ Attach event listeners to all plan buttons
-    planButtons.forEach(button => {
-        button.addEventListener("click", function () {
-            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
-
-            registrationContainer.style.display = "block"; // ✅ Show form
-            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
-
-            console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
-        });
-    });
-
-    // ✅ Modify registerUser function to use selectedPlanType
-    window.registerUser = function(event) {
-        event.preventDefault();
-
-        if (!selectedPlanType) {
-            alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
-            return;
-        }
-
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const department = document.getElementById("department").value;
-        const municipality = document.getElementById("municipality").value;
-
-        const selectedDay = document.getElementById("selectedDay").value;
-        const selectedTime = document.getElementById("selectedTime").value;
-
-        const vehicles = [];
-        document.querySelectorAll(".vehicle-entry").forEach(entry => {
-            vehicles.push({
-                plate: entry.querySelector(".plate").value,
-                model: entry.querySelector(".model").value,
-                brand: entry.querySelector(".brand").value,
-                year: entry.querySelector(".year").value
-            });
-        });
-
-        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-            alert("❌ Todos los campos son obligatorios.");
-            return;
-        }
-
-        auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const userId = userCredential.user.uid;
-        const paymentDate = new Date();
-        const nextPaymentDate = new Date();
-        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-    const messaging = firebase.messaging();
-          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
-  .then((token) => {
-    console.log("✅ pushToken obtenido:", token);
-    return db.collection("users").doc(userId).set({
-      uid: userId,
-      name,
-      email,
-      phone,
-      planType: selectedPlanType,
-      department,
-      municipality,
-      registrationDate: firebase.firestore.Timestamp.now(),
-      lastUpgradeDate: firebase.firestore.Timestamp.now(),
-      schedule: {
-        day: selectedDay,
-        time: selectedTime
-      },
-      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-      paymentStatus: "Pending",
-      subscriptionStatus: "active",
-      monthsPaid: 0,
-      vehicles,
-      pushToken: token || null
-    });
-  });
-
-
-        function getNextMonthDate() {
-  const date = new Date();
-  date.setMonth(date.getMonth() + 1);
-  return date;
-}
-
-// Then, inside the PayPal success logic or registration confirmation:
-const user = firebase.auth().currentUser;
-if (user) {
-  const userRef = db.collection("users").doc(user.uid);
-  userRef.update({
-    paymentStatus: "Completed",
-    paymentDate: firebase.firestore.Timestamp.now(),
-    nextPaymentDate: firebase.firestore.Timestamp.fromDate(getNextMonthDate()),
-    paymentHistory: firebase.firestore.FieldValue.arrayUnion({
-      date: firebase.firestore.Timestamp.now(),
-      amount: 20,
-      method: "PayPal",
-      status: "Completed"
-    })
-  });
-}
-        
-       // Create a full-screen overlay
-    const overlay = document.createElement("div");
-    overlay.style.position = "fixed";
-    overlay.style.top = "0";
-    overlay.style.left = "0";
-    overlay.style.width = "100%";
-    overlay.style.height = "100%";
-    overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-    overlay.style.display = "flex";
-    overlay.style.flexDirection = "column";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "center";
-    overlay.style.zIndex = "9999";
-    overlay.innerHTML = `
-        <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-        <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-        <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // CSS Spinner Animation
-    const style = document.createElement("style");
-    style.innerHTML = `
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    `;
-    document.head.appendChild(style);
-
-   // Redirect after 2.5s
-setTimeout(() => {
-    window.location.href = "login.html";
-}, 2500);
-})
-          .catch((error) => {
-    console.error("❌ Error en el registro:", error.message);
-    alert("❌ Error en el registro: " + error.message);
-});
-
-// ✅ Function to Update Vehicle Fields Based on Plan Type
-// ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
-function updateVehicleFields(planType) {
-    const vehicleContainer = document.getElementById("vehicle-container");
-    vehicleContainer.innerHTML = ""; // Clear previous entries
-
-    for (let i = 0; i < 3; i++) {
-        const vehicleEntry = document.createElement("div");
-        vehicleEntry.classList.add("vehicle-entry");
-
-        // ✅ Hide extra vehicles if Basic plan
-        if (!planType.includes("plus") && i > 0) {
-            vehicleEntry.style.display = "none"; // Hidden by default
-        }
-
-        vehicleEntry.innerHTML = `
-            <h4>Vehículo ${i + 1}</h4>
-            <label>Placa:</label>
-            <input type="text" class="plate">
-
-            <label>Modelo:</label>
-            <input type="text" class="model">
-
-            <label>Marca:</label>
-            <input type="text" class="brand">
-
-            <label>Año:</label>
-            <input type="number" class="year">
-        `;
-        vehicleContainer.appendChild(vehicleEntry);
-    }
-
-    console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 saved)"}`);
-}
-        console.log("Before the error point");
-
-            </script>
 </body>
 </html>
