@@ -1,114 +1,71 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Push Notification Test</title>
-    <link rel="stylesheet" href="styles.css">
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+    import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
 
-    <script src="env.js?v=1.0"></script>  <!-- Load env.js to prevent caching issues -->
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js"></script>
+    const firebaseConfig = {
+        apiKey: window._env_.FIREBASE_API_KEY,
+        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+        projectId: window._env_.FIREBASE_PROJECT_ID,
+        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+        appId: window._env_.FIREBASE_APP_ID,
+        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
 
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
-        import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+    const auth = getAuth(app);
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: window._env_.FIREBASE_API_KEY,
-            authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-            projectId: window._env_.FIREBASE_PROJECT_ID,
-            storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-            appId: window._env_.FIREBASE_APP_ID,
-            measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-        };
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ DOM fully loaded!');
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const messaging = getMessaging(app);
-        const auth = getAuth(app);
-
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ DOM fully loaded!');
-
-            // Register Firebase service worker
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-    .then((registration) => {
-        console.log('✅ Service Worker registered successfully:', registration);
-    })
-    .catch((error) => {
-        console.error('❌ Error registering service worker:', error);
-    });
-
-                   
-            } else {
-                console.error('❌ Service Worker is not supported in this browser.');
-            }
-
-            // Request permission to send notifications
-            function requestNotificationPermission() {
-                console.log('Requesting notification permission...');
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        console.log('✅ Push notifications granted.');
-                        getTokenForPushNotifications(); // Get token after permission
-                    } else {
-                        console.error('❌ Push notifications permission denied.');
-                        alert('You need to grant permission for push notifications.');
-                    }
-                }).catch((error) => {
-                    console.error('❌ Error requesting notification permission:', error);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
+                .then((registration) => {
+                    console.log('✅ Service Worker registered successfully:', registration);
+                })
+                .catch((error) => {
+                    console.error('❌ Error registering service worker:', error);
                 });
-            }
+        }
 
-            // Get Firebase Push Notification Token
-            function getTokenForPushNotifications() {
-                console.log('Attempting to retrieve push token...');
-                getToken(messaging, {
-                    vapidKey: 'BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE'
-                }).then((token) => {
-                    if (token) {
-                        console.log('✅ Push token obtained:', token);
-                        alert('Push token obtained: ' + token);
-                    } else {
-                        console.error('❌ Failed to get push token.');
-                        alert('Unable to get push token.');
-                    }
-                }).catch((error) => {
-                    console.error('❌ Error obtaining push token:', error);
-                    alert('Error with push notifications: ' + error.message);
-                });
-            }
-
-            // Handle button click to request notification permission
-            document.getElementById('enable-notifications').addEventListener('click', function() {
-                console.log('Button clicked: Requesting notification permission...');
-                requestNotificationPermission();
+        function requestNotificationPermission() {
+            console.log('Requesting notification permission...');
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    console.log('✅ Push notifications granted.');
+                    getTokenForPushNotifications();
+                } else {
+                    console.error('❌ Push notifications permission denied.');
+                    alert('You need to grant permission for push notifications.');
+                }
+            }).catch((error) => {
+                console.error('❌ Error requesting notification permission:', error);
             });
+        }
+
+        function getTokenForPushNotifications() {
+            console.log('Attempting to retrieve push token...');
+            getToken(messaging, {
+                vapidKey: 'BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE'
+            }).then((token) => {
+                if (token) {
+                    console.log('✅ Push token obtained:', token);
+                    alert('Push token obtained: ' + token);
+                } else {
+                    console.error('❌ Failed to get push token.');
+                    alert('Unable to get push token.');
+                }
+            }).catch((error) => {
+                console.error('❌ Error obtaining push token:', error);
+                alert('Error with push notifications: ' + error.message);
+            });
+        }
+
+        document.getElementById('enable-notifications').addEventListener('click', function() {
+            console.log('Button clicked: Requesting notification permission...');
+            requestNotificationPermission();
         });
-    </script>
-
-</head>
-
-<body>
-    <h1>Push Notification Test</h1>
-    <p>Click the button below to enable push notifications:</p>
-
-    <button id="enable-notifications">Enable Notifications</button>
-
-    <div class="message">
-        <p id="status">Status: Push notifications are not enabled.</p>
-    </div>
-
-    <footer>
-        <p>&copy; 2024 AutoCuidado Club</p>
-    </footer>
-</body>
-</html>
+    });
+</script>
