@@ -204,6 +204,41 @@
     color: red;
     font-weight: bold;
 }
+.countdown-container {
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+
+.countdown-container h2 {
+  color: #333;
+  font-size: 24px;
+}
+
+#countdown {
+  font-size: 30px;
+  font-weight: bold;
+  color: #e74c3c; /* Red color for urgency */
+  margin: 15px 0;
+}
+
+.cta-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.cta-button:hover {
+  background-color: #0056b3;
+}
 
     </style>
 </head>
@@ -279,6 +314,15 @@
                     Completa tu pago ahora 🔗
                 </a>
             </div>
+            <!-- Countdown Timer Section -->
+<div class="countdown-container">
+  <h2>Hurry up! Limited-time offer</h2>
+  <p>Complete your payment to enjoy a <strong>45% discount</strong>!</p>
+  <div id="countdown"></div>
+  <p><strong>$35 Savings</strong> if you pay now.</p>
+  <button id="upgrade-now" class="cta-button">Upgrade Now</button>
+</div>
+
         </div>
 
         <!-- Plan Upgrade Card -->
