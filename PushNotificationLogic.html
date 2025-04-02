@@ -39,7 +39,7 @@
 
             // Register Firebase service worker
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')  // Ensure correct path
+                navigator.serviceWorker.register('/public/sw/firebase-messaging-sw.js')  // Ensure correct path
                     .then((registration) => {
                         console.log('✅ Service Worker registered successfully:', registration);
                     })
