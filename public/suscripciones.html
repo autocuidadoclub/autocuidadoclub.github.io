@@ -6,226 +6,207 @@
     <title>Registro en AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
 
-     <!-- ✅ Force Load env.js to Prevent Caching Issues -->
+    <!-- Force Load env.js to Prevent Caching Issues -->
     <script src="env.js?v=1.0"></script>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
- 
 
-      <script>
+    <script>
         document.addEventListener("DOMContentLoaded", function () {
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Firebase env.js not loaded.");
-        alert("❌ Firebase is not initialized. Check env.js.");
-        return;
-    }
+            console.log("✅ DOM fully loaded!");
 
-    console.log("✅ DOM fully loaded!");
-
-    const firebaseConfig = {
-        apiKey: window._env_.FIREBASE_API_KEY,
-        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-        projectId: window._env_.FIREBASE_PROJECT_ID,
-        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-        appId: window._env_.FIREBASE_APP_ID,
-        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase initialized successfully!");
-    }
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    let selectedPlanType = "";
-
-    // Ensure registration container is found
-    const registrationContainer = document.getElementById("registration-container");
-    if (!registrationContainer) {
-        console.error("❌ Error: No se encontró el contenedor de registro.");
-        return;
-    }
-
-    const planButtons = document.querySelectorAll(".plan-button");
-
-    // ✅ Attach event listeners to all plan buttons
-    planButtons.forEach(button => {
-        button.addEventListener("click", function () {
-            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
-            console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-
-            updateVehicleFields(selectedPlanType); // ✅ Update vehicle input fields
-
-            registrationContainer.style.display = "block"; // ✅ Show form
-            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
-        });
-    });
-
-    // ✅ Function to Update Vehicle Fields Based on Plan Type
-    function updateVehicleFields(planType) {
-        const vehicleContainer = document.getElementById("vehicle-container");
-        vehicleContainer.innerHTML = ""; // ✅ Clear previous entries
-
-        let maxVehicles = planType.includes("plus") ? 3 : 1; // ✅ Plus plans allow 3, Basic allows 1
-
-        for (let i = 0; i < maxVehicles; i++) {
-            const vehicleEntry = document.createElement("div");
-            vehicleEntry.classList.add("vehicle-entry");
-            vehicleEntry.innerHTML = `
-                <h4>Vehículo ${i + 1}</h4>
-                <label>Placa:</label>
-                <input type="text" class="plate" required>
-
-                <label>Modelo:</label>
-                <input type="text" class="model" required>
-
-                <label>Marca:</label>
-                <input type="text" class="brand" required>
-
-                <label>Año:</label>
-                <input type="number" class="year" required>
-            `;
-            vehicleContainer.appendChild(vehicleEntry);
-        }
-
-        console.log(`✅ Mostrando ${maxVehicles} campos de vehículos para plan: ${planType}`);
-    }
-
-    // ✅ Function to Select a Schedule Box
-    window.selectScheduleBox = function(cell) {
-        const cells = document.querySelectorAll(".schedule-table tbody td");
-
-        // Get the clicked cell's text
-        const timeBlock = cell.innerText.trim();
-
-        // Validate the clicked cell
-        if (timeBlock === "-" || timeBlock === "") {
-            alert("Por favor, seleccione un horario válido.");
-            return; // Do not allow selection of invalid cells
-        }
-
-        // Remove selection from all other cells
-        cells.forEach((c) => c.classList.remove("selected-box"));
-
-        // Highlight the selected cell
-        cell.classList.add("selected-box");
-
-        // Get the corresponding day from the column header
-        const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
-        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-        const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-        // Update the hidden input fields
-        document.getElementById("selectedDay").value = day;
-        document.getElementById("selectedTime").value = timeBlock;
-
-        console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
-    };
-
-    // ✅ Attach Event Listener for Registration Form
-    document.getElementById("registerForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        if (!selectedPlanType) {
-            alert("❌ Debes seleccionar un plan antes de registrarte.");
-            return;
-        }
-
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const department = document.getElementById("department").value;
-        const municipality = document.getElementById("municipality").value;
-        const selectedDay = document.getElementById("selectedDay").value;
-        const selectedTime = document.getElementById("selectedTime").value;
-
-        const vehicles = [];
-document.querySelectorAll(".vehicle-entry").forEach(entry => {
-    vehicles.push({
-        plate: entry.querySelector(".plate").value || "",
-        model: entry.querySelector(".model").value || "",
-        brand: entry.querySelector(".brand").value || "",
-        year: entry.querySelector(".year").value || ""
-    });
-});
-
-        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-            alert("❌ Todos los campos son obligatorios.");
-            return;
-        }
-
-        auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            const paymentDate = new Date();
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-       return db.collection("users").doc(userId).set({
-    uid: userId,
-    name,
-    email,
-    phone,
-    planType: selectedPlanType,
-    department,
-    municipality,
-    registrationDate: firebase.firestore.Timestamp.now(),
-    lastUpgradeDate: firebase.firestore.Timestamp.now(),
-    schedule: { 
-        day: selectedDay, 
-        time: selectedTime 
-    },
-    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-    paymentStatus: "Pending",
-    subscriptionStatus: "active", // ✅ ADD THIS LINE
-    monthsPaid: 0,
-    vehicles
-});
-
-
-
-        })
-        .then(() => {
-            alert("✅ Registro exitoso. Redirigiendo...");
-            window.location.href = "login.html";
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
-    });
-
-}); // ✅ Closing brace at the correct place
-
-        // ✅ Function to Update Vehicle Fields Based on Plan Type
-        function updateVehicleFields(planType) {
-            const vehicleContainer = document.getElementById("vehicle-container");
-            vehicleContainer.innerHTML = "";
-            let maxVehicles = (planType.includes("plus")) ? 3 : 1;
-            for (let i = 0; i < maxVehicles; i++) {
-                const vehicleEntry = document.createElement("div");
-                vehicleEntry.classList.add("vehicle-entry");
-                vehicleEntry.innerHTML = `
-                    <h4>Vehículo ${i + 1}</h4>
-                    <label>Placa:</label>
-                    <input type="text" class="plate" required>
-                    <label>Modelo:</label>
-                    <input type="text" class="model" required>
-                    <label>Marca:</label>
-                    <input type="text" class="brand" required>
-                    <label>Año:</label>
-                    <input type="number" class="year" required>
-                `;
-                vehicleContainer.appendChild(vehicleEntry);
+            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+                console.error("❌ Error: Firebase env.js no cargado.");
+                alert("❌ Firebase no está inicializado. Revisa env.js.");
+                return;
             }
-        }
+
+            const firebaseConfig = {
+                apiKey: window._env_.FIREBASE_API_KEY,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                projectId: window._env_.FIREBASE_PROJECT_ID,
+                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                appId: window._env_.FIREBASE_APP_ID,
+                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+            };
+
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log("✅ Firebase inicializado correctamente");
+            }
+
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            let selectedPlanType = null;
+
+            const registrationContainer = document.getElementById("registration-container");
+            const planButtons = document.querySelectorAll(".plan-button");
+
+            planButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    selectedPlanType = this.getAttribute("data-plan");
+                    updateVehicleFields(selectedPlanType);
+                    registrationContainer.style.display = "block";
+                    registrationContainer.scrollIntoView({ behavior: "smooth" });
+                    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+                });
+            });
+
+            document.getElementById("registerForm").addEventListener("submit", registerUser);
+
+            function registerUser(event) {
+                event.preventDefault();
+
+                if (!selectedPlanType) {
+                    alert("❌ Debes seleccionar un plan antes de registrarte.");
+                    return;
+                }
+
+                const name = document.getElementById("name").value.trim();
+                const email = document.getElementById("email").value.trim();
+                const phone = document.getElementById("phone").value.trim();
+                const password = document.getElementById("password").value.trim();
+                const department = document.getElementById("department").value;
+                const municipality = document.getElementById("municipality").value;
+                const selectedDay = document.getElementById("selectedDay").value;
+                const selectedTime = document.getElementById("selectedTime").value;
+
+                const vehicles = [];
+                document.querySelectorAll(".vehicle-entry").forEach(entry => {
+                    vehicles.push({
+                        plate: entry.querySelector(".plate").value || "",
+                        model: entry.querySelector(".model").value || "",
+                        brand: entry.querySelector(".brand").value || "",
+                        year: entry.querySelector(".year").value || ""
+                    });
+                });
+
+                if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+                    alert("❌ Todos los campos son obligatorios.");
+                    return;
+                }
+
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const userId = userCredential.user.uid;
+                        const paymentDate = new Date();
+                        const nextPaymentDate = new Date();
+                        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+                        return db.collection("users").doc(userId).set({
+                            uid: userId,
+                            name,
+                            email,
+                            phone,
+                            planType: selectedPlanType,
+                            department,
+                            municipality,
+                            registrationDate: firebase.firestore.Timestamp.now(),
+                            lastUpgradeDate: firebase.firestore.Timestamp.now(),
+                            schedule: {
+                                day: selectedDay,
+                                time: selectedTime
+                            },
+                            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                            paymentStatus: "Pending",
+                            subscriptionStatus: "active",
+                            monthsPaid: 0,
+                            vehicles
+                        });
+                    })
+                    .then(() => {
+                        const overlay = document.createElement("div");
+                        overlay.style.position = "fixed";
+                        overlay.style.top = "0";
+                        overlay.style.left = "0";
+                        overlay.style.width = "100%";
+                        overlay.style.height = "100%";
+                        overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+                        overlay.style.display = "flex";
+                        overlay.style.flexDirection = "column";
+                        overlay.style.justifyContent = "center";
+                        overlay.style.alignItems = "center";
+                        overlay.style.zIndex = "9999";
+                        overlay.innerHTML = `
+                            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+                        `;
+                        document.body.appendChild(overlay);
+
+                        const style = document.createElement("style");
+                        style.innerHTML = `
+                            @keyframes spin {
+                                0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); }
+                            }
+                        `;
+                        document.head.appendChild(style);
+
+                        setTimeout(() => {
+                            window.location.href = "login.html";
+                        }, 2500);
+                    })
+                    .catch((error) => {
+                        console.error("❌ Error en el registro:", error.message);
+                        alert("❌ Error en el registro: " + error.message);
+                    });
+            }
+
+            window.selectScheduleBox = function (cell) {
+                const cells = document.querySelectorAll(".schedule-table tbody td");
+                const timeBlock = cell.innerText.trim();
+
+                if (timeBlock === "-" || timeBlock === "") {
+                    alert("Por favor, seleccione un horario válido.");
+                    return;
+                }
+
+                cells.forEach((c) => c.classList.remove("selected-box"));
+                cell.classList.add("selected-box");
+
+                const dayIndex = cell.cellIndex;
+                const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+                const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+                document.getElementById("selectedDay").value = day;
+                document.getElementById("selectedTime").value = timeBlock;
+
+                console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
+            };
+
+            function updateVehicleFields(planType) {
+                const vehicleContainer = document.getElementById("vehicle-container");
+                vehicleContainer.innerHTML = "";
+
+                const maxVehicles = planType.includes("plus") ? 3 : 1;
+                for (let i = 0; i < maxVehicles; i++) {
+                    const vehicleEntry = document.createElement("div");
+                    vehicleEntry.classList.add("vehicle-entry");
+                    vehicleEntry.innerHTML = `
+                        <h4>Vehículo ${i + 1}</h4>
+                        <label>Placa:</label>
+                        <input type="text" class="plate" required>
+                        <label>Modelo:</label>
+                        <input type="text" class="model" required>
+                        <label>Marca:</label>
+                        <input type="text" class="brand" required>
+                        <label>Año:</label>
+                        <input type="number" class="year" required>
+                    `;
+                    vehicleContainer.appendChild(vehicleEntry);
+                }
+
+                console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
+            }
+        });
     </script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -249,139 +230,29 @@ document.querySelectorAll(".vehicle-entry").forEach(entry => {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-
         .floating-contact-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff6600;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s, transform 0.2s;
-}
-
-.floating-contact-button:hover {
-    background-color: #cc5500;
-    transform: scale(1.05);
-}
-
-        /* Improved Table Styling */
-        .subscription-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 18px;
-            text-align: left;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .subscription-table th, .subscription-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
-        .subscription-table th {
-            background: #FF6600;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff6600;
             color: white;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
             font-weight: bold;
-            text-align: center;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, transform 0.2s;
         }
-        .subscription-table td {
-            text-align: center;
+        .floating-contact-button:hover {
+            background-color: #cc5500;
+            transform: scale(1.05);
         }
-        .highlight-cell {
-            font-weight: bold;
-            color: #FF6600;
-        }
-        .warning-text {
-            color: red;
-            font-weight: bold;
-        }
-        .benefits-list {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-  .subscription-disclaimer {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f8f9fa;
-    font-size: 15px;
-    color: #555;
-  }
-    
-/* Highlight Plan Badges */
-.discount-badge {
-    position: absolute;
-    top: -10px;
-    left: 10px;
-    background-color: #FF6600;
-    color: white;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-/* Discounted Price */
-.discounted-price {
-    color: #FF6600;
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-/* Plan Item Styling */
-.plan-item {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    text-align: center;
-    width: 300px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-}
-.highlight {
-    border: 2px solid #FF6600;
-    box-shadow: 0px 4px 10px rgba(255, 102, 0, 0.3);
-}
-
-/* Limited-Time Offer Message */
-.limited-time {
-    color: #FF6600;
-    font-size: 0.95em;
-    font-style: italic;
-    margin-top: 10px;
-}
-
-/* Button Styles */
-button {
-    background-color: #003366;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-button:hover {
-    background-color: #FF6600;
-}
-
-
-</style>
+    </style>
 </head>
 
 <body>
-<!-- Navigation -->
     <nav class="navbar">
         <ul class="nav-links">
             <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
@@ -394,10 +265,11 @@ button:hover {
             <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
     </nav>
-<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-    <i class="fas fa-headset"></i> Contactar Staff
-</button>
-<!-- Header -->
+
+    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+        <i class="fas fa-headset"></i> Contactar Staff
+    </button>
+    
     <header>
         <div class="header-container">
             <div class="header-text">
@@ -511,29 +383,26 @@ button:hover {
     <!-- Subscription Plans -->
     <section>
              
- <h2 style="margin-top: 30px;"margin-bottom: 30px;>Planes de Suscripciones Básicas (cobertura: 1 vehículo)</h2>
+ <h2 style="margin-top: 30px; margin-bottom: 30px;">Planes de Suscripciones Básicas (cobertura: 1 vehículo)</h2>
         <div class="subscription-row">
  <!-- 3-Month Plan -->
-     <div class="plan-item highlight">
-        <div class="discount-badge">¡Inicio de Año: Ahorra 30% Solo Febrero!</div>
-        <div class="plan-option">
-            <img src="3mb.jpg" alt="Plan Básico 3 meses" class="plan-image">
-            <p><strong>3 meses:</strong> <s>$34.99</s> <span class="discounted-price">$24.49/mes</span></p>
-            <ul class="plan-benefits">
-                <li>3 inspecciones preventivas (una cada mes).</li>
-                <li><strong>Beneficio:</strong> Ideal para probar el servicio sin compromiso a largo plazo.</li>
-                <li><strong>Ideal para:</strong> Clientes nuevos que buscan flexibilidad.</li>
-            </ul>
-            <p class="limited-time">Promoción válida solo en Febrero, ¡aprovecha hoy mismo!</p>
-           <!-- 🟢 BOTÓN MEJORADO -->
-            <button class="plan-button" data-plan="basic3m">¡Quiero este plan!</button>
-            
-            <!-- 🔗 LINK PEQUEÑO -->
-            <p style="margin-top:10px; font-size:14px;">
-                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
-                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
-            </p>
-        </div>
+    <div class="plan-item highlight">
+    <div class="discount-badge">¡Inicio de Año: Ahorra 30% Solo Febrero!</div>
+    <div class="plan-option">
+        <img src="3mb.jpg" alt="Plan Básico 3 meses" class="plan-image">
+        <p><strong>3 meses:</strong> <s>$34.99</s> <span class="discounted-price">$24.49/mes</span></p>
+        <ul class="plan-benefits">
+            <li>3 inspecciones preventivas (una cada mes).</li>
+            <li><strong>Beneficio:</strong> Ideal para probar el servicio sin compromiso a largo plazo.</li>
+            <li><strong>Ideal para:</strong> Clientes nuevos que buscan flexibilidad.</li>
+        </ul>
+        <p class="limited-time">Promoción válida solo en Febrero, ¡aprovecha hoy mismo!</p>
+        <button class="plan-button" data-plan="basic3m">¡Quiero este plan!</button>
+        <p style="margin-top:10px; font-size:14px;">
+            <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+            <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+        </p>
+    </div>
     </div>
 
     <!-- 6-Month Plan -->
@@ -551,9 +420,13 @@ button:hover {
              <button class="plan-button" data-plan="basic6m">¡Quiero este plan!</button>
             
             <!-- 🔗 LINK PEQUEÑO -->
-            <p style="margin-top:10px; font-size:14px;">
-                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
-                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+           
+ <p style="margin-top:10px; font-size:14px;">
+  <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+  <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+</p>
+
+
         </div>
     </div>
 
@@ -618,26 +491,26 @@ button:hover {
 </style>
 
               <div class="plan-item">
-                   <div class="plan-option">
-                    <img src="12mb.jpg" alt="Plan Básico 12 meses" class="plan-image">
-                    <p><strong>12 meses:</strong> $30.00/mes</p>
-                    <ul class="plan-benefits">
-                        <li>12 inspecciones preventivas (una cada mes).</li>
-                        <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante el año.</li>
-                        <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
-                        <li><strong>Descuento: </strong> 14% de descuento en comparación con el plan básico de 3 meses.</li>
-                        </ul>
-                      <button class="plan-button" data-plan="basic12m">¡Quiero este plan!</button>
-            
-            <!-- 🔗 LINK PEQUEÑO -->
-            <p style="margin-top:10px; font-size:14px;">
-                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
-                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
-            </div>
-        </div>
+    <div class="plan-option">
+        <img src="12mb.jpg" alt="Plan Básico 12 meses" class="plan-image">
+        <p><strong>12 meses:</strong> $30.00/mes</p>
+        <ul class="plan-benefits">
+            <li>12 inspecciones preventivas (una cada mes).</li>
+            <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante el año.</li>
+            <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
+            <li><strong>Descuento: </strong> 14% de descuento en comparación con el plan básico de 3 meses.</li>
+        </ul>
+        <button class="plan-button" data-plan="basic12m">¡Quiero este plan!</button>
+        <p style="margin-top:10px; font-size:14px;">
+            <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+            <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+        </p>
+    </div>
+              </div>
+
             </div>
 
-        <h2 style="margin-top: 30px;margin-bottom: 30px;">Planes de Suscripciones Plus (cobertura: 3 vehículos)</h2>
+        <h2 style="margin-top: 30px; margin-bottom: 30px;">Planes de Suscripciones Básicas (cobertura: 1 vehículo)</h2>
         <div class="subscription-row">
             <div class="plan-item">
                 <div class="plan-option">
@@ -653,8 +526,10 @@ button:hover {
             
             <!-- 🔗 LINK PEQUEÑO -->
             <p style="margin-top:10px; font-size:14px;">
-                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
-                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+  <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+  <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+</p>
+
                 </div>
             </div>
             <div class="plan-item">
@@ -670,9 +545,11 @@ button:hover {
                     <button class="plan-button" data-plan="plus6m">¡Quiero este plan!</button>
             
             <!-- 🔗 LINK PEQUEÑO -->
-            <p style="margin-top:10px; font-size:14px;">
-                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
-                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+           <p style="margin-top:10px; font-size:14px;">
+  <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+  <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+           </p>
+
                 </div>
             </div>
              <div class="plan-item">       
@@ -689,8 +566,10 @@ button:hover {
             
             <!-- 🔗 LINK PEQUEÑO -->
             <p style="margin-top:10px; font-size:14px;">
-                <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
-                <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+  <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
+  <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
+</p>
+
                 </div>
             </div>
         </div>
@@ -718,24 +597,23 @@ button:hover {
         <div id="vehicle-section">
     <h3>Datos del Vehículo</h3>
     <div id="vehicle-container">
-        <div class="vehicle-entry">
-            <!-- Placa (Número de placa del vehículo) -->
-<label for="plate">Placa:</label>
-<input type="text" id="plate" class="plate" placeholder="Número de placa" title="Ingrese el número de placa" autocomplete="off" required>
+       <div class="vehicle-entry">
+    <!-- Contents for vehicle entry -->
+    <label for="plate">Placa:</label>
+    <input type="text" id="plate" class="plate" placeholder="Número de placa" title="Ingrese el número de placa" autocomplete="off" required>
 
-<!-- Modelo (Modelo del vehículo) -->
-<label for="model">Modelo:</label>
-<input type="text" id="model" class="model" placeholder="Modelo del vehículo" title="Ingrese el modelo del vehículo" autocomplete="off" required>
+    <label for="model">Modelo:</label>
+    <input type="text" id="model" class="model" placeholder="Modelo del vehículo" title="Ingrese el modelo del vehículo" autocomplete="off" required>
 
-<!-- Marca (Marca del vehículo) -->
-<label for="brand">Marca:</label>
-<input type="text" id="brand" class="brand" placeholder="Marca del vehículo" title="Ingrese la marca del vehículo" autocomplete="off" required>
+    <label for="brand">Marca:</label>
+    <input type="text" id="brand" class="brand" placeholder="Marca del vehículo" title="Ingrese la marca del vehículo" autocomplete="off" required>
 
-<!-- Año (Año del vehículo) -->
-<label for="year">Año:</label>
-<input type="number" id="year" class="year" placeholder="Año del vehículo" title="Ingrese el año del vehículo" autocomplete="off" required>
+    <label for="year">Año:</label>
+    <input type="number" id="year" class="year" placeholder="Año del vehículo" title="Ingrese el año del vehículo" autocomplete="off" required>
 
-        </div>
+    <button type="button" onclick="removeVehicle(this)">Eliminar</button>
+</div>
+
     </div>
    </div>
 
@@ -927,6 +805,7 @@ button:hover {
     </section>
     </form>
     </div>
+
     
  <!-- Footer -->
     <footer>
@@ -1027,32 +906,59 @@ document.addEventListener("DOMContentLoaded", function () {
         const nextPaymentDate = new Date();
         nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-        return db.collection("users").doc(userId).set({
-    uid: userId,
-    name,
-    email,
-    phone,
-    planType: selectedPlanType,
-    department,
-    municipality,
-    registrationDate: firebase.firestore.Timestamp.now(),
-    lastUpgradeDate: firebase.firestore.Timestamp.now(), // ✅ Aquí debes agregarlo
-    schedule: { 
-        day: selectedDay, 
-        time: selectedTime 
-    },
-    paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-    nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-    paymentStatus: "Pending",
-    monthsPaid: 0, // ✅ También agregar aquí
-    vehicles
-});
+    const messaging = firebase.messaging();
+          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
+  .then((token) => {
+    console.log("✅ pushToken obtenido:", token);
+    return db.collection("users").doc(userId).set({
+      uid: userId,
+      name,
+      email,
+      phone,
+      planType: selectedPlanType,
+      department,
+      municipality,
+      registrationDate: firebase.firestore.Timestamp.now(),
+      lastUpgradeDate: firebase.firestore.Timestamp.now(),
+      schedule: {
+        day: selectedDay,
+        time: selectedTime
+      },
+      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+      paymentStatus: "Pending",
+      subscriptionStatus: "active",
+      monthsPaid: 0,
+      vehicles,
+      pushToken: token || null
+    });
+  });
 
 
-    })  // ✅ Ensure this bracket properly closes .then()
+        function getNextMonthDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+}
 
-       .then(() => {
-    // Create a full-screen overlay
+// Then, inside the PayPal success logic or registration confirmation:
+const user = firebase.auth().currentUser;
+if (user) {
+  const userRef = db.collection("users").doc(user.uid);
+  userRef.update({
+    paymentStatus: "Completed",
+    paymentDate: firebase.firestore.Timestamp.now(),
+    nextPaymentDate: firebase.firestore.Timestamp.fromDate(getNextMonthDate()),
+    paymentHistory: firebase.firestore.FieldValue.arrayUnion({
+      date: firebase.firestore.Timestamp.now(),
+      amount: 20,
+      method: "PayPal",
+      status: "Completed"
+    })
+  });
+}
+        
+       // Create a full-screen overlay
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
     overlay.style.top = "0";
@@ -1083,21 +989,15 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
     document.head.appendChild(style);
 
-    // Redirect after 2.5s
-    setTimeout(() => {
-        window.location.href = "login.html";
-    }, 2500);
+   // Redirect after 2.5s
+setTimeout(() => {
+    window.location.href = "login.html";
+}, 2500);
 })
-
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-        });
-    };  
+          .catch((error) => {
+    console.error("❌ Error en el registro:", error.message);
+    alert("❌ Error en el registro: " + error.message);
 });
-
-
-
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
 // ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
@@ -1133,6 +1033,7 @@ function updateVehicleFields(planType) {
 
     console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1 visible, 3 saved)"}`);
 }
+        console.log("Before the error point");
 
             </script>
 </body>
