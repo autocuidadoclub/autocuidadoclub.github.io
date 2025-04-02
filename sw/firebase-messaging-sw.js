@@ -1,7 +1,8 @@
+// Import the necessary Firebase SDKs for the service worker.
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js');
 
-// Initialize Firebase
+// Initialize Firebase in the service worker
 firebase.initializeApp({
   apiKey: "AIzaSyCY6BeuJSbUboosMDrvlzQUmeNLb2dJX_0",
   authDomain: "bookings-autocuidad-club.firebaseapp.com",
@@ -18,11 +19,14 @@ const messaging = firebase.messaging();
 // Handle background push notifications
 messaging.onBackgroundMessage(function(payload) {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+
+  // Construct notification options
   const notificationTitle = 'Background Message Title';
   const notificationOptions = {
     body: 'Background Message body.',
-    icon: '/firebase-logo.png'
+    icon: '/firebase-logo.png' // Make sure this icon exists at the root
   };
 
+  // Display notification
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
