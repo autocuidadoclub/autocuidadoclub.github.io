@@ -517,7 +517,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-      // Try to get the saved end time from localStorage
+      
+  // Try to get the saved end time from localStorage
   var savedEndTime = localStorage.getItem("countdownEndTime");
 
   // If no saved end time exists, set a new one (48 hours from now)
@@ -546,7 +547,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("upgrade-now").disabled = true;
     }
   }, 1000);
-
+     
 // Global variables
 let auth, db;
 
