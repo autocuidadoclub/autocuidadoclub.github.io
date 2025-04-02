@@ -249,6 +249,80 @@
             background-color: #cc5500;
             transform: scale(1.05);
         }
+
+        /* Table styles */
+.subscription-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.subscription-table th,
+.subscription-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.subscription-table th {
+    background-color: #f4f4f4;
+}
+
+@media only screen and (max-width: 768px) {
+    /* Stack the table on smaller screens */
+    .subscription-table, 
+    .subscription-table th, 
+    .subscription-table td {
+        display: block;
+    }
+
+    .subscription-table th {
+        background-color: #f4f4f4;
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .subscription-table td {
+        position: relative;
+        padding-left: 50%;
+    }
+
+    .subscription-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+    }
+
+    /* Adjust font size for mobile */
+    .subscription-table td {
+        font-size: 14px;
+    }
+}
+
+.subscription-table td[data-label]:before {
+    content: attr(data-label);
+    font-weight: bold;
+}
+
+/* Ensure the header stays aligned with the data */
+.subscription-table td {
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+/* Mobile-friendly adjustment for headings and table */
+@media only screen and (max-width: 480px) {
+    .subscription-table td {
+        padding: 8px;
+    }
+
+    .subscription-table th, .subscription-table td {
+        font-size: 12px;
+    }
+}
+
     </style>
 </head>
 
