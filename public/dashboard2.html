@@ -147,7 +147,15 @@
     transform: scale(1.05);
 }
 
-  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 0 20px; /* optional: to align with Reprogramar box padding */
+    box-sizing: border-box;
+}
+
 .dashboard-section {
     width: 100%;
     padding: 0 20px;
@@ -413,7 +421,24 @@
     </div> <!-- End Flex Row -->
 </div>
 
-            
+      <div class="card" style="margin-top: 20px;">
+  <h3>📜 Historial de Pagos</h3>
+  <button onclick="loadPaymentHistory()" class="orange-button">Ver Historial</button>
+  <table id="customerHistoryTable" style="margin-top: 15px; display: none;">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Monto</th>
+        <th>Método</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="customerHistoryBody"></tbody>
+  </table>
+</div>
+
+
+     
 <script>
 // Global variables
 let auth, db;
@@ -834,6 +859,44 @@ if (progressDescription) {
 
 }
 
+    // Place this in the JS script block of dashboard3.html
+// 📜 View Payment History Function
+function loadPaymentHistory() {
+  const user = firebase.auth().currentUser;
+  const body = document.getElementById("customerHistoryBody");
+  const table = document.getElementById("customerHistoryTable");
+  body.innerHTML = "";
+
+  if (!user) return;
+
+  db.collection("users").doc(user.uid).get().then(doc => {
+    const data = doc.data();
+    const history = data.paymentHistory || [];
+
+    if (history.length === 0) {
+      body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
+    } else {
+      history.forEach(entry => {
+        const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
+        body.innerHTML += `
+          <tr>
+            <td>${date}</td>
+            <td>$${entry.amount || "N/A"}</td>
+            <td>${entry.method || "-"}</td>
+            <td>${entry.status || "-"}</td>
+          </tr>
+        `;
+      });
+    }
+
+    table.style.display = "table";
+  }).catch(error => {
+    console.error("❌ Error al cargar historial de pagos:", error);
+    alert("Error al cargar el historial de pagos.");
+  });
+}
+
+    
 </script>
 
     
@@ -868,28 +931,7 @@ if (progressDescription) {
 
         
     </footer>
-  <div id="install-banner" style="display: none; ...">
-  📲 Para instalar AutoCuidado Club en iPhone...
-  <button onclick="dismissBanner()">X</button>
-</div>
-
-<div id="install-banner" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center; font-size: 14px; position: fixed; top: 0; width: 100%; z-index: 1000;">
-    📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
-    <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
-</div>
-
-<script>
-function dismissBanner() {
-    document.getElementById("install-banner").style.display = "none";
-}
-
-// ✅ More robust iOS check
-if ((/iPad|iPhone|iPod/.test(navigator.userAgent)) && !window.MSStream) {
-    document.getElementById("install-banner").style.display = "block";
-}
-</script>
-
-  
+    
 
 </body>
 </html>
