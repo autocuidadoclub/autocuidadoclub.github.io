@@ -10,14 +10,10 @@
     <script src="env.js?v=1.0"></script>
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
-
-    <!-- Firebase Modular SDK -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js";
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+        import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
 
         // Firebase config object
         const firebaseConfig = {
@@ -32,27 +28,34 @@
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-
-        // Initialize Firebase Authentication and Messaging
-        const auth = getAuth(app);
         const messaging = getMessaging(app);
+        const auth = getAuth(app);
 
-        // Register Firebase Service Worker for Push Notifications
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("✅ DOM fully loaded!");
+
+            // Ensure service worker is registered correctly
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/firebase-messaging-sw.js')  // Make sure this path is correct!
                 .then((registration) => {
-                    console.log('✅ Service Worker registered:', registration);
-                })
-                .catch((err) => {
+                    console.log("✅ Service Worker registered:", registration);
+                }).catch((err) => {
                     console.error('❌ Service Worker registration failed:', err);
                 });
-        }
+            }
+
+            // Request Notification Permission when the button is clicked
+            document.getElementById("enable-notifications").addEventListener("click", function () {
+                requestNotificationPermission();
+            });
+        });
 
         // Request Notification Permission
         function requestNotificationPermission() {
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
                     console.log("✅ Push notifications granted.");
+                    // After permission is granted, get the token
                     getTokenForPushNotifications();
                 } else {
                     console.error("❌ Push notifications permission denied.");
@@ -78,27 +81,6 @@
                 alert("❌ Error with push notifications: " + error.message);
             });
         }
-
-        // Handle button click to request notification permission
-        document.getElementById("enable-notifications").addEventListener("click", function() {
-            // Check if the user is authenticated
-            const user = auth.currentUser;
-
-            if (!user) {
-                console.error("❌ User is not authenticated.");
-                alert("❌ Please log in to enable notifications.");
-                return;
-            }
-
-            // Request notification permission when the button is clicked
-            requestNotificationPermission();
-        });
-
-        // Handle Token Refresh and Foreground Notifications
-        onMessage(messaging, (payload) => {
-            console.log("Message received: ", payload);
-            // Handle foreground notifications as needed
-        });
     </script>
 </head>
 
