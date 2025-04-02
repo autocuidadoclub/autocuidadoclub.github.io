@@ -204,6 +204,41 @@
     color: red;
     font-weight: bold;
 }
+.countdown-container {
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+
+.countdown-container h2 {
+  color: #333;
+  font-size: 24px;
+}
+
+#countdown {
+  font-size: 30px;
+  font-weight: bold;
+  color: #e74c3c; /* Red color for urgency */
+  margin: 15px 0;
+}
+
+.cta-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.cta-button:hover {
+  background-color: #0056b3;
+}
 
     </style>
 </head>
@@ -214,7 +249,7 @@
             <li><a href="nosotros.html">Nosotros</a></li>
             <li><a href="index.html">Inicio</a></li>
             <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Conoce Nuestras Suscripciones</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
             <li><a href="contacto.html">Contacto</a></li>
         </ul>
         <div class="logo-container">
@@ -279,6 +314,15 @@
                     Completa tu pago ahora 🔗
                 </a>
             </div>
+            <!-- Countdown Timer Section -->
+<div class="countdown-container">
+  <h2>Hurry up! Limited-time offer</h2>
+  <p>Complete your payment to enjoy a <strong>45% discount</strong>!</p>
+  <div id="countdown"></div>
+  <p><strong>$35 Savings</strong> if you pay now.</p>
+  <button id="upgrade-now" class="cta-button">Upgrade Now</button>
+</div>
+
         </div>
 
         <!-- Plan Upgrade Card -->
@@ -438,11 +482,9 @@
 </div>
 
 
-     
-<script>
-// Global variables
-let auth, db;
 
+ <script>
+ 
 // Firebase Config
 const firebaseConfig = {
     apiKey: window._env_.FIREBASE_API_KEY,
@@ -474,6 +516,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+      
+  // Try to get the saved end time from localStorage
+  var savedEndTime = localStorage.getItem("countdownEndTime");
+
+  // If no saved end time exists, set a new one (48 hours from now)
+  if (!savedEndTime) {
+    savedEndTime = new Date().getTime() + 48 * 60 * 60 * 1000; // 48 hours from now
+    localStorage.setItem("countdownEndTime", savedEndTime); // Save it in localStorage
+  }
+
+  // Update the countdown every 1 second
+  var x = setInterval(function() {
+    var now = new Date().getTime();
+    var distance = savedEndTime - now;
+
+    // Time calculations for hours, minutes, and seconds
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Display the countdown
+    document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
+
+    // If the countdown finishes, clear the interval and show EXPIRED
+    if (distance < 0) {
+      clearInterval(x);
+      document.getElementById("countdown").innerHTML = "EXPIRED";
+      document.getElementById("upgrade-now").disabled = true;
+    }
+  }, 1000);
+     
+// Global variables
+let auth, db;
 
     function upgradePlan() {
     const selectedPlan = document.getElementById("new-plan").value;
