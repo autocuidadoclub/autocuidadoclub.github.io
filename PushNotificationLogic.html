@@ -31,56 +31,60 @@
         const messaging = getMessaging(app);
         const auth = getAuth(app);
 
-        document.addEventListener("DOMContentLoaded", function () {
-            console.log("✅ DOM fully loaded!");
+        document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM fully loaded!');
 
-            // Ensure service worker is registered correctly
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/firebase-messaging-sw.js')  // Make sure this path is correct!
-                .then((registration) => {
-                    console.log("✅ Service Worker registered:", registration);
-                }).catch((err) => {
-                    console.error('❌ Service Worker registration failed:', err);
-                });
-            }
+  // Register Firebase service worker (it must be located in the sw folder)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')  // Update path to the sw folder
+      .then((registration) => {
+        console.log('Service Worker registered successfully:', registration);
+      })
+      .catch((error) => {
+        console.error('Error registering service worker:', error);
+      });
+  }
 
-            // Request Notification Permission when the button is clicked
-            document.getElementById("enable-notifications").addEventListener("click", function () {
-                requestNotificationPermission();
-            });
-        });
+  // Initialize Firebase Messaging
+  const messaging = firebase.messaging();
 
-        // Request Notification Permission
-        function requestNotificationPermission() {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    console.log("✅ Push notifications granted.");
-                    // After permission is granted, get the token
-                    getTokenForPushNotifications();
-                } else {
-                    console.error("❌ Push notifications permission denied.");
-                    alert("❌ You need to grant permission for push notifications.");
-                }
-            });
-        }
+  // Request permission to send notifications
+  function requestNotificationPermission() {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        console.log('Push notifications granted.');
+        getTokenForPushNotifications(); // Get token after permission
+      } else {
+        console.error('Push notifications permission denied.');
+        alert('You need to grant permission for push notifications.');
+      }
+    });
+  }
 
-        // Get Firebase Push Notification Token
-        function getTokenForPushNotifications() {
-            getToken(messaging, {
-                vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-            }).then((token) => {
-                if (token) {
-                    console.log("✅ Push token obtained:", token);
-                    alert("Push token obtained: " + token);
-                } else {
-                    console.error("❌ Failed to get push token.");
-                    alert("❌ Unable to get push token.");
-                }
-            }).catch((error) => {
-                console.error("❌ Error obtaining push token:", error);
-                alert("❌ Error with push notifications: " + error.message);
-            });
-        }
+  // Get Firebase Push Notification Token
+  function getTokenForPushNotifications() {
+    messaging.getToken({
+      vapidKey: 'BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE'
+    }).then((token) => {
+      if (token) {
+        console.log('Push token obtained:', token);
+        alert('Push token obtained: ' + token);
+      } else {
+        console.error('Failed to get push token.');
+        alert('Unable to get push token.');
+      }
+    }).catch((error) => {
+      console.error('Error obtaining push token:', error);
+      alert('Error with push notifications: ' + error.message);
+    });
+  }
+
+  // Handle the button click to request notification permission
+  document.getElementById('enable-notifications').addEventListener('click', function() {
+    requestNotificationPermission();
+  });
+});
+
     </script>
 </head>
 
