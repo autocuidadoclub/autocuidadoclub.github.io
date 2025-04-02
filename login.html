@@ -54,7 +54,9 @@
             .catch(error => console.error("❌ Persistence Error:", error));
 
         // ✅ Login User Function
-        window.loginUser = function () {
+        window.loginUser = function (event) {
+            event.preventDefault();
+
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
 
@@ -63,16 +65,47 @@
                 return;
             }
 
-            auth.signInWithEmailAndPassword(email, password)
-                .then(userCredential => {
-                    console.log("✅ Login Success:", userCredential.user.email);
-                    alert("✅ Bienvenido a AutoCuidado Club!");
-                    window.location.href = 'dashboard2.html'; // Redirect to Dashboard
-                })
-                .catch(error => {
-                    console.error("❌ Login Error:", error.message);
-                    alert("❌ Error: " + error.message);
-                });
+            // Create full-screen overlay for loading effect
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = "9999";
+            overlay.innerHTML = `
+                <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">Iniciando sesión...</h2>
+                <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+            `;
+            document.body.appendChild(overlay);
+
+            // Simulate login attempt (replace with actual Firebase login)
+            setTimeout(() => {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(userCredential => {
+                        // On successful login
+                        overlay.innerHTML = `
+                            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Login Exitoso</h2>
+                            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo...</p>
+                            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+                        `;
+                        setTimeout(() => {
+                            window.location.href = 'dashboard2.html'; // Redirect to Dashboard
+                        }, 2500);
+                    })
+                    .catch(error => {
+                        console.error("❌ Login Error:", error.message);
+                        overlay.innerHTML = `
+                            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">❌ Error</h2>
+                            <p style="color: white; font-size: 1.2em;">Intentar nuevamente...</p>
+                        `;
+                    });
+            }, 2000); // Simulate a 2-second login delay
         };
 
         // ✅ Forgot Password Function
@@ -100,24 +133,23 @@
     });
     </script>
 </head>
-    
-</head>
 <body>
 
+    <!-- Install Banner for iPhone -->
     <div id="install-banner" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center; font-size: 14px; position: fixed; top: 0; width: 100%; z-index: 1000;">
-    📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
-    <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
-</div>
+        📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
+        <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
+    </div>
+    
+    <script>
+    function dismissBanner() {
+        document.getElementById("install-banner").style.display = "none";
+    }
 
-<script>
-function dismissBanner() {
-    document.getElementById("install-banner").style.display = "none";
-}
-
-if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
-    document.getElementById("install-banner").style.display = "block";
-}
-</script>
+    if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+        document.getElementById("install-banner").style.display = "block";
+    }
+    </script>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -142,14 +174,12 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
             </div>
         </div>
     </header>
-<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-    <i class="fas fa-headset"></i> Contactar Staff
-</button>
+
     <!-- Login Section -->
     <section id="login-section" class="login-section">
         <div class="form-container">
             <h2>Iniciar Sesión</h2>
-            <form onsubmit="loginUser(); return false;">
+            <form onsubmit="loginUser(event); return false;">
                 <label for="email">Correo Electrónico:</label>
                 <input type="email" id="email" required>
                 <label for="password">Contraseña:</label>
@@ -173,19 +203,6 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
         </div>
     </section>
 
-   <div class="register-promo-container">
-    <p class="register-promo-text">
-        🚗 ¿Aún no tienes cuenta en <strong>AutoCuidado Club</strong>?<br>
-        ¡Obtén el cuidado que tu vehículo merece con el plan perfecto para ti!
-    </p>
-    <div class="register-promo-container">
-    <a href="suscripciones.html" class="register-promo-button">✨ Regístrate y descubre tu plan ideal</a>
-</div>
-
-   </div>
-
-
-    
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
@@ -198,25 +215,20 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
              <li><a href="tac.html">Términos y Condiciones</a></li>
         </ul>
    
-    <div class="social-container" style="text-align: center; margin-top: 20px;">
-    <p><strong>Síguenos en nuestras redes sociales</strong></p>
-    <div class="social-buttons">
-        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-            <i class="fab fa-instagram fa-3x"></i>
-        </a>
-        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
-            <i class="fab fa-facebook-f fa-3x"></i>
-        </a>
-        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-            <i class="fab fa-twitter fa-3x"></i>
-        </a>
+        <div class="social-container" style="text-align: center; margin-top: 20px;">
+        <p><strong>Síguenos en nuestras redes sociales</strong></p>
+        <div class="social-buttons">
+            <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+                <i class="fab fa-instagram fa-3x"></i>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
+                <i class="fab fa-facebook-f fa-3x"></i>
+            </a>
+            <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+                <i class="fab fa-twitter fa-3x"></i>
+            </a>
+        </div>
     </div>
-</div>
-
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-
-    
-    </footer>
+</footer>
 </body>
 </html>
