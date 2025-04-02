@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,226 +6,206 @@
     <title>Registro en AutoCuidado Club</title>
     <link rel="stylesheet" href="styles.css">
 
-     <!-- ✅ Force Load env.js to Prevent Caching Issues -->
+    <!-- Force Load env.js to Prevent Caching Issues -->
     <script src="env.js?v=1.0"></script>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
- 
 
- <script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM fully loaded!");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("✅ DOM fully loaded!");
 
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Firebase env.js no cargado.");
-        alert("❌ Firebase no está inicializado. Revisa env.js.");
-        return;
-    }
+            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+                console.error("❌ Error: Firebase env.js no cargado.");
+                alert("❌ Firebase no está inicializado. Revisa env.js.");
+                return;
+            }
 
-    const firebaseConfig = {
-        apiKey: window._env_.FIREBASE_API_KEY,
-        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-        projectId: window._env_.FIREBASE_PROJECT_ID,
-        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-        appId: window._env_.FIREBASE_APP_ID,
-        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-    };
+            const firebaseConfig = {
+                apiKey: window._env_.FIREBASE_API_KEY,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                projectId: window._env_.FIREBASE_PROJECT_ID,
+                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                appId: window._env_.FIREBASE_APP_ID,
+                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+            };
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase inicializado correctamente");
-    }
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log("✅ Firebase inicializado correctamente");
+            }
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const messaging = firebase.messaging();
-    let selectedPlanType = null;
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            let selectedPlanType = null;
 
-    // ✅ Register Firebase Service Worker for Push Messaging
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
-            .then((registration) => {
-                console.log('✅ Service Worker registered:', registration);
-            })
-            .catch((err) => {
-                console.error('❌ Service Worker registration failed:', err);
+            const registrationContainer = document.getElementById("registration-container");
+            const planButtons = document.querySelectorAll(".plan-button");
+
+            planButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    selectedPlanType = this.getAttribute("data-plan");
+                    updateVehicleFields(selectedPlanType);
+                    registrationContainer.style.display = "block";
+                    registrationContainer.scrollIntoView({ behavior: "smooth" });
+                    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+                });
             });
-    }
 
-    const registrationContainer = document.getElementById("registration-container");
-    const planButtons = document.querySelectorAll(".plan-button");
+            document.getElementById("registerForm").addEventListener("submit", registerUser);
 
-    planButtons.forEach(button => {
-        button.addEventListener("click", function () {
-            selectedPlanType = this.getAttribute("data-plan");
-            updateVehicleFields(selectedPlanType);
-            registrationContainer.style.display = "block";
-            registrationContainer.scrollIntoView({ behavior: "smooth" });
-            console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-        });
-    });
+            function registerUser(event) {
+                event.preventDefault();
 
-    document.getElementById("registerForm").addEventListener("submit", registerUser);
+                if (!selectedPlanType) {
+                    alert("❌ Debes seleccionar un plan antes de registrarte.");
+                    return;
+                }
 
-    function registerUser(event) {
-        event.preventDefault();
+                const name = document.getElementById("name").value.trim();
+                const email = document.getElementById("email").value.trim();
+                const phone = document.getElementById("phone").value.trim();
+                const password = document.getElementById("password").value.trim();
+                const department = document.getElementById("department").value;
+                const municipality = document.getElementById("municipality").value;
+                const selectedDay = document.getElementById("selectedDay").value;
+                const selectedTime = document.getElementById("selectedTime").value;
 
-        if (!selectedPlanType) {
-            alert("❌ Debes seleccionar un plan antes de registrarte.");
-            return;
-        }
-
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const department = document.getElementById("department").value;
-        const municipality = document.getElementById("municipality").value;
-        const selectedDay = document.getElementById("selectedDay").value;
-        const selectedTime = document.getElementById("selectedTime").value;
-
-        const vehicles = [];
-        document.querySelectorAll(".vehicle-entry").forEach(entry => {
-            vehicles.push({
-                plate: entry.querySelector(".plate").value || "",
-                model: entry.querySelector(".model").value || "",
-                brand: entry.querySelector(".brand").value || "",
-                year: entry.querySelector(".year").value || ""
-            });
-        });
-
-        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-            alert("❌ Todos los campos son obligatorios.");
-            return;
-        }
-
-        auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const userId = userCredential.user.uid;
-                const paymentDate = new Date();
-                const nextPaymentDate = new Date();
-                nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-                return messaging.getToken({
-                    vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-                }).then((token) => {
-                    return db.collection("users").doc(userId).set({
-                        uid: userId,
-                        name,
-                        email,
-                        phone,
-                        planType: selectedPlanType,
-                        department,
-                        municipality,
-                        registrationDate: firebase.firestore.Timestamp.now(),
-                        lastUpgradeDate: firebase.firestore.Timestamp.now(),
-                        schedule: {
-                            day: selectedDay,
-                            time: selectedTime
-                        },
-                        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                        paymentStatus: "Pending",
-                        subscriptionStatus: "active",
-                        monthsPaid: 0,
-                        vehicles,
-                        pushToken: token || null
+                const vehicles = [];
+                document.querySelectorAll(".vehicle-entry").forEach(entry => {
+                    vehicles.push({
+                        plate: entry.querySelector(".plate").value || "",
+                        model: entry.querySelector(".model").value || "",
+                        brand: entry.querySelector(".brand").value || "",
+                        year: entry.querySelector(".year").value || ""
                     });
                 });
-            })
-            .then(() => {
-                const overlay = document.createElement("div");
-                overlay.style.position = "fixed";
-                overlay.style.top = "0";
-                overlay.style.left = "0";
-                overlay.style.width = "100%";
-                overlay.style.height = "100%";
-                overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-                overlay.style.display = "flex";
-                overlay.style.flexDirection = "column";
-                overlay.style.justifyContent = "center";
-                overlay.style.alignItems = "center";
-                overlay.style.zIndex = "9999";
-                overlay.innerHTML = `
-                    <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-                    <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-                    <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-                `;
-                document.body.appendChild(overlay);
 
-                const style = document.createElement("style");
-                style.innerHTML = `
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                `;
-                document.head.appendChild(style);
+                if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+                    alert("❌ Todos los campos son obligatorios.");
+                    return;
+                }
 
-                setTimeout(() => {
-                    window.location.href = "login.html";
-                }, 2500);
-            })
-            .catch((error) => {
-                console.error("❌ Error en el registro:", error.message);
-                alert("❌ Error en el registro: " + error.message);
-            });
-    }
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const userId = userCredential.user.uid;
+                        const paymentDate = new Date();
+                        const nextPaymentDate = new Date();
+                        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-    window.selectScheduleBox = function (cell) {
-        const cells = document.querySelectorAll(".schedule-table tbody td");
-        const timeBlock = cell.innerText.trim();
+                        return db.collection("users").doc(userId).set({
+                            uid: userId,
+                            name,
+                            email,
+                            phone,
+                            planType: selectedPlanType,
+                            department,
+                            municipality,
+                            registrationDate: firebase.firestore.Timestamp.now(),
+                            lastUpgradeDate: firebase.firestore.Timestamp.now(),
+                            schedule: {
+                                day: selectedDay,
+                                time: selectedTime
+                            },
+                            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                            paymentStatus: "Pending",
+                            subscriptionStatus: "active",
+                            monthsPaid: 0,
+                            vehicles
+                        });
+                    })
+                    .then(() => {
+                        const overlay = document.createElement("div");
+                        overlay.style.position = "fixed";
+                        overlay.style.top = "0";
+                        overlay.style.left = "0";
+                        overlay.style.width = "100%";
+                        overlay.style.height = "100%";
+                        overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+                        overlay.style.display = "flex";
+                        overlay.style.flexDirection = "column";
+                        overlay.style.justifyContent = "center";
+                        overlay.style.alignItems = "center";
+                        overlay.style.zIndex = "9999";
+                        overlay.innerHTML = `
+                            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+                        `;
+                        document.body.appendChild(overlay);
 
-        if (timeBlock === "-" || timeBlock === "") {
-            alert("Por favor, seleccione un horario válido.");
-            return;
-        }
+                        const style = document.createElement("style");
+                        style.innerHTML = `
+                            @keyframes spin {
+                                0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); }
+                            }
+                        `;
+                        document.head.appendChild(style);
 
-        cells.forEach((c) => c.classList.remove("selected-box"));
-        cell.classList.add("selected-box");
+                        setTimeout(() => {
+                            window.location.href = "login.html";
+                        }, 2500);
+                    })
+                    .catch((error) => {
+                        console.error("❌ Error en el registro:", error.message);
+                        alert("❌ Error en el registro: " + error.message);
+                    });
+            }
 
-        const dayIndex = cell.cellIndex;
-        const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-        const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+            window.selectScheduleBox = function (cell) {
+                const cells = document.querySelectorAll(".schedule-table tbody td");
+                const timeBlock = cell.innerText.trim();
 
-        document.getElementById("selectedDay").value = day;
-        document.getElementById("selectedTime").value = timeBlock;
+                if (timeBlock === "-" || timeBlock === "") {
+                    alert("Por favor, seleccione un horario válido.");
+                    return;
+                }
 
-        console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
-    };
+                cells.forEach((c) => c.classList.remove("selected-box"));
+                cell.classList.add("selected-box");
 
-    function updateVehicleFields(planType) {
-        const vehicleContainer = document.getElementById("vehicle-container");
-        vehicleContainer.innerHTML = "";
+                const dayIndex = cell.cellIndex;
+                const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+                const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
-        const maxVehicles = planType.includes("plus") ? 3 : 1;
-        for (let i = 0; i < maxVehicles; i++) {
-            const vehicleEntry = document.createElement("div");
-            vehicleEntry.classList.add("vehicle-entry");
-            vehicleEntry.innerHTML = `
-                <h4>Vehículo ${i + 1}</h4>
-                <label>Placa:</label>
-                <input type="text" class="plate" required>
-                <label>Modelo:</label>
-                <input type="text" class="model" required>
-                <label>Marca:</label>
-                <input type="text" class="brand" required>
-                <label>Año:</label>
-                <input type="number" class="year" required>
-            `;
-            vehicleContainer.appendChild(vehicleEntry);
-        }
+                document.getElementById("selectedDay").value = day;
+                document.getElementById("selectedTime").value = timeBlock;
 
-        console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
-    }
-});
-</script>
+                console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
+            };
 
+            function updateVehicleFields(planType) {
+                const vehicleContainer = document.getElementById("vehicle-container");
+                vehicleContainer.innerHTML = "";
 
+                const maxVehicles = planType.includes("plus") ? 3 : 1;
+                for (let i = 0; i < maxVehicles; i++) {
+                    const vehicleEntry = document.createElement("div");
+                    vehicleEntry.classList.add("vehicle-entry");
+                    vehicleEntry.innerHTML = `
+                        <h4>Vehículo ${i + 1}</h4>
+                        <label>Placa:</label>
+                        <input type="text" class="plate" required>
+                        <label>Modelo:</label>
+                        <input type="text" class="model" required>
+                        <label>Marca:</label>
+                        <input type="text" class="brand" required>
+                        <label>Año:</label>
+                        <input type="number" class="year" required>
+                    `;
+                    vehicleContainer.appendChild(vehicleEntry);
+                }
+
+                console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
+            }
+        });
+    </script>
 
     <style>
         body {
@@ -252,142 +230,29 @@ document.addEventListener("DOMContentLoaded", function () {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-
         .floating-contact-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff6600;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s, transform 0.2s;
-}
-
-.floating-contact-button:hover {
-    background-color: #cc5500;
-    transform: scale(1.05);
-}
-
-        /* Improved Table Styling */
-        .subscription-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 18px;
-            text-align: left;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .subscription-table th, .subscription-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
-        .subscription-table th {
-            background: #FF6600;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff6600;
             color: white;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
             font-weight: bold;
-            text-align: center;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, transform 0.2s;
         }
-        .subscription-table td {
-            text-align: center;
+        .floating-contact-button:hover {
+            background-color: #cc5500;
+            transform: scale(1.05);
         }
-        .highlight-cell {
-            font-weight: bold;
-            color: #FF6600;
-        }
-        .warning-text {
-            color: red;
-            font-weight: bold;
-        }
-        .benefits-list {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-  .subscription-disclaimer {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f8f9fa;
-    font-size: 15px;
-    color: #555;
-  }
-    
-/* Highlight Plan Badges */
-.discount-badge {
-    position: absolute;
-    top: -10px;
-    left: 10px;
-    background-color: #FF6600;
-    color: white;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-/* Discounted Price */
-.discounted-price {
-    color: #FF6600;
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-/* Plan Item Styling */
-.plan-item {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    text-align: center;
-    width: 300px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-}
-.highlight {
-    border: 2px solid #FF6600;
-    box-shadow: 0px 4px 10px rgba(255, 102, 0, 0.3);
-}
-
-/* Limited-Time Offer Message */
-.limited-time {
-    color: #FF6600;
-    font-size: 0.95em;
-    font-style: italic;
-    margin-top: 10px;
-}
-
-/* Button Styles */
-button {
-    background-color: #003366;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-button:hover {
-    background-color: #FF6600;
-}
-
-
-</style>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
-
+    </style>
 </head>
 
 <body>
-<!-- Navigation -->
     <nav class="navbar">
         <ul class="nav-links">
             <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
@@ -400,10 +265,11 @@ button:hover {
             <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
         </div>
     </nav>
-<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-    <i class="fas fa-headset"></i> Contactar Staff
-</button>
-<!-- Header -->
+
+    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+        <i class="fas fa-headset"></i> Contactar Staff
+    </button>
+    
     <header>
         <div class="header-container">
             <div class="header-text">
