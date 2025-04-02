@@ -8,20 +8,9 @@
 
     <!-- Force Load env.js to Prevent Caching Issues -->
     <script src="env.js?v=1.0"></script>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js"></script>
 
+    <!-- Firebase SDK as Modules -->
     <script type="module">
-        // Check if env.js is loaded properly
-        if (typeof window._env_ === "undefined") {
-            console.error("❌ env.js not loaded. Firebase configuration is missing.");
-            alert("❌ Firebase configuration is missing.");
-            return;
-        }
-
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
         import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
         import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
@@ -45,6 +34,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('✅ DOM fully loaded!');
 
+            // Register Firebase service worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw/firebase-messaging-sw.js')
                     .then((registration) => {
@@ -53,14 +43,17 @@
                     .catch((error) => {
                         console.error('❌ Error registering service worker:', error);
                     });
+            } else {
+                console.error('❌ Service Worker is not supported in this browser.');
             }
 
+            // Request permission to send notifications
             function requestNotificationPermission() {
                 console.log('Requesting notification permission...');
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted') {
                         console.log('✅ Push notifications granted.');
-                        getTokenForPushNotifications();
+                        getTokenForPushNotifications(); // Get token after permission
                     } else {
                         console.error('❌ Push notifications permission denied.');
                         alert('You need to grant permission for push notifications.');
@@ -70,6 +63,7 @@
                 });
             }
 
+            // Get Firebase Push Notification Token
             function getTokenForPushNotifications() {
                 console.log('Attempting to retrieve push token...');
                 getToken(messaging, {
