@@ -6,30 +6,18 @@
     <title>Push Notification Test</title>
     <link rel="stylesheet" href="styles.css">
 
-    <!-- ✅ Force Load env.js to Prevent Caching Issues -->
-    <script src="env.js?v=1.0"></script>
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-      <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Push Notification Test</title>
-    <link rel="stylesheet" href="styles.css">
-
     <!-- Force Load env.js to Prevent Caching Issues -->
     <script src="env.js?v=1.0"></script>
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js"></script>
 
     <script type="module">
-       import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
-import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+        import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -104,26 +92,7 @@ import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/fireb
                 requestNotificationPermission();
             });
         });
-
     </script>
-
-</head>
-
-<body>
-    <h1>Push Notification Test</h1>
-    <p>Click the button below to enable push notifications:</p>
-
-    <button id="enable-notifications">Enable Notifications</button>
-
-    <div class="message">
-        <p id="status">Status: Push notifications are not enabled.</p>
-    </div>
-
-    <footer>
-        <p>&copy; 2024 AutoCuidado Club</p>
-    </footer>
-</body>
-</html>
 
 </head>
 
