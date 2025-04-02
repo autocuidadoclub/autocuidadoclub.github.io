@@ -11,7 +11,22 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
+    <!-- Push Notification Script -->
+    <script>
+    (function(w, d) {
+        w.PushEngage = w.PushEngage || [];
+        w._peq = w._peq || [];
+        PushEngage.push(['init', {
+            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'  // Replace with your PushEngage appId
+        }]);
 
+        var e = d.createElement('script');
+        e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
+        e.async = true;
+        e.type = 'text/javascript';
+        d.head.appendChild(e);
+    })(window, document);
+    </script>
     
        
 </head>
