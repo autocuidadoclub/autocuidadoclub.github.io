@@ -33,11 +33,58 @@
 
 <body>
 
-    <!-- Apple Banner -->
-    <div id="install-banner">
-        📱 ¿Usas iPhone? Abre Safari, toca <strong>Compartir</strong> y selecciona <strong>'Agregar a pantalla de inicio'</strong>.
-        <button onclick="dismissBanner()">X</button>
-    </div>
+    <!-- Add this button where you want to show the install banner -->
+<button id="install-button" style="display:none;">Install AutoCuidado Club</button>
+
+<script>
+// Store the deferred prompt event to trigger it later
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+    // Prevent the default prompt
+    e.preventDefault();
+
+    // Save the event for later use
+    deferredPrompt = e;
+
+    // Show the install button after a delay (e.g., 3 seconds)
+    setTimeout(() => {
+        document.getElementById('install-button').style.display = 'block';
+    }, 3000);  // 3-second delay to show the install prompt
+
+    // When the install button is clicked, trigger the prompt
+    document.getElementById('install-button').addEventListener('click', () => {
+        deferredPrompt.prompt();  // Show the install dialog
+
+        // Wait for the user's choice
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the PWA installation');
+            } else {
+                console.log('User dismissed the PWA installation');
+            }
+            deferredPrompt = null;  // Reset the deferred prompt
+        });
+    });
+});
+</script>
+
+    <!-- iOS Install Message -->
+<div id="ios-message" style="display:none; margin-top:10px; text-align:center;">
+    📱 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca <strong>Compartir</strong> y selecciona <strong>'Agregar a pantalla de inicio'</strong>.
+</div>
+
+<script>
+window.addEventListener("load", () => {
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const isInStandaloneMode = ("standalone" in window.navigator) && window.navigator.standalone;
+
+    // Show the banner for iOS devices if the app is not in standalone mode
+    if (isIos && !isInStandaloneMode) {
+        document.getElementById("ios-message").style.display = "block";
+    }
+});
+</script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
