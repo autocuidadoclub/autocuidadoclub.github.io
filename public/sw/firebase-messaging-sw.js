@@ -1,3 +1,4 @@
+// Import the necessary Firebase SDKs for the service worker
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js');
 
@@ -21,7 +22,7 @@ messaging.onBackgroundMessage(function(payload) {
     const notificationTitle = 'Background Message Title';
     const notificationOptions = {
         body: 'Background Message body.',
-        icon: '/firebase-logo.png'  // Make sure this icon exists at the root
+        icon: '/firebase-logo.png'  // Ensure this icon exists at the root
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
