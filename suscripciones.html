@@ -158,27 +158,32 @@
                     });
             }
 
-            window.selectScheduleBox = function (cell) {
-                const cells = document.querySelectorAll(".schedule-table tbody td");
-                const timeBlock = cell.innerText.trim();
+           window.selectScheduleBox = function (cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    const timeBlock = cell.innerText.trim();
 
-                if (timeBlock === "-" || timeBlock === "") {
-                    alert("Por favor, seleccione un horario válido.");
-                    return;
-                }
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return;
+    }
 
-                cells.forEach((c) => c.classList.remove("selected-box"));
-                cell.classList.add("selected-box");
+    cells.forEach((c) => c.classList.remove("selected-box"));
+    cell.classList.add("selected-box");
 
-                const dayIndex = cell.cellIndex;
-                const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-                const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    const dayIndex = cell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
 
-                document.getElementById("selectedDay").value = day;
-                document.getElementById("selectedTime").value = timeBlock;
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = timeBlock;
 
-                console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
-            };
+    // Update the confirmation message below the table
+    const confirmationMessage = document.getElementById("confirmation-message");
+    confirmationMessage.innerText = `${day} - ${timeBlock}`;
+
+    console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
+};
+
 
             function updateVehicleFields(planType) {
                 const vehicleContainer = document.getElementById("vehicle-container");
@@ -763,6 +768,10 @@ button:hover {
         <input type="hidden" id="selectedDay" required>
         <input type="hidden" id="selectedTime" required>
 
+        <div id="schedule-confirmation" class="schedule-confirmation">
+    <p>📅 Horario seleccionado: <span id="confirmation-message">Ningún horario seleccionado</span></p>
+</div>
+
         <div class="card">
     <h3>Seleccione su Ubicación</h3>
     <label for="department">Departamento:</label>
@@ -885,7 +894,8 @@ button:hover {
     function removeVehicle(button) {
         button.parentElement.remove();
     }
-        
+
+                
     </script>
 
 <!-- Checkbox for Terms and Conditions -->
