@@ -17,7 +17,7 @@
         w.PushEngage = w.PushEngage || [];
         w._peq = w._peq || [];
         PushEngage.push(['init', {
-            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'  
+            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'  // Replace with your PushEngage appId
         }]);
 
         var e = d.createElement('script');
@@ -32,7 +32,42 @@
 </head>
 
 <body>
+
+    <!-- Apple Banner -->
+    <div id="install-banner">
+        📱 ¿Usas iPhone? Abre Safari, toca <strong>Compartir</strong> y selecciona <strong>'Agregar a pantalla de inicio'</strong>.
+        <button onclick="dismissBanner()">X</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+                document.getElementById("install-banner").style.display = "block";
+            }
+        });
+
+        function dismissBanner() {
+            document.getElementById("install-banner").style.display = "none";
+        }
+
+  <div id="install-banner">
+        📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
+        <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+                document.getElementById("install-banner").style.display = "block";
+            }
+        });
         
+        function dismissBanner() {
+            document.getElementById("install-banner").style.display = "none";
+        }
+    </script>
+
+    
     <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-left">
@@ -63,87 +98,7 @@
       <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
     <i class="fas fa-headset"></i> Contactar Staff
 </button>
-
-    <!-- Add this button where you want to show the install banner -->
-<button id="install-button" style="display:none;">Instala nuestra AutoCuidado Club APP</button>
-
-<script>
-// Store the deferred prompt event to trigger it later
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e) => {
-    // Prevent the default prompt
-    e.preventDefault();
-
-    // Save the event for later use
-    deferredPrompt = e;
-
-    // Show the install button after a delay (e.g., 3 seconds)
-    setTimeout(() => {
-        document.getElementById('install-button').style.display = 'block';
-    }, 3000);  // 3-second delay to show the install prompt
-
-    // When the install button is clicked, trigger the prompt
-    document.getElementById('install-button').addEventListener('click', () => {
-        deferredPrompt.prompt();  // Show the install dialog
-
-        // Wait for the user's choice
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the PWA installation');
-            } else {
-                console.log('User dismissed the PWA installation');
-            }
-            deferredPrompt = null;  // Reset the deferred prompt
-        });
-    });
-});
-</script>
-
-    <!-- iOS Install Message -->
-<div id="ios-message" style="display:none; margin-top:10px; text-align:center;">
-    📱 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca <strong>Compartir</strong> y selecciona <strong>'Agregar a pantalla de inicio'</strong>.
-</div>
-
-<script>
-window.addEventListener("load", () => {
-    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isInStandaloneMode = ("standalone" in window.navigator) && window.navigator.standalone;
-
-    // Show the banner for iOS devices if the app is not in standalone mode
-    if (isIos && !isInStandaloneMode) {
-        document.getElementById("ios-message").style.display = "block";
-    }
-});
-</script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
-                document.getElementById("install-banner").style.display = "block";
-            }
-        });
-
-        function dismissBanner() {
-            document.getElementById("install-banner").style.display = "none";
-        }
-
-  <div id="install-banner">
-        📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
-        <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
-                document.getElementById("install-banner").style.display = "block";
-            }
-        });
-        
-        function dismissBanner() {
-            document.getElementById("install-banner").style.display = "none";
-        }
-    </script>
+    
             <!-- Preventive Maintenance Section -->
    <section class="centered-value-section">
   <h2>¿Te imaginas gastar 40% menos en tu carro?</h2>
