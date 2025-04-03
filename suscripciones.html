@@ -208,11 +208,85 @@
     </script>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-        }
+       body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+        /* Ensures full screen width usage */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ensure all main containers use full width */
+.main-container, .content-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 10px;
+}
+
+/* Flexbox layout for better responsiveness */
+.subscription-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px; /* Space between each plan */
+}
+
+/* Make sure each plan item uses full width on smaller screens */
+.plan-item {
+    width: 100%; /* Full width on mobile */
+    max-width: 300px; /* Limit to a max width for larger screens */
+    box-sizing: border-box;
+}
+
+/* Adjust plan item images to be responsive */
+.plan-image {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Styling for the disclaimer box */
+.disclaimer-box {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 768px) {
+    /* Ensure the navbar and logo scale appropriately on mobile */
+    .navbar {
+        padding: 10px;
+    }
+
+    .plan-item {
+        width: 100%;  /* Full width for each plan on mobile */
+        margin-bottom: 20px;
+    }
+
+    .plan-image {
+        max-width: 100%; /* Ensures images scale properly */
+    }
+
+    .subscription-row {
+        display: block; /* Stack plans vertically on mobile */
+    }
+
+    /* Adjust the disclaimer text for smaller devices */
+    .disclaimer-box p {
+        font-size: 13px;
+    }
+}
+
         .card {
             border: 1px solid #ddd;
             border-radius: 8px;
