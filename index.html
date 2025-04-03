@@ -42,10 +42,7 @@
     window.addEventListener("beforeinstallprompt", (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        setTimeout(() => {
-            document.getElementById("install-button").style.display = "block";
-        }, 3000);
-    });
+         });
 
     document.getElementById("install-button").addEventListener("click", () => {
         if (deferredPrompt) {
