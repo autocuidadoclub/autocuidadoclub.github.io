@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -115,22 +116,23 @@ window.addEventListener("load", () => {
         document.getElementById("ios-message").style.display = "block";
     }
 });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
-            document.getElementById("install-banner").style.display = "block";
-        }
-    });
-
-    function dismissBanner() {
-        document.getElementById("install-banner").style.display = "none";
-    }
 </script>
 
-<div id="install-banner" style="display: none; text-align: center; background: #f4f4f4; padding: 10px;">
-    📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
-    <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
-</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+                document.getElementById("install-banner").style.display = "block";
+            }
+        });
+
+        function dismissBanner() {
+            document.getElementById("install-banner").style.display = "none";
+        }
+
+  <div id="install-banner">
+        📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
+        <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -428,31 +430,19 @@ window.addEventListener("load", () => {
 
    
     <!-- JavaScript for Tabs -->
-   <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const tabs = document.querySelectorAll(".tab-button");
-    const contents = document.querySelectorAll(".tab-content");
+    <script>
+        const tabs = document.querySelectorAll(".tab-button");
+        const contents = document.querySelectorAll(".tab-content");
 
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            tabs.forEach(btn => btn.classList.remove("active"));
-            contents.forEach(content => content.style.display = "none");
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(btn => btn.classList.remove("active"));
+                contents.forEach(content => content.style.display = "none");
 
-            const tabId = tab.getAttribute("data-tab");
-            document.getElementById(tabId).style.display = "block";
-            tab.classList.add("active");
+                tab.classList.add("active");
+                document.getElementById(tab.dataset.tab).style.display = "block";
+            });
         });
-    });
-
-    // Mostrar la pestaña activa por defecto al cargar (por si JS corre antes de que esté visible)
-    const activeTab = document.querySelector(".tab-button.active");
-    if (activeTab) {
-        const tabId = activeTab.getAttribute("data-tab");
-        document.getElementById(tabId).style.display = "block";
-    }
-});
-
-
         let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", (event) => {
