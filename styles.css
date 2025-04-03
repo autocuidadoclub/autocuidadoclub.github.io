@@ -409,7 +409,7 @@ html {
 
 /* Selected Cells */
 .schedule-table td.selected {
-    background-color: #FFD700;
+    background-color: #FF6600;
     color: #000;
     font-weight: bold;
 }
