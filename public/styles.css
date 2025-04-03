@@ -1803,15 +1803,3 @@ header {
   gap: 20px; /* Add space between the images */
   margin-top: 20px;
 }
-
-.graphic-container {
-  width: 48%; /* Ensure the images take up nearly half of the container */
-  text-align: center;
-}
-
-.plan-graphic {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
