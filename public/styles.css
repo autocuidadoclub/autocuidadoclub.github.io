@@ -1804,3 +1804,11 @@ header {
   gap: 20px; /* Add space between the images */
   margin-top: 20px;
 }
+
+.schedule-confirmation {
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--orange);
+    text-align: center;
+}
