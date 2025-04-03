@@ -353,6 +353,66 @@ header p {
     }
 }
 
+/* Header Style */
+header {
+    width: 100%;
+    max-width: 1200px; /* Matching width to other content */
+    margin: 0 auto; /* Center-align the header */
+    padding: 20px 0;
+    background-color: #003366;
+    text-align: center;
+}
+
+header h1 {
+    color: white;
+    font-size: 30px;
+    margin: 0;
+    word-wrap: break-word; /* Prevent text overflow */
+    line-height: 1.2;
+}
+
+header p {
+    color: white;
+    font-size: 18px;
+    margin-top: 10px;
+    word-wrap: break-word; /* Prevent text overflow */
+}
+
+/* Adjusting table container for consistency */
+.table-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    overflow-x: auto; /* Ensures mobile responsiveness */
+}
+
+.subscription-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.subscription-table th, .subscription-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Responsive adjustment */
+@media only screen and (max-width: 768px) {
+    header h1 {
+        font-size: 24px;
+    }
+
+    header p {
+        font-size: 16px;
+    }
+
+    .subscription-table th, .subscription-table td {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
 
     </style>
 </head>
