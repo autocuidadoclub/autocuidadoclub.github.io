@@ -251,16 +251,42 @@
         }
 
         /* Ensure full width for both the header and table */
-header, .table-container {
+/* Ensuring the header width matches the table layout */
+header {
     width: 100%;
-    max-width: 1200px; /* Optionally, set a max width to avoid stretching too far */
-    margin: 0 auto; /* Center align the content */
+    max-width: 1200px; /* Optional max width */
+    margin: 0 auto; /* Center align header */
+    padding: 20px 0;
+    background-color: #003366;
+}
+
+header h1, header p {
+    text-align: center;
+    color: white;
+    margin: 0;
+    font-size: 30px; /* Adjust as needed */
+}
+
+header img {
+    width: 100px; /* Adjust logo size */
+    margin-top: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Adjusted Table container */
+.table-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    overflow-x: auto; /* For mobile responsiveness */
 }
 
 .subscription-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Ensures columns align even if the content is too long */
+    table-layout: fixed;
 }
 
 .subscription-table th, .subscription-table td {
@@ -275,28 +301,22 @@ h2 {
     font-size: 24px;
 }
 
-/* Adjust for mobile screens */
+/* Responsive for smaller screens */
 @media only screen and (max-width: 768px) {
+    header h1, header p {
+        font-size: 24px;
+    }
+
     .subscription-table th, .subscription-table td {
         font-size: 14px;
-        padding: 10px;
+        padding: 8px;
     }
 
-    /* Center align header text and make the table responsive */
-    header h1, header p {
-        text-align: center;
-    }
-
-    /* Mobile scrolling for the table */
     .table-container {
         overflow-x: auto;
-        margin-bottom: 20px;
-    }
-
-    .table-container table {
-        width: 100%;
     }
 }
+
 
     </style>
 </head>
