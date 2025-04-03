@@ -208,11 +208,85 @@
     </script>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-        }
+       body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+        /* Ensures full screen width usage */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ensure all main containers use full width */
+.main-container, .content-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 10px;
+}
+
+/* Flexbox layout for better responsiveness */
+.subscription-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px; /* Space between each plan */
+}
+
+/* Make sure each plan item uses full width on smaller screens */
+.plan-item {
+    width: 100%; /* Full width on mobile */
+    max-width: 300px; /* Limit to a max width for larger screens */
+    box-sizing: border-box;
+}
+
+/* Adjust plan item images to be responsive */
+.plan-image {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Styling for the disclaimer box */
+.disclaimer-box {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 768px) {
+    /* Ensure the navbar and logo scale appropriately on mobile */
+    .navbar {
+        padding: 10px;
+    }
+
+    .plan-item {
+        width: 100%;  /* Full width for each plan on mobile */
+        margin-bottom: 20px;
+    }
+
+    .plan-image {
+        max-width: 100%; /* Ensures images scale properly */
+    }
+
+    .subscription-row {
+        display: block; /* Stack plans vertically on mobile */
+    }
+
+    /* Adjust the disclaimer text for smaller devices */
+    .disclaimer-box p {
+        font-size: 13px;
+    }
+}
+
         .card {
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -292,12 +366,31 @@
         </div>
     </header>
 
-<!-- Add this near the subscription plans, ideally before or after the plan options -->
-<div class="subscription-disclaimer">
+<!-- Disclaimer Box -->
+<style>
+    /* Style the disclaimer box */
+.disclaimer-box {
+    background-color: #f8f8f8; /* Light gray background */
+    border: 1px solid #ddd;   /* Gray border */
+    padding: 20px;             /* Add padding around the text */
+    border-radius: 8px;       /* Rounded corners */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    font-size: 14px;           /* Set a smaller font size */
+    margin-top: 20px;          /* Add some space from the top */
+}
+
+/* Style the "Nota" text to make it stand out */
+.disclaimer-box strong {
+    color: #003366; /* Dark blue color for emphasis */
+}
+</style>
+    
+    <div class="disclaimer-box">
   <p>
     <strong>Nota:</strong> Los servicios de AutoCuidado Club están diseñados exclusivamente para motores de gasolina. Esto está alineado con nuestro compromiso de ofrecer movilidad con una huella de carbono más baja. Según la Agencia Europea de Medio Ambiente (EEA), los motores diésel son responsables de hasta 20 veces más contaminación que los de gasolina.
   </p>
 </div>
+
 
 <style>
    /* Flexbox layout for the image container */
@@ -334,12 +427,14 @@
     <div class="graphic-container">
       <h3>Precio por Vehículo</h3>
       <img src="pricepercar.png" alt="Precio por Vehículo" class="plan-graphic">
+        <p>Los planes plus son ejecutados para paquetes de 3 vehículos, esta comparación se hace para precios por vehículos</p>
     </div>
 
     <!-- Right Graphic: Ahorro Anual por Vehículo -->
     <div class="graphic-container">
       <h3>Ahorro Anual por Vehículo</h3>
       <img src="savesgraphics.png" alt="Ahorro Anual por Vehículo" class="plan-graphic">
+        <p>La comparación ejecutada se desarrolla contra el precio regular de los planes de suscripción de 12 meses divido por cada vehíulo  y el precio regular del plan básico de 3 meses</p>
     </div>
   </div>
 </section>
@@ -514,7 +609,7 @@ button:hover {
 
             </div>
 
-        <h2 style="margin-top: 30px; margin-bottom: 30px;">Planes de Suscripciones Básicas (cobertura: 1 vehículo)</h2>
+        <h2 style="margin-top: 30px; margin-bottom: 30px;">Planes de Suscripciones Plus (cobertura: 3 vehículo)</h2>
         <div class="subscription-row">
             <div class="plan-item">
                 <div class="plan-option">
