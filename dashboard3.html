@@ -404,6 +404,10 @@
     <strong>Guardar Nuevo Horario</strong>
 </button>
     </div>
+    
+<div id="schedule-confirmation" class="schedule-confirmation">
+    <p>📅 Horario seleccionado: <span id="confirmation-message">Ningún horario seleccionado</span></p>
+</div>
 
    
     <!-- Loyalty Rewards Section -->
@@ -825,18 +829,47 @@ function formatTimestamp(timestamp) {
 function selectScheduleBox(cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
     const timeBlock = cell.innerText.trim();
+
     if (timeBlock === "-" || timeBlock === "") {
         alert("❌ Selecciona un horario válido.");
         return;
     }
+
     cells.forEach((c) => c.classList.remove("selected-box"));
     cell.classList.add("selected-box");
+
     const dayIndex = cell.cellIndex;
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden inputs for form submission
     document.getElementById("selectedDay").value = day;
     document.getElementById("selectedTime").value = timeBlock;
+
+    // Update the confirmation message below the table
+    const confirmationMessage = document.getElementById("confirmation-message");
+    confirmationMessage.innerText = `${day} - ${timeBlock}`;
+
+    console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
 }
+const user = firebase.auth().currentUser;
+if (!user) {
+    alert("Debes estar autenticado para actualizar el horario.");
+    return;
+}
+
+const userRef = db.collection("users").doc(user.uid);
+userRef.update({
+    schedule: {
+        day: day,
+        time: timeBlock
+    }
+}).then(() => {
+    alert(`✅ Horario actualizado a: ${day} - ${timeBlock}`);
+}).catch((error) => {
+    console.error("❌ Error al actualizar el horario:", error);
+});
+
 
 
     
