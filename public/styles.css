@@ -421,9 +421,10 @@ html {
     font-weight: bold;
 }
 
+/* Selected Cells */
 .schedule-table td.selected-box {
-    background-color: var(--orange);
-    color: white;
+    background-color: #FF6600; /* Orange */
+    color: white; /* Ensure the text is white for readability */
     font-weight: bold;
     border-radius: 5px;
 }
