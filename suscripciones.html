@@ -249,6 +249,55 @@
             background-color: #cc5500;
             transform: scale(1.05);
         }
+
+        /* Ensure full width for both the header and table */
+header, .table-container {
+    width: 100%;
+    max-width: 1200px; /* Optionally, set a max width to avoid stretching too far */
+    margin: 0 auto; /* Center align the content */
+}
+
+.subscription-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensures columns align even if the content is too long */
+}
+
+.subscription-table th, .subscription-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+h2 {
+    text-align: center;
+    color: #ff6600;
+    font-size: 24px;
+}
+
+/* Adjust for mobile screens */
+@media only screen and (max-width: 768px) {
+    .subscription-table th, .subscription-table td {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* Center align header text and make the table responsive */
+    header h1, header p {
+        text-align: center;
+    }
+
+    /* Mobile scrolling for the table */
+    .table-container {
+        overflow-x: auto;
+        margin-bottom: 20px;
+    }
+
+    .table-container table {
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 
