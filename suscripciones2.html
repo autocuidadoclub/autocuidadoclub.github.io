@@ -182,7 +182,23 @@
     const confirmationMessage = document.getElementById("confirmation-message");
     confirmationMessage.innerText = `${day} - ${timeBlock}`;
 
+    const registerButton = document.getElementById("register-button");
+if (registerButton) {
+    registerButton.disabled = true;
+    registerButton.innerText = "Registrando...";
+}
+
+
     console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
+
+               handleRegistration(newUserId); // Pass the new user's UID
+
+               if (typeof _pe !== "undefined") {
+    _pe.tagPushSubscriber('not_paid_yet');
+    console.log("📬 PushEngage tag applied: not_paid_yet");
+}
+
+
 };
 
 
