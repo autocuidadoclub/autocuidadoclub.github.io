@@ -61,7 +61,7 @@
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
-            async function registerUser(event) {
+           function registerUser(event) {
     event.preventDefault();
 
     if (!selectedPlanType) {
@@ -77,7 +77,7 @@
     const municipality = document.getElementById("municipality").value;
     const selectedDay = document.getElementById("selectedDay").value;
     const selectedTime = document.getElementById("selectedTime").value;
-    const referralCode = document.getElementById("referralCode").value.trim();
+    const referralCode = document.getElementById("referralCode")?.value.trim(); // ✅ Optional safe
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
@@ -94,103 +94,95 @@
         return;
     }
 
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const userId = userCredential.user.uid;
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            const paymentDate = new Date();
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-        const paymentDate = new Date();
-        const nextPaymentDate = new Date();
-        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+            // ✅ Prepare user data
+            const userData = {
+                uid: userId,
+                name,
+                email,
+                phone,
+                planType: selectedPlanType,
+                department,
+                municipality,
+                registrationDate: firebase.firestore.Timestamp.now(),
+                lastUpgradeDate: firebase.firestore.Timestamp.now(),
+                schedule: {
+                    day: selectedDay,
+                    time: selectedTime
+                },
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                paymentStatus: "Pending",
+                subscriptionStatus: "active",
+                monthsPaid: 0,
+                vehicles,
+                freeRescheduleClaimed: false,
+                referredBy: referralCode || null
+            };
 
-        let pushToken = null;
-        try {
-            pushToken = await messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" });
-            console.log("✅ Push token obtenido:", pushToken);
-        } catch (tokenError) {
-            console.warn("⚠️ No se pudo obtener el token de push:", tokenError);
-        }
+            // ✅ Save user profile
+            return db.collection("users").doc(userId).set(userData).then(() => {
+                // ✅ If referral code is used, update referrer data
+                if (referralCode && referralCode !== userId) {
+                    const referrerRef = db.collection("referrals").doc(referralCode);
 
-        await db.collection("users").doc(userId).set({
-            uid: userId,
-            name,
-            email,
-            phone,
-            planType: selectedPlanType,
-            department,
-            municipality,
-            registrationDate: firebase.firestore.Timestamp.now(),
-            lastUpgradeDate: firebase.firestore.Timestamp.now(),
-            schedule: {
-                day: selectedDay,
-                time: selectedTime
-            },
-            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-            paymentStatus: "Pending",
-            subscriptionStatus: "active",
-            monthsPaid: 0,
-            vehicles,
-            freeRescheduleClaimed: false,
-            pushToken: pushToken || null,
-            referredBy: referralCode || null
+                    return referrerRef.set({
+                        completed: firebase.firestore.FieldValue.increment(1),
+                        bonuses: firebase.firestore.FieldValue.increment(1)
+                    }, { merge: true }).then(() => {
+                        console.log("🎉 Referral bonus applied for:", referralCode);
+                    }).catch(err => {
+                        console.error("❌ Error updating referral data:", err);
+                    });
+                }
+            });
+        })
+        .then(() => {
+            // ✅ Show success overlay
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = "9999";
+            overlay.innerHTML = `
+                <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+            `;
+            document.body.appendChild(overlay);
+
+            const style = document.createElement("style");
+            style.innerHTML = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2500);
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
         });
-
-        if (referralCode && referralCode !== userId) {
-            await db.collection("referrals").doc(referralCode).set({
-                completed: firebase.firestore.FieldValue.increment(1),
-                bonuses: firebase.firestore.FieldValue.increment(1)
-            }, { merge: true });
-            console.log("🎉 Referral data updated for referrer:", referralCode);
-
-            if (typeof _pe !== "undefined") {
-                _pe.tagPushSubscriber('referral_completed');
-                console.log("📬 PushEngage tag applied: referral_completed");
-            }
-        }
-
-        if (typeof _pe !== "undefined") {
-            _pe.tagPushSubscriber('not_paid_yet');
-            console.log("📬 PushEngage tag applied: not_paid_yet");
-        }
-
-        // ✅ Success overlay
-        const overlay = document.createElement("div");
-        overlay.style.position = "fixed";
-        overlay.style.top = "0";
-        overlay.style.left = "0";
-        overlay.style.width = "100%";
-        overlay.style.height = "100%";
-        overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-        overlay.style.display = "flex";
-        overlay.style.flexDirection = "column";
-        overlay.style.justifyContent = "center";
-        overlay.style.alignItems = "center";
-        overlay.style.zIndex = "9999";
-        overlay.innerHTML = `
-            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-        `;
-        document.body.appendChild(overlay);
-
-        const style = document.createElement("style");
-        style.innerHTML = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 2500);
-
-    } catch (error) {
-        console.error("❌ Error en el registro:", error.message);
-        alert("❌ Error en el registro: " + error.message);
-    }
 }
+
 
             
            window.selectScheduleBox = function (cell) {
