@@ -972,6 +972,40 @@ function loadPaymentHistory() {
   });
 }
 
+     function showFreeRescheduleOffer(userData) {
+  const now = new Date();
+  const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
+  const monthsUnpaid = lastPaymentDate
+    ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
+    : 3; // default to 3 if missing
+
+  if (
+    userData.monthsPaid === 0 &&
+    monthsUnpaid >= 2 &&
+    userData.freeRescheduleClaimed === false
+  ) {
+    const offerBox = document.createElement("div");
+    offerBox.innerHTML = `
+      <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
+        <h3>🎁 ¡Te regalamos una cita!</h3>
+        <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
+        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">Agendar ahora</button>
+      </div>
+    `;
+    document.body.prepend(offerBox);
+
+    document.getElementById("claimFreeReschedule").addEventListener("click", () => {
+      // Redirect to booking page or open modal
+      window.location.href = "agenda.html?gratis=true";
+
+      // Optionally mark it as claimed (or after they book)
+      db.collection("users").doc(userData.uid).update({
+        freeRescheduleClaimed: true
+      });
+    });
+  }
+}
+
     
 </script>
 
