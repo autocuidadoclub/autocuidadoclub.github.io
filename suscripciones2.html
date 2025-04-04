@@ -123,7 +123,7 @@
                 monthsPaid: 0,
                 vehicles,
                 freeRescheduleClaimed: false,
-                referredBy: referralCode || null
+                referredBy: referrerrEmail || null
             };
 
             // ✅ Save user profile
@@ -1209,8 +1209,7 @@ document.addEventListener("DOMContentLoaded", function () {
       monthsPaid: 0,
       vehicles,
       freeRescheduleClaimed: false,
-      pushToken: token || null,
-      referredBy: referralCode || null
+      referredBy: referredByEmail
     });
        if (referralCode && referralCode !== userId) {
         await db.collection("referrals").doc(referralCode).set({
