@@ -336,7 +336,7 @@ html {
 
 .propuesta-item {
     padding: 20px;
-    color: white;
+    color: white !important;
     font-size: 1.1em;
     font-weight: bold;
     border-radius: 5px;
