@@ -975,7 +975,8 @@ function loadPaymentHistory() {
   });
 }
 
-     function showFreeRescheduleOffer(userData) {
+    function showFreeRescheduleOffer(userData) {
+        console.log("Verificando oferta gratuita de reprogramación...");
   const now = new Date();
   const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
   const monthsUnpaid = lastPaymentDate
@@ -985,11 +986,9 @@ function loadPaymentHistory() {
   if (
     userData.monthsPaid === 0 &&
     monthsUnpaid >= 2 &&
-    userData.freeRescheduleClaimed === false {
-    console.log("✅ Condiciones cumplidas, mostrando oferta...");
-    // (resto de la función)
-  }
+    userData.freeRescheduleClaimed === false
   ) {
+    console.log("✅ Condiciones cumplidas, mostrando oferta...");
     const offerBox = document.createElement("div");
     offerBox.innerHTML = `
       <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
