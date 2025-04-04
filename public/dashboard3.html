@@ -881,13 +881,6 @@ const registrationDate = userData.registrationDate?.toDate?.() || null;
   `;
   document.body.appendChild(promoDiv);
 
-  // ✅ Function to close the popup
-  function closePromoPopup() {
-    const popup = document.getElementById("promo-popup");
-    if (popup) {
-      popup.remove();
-    }
-  }
 
   // ✅ Tag in PushEngage
   if (typeof _pe !== "undefined") {
@@ -903,6 +896,13 @@ updateLoyaltyCard(userData);
 checkFirstTimePaymentOffer(userData); // ✅ add this here
 }
 
+  // ✅ Function to close the popup
+  function closePromoPopup() {
+    const popup = document.getElementById("promo-popup");
+    if (popup) {
+      popup.remove();
+    }
+  }
 
 // Payment Status Function
 function handlePaymentStatus(userData) {
