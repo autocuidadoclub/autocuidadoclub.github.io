@@ -430,84 +430,88 @@
 </button>
     </div>
 
-    <div class="card" style="margin-top: 20px;">
-  <h3>🎉 Recomienda a un amigo y gana recompensas</h3>
-  <p>Comparte tu código exclusivo y gana un mes a $5 cuando tu referido active su plan.</p>
-  
-  <div style="margin-bottom: 10px;">
-    <strong>Tu código de referido:</strong>
-    <input type="text" id="referralCode" readonly style="width: 60%; padding: 5px;" />
-    <button onclick="copyReferralCode()" class="orange-button">Copiar Código</button>
-  </div>
+    <!-- 📢 Referral Program - Dashboard Block -->
+<div class="card" style="margin-top: 20px;">
+  <h3>🎉 Programa de Recomendaciones</h3>
+  <p>Invita a tus amigos y gana beneficios exclusivos.</p>
+  <p><strong>Tu código de referido:</strong></p>
+  <input type="text" id="referralCodeDisplay" readonly style="width: 100%; padding: 8px; margin-bottom: 10px;">
+  <button onclick="copyReferralCode()" class="orange-button">Copiar Código</button>
 
-  <div style="margin-bottom: 10px;">
-    <p><strong>Referidos exitosos:</strong> <span id="referralsCompleted">0</span></p>
-    <p><strong>Bonos disponibles:</strong> <span id="referralBonuses">0</span></p>
-  </div>
+  <p style="margin-top: 15px;"><strong>Referidos completados:</strong> <span id="referralsCompleted">0</span></p>
+  <p><strong>Bonos disponibles:</strong> <span id="bonusesAvailable">0</span></p>
 
-  <button onclick="claimReferralBonus()" class="orange-button">Canjear Bono</button>
+  <button onclick="claimReferralBonus()" class="orange-button" style="margin-top: 10px;">Reclamar Bono 🎁</button>
 </div>
 
-<!-- Floating popup -->
-<div id="referralPopup" style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%);
- background:#fffbe6; padding:20px; border-radius:10px; border:2px solid #ff9800; z-index:9999; box-shadow:0px 4px 12px rgba(0,0,0,0.15); text-align:center;">
+<!-- 💡 Pop-up Recomienda -->
+<div id="referralPopup" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%);
+background:#fff8e1; border:2px solid #ffc107; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.2);
+z-index:9999; text-align:center; max-width:90%;">
   <h3>🎁 ¡Recomienda a un amigo!</h3>
-  <p>Gana un mes extra por cada amigo que se suscriba. Comparte tu código ahora.</p>
-  <button onclick="closeReferralPopup()" style="background:#ff6600; color:white; padding:8px 16px; border:none; border-radius:5px;">Cerrar</button>
+  <p>Comparte tu código y gana bonos cada vez que alguien active su plan.</p>
+  <button onclick="closeReferralPopup()" style="margin-top:10px; background:#ff6600; color:#fff; padding:10px 15px; border:none; border-radius:5px;">Cerrar</button>
 </div>
 
 <script>
-function loadReferralDashboard(userData) {
-  const userCode = userData.uid;
-  document.getElementById("referralCode").value = userCode;
+// 👥 Show Referral Data
+function loadReferralData(userData) {
+  const userId = userData.uid;
+  document.getElementById("referralCodeDisplay").value = userId;
 
-  const completed = userData.referralsCompleted || 0;
-  const bonuses = userData.referralBonuses || 0;
-
-  document.getElementById("referralsCompleted").innerText = completed;
-  document.getElementById("referralBonuses").innerText = bonuses;
-
-  // Optional popup logic for attention
-  if (completed < 1) {
-    setTimeout(() => {
-      document.getElementById("referralPopup").style.display = "block";
-    }, 1500);
-  }
+  db.collection("referrals").doc(userId).get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById("referralsCompleted").innerText = data.completed || 0;
+      document.getElementById("bonusesAvailable").innerText = data.bonuses || 0;
+    } else {
+      document.getElementById("referralsCompleted").innerText = "0";
+      document.getElementById("bonusesAvailable").innerText = "0";
+    }
+  });
 }
 
+// 📋 Copy Referral Code
 function copyReferralCode() {
-  const copyText = document.getElementById("referralCode");
+  const copyText = document.getElementById("referralCodeDisplay");
   copyText.select();
   document.execCommand("copy");
   alert("✅ Código copiado: " + copyText.value);
 }
 
-function closeReferralPopup() {
-  document.getElementById("referralPopup").style.display = "none";
-}
-
+// 🎉 Claim Referral Bonus
 function claimReferralBonus() {
   const user = firebase.auth().currentUser;
-  if (!user) return alert("Debes iniciar sesión para canjear tu bono.");
+  if (!user) return alert("Debes iniciar sesión.");
 
-  const userRef = db.collection("users").doc(user.uid);
-  userRef.get().then(doc => {
-    const data = doc.data();
-    if (data.referralBonuses > 0) {
-      userRef.update({
-        referralBonuses: firebase.firestore.FieldValue.increment(-1),
-        monthsPaid: firebase.firestore.FieldValue.increment(1),
-        lastUpgradeDate: firebase.firestore.Timestamp.now()
+  const referralRef = db.collection("referrals").doc(user.uid);
+  referralRef.get().then(doc => {
+    if (doc.exists && doc.data().bonuses > 0) {
+      referralRef.update({
+        bonuses: firebase.firestore.FieldValue.increment(-1)
       }).then(() => {
-        alert("🎉 Bono canjeado exitosamente. Disfruta tu mes adicional!");
-        window.location.reload();
+        alert("🎉 ¡Bono reclamado con éxito!");
+        loadReferralData({ uid: user.uid });
       });
     } else {
-      alert("No tienes bonos disponibles actualmente.");
+      alert("❌ No tienes bonos disponibles.");
     }
   });
 }
+
+// 🚀 Show Pop-up on load
+window.addEventListener("load", function () {
+  setTimeout(() => {
+    document.getElementById("referralPopup").style.display = "block";
+  }, 2000);
+});
+
+// 🛑 Close Pop-up
+function closeReferralPopup() {
+  document.getElementById("referralPopup").style.display = "none";
+}
 </script>
+
 
    
     <!-- Loyalty Rewards Section -->
