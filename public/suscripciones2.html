@@ -908,6 +908,54 @@ button:hover {
     </div>
             <p></p>
             <p></p>
+
+
+<!-- 📝 Referral Input Field in Registration Form -->
+<div class="form-group">
+  <label for="referralCode">¿Tienes un código de referido?</label>
+  <input type="text" id="referralCode" name="referralCode" placeholder="Código de referido (opcional)">
+</div>
+
+<script>
+// 🎉 Referral Tracking on Registration
+function handleRegistration(newUserId) {
+  const referralCode = document.getElementById("referralCode").value.trim();
+
+  if (referralCode && referralCode !== newUserId) {
+    const referrerRef = db.collection("referrals").doc(referralCode);
+
+    // Increment completed referrals and bonuses
+    referrerRef.set({
+      completed: firebase.firestore.FieldValue.increment(1),
+      bonuses: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true }).then(() => {
+      console.log("🎉 Referral data updated for referrer:", referralCode);
+
+      // ✅ Optionally, send push notification
+      if (typeof _pe !== "undefined") {
+        _pe.tagPushSubscriber('referral_completed');
+      }
+
+      // ✅ Optional: send confirmation email to referrer
+      /*
+      emailjs.send('service_id', 'template_id', {
+        to_email: referrerEmail, // You need to fetch this from Firestore
+        message: '¡Has ganado un nuevo bono por referir!'
+      }).then(response => {
+        console.log("Email sent", response);
+      }).catch(err => console.error("Email error", err));
+      */
+
+    }).catch(err => console.error("Error updating referrer:", err));
+
+    // Save referral in new user profile
+    db.collection("users").doc(newUserId).update({
+      referredBy: referralCode
+    });
+  }
+}
+</script>
+
             
         <button type="submit">Registrarse</button>
     
