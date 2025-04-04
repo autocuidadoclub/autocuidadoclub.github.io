@@ -220,6 +220,8 @@ if (registerButton) {
                         <input type="text" class="brand" required>
                         <label>Año:</label>
                         <input type="number" class="year" required>
+                        <input type="hidden" id="referredBy" name="referredBy">
+
                     `;
                     vehicleContainer.appendChild(vehicleEntry);
                 }
@@ -914,6 +916,8 @@ button:hover {
 
                 
     </script>
+
+<input type="hidden" id="referredBy" name="referredBy">
 
 <!-- Checkbox for Terms and Conditions -->
     <div style="margin-top: 35px;">
