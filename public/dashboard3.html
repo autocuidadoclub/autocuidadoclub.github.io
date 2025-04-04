@@ -731,7 +731,10 @@ if (currentPlanType === "basic3m") {
         option.selected = true;
         newPlanSelect.appendChild(option);
     }
-}
+
+    showFreeRescheduleOffer(userData);
+
+    }
 
 
 // Payment Status Function
@@ -982,7 +985,10 @@ function loadPaymentHistory() {
   if (
     userData.monthsPaid === 0 &&
     monthsUnpaid >= 2 &&
-    userData.freeRescheduleClaimed === false
+    userData.freeRescheduleClaimed === false {
+    console.log("✅ Condiciones cumplidas, mostrando oferta...");
+    // (resto de la función)
+  }
   ) {
     const offerBox = document.createElement("div");
     offerBox.innerHTML = `
