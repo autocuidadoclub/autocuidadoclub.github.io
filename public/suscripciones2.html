@@ -121,6 +121,8 @@
                             monthsPaid: 0,
                             vehicles,
                             freeRescheduleClaimed: false,
+                            pushToken: token || null,
+                            referredBy: referralCode || null,
                         });
                     })
                     .then(() => {
@@ -1186,7 +1188,7 @@ document.addEventListener("DOMContentLoaded", function () {
       monthsPaid: 0,
       vehicles,
       freeRescheduleClaimed: false,
-      pushToken: pushToken || null,
+      pushToken: token || null,
       referredBy: referralCode || null
     });
        if (referralCode && referralCode !== userId) {
