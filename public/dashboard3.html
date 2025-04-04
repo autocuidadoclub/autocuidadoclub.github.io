@@ -771,7 +771,7 @@ const registrationDate = userData.registrationDate?.toDate?.() || null;
   const shouldShowOffer =
     userData.monthsPaid === 0 &&
     userData.paymentStatus === "Pending" &&
-    daysSinceRegister >= 7;
+    daysSinceRegister >= 0;
 
   console.log("📌 Checking first-time offer:");
   console.log("monthsPaid:", userData.monthsPaid);
