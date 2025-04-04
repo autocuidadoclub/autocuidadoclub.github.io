@@ -1019,7 +1019,16 @@ function loadPaymentHistory() {
       <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
         <h3>🎁 ¡Te regalamos una cita!</h3>
         <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
-        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">Agendar ahora</button>
+        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" #claimFreeReschedule {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+>Agendar ahora</button>
       </div>
     `;
     document.body.prepend(offerBox);
