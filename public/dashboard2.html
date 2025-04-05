@@ -309,8 +309,30 @@ function updateUserInfo(userData) {
     document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
     document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
 }
+// Hide countdown if payment is completed
+const countdownContainer = document.querySelector(".countdown-container");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    if (countdownContainer) countdownContainer.style.display = "none";
+} else {
+    if (countdownContainer) countdownContainer.style.display = "block";
+}
 
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    const subscriptionCard = document.getElementById("subscription-upgrade-card");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    subscriptionCard.classList.remove("subscription-blurred");
+} else {
+    subscriptionCard.classList.add("subscription-blurred");
+}
+const lockedPopup = document.getElementById("subscription-locked-popup");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    subscriptionCard.classList.remove("subscription-blurred");
+    if (lockedPopup) lockedPopup.style.display = "none";
+} else {
+    subscriptionCard.classList.add("subscription-blurred");
+    if (lockedPopup) lockedPopup.style.display = "block";
+}
+
+        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
    // After updating schedule info
 document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
 
@@ -1028,16 +1050,19 @@ function redirectToPayment() {
     animation: pop-in 0.5s ease-out;
 }
 
-@keyframes pop-in {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -60%);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
+/* Fix blur only for the title of subscription section */
+.subscription-blurred #subscription-upgrade-card > h3 {
+  filter: none !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
 }
+
+.subscription-blurred #subscription-upgrade-card > h3:hover {
+  color: #ff6600;
+  cursor: pointer;
+}
+
 
     </style>
 </head>
@@ -1113,6 +1138,7 @@ function redirectToPayment() {
                     Completa tu pago ahora 🔗
                 </a>
             </div>
+            
             <!-- Countdown Timer Section -->
 <div class="countdown-container">
   <h2>Hurry up! Limited-time offer</h2>
@@ -1124,29 +1150,44 @@ function redirectToPayment() {
 
         </div>
 
-        <!-- Plan Upgrade Card -->
-        <div class="card">
-            <h3>¿Te gustaría Mejorar de Suscripción?</h3>
-            <p><strong>Tipo de Plan Actual:</strong></p>
-            <p></p><span id="planType">Cargando...</span></p>
-            <p><strong>Descripción:</strong></p>
-            <p></p><span id="planMessage">Cargando...</span></p>
+       
+        <div class="card" id="subscription-upgrade-card">
+    <h3>¿Te gustaría Mejorar de Suscripción?</h3>
 
-            <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+    <!-- Locked popup -->
+    <div id="subscription-locked-popup" style="
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 2;
+    ">
+      <strong>🔒 Desbloquea esta opción al pagar tu plan actual de suscripción</strong>
+    </div>
 
-            <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-                <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-                    Añade más vehículos: Mejora a Plan Plus 🚗✨
-                </button>
-            </div>
+    <!-- ✅ Wrap the content that we want to blur -->
+    <div class="subscription-blur-target">
+        <p><strong>Tipo de Plan Actual:</strong></p>
+        <p><span id="planType">Cargando...</span></p>
+        <p><strong>Descripción:</strong></p>
+        <p><span id="planMessage">Cargando...</span></p>
 
-            <label for="new-plan">Selecciona un nuevo plan:</label>
-            <select id="new-plan"></select>
-            <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
+        <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+
+        <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+            <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+                Añade más vehículos: Mejora a Plan Plus 🚗✨
+            </button>
         </div>
-    </div> <!-- End Grid -->
-      
-</section>
+
+        <label for="new-plan">Selecciona un nuevo plan:</label>
+        <select id="new-plan"></select>
+        <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
+    </div>
+</div>
 
            
     <!-- Reschedule Section -->
@@ -1261,6 +1302,26 @@ function redirectToPayment() {
 .referral-submission-section button:hover {
   background-color: #ff6600;
 }
+
+    .subscription-blurred .subscription-blur-target {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.subscription-blurred h3 {
+  filter: none;
+  pointer-events: auto;
+}
+
+.subscription-blurred #subscription-locked-popup {
+  display: block;
+}
+
+    .subscription-blur-target {
+  transition: filter 0.3s ease;
+}
+
+
 </style>
 
     
@@ -1383,7 +1444,10 @@ function redirectToPayment() {
 </div>
 
     
-
+        </div>
+    </div>
+</section>
+    
 
 
 
