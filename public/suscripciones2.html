@@ -1179,20 +1179,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const userId = userCredential.user.uid;
-        const paymentDate = new Date();
-        const nextPaymentDate = new Date();
-        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-   await db.collection("users").doc(userId).set(userData);
-
-        function getNextMonthDate() {
-  const date = new Date();
-  date.setMonth(date.getMonth() + 1);
-  return date;
-}
 
 // Then, inside the PayPal success logic or registration confirmation:
 const user = firebase.auth().currentUser;
