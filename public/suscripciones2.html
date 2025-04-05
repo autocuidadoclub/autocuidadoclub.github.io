@@ -94,18 +94,29 @@ async function registerUser(event) {
         return;
     }
 
-    let referredBy = null;
+   let referredBy = null;
 
-    // ✅ Validate referral email if provided
-    if (referralCode) {
-        const querySnapshot = await db.collection("users").where("email", "==", referralCode).get();
+const referralEmail = document.getElementById("referralCode").value.trim();
+
+if (referralEmail) {
+    try {
+        const querySnapshot = await db.collection("users")
+            .where("email", "==", referralEmail)
+            .get();
+
         if (querySnapshot.empty) {
-            alert("Correo de referido no encontrado. Verifica por favor.");
-            return;
+            alert("❌ Correo de referido no encontrado. Verifica por favor.");
+            return; // stop the registration
         } else {
-            referredBy = referralCode;
+            referredBy = referralEmail;
+            console.log("✅ Correo de referido válido:", referredBy);
         }
+    } catch (error) {
+        console.error("❌ Error al verificar el correo de referido:", error);
+        alert("❌ Error al verificar el correo de referido: " + error.message);
+        return;
     }
+}
 
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
@@ -140,14 +151,28 @@ async function registerUser(event) {
 
         await db.collection("users").doc(userId).set(userData);
 
-        // ✅ Update referrer bonus if referral code used
-        if (referralCode && referralCode !== userId) {
-            await db.collection("referrals").doc(referralCode).set({
+        if (referredBy) {
+    try {
+        const referrerSnapshot = await db.collection("users")
+            .where("email", "==", referredBy)
+            .get();
+
+        if (!referrerSnapshot.empty) {
+            const referrerDoc = referrerSnapshot.docs[0];
+            const referrerId = referrerDoc.id;
+
+            await db.collection("referrals").doc(referrerId).set({
                 completed: firebase.firestore.FieldValue.increment(1),
                 bonuses: firebase.firestore.FieldValue.increment(1)
             }, { merge: true });
-            console.log("🎉 Referral bonus applied for:", referralCode);
+
+            console.log("🎉 Bono de referido aplicado para:", referredBy);
         }
+    } catch (error) {
+        console.error("❌ Error al aplicar el bono de referido:", error);
+    }
+}
+
 
         // ✅ Show success overlay
         const overlay = document.createElement("div");
@@ -1038,47 +1063,7 @@ button:hover {
   <input type="text" id="referralCode" name="referralCode" placeholder="Código de referido (opcional)">
 </div>
 
-<script>
-// 🎉 Referral Tracking on Registration
-function handleRegistration(newUserId) {
-  const referralCode = document.getElementById("referralCode").value.trim();
-
-  if (referralCode && referralCode !== newUserId) {
-    const referrerRef = db.collection("referrals").doc(referralCode);
-
-    // Increment completed referrals and bonuses
-    referrerRef.set({
-      completed: firebase.firestore.FieldValue.increment(1),
-      bonuses: firebase.firestore.FieldValue.increment(1)
-    }, { merge: true }).then(() => {
-      console.log("🎉 Referral data updated for referrer:", referralCode);
-
-      // ✅ Optionally, send push notification
-      if (typeof _pe !== "undefined") {
-        _pe.tagPushSubscriber('referral_completed');
-      }
-
-      // ✅ Optional: send confirmation email to referrer
-      /*
-      emailjs.send('service_id', 'template_id', {
-        to_email: referrerEmail, // You need to fetch this from Firestore
-        message: '¡Has ganado un nuevo bono por referir!'
-      }).then(response => {
-        console.log("Email sent", response);
-      }).catch(err => console.error("Email error", err));
-      */
-
-    }).catch(err => console.error("Error updating referrer:", err));
-
-    // Save referral in new user profile
-    db.collection("users").doc(newUserId).update({
-      referredBy: referralCode
-    });
-  }
-}
-</script>
-
-            
+           
         <button type="submit">Registrarse</button>
     
         </div>
