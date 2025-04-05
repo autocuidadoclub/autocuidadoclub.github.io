@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -41,6 +43,7 @@
 
             const auth = firebase.auth();
             const db = firebase.firestore();
+            const messaging = firebase.messaging();
             let selectedPlanType = null;
 
             const registrationContainer = document.getElementById("registration-container");
@@ -58,107 +61,130 @@
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
-            function registerUser(event) {
-                event.preventDefault();
+           function registerUser(event) {
+    event.preventDefault();
 
-                if (!selectedPlanType) {
-                    alert("❌ Debes seleccionar un plan antes de registrarte.");
-                    return;
-                }
+    if (!selectedPlanType) {
+        alert("❌ Debes seleccionar un plan antes de registrarte.");
+        return;
+    }
 
-                const name = document.getElementById("name").value.trim();
-                const email = document.getElementById("email").value.trim();
-                const phone = document.getElementById("phone").value.trim();
-                const password = document.getElementById("password").value.trim();
-                const department = document.getElementById("department").value;
-                const municipality = document.getElementById("municipality").value;
-                const selectedDay = document.getElementById("selectedDay").value;
-                const selectedTime = document.getElementById("selectedTime").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
+    const referralCode = document.getElementById("referralCode")?.value.trim(); // ✅ Optional safe
 
-                const vehicles = [];
-                document.querySelectorAll(".vehicle-entry").forEach(entry => {
-                    vehicles.push({
-                        plate: entry.querySelector(".plate").value || "",
-                        model: entry.querySelector(".model").value || "",
-                        brand: entry.querySelector(".brand").value || "",
-                        year: entry.querySelector(".year").value || ""
+    const vehicles = [];
+    document.querySelectorAll(".vehicle-entry").forEach(entry => {
+        vehicles.push({
+            plate: entry.querySelector(".plate").value || "",
+            model: entry.querySelector(".model").value || "",
+            brand: entry.querySelector(".brand").value || "",
+            year: entry.querySelector(".year").value || ""
+        });
+    });
+
+    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios.");
+        return;
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            const paymentDate = new Date();
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+            // ✅ Prepare user data
+            const userData = {
+                uid: userId,
+                name,
+                email,
+                phone,
+                planType: selectedPlanType,
+                department,
+                municipality,
+                registrationDate: firebase.firestore.Timestamp.now(),
+                lastUpgradeDate: firebase.firestore.Timestamp.now(),
+                schedule: {
+                    day: selectedDay,
+                    time: selectedTime
+                },
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                paymentStatus: "Pending",
+                subscriptionStatus: "active",
+                monthsPaid: 0,
+                vehicles,
+                freeRescheduleClaimed: false,
+                referredBy: referrerrEmail || null
+            };
+
+            // ✅ Save user profile
+            return db.collection("users").doc(userId).set(userData).then(() => {
+                // ✅ If referral code is used, update referrer data
+                if (referralCode && referralCode !== userId) {
+                    const referrerRef = db.collection("referrals").doc(referralCode);
+
+                    return referrerRef.set({
+                        completed: firebase.firestore.FieldValue.increment(1),
+                        bonuses: firebase.firestore.FieldValue.increment(1)
+                    }, { merge: true }).then(() => {
+                        console.log("🎉 Referral bonus applied for:", referralCode);
+                    }).catch(err => {
+                        console.error("❌ Error updating referral data:", err);
                     });
-                });
-
-                if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-                    alert("❌ Todos los campos son obligatorios.");
-                    return;
                 }
+            });
+        })
+        .then(() => {
+            // ✅ Show success overlay
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = "9999";
+            overlay.innerHTML = `
+                <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+            `;
+            document.body.appendChild(overlay);
 
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const userId = userCredential.user.uid;
-                        const paymentDate = new Date();
-                        const nextPaymentDate = new Date();
-                        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+            const style = document.createElement("style");
+            style.innerHTML = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
 
-                        return db.collection("users").doc(userId).set({
-                            uid: userId,
-                            name,
-                            email,
-                            phone,
-                            planType: selectedPlanType,
-                            department,
-                            municipality,
-                            registrationDate: firebase.firestore.Timestamp.now(),
-                            lastUpgradeDate: firebase.firestore.Timestamp.now(),
-                            schedule: {
-                                day: selectedDay,
-                                time: selectedTime
-                            },
-                            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                            paymentStatus: "Pending",
-                            subscriptionStatus: "active",
-                            monthsPaid: 0,
-                            vehicles,
-                            freeRescheduleClaimed: false,
-                        });
-                    })
-                    .then(() => {
-                        const overlay = document.createElement("div");
-                        overlay.style.position = "fixed";
-                        overlay.style.top = "0";
-                        overlay.style.left = "0";
-                        overlay.style.width = "100%";
-                        overlay.style.height = "100%";
-                        overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-                        overlay.style.display = "flex";
-                        overlay.style.flexDirection = "column";
-                        overlay.style.justifyContent = "center";
-                        overlay.style.alignItems = "center";
-                        overlay.style.zIndex = "9999";
-                        overlay.innerHTML = `
-                            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-                            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-                            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-                        `;
-                        document.body.appendChild(overlay);
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2500);
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+        });
+}
 
-                        const style = document.createElement("style");
-                        style.innerHTML = `
-                            @keyframes spin {
-                                0% { transform: rotate(0deg); }
-                                100% { transform: rotate(360deg); }
-                            }
-                        `;
-                        document.head.appendChild(style);
 
-                        setTimeout(() => {
-                            window.location.href = "login.html";
-                        }, 2500);
-                    })
-                    .catch((error) => {
-                        console.error("❌ Error en el registro:", error.message);
-                        alert("❌ Error en el registro: " + error.message);
-                    });
-            }
-
+            
            window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
     const timeBlock = cell.innerText.trim();
@@ -182,7 +208,23 @@
     const confirmationMessage = document.getElementById("confirmation-message");
     confirmationMessage.innerText = `${day} - ${timeBlock}`;
 
+    const registerButton = document.getElementById("register-button");
+if (registerButton) {
+    registerButton.disabled = true;
+    registerButton.innerText = "Registrando...";
+}
+
+
     console.log(`📅 Horario seleccionado: ${day} - ${timeBlock}`);
+
+               handleRegistration(newUserId); // Pass the new user's UID
+
+               if (typeof _pe !== "undefined") {
+    _pe.tagPushSubscriber('not_paid_yet');
+    console.log("📬 PushEngage tag applied: not_paid_yet");
+}
+
+
 };
 
 
@@ -204,6 +246,8 @@
                         <input type="text" class="brand" required>
                         <label>Año:</label>
                         <input type="number" class="year" required>
+                        <input type="hidden" id="referredBy" name="referredBy">
+
                     `;
                     vehicleContainer.appendChild(vehicleEntry);
                 }
@@ -342,6 +386,74 @@ body, html {
   border-radius: 8px;
 }
 
+        
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 20px;
+      background: #003366;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #ff6600;
+    }
+
+    .success-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,51,102,0.9);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      text-align: center;
+    }
+
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #ff6600;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
         </style>
 </head>
 
@@ -603,7 +715,8 @@ button:hover {
             <li>12 inspecciones preventivas (una cada mes).</li>
             <li><strong>Beneficio:</strong> Ahorro mensual y garantía de un mantenimiento constante y sin sorpresas durante el año.</li>
             <li><strong>Ideal para:</strong> Clientes que están listos para un compromiso a largo plazo con el mantenimiento de su vehículo.</li>
-            </ul>
+            <li><strong>Descuento: </strong> 14% de descuento en comparación con el plan básico de 3 meses.</li>
+        </ul>
         <button class="plan-button" data-plan="basic12m">¡Quiero este plan!</button>
         <p style="margin-top:10px; font-size:14px;">
             <a href="tac.html" target="_blank">Ver términos y condiciones</a> | 
@@ -624,6 +737,7 @@ button:hover {
                         <li>3 inspecciones preventivas para cada vehículo (una cada mes).</li>
                         <li><strong>Beneficio:</strong> Prueba rápida y flexible para clientes con más de un vehículo.</li>
                         <li><strong>Ideal para:</strong> Clientes nuevos o con múltiples vehículos que desean evaluar el servicio.</li>
+                        <li><strong>Descuento: </strong> 33% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         </ul>
                      <button class="plan-button" data-plan="plus3m">¡Quiero este plan!</button>
             
@@ -643,6 +757,7 @@ button:hover {
                         <li>6 inspecciones preventivas para cada vehículo (una cada mes).</li>
                         <li><strong>Beneficio:</strong> Ahorro mensual y consistencia en el mantenimiento para múltiples vehículos.</li>
                         <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 38% de descuento en comparación con el plan básico de 3 meses por vehículo.</li>
                         </ul>
                     <button class="plan-button" data-plan="plus6m">¡Quiero este plan!</button>
             
@@ -662,6 +777,7 @@ button:hover {
                         <li>12 inspecciones preventivas para cada vehículo (una cada mes).</li>
                         <li><strong>Beneficio:</strong> Gran ahorro anual y mantenimiento para hasta tres vehículos.</li>
                         <li><strong>Ideal para:</strong> Clientes que buscan mantener varios vehículos a mediano plazo con eficiencia de costos.</li>
+                        <li><strong>Descuento: </strong> 42% de descuento en comparación con el plan básico de 3 meses por vehículo, <strong>Equivalente a 5.5 meses gratis</strong></li>
                         </ul>
                     <button class="plan-button" data-plan="plus12m">¡Quiero este plan!</button>
             
@@ -895,15 +1011,65 @@ button:hover {
                 
     </script>
 
+<input type="hidden" id="referredBy" name="referredBy">
+
 <!-- Checkbox for Terms and Conditions -->
     <div style="margin-top: 35px;">
         <input type="checkbox" id="terms" name="terms" required>
         <label for="terms">
-            He leído y acepto los <a href="tac.html" target="_blank">Términos y Condiciones</a>.
+           He leído y acepto los <button type="button" onclick="window.open('tac.html', '_blank')">Términos y Condiciones</button>.
         </label>
     </div>
             <p></p>
             <p></p>
+
+
+<!-- 📝 Referral Input Field in Registration Form -->
+<div class="form-group">
+  <label for="referralCode">¿Tienes un código de referido?</label>
+  <input type="text" id="referralCode" name="referralCode" placeholder="Código de referido (opcional)">
+</div>
+
+<script>
+// 🎉 Referral Tracking on Registration
+function handleRegistration(newUserId) {
+  const referralCode = document.getElementById("referralCode").value.trim();
+
+  if (referralCode && referralCode !== newUserId) {
+    const referrerRef = db.collection("referrals").doc(referralCode);
+
+    // Increment completed referrals and bonuses
+    referrerRef.set({
+      completed: firebase.firestore.FieldValue.increment(1),
+      bonuses: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true }).then(() => {
+      console.log("🎉 Referral data updated for referrer:", referralCode);
+
+      // ✅ Optionally, send push notification
+      if (typeof _pe !== "undefined") {
+        _pe.tagPushSubscriber('referral_completed');
+      }
+
+      // ✅ Optional: send confirmation email to referrer
+      /*
+      emailjs.send('service_id', 'template_id', {
+        to_email: referrerEmail, // You need to fetch this from Firestore
+        message: '¡Has ganado un nuevo bono por referir!'
+      }).then(response => {
+        console.log("Email sent", response);
+      }).catch(err => console.error("Email error", err));
+      */
+
+    }).catch(err => console.error("Error updating referrer:", err));
+
+    // Save referral in new user profile
+    db.collection("users").doc(newUserId).update({
+      referredBy: referralCode
+    });
+  }
+}
+</script>
+
             
         <button type="submit">Registrarse</button>
     
@@ -912,6 +1078,11 @@ button:hover {
     </form>
     </div>
 
+    <div id="successOverlay" class="success-overlay" style="display:none;">
+  <h2>✅ Registro exitoso</h2>
+  <p>Redirigiendo a tu cuenta...</p>
+  <div class="loader"></div>
+</div>
     
  <!-- Footer -->
     <footer>
@@ -989,6 +1160,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const selectedDay = document.getElementById("selectedDay").value;
         const selectedTime = document.getElementById("selectedTime").value;
+         const referralCode = document.getElementById("referralCode").value.trim();
 
         const vehicles = [];
         document.querySelectorAll(".vehicle-entry").forEach(entry => {
@@ -1036,8 +1208,30 @@ document.addEventListener("DOMContentLoaded", function () {
       subscriptionStatus: "active",
       monthsPaid: 0,
       vehicles,
-      pushToken: token || null
+      freeRescheduleClaimed: false,
+      referredBy: referredByEmail
     });
+       if (referralCode && referralCode !== userId) {
+        await db.collection("referrals").doc(referralCode).set({
+          completed: firebase.firestore.FieldValue.increment(1),
+          bonuses: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true });
+        if (typeof _pe !== "undefined") {
+          _pe.tagPushSubscriber('referral_completed');
+        }
+      }
+
+      if (typeof _pe !== "undefined") {
+        _pe.tagPushSubscriber('not_paid_yet');
+      }
+
+      document.getElementById("successOverlay").style.display = "flex";
+      setTimeout(() => { window.location.href = "login.html"; }, 2500);
+
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("Error: " + error.message);
+    }
   });
 
 
