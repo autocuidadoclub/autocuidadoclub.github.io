@@ -430,90 +430,346 @@
 </button>
     </div>
 
-    <!-- 📢 Referral Program - Dashboard Block -->
-<div class="card" style="margin-top: 20px;">
-  <h3>🎉 Programa de Recomendaciones</h3>
-  <p>Invita a tus amigos y gana beneficios exclusivos.</p>
-  <p><strong>Tu código de referido:</strong></p>
-  <input type="text" id="referralCodeDisplay" readonly style="width: 100%; padding: 8px; margin-bottom: 10px;">
-  <button onclick="copyReferralCode()" class="orange-button">Copiar Código</button>
+<section class="referral-progress-section">
+  <h2>Mi Progreso de Referidos</h2>
+  <p>Comparte los datos de tus referidos directamente desde tu panel, y sigue su progreso hasta obtener tu recompensa 🎁</p>
+<section class="referral-submission-section">
+  <h2>Agregar un Nuevo Referido</h2>
+  <p>Comparte los datos de tu referido y sigue su progreso en tiempo real.</p>
 
-  <p style="margin-top: 15px;"><strong>Referidos completados:</strong> <span id="referralsCompleted">0</span></p>
-  <p><strong>Bonos disponibles:</strong> <span id="bonusesAvailable">0</span></p>
+  <form id="referralForm">
+    <label for="referralName">Nombre del referido:</label>
+    <input type="text" id="referralName" name="referralName" required placeholder="Ej. Juan Pérez">
 
-  <button onclick="claimReferralBonus()" class="orange-button" style="margin-top: 10px;">Reclamar Bono 🎁</button>
-</div>
+    <label for="referralEmail">Correo electrónico del referido:</label>
+    <input type="email" id="referralEmail" name="referralEmail" required placeholder="correo@ejemplo.com">
 
-<!-- 💡 Pop-up Recomienda -->
-<div id="referralPopup" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%);
-background:#fff8e1; border:2px solid #ffc107; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.2);
-z-index:9999; text-align:center; max-width:90%;">
-  <h3>🎁 ¡Recomienda a un amigo!</h3>
-  <p>Comparte tu código y gana bonos cada vez que alguien active su plan.</p>
-  <button onclick="closeReferralPopup()" style="margin-top:10px; background:#ff6600; color:#fff; padding:10px 15px; border:none; border-radius:5px;">Cerrar</button>
-</div>
+    <label for="referralPhone">Número de WhatsApp:</label>
+    <input type="text" id="referralPhone" name="referralPhone" required placeholder="+50312345678">
 
-<script>
-// 👥 Show Referral Data
-function loadReferralData(userData) {
-  const userId = userData.uid;
-  document.getElementById("referralCodeDisplay").value = userId;
+    <button type="submit">Enviar Referido 🎉</button>
+  </form>
+</section>
 
-  db.collection("referrals").doc(userId).get().then(doc => {
-    if (doc.exists) {
-      const data = doc.data();
-      document.getElementById("referralsCompleted").innerText = data.completed || 0;
-      document.getElementById("bonusesAvailable").innerText = data.bonuses || 0;
-    } else {
-      document.getElementById("referralsCompleted").innerText = "0";
-      document.getElementById("bonusesAvailable").innerText = "0";
+<style>
+.referral-submission-section {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-submission-section label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.referral-submission-section input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.referral-submission-section button {
+  background-color: #003366;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.referral-submission-section button:hover {
+  background-color: #ff6600;
+}
+</style>
+
+    
+  <div id="referralList">
+    <p>Cargando tus referidos...</p>
+  </div>
+</section>
+
+<style>
+.referral-progress-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+}
+
+.referral-step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.referral-step span {
+  margin-left: 10px;
+}
+
+.referral-step .completed {
+  color: green;
+  font-weight: bold;
+}
+
+.referral-step .pending {
+  color: orange;
+}
+
+    #notificationPopup {
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+</style>
+
+
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      const userId = user.uid;
+      const referralList = document.getElementById("referralList");
+
+      function loadReferrals() {
+        referralList.innerHTML = "<p>Cargando tus referidos...</p>";
+
+        firebase.firestore()
+          .collection("users")
+          .doc(userId)
+          .collection("referrals")
+          .orderBy("timestamp", "desc")
+          .onSnapshot(snapshot => {
+            if (snapshot.empty) {
+              referralList.innerHTML = "<p>No tienes referidos aún.</p>";
+              return;
+            }
+
+            let html = "";
+            snapshot.forEach(doc => {
+              const data = doc.data();
+
+              html += `
+                <div class="referral-item">
+                  <h4>${data.name || "Nombre no disponible"}</h4>
+                  <div class="referral-step">
+                    ${data.timestamp ? "✅" : "⏳"}
+                    <span class="${data.timestamp ? 'completed' : 'pending'}">1. Información enviada</span>
+                  </div>
+                  <div class="referral-step">
+                    ${data.registered ? "✅" : "⏳"}
+                    <span class="${data.registered ? 'completed' : 'pending'}">2. Cliente registrado</span>
+                  </div>
+                  <div class="referral-step">
+                    ${data.paid ? "✅" : "⏳"}
+                    <span class="${data.paid ? 'completed' : 'pending'}">3. Pago recibido</span>
+                  </div>
+                </div>
+              `;
+            });
+
+            referralList.innerHTML = html;
+          });
+      }
+
+      loadReferrals();
     }
   });
-}
-
-// 📋 Copy Referral Code
-function copyReferralCode() {
-  const copyText = document.getElementById("referralCodeDisplay");
-  copyText.select();
-  document.execCommand("copy");
-  alert("✅ Código copiado: " + copyText.value);
-}
-
-// 🎉 Claim Referral Bonus
-function claimReferralBonus() {
-  const user = firebase.auth().currentUser;
-  if (!user) return alert("Debes iniciar sesión.");
-
-  const referralRef = db.collection("referrals").doc(user.uid);
-  referralRef.get().then(doc => {
-    if (doc.exists && doc.data().bonuses > 0) {
-      referralRef.update({
-        bonuses: firebase.firestore.FieldValue.increment(-1)
-      }).then(() => {
-        alert("🎉 ¡Bono reclamado con éxito!");
-        loadReferralData({ uid: user.uid });
-      });
-    } else {
-      alert("❌ No tienes bonos disponibles.");
-    }
-  });
-}
-
-// 🚀 Show Pop-up on load
-window.addEventListener("load", function () {
-  setTimeout(() => {
-    document.getElementById("referralPopup").style.display = "block";
-  }, 2000);
 });
 
-// 🛑 Close Pop-up
-function closeReferralPopup() {
-  document.getElementById("referralPopup").style.display = "none";
+document.addEventListener("DOMContentLoaded", () => {
+  const referralForm = document.getElementById("referralForm");
+
+  referralForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById("referralName").value.trim();
+    const email = document.getElementById("referralEmail").value.trim();
+    const phone = document.getElementById("referralPhone").value.trim();
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      alert("Debes iniciar sesión para enviar referidos.");
+      return;
+    }
+
+    const userId = user.uid;
+    const referralId = Date.now().toString(); // Unique ID based on timestamp
+
+    try {
+      // ✅ 1. Save to Firestore
+      await firebase.firestore()
+        .collection("users")
+        .doc(userId)
+        .collection("referrals")
+        .doc(referralId)
+        .set({
+          name,
+          email,
+          phone,
+          registered: false,
+          paid: false,
+          timestamp: firebase.firestore.Timestamp.now()
+        });
+
+      // ✅ 2. Optional: Send email notification to you
+      await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: 'POST',
+        body: new URLSearchParams({
+          name: name,
+          email: email,
+          phone: phone,
+          message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+        })
+      });
+
+    const successMessage = document.createElement("div");
+successMessage.innerHTML = `
+  <div style="
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #d4edda;
+    color: #155724;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    text-align: center;
+  ">
+    <strong>🎉 Referido enviado con éxito</strong>
+    <p>Ahora puedes seguir su progreso en tiempo real en tu dashboard.</p>
+  </div>
+`;
+
+document.body.appendChild(successMessage);
+setTimeout(() => successMessage.remove(), 4000);
+
+    } catch (error) {
+      console.error("❌ Error al enviar el referido:", error);
+      alert("Ocurrió un error al enviar el referido. Inténtalo nuevamente.");
+    }
+  });
+});
+
+        document.addEventListener("DOMContentLoaded", () => {
+  const notificationPopup = document.getElementById("notificationPopup");
+  const notificationMessage = document.getElementById("notificationMessage");
+  let lastReferralStates = {}; // To track changes
+
+  function showNotification(message) {
+    notificationMessage.textContent = message;
+    notificationPopup.style.display = "block";
+    setTimeout(() => {
+      notificationPopup.style.display = "none";
+    }, 4000);
+  }
+
+            function sendCustomerEmail(subject, message, customerEmail) {
+  fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+    method: 'POST',
+    body: new URLSearchParams({
+      email: customerEmail,
+      subject: subject,
+      message: message
+    })
+  });
 }
+
+            // Check for registration update
+if (!lastReferralStates[referralId].registered && referral.registered) {
+  showNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
+  sendCustomerEmail(
+    "🎉 Notificación de referido registrado",
+    `Tu referido ${referral.name} se ha registrado exitosamente.`,
+    user.email
+  );
+}
+
+// Check for payment update
+if (!lastReferralStates[referralId].paid && referral.paid) {
+  showNotification(`💸 Tu referido ${referral.name} completó su primer pago. ¡Bono desbloqueado! 🎁`);
+  sendCustomerEmail(
+    "🎉 Notificación de bono desbloqueado",
+    `¡Felicidades! Tu referido ${referral.name} completó su pago y has desbloqueado tu bono.`,
+    user.email
+  );
+}
+
+            
+  function listenForReferralUpdates() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const referralsRef = firebase.firestore()
+      .collection("users")
+      .doc(user.uid)
+      .collection("referrals");
+
+    referralsRef.onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        const referral = change.doc.data();
+        const referralId = change.doc.id;
+
+        if (!lastReferralStates[referralId]) {
+          // First time seeing this referral
+          lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
+          return; // Skip initial load
+        }
+
+        // Check for registration update
+        if (!lastReferralStates[referralId].registered && referral.registered) {
+          showNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
+        }
+
+        // Check for payment update
+        if (!lastReferralStates[referralId].paid && referral.paid) {
+          showNotification(`💸 Tu referido ${referral.name} completó su primer pago. ¡Bono desbloqueado! 🎁`);
+        }
+
+        // Update last known state
+        lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
+      });
+    });
+  }
+
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      listenForReferralUpdates();
+    }
+  });
+});
 </script>
 
+        
 
-   
+    
     <!-- Loyalty Rewards Section -->
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
@@ -573,21 +829,7 @@ function closeReferralPopup() {
     </div> <!-- End Flex Row -->
 </div>
 
-      <div class="card" style="margin-top: 20px;">
-  <h3>📜 Historial de Pagos</h3>
-  <button onclick="loadPaymentHistory()" class="orange-button">Ver Historial</button>
-  <table id="customerHistoryTable" style="margin-top: 15px; display: none;">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Monto</th>
-        <th>Método</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody id="customerHistoryBody"></tbody>
-  </table>
-</div>
+    
 
 
 
@@ -1244,7 +1486,25 @@ function redirectToPayment() {
 
         
     </footer>
-    
+
+            <!-- 🔔 Notification Pop-up -->
+<div id="notificationPopup" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #003366;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 9999;
+  max-width: 300px;
+  font-size: 14px;
+">
+  <span id="notificationMessage">Notificación aquí</span>
+</div>
+
 
 </body>
 </html>
