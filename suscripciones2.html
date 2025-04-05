@@ -77,7 +77,7 @@ async function registerUser(event) {
     const municipality = document.getElementById("municipality").value;
     const selectedDay = document.getElementById("selectedDay").value;
     const selectedTime = document.getElementById("selectedTime").value;
-    const referralEmail = document.getElementById("referralCode")?.value.trim(); // ✅ Optional safe
+    const referralCode = document.getElementById("referralCode")?.value.trim();
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
@@ -96,21 +96,16 @@ async function registerUser(event) {
 
     let referredBy = null;
 
-if (referralEmail) {
-    if (referralEmail.toLowerCase() === email.toLowerCase()) {
-        alert("No puedes referirte a ti mismo.");
-        return;
+    // ✅ Validate referral email if provided
+    if (referralCode) {
+        const querySnapshot = await db.collection("users").where("email", "==", referralCode).get();
+        if (querySnapshot.empty) {
+            alert("Correo de referido no encontrado. Verifica por favor.");
+            return;
+        } else {
+            referredBy = referralCode;
+        }
     }
-
-    const querySnapshot = await db.collection("users").where("email", "==", referralEmail).get();
-    if (querySnapshot.empty) {
-        alert("Correo de referido no encontrado. Verifica por favor.");
-        return;
-    } else {
-        referredBy = referralEmail;
-    }
-}
-
 
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
@@ -119,7 +114,6 @@ if (referralEmail) {
         const nextPaymentDate = new Date(paymentDate);
         nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-        // ✅ Prepare user data
         const userData = {
             uid: userId,
             name,
@@ -146,16 +140,13 @@ if (referralEmail) {
 
         await db.collection("users").doc(userId).set(userData);
 
-        // ✅ If referral email is used, update referral stats
-        if (referralEmail) {
-            const referrerRef = db.collection("referrals").doc(referralEmail);
-
-            await referrerRef.set({
+        // ✅ Update referrer bonus if referral code used
+        if (referralCode && referralCode !== userId) {
+            await db.collection("referrals").doc(referralCode).set({
                 completed: firebase.firestore.FieldValue.increment(1),
                 bonuses: firebase.firestore.FieldValue.increment(1)
             }, { merge: true });
-
-            console.log("🎉 Referral bonus applied for:", referralEmail);
+            console.log("🎉 Referral bonus applied for:", referralCode);
         }
 
         // ✅ Show success overlay
@@ -196,6 +187,7 @@ if (referralEmail) {
         alert("❌ Error en el registro: " + error.message);
     }
 }
+
 
 }
 
