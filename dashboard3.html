@@ -309,6 +309,13 @@ function updateUserInfo(userData) {
     document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
     document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
 }
+// Hide countdown if payment is completed
+const countdownContainer = document.querySelector(".countdown-container");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    if (countdownContainer) countdownContainer.style.display = "none";
+} else {
+    if (countdownContainer) countdownContainer.style.display = "block";
+}
 
     document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
    // After updating schedule info
