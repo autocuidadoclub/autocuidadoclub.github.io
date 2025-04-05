@@ -18,582 +18,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-  <style>
-        /* Styles for Loyalty Card */
-        .loyalty-card {
-            text-align: center;
-            padding: 20px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
 
-        .holes {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            justify-items: center;
-            margin-bottom: 20px;
-        }
-
-        .hole {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s ease-in-out;
-            border: 2px dashed #ccc;
-            background-color: #fff;
-            color: #ccc;
-        }
-
-        .hole.completed {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-        }
-
-        .hole.star {
-            font-size: 24px;
-            color: gold;
-        }
-
-        .hole.star.completed {
-            background-color: #4caf50;
-            color: white;
-        }
-
-        .rewards {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
-        .reward-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .reward-card:hover {
-            background-color: #e6f7e6;
-        }
-
-        .reward-icon {
-            font-size: 24px;
-            margin-right: 15px;
-        }
-
-        .reward-info h4 {
-            margin: 0;
-            font-size: 18px;
-            color: #333;
-        }
-
-        .reward-info p {
-            margin: 5px 0 0;
-            font-size: 14px;
-            color: #777;
-        }
-
-        .reward-status {
-            font-size: 14px;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-
-        .reward-status.locked {
-            background-color: #ccc;
-            color: white;
-        }
-
-        .reward-status.unlocked {
-            background-color: #4caf50;
-            color: white;
-        }
-      .floating-contact-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff6600;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s, transform 0.2s;
-}
-
-.floating-contact-button:hover {
-    background-color: #cc5500;
-    transform: scale(1.05);
-}
-
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    width: 100%;
-    padding: 0 20px; /* optional: to align with Reprogramar box padding */
-    box-sizing: border-box;
-}
-
-.dashboard-section {
-    width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
-}
-
-.card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-      .orange-button {
-    padding: 10px 15px;
-    background-color: #ff6600;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
-}
-
-.orange-button:hover {
-    background-color: #cc5500;
-}
-
-.reschedule-section p {
-    margin-bottom: 5px;
-    line-height: 1.4;
-}
-
-.reschedule-section {
-    margin-bottom: 20px;
-    padding: 20px;
-}
-
-      .reschedule-section p {
-    margin: 5px 0; /* reduces unnecessary vertical spacing */
-    line-height: 1.4; /* clean look */
-}
-
-.reschedule-warning {
-    color: red;
-    font-weight: bold;
-}
-.countdown-container {
-  background-color: #f2f2f2;
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  margin-top: 20px;
-  border: 1px solid #ccc;
-}
-
-.countdown-container h2 {
-  color: #333;
-  font-size: 24px;
-}
-
-#countdown {
-  font-size: 30px;
-  font-weight: bold;
-  color: #e74c3c; /* Red color for urgency */
-  margin: 15px 0;
-}
-
-.cta-button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  font-size: 18px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  text-transform: uppercase;
-}
-
-.cta-button:hover {
-  background-color: #0056b3;
-}
-
-      #floating-offer {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    background: #fffbec;
-    border: 2px solid #ffc107;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
-    animation: pop-in 0.5s ease-out;
-}
-
-@keyframes pop-in {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -60%);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-}
-
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <ul class="nav-links">
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-        </ul>
-        <div class="logo-container">
-            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-        </div>
-        
-    </nav>
-
-    
-    <!-- Header -->
-    <header>
-    <div class="header-container">
-        <h2 id="user-info">Cargando usuario...</h2>
-          </div>
-        </header>
-    
-        <button class="orange-button" onclick="logoutUser()" style="margin-left: 10px;">Cerrar Sesión</button>
-
-     <!-- Contact Button -->
-<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-    <i class="fas fa-headset"></i> Contactar Staff
-</button>
-
-    <!-- Dashboard Content -->
-  <!-- Dashboard Content -->
-<section class="dashboard-section">
-
-    <!-- Grid Start -->
-    <div class="dashboard-grid">
-
-        <!-- User Info Card -->
-        <div class="card">
-            <h3><i class="fas fa-user"></i> Información del Usuario</h3>
-            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
-            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
-            <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
-            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
-            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
-            <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
-        </div>
-
-          <!-- Tip del Mes Card -->
-        <div class="card">
-            <h3>🚗✨ Tip del mes</h3>
-            <p><strong>🔧 Consejo experto:</strong> En AutoCuidado Club no vendemos repuestos ni aceites, te damos algo mejor: <strong>asesoría experta y sin estrés</strong>. Nuestro staff certificado te avisa exactamente cuándo cambiar aceite, filtros, o cualquier pieza. Te recomendamos solo las mejores marcas, en la tienda adecuada y al mejor precio. Y aún mejor: ¡nosotros nos encargamos de ir por las piezas, cambiarlas en el momento indicado y coordinamos todo el proceso por ti! 💪✨</p>
-            <p><strong>❄️ Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
-        </div>
-
-        
-        <!-- Payment Status Card -->
-        <div class="card">
-            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-
-            <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-                ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
-            </div>
-            <div id="complete-payment" style="margin-top: 10px; display: none;">
-                <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
-                    Completa tu pago ahora 🔗
-                </a>
-            </div>
-            <!-- Countdown Timer Section -->
-<div class="countdown-container">
-  <h2>Hurry up! Limited-time offer</h2>
-  <p>Complete your payment to enjoy a <strong>45% discount</strong>!</p>
-  <div id="countdown"></div>
-  <p><strong>$35 Savings</strong> if you pay now.</p>
-  <button id="upgrade-now" class="cta-button">Upgrade Now</button>
-</div>
-
-        </div>
-
-        <!-- Plan Upgrade Card -->
-        <div class="card">
-            <h3>¿Te gustaría Mejorar de Suscripción?</h3>
-            <p><strong>Tipo de Plan Actual:</strong></p>
-            <p></p><span id="planType">Cargando...</span></p>
-            <p><strong>Descripción:</strong></p>
-            <p></p><span id="planMessage">Cargando...</span></p>
-
-            <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
-
-            <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-                <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-                    Añade más vehículos: Mejora a Plan Plus 🚗✨
-                </button>
-            </div>
-
-            <label for="new-plan">Selecciona un nuevo plan:</label>
-            <select id="new-plan"></select>
-            <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
-        </div>
-    </div> <!-- End Grid -->
-      
-</section>
-
-           
-    <!-- Reschedule Section -->
-    <div class="card reschedule-section">
-        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
-        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
-        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
-        Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
-        </div>
-            <div id="reschedule-info" style="color: orange; font-weight: bold; margin-top: 10px; display: none;">
-    </div>
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Horario</th>
-                    <th>Lunes</th>
-                    <th>Miércoles</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Bloque 1</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 2</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                </tr>
-                <tr>
-                    <td>Bloque 3</td>
-                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                </tr>
-            </tbody>
-        </table>
-       <button id="save-schedule-btn" onclick="updateSchedule()">
-<input type="hidden" id="selectedDay" name="selectedDay" required>
-<input type="hidden" id="selectedTime" name="selectedTime" required>
-
-    <strong>Guardar Nuevo Horario</strong>
-</button>
-    </div>
-
-    <!-- 📢 Referral Program - Dashboard Block -->
-<div class="card" style="margin-top: 20px;">
-  <h3>🎉 Programa de Recomendaciones</h3>
-  <p>Invita a tus amigos y gana beneficios exclusivos.</p>
-  <p><strong>Tu código de referido:</strong></p>
-  <input type="text" id="referralCodeDisplay" readonly style="width: 100%; padding: 8px; margin-bottom: 10px;">
-  <button onclick="copyReferralCode()" class="orange-button">Copiar Código</button>
-
-  <p style="margin-top: 15px;"><strong>Referidos completados:</strong> <span id="referralsCompleted">0</span></p>
-  <p><strong>Bonos disponibles:</strong> <span id="bonusesAvailable">0</span></p>
-
-  <button onclick="claimReferralBonus()" class="orange-button" style="margin-top: 10px;">Reclamar Bono 🎁</button>
-</div>
-
-<!-- 💡 Pop-up Recomienda -->
-<div id="referralPopup" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%);
-background:#fff8e1; border:2px solid #ffc107; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.2);
-z-index:9999; text-align:center; max-width:90%;">
-  <h3>🎁 ¡Recomienda a un amigo!</h3>
-  <p>Comparte tu código y gana bonos cada vez que alguien active su plan.</p>
-  <button onclick="closeReferralPopup()" style="margin-top:10px; background:#ff6600; color:#fff; padding:10px 15px; border:none; border-radius:5px;">Cerrar</button>
-</div>
-
-<script>
-// 👥 Show Referral Data
-function loadReferralData(userData) {
-  const userId = userData.uid;
-  document.getElementById("referralCodeDisplay").value = userId;
-
-  db.collection("referrals").doc(userId).get().then(doc => {
-    if (doc.exists) {
-      const data = doc.data();
-      document.getElementById("referralsCompleted").innerText = data.completed || 0;
-      document.getElementById("bonusesAvailable").innerText = data.bonuses || 0;
-    } else {
-      document.getElementById("referralsCompleted").innerText = "0";
-      document.getElementById("bonusesAvailable").innerText = "0";
-    }
-  });
-}
-
-// 📋 Copy Referral Code
-function copyReferralCode() {
-  const copyText = document.getElementById("referralCodeDisplay");
-  copyText.select();
-  document.execCommand("copy");
-  alert("✅ Código copiado: " + copyText.value);
-}
-
-// 🎉 Claim Referral Bonus
-function claimReferralBonus() {
-  const user = firebase.auth().currentUser;
-  if (!user) return alert("Debes iniciar sesión.");
-
-  const referralRef = db.collection("referrals").doc(user.uid);
-  referralRef.get().then(doc => {
-    if (doc.exists && doc.data().bonuses > 0) {
-      referralRef.update({
-        bonuses: firebase.firestore.FieldValue.increment(-1)
-      }).then(() => {
-        alert("🎉 ¡Bono reclamado con éxito!");
-        loadReferralData({ uid: user.uid });
-      });
-    } else {
-      alert("❌ No tienes bonos disponibles.");
-    }
-  });
-}
-
-// 🚀 Show Pop-up on load
-window.addEventListener("load", function () {
-  setTimeout(() => {
-    document.getElementById("referralPopup").style.display = "block";
-  }, 2000);
-});
-
-// 🛑 Close Pop-up
-function closeReferralPopup() {
-  document.getElementById("referralPopup").style.display = "none";
-}
-</script>
-
-
-   
-    <!-- Loyalty Rewards Section -->
-        <div class="card">
-            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
-            <div class="loyalty-card">
-                <p>Completa 8 meses continuos y desbloquea los beneficios🔥</p>
-                <div class="holes">
-                   <div class="hole">○</div>
-                    <p>Proceso de registro completo</p>
-                    <div class="hole">○</div>
-                    <p>Pago inicial procesado en tu suscripción</p>
-                    <div class="hole">○</div>
-                    <p>1er Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>3er Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>5to Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>6to Mes de suscripción activo</p>
-                    <div class="hole">○</div>
-                    <p>7to Mes de suscripción activo</p>
-                    <div class="hole star">★</div>
-                    <p>8to Mes de suscripción activo</p>
-                </div>
-                <div class="description">
-                    <p><strong>Progreso atual:</strong></p>
-                </div>
-            </div>
-
-           <!-- Rewards -->
-<div class="rewards">
-    <h3><i class="fas fa-gift"></i> Premios Disponibles 
-        <span class="reward-status locked" style="margin-left:10px;"><i class="fas fa-lock"></i> Bloqueado</span>
-    </h3>
-    
-    <div class="reward-row"> <!-- FLEX ROW CONTAINER -->
-        <div class="reward-card">
-            <div class="reward-icon">🎐</div>
-            <div class="reward-info">
-                <h4>Recarga de A/C</h4>
-                <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
-            </div>
-        </div>
-        <div class="reward-card">
-            <div class="reward-icon">🚗</div>
-            <div class="reward-info">
-                <h4>Carwash gratis</h4>
-                <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
-            </div>
-        </div>
-        <div class="reward-card">
-            <div class="reward-icon">📝</div>
-            <div class="reward-info">
-                <h4>Revisión extra del mes en curso</h4>
-                <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
-            </div>
-        </div>
-    </div> <!-- End Flex Row -->
-</div>
-
-      <div class="card" style="margin-top: 20px;">
-  <h3>📜 Historial de Pagos</h3>
-  <button onclick="loadPaymentHistory()" class="orange-button">Ver Historial</button>
-  <table id="customerHistoryTable" style="margin-top: 15px; display: none;">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Monto</th>
-        <th>Método</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody id="customerHistoryBody"></tbody>
-  </table>
-</div>
-
-
-
- <script>
- 
-// Firebase Config
+    <script>
+// ✅ Configuración Firebase desde env.js
 const firebaseConfig = {
     apiKey: window._env_.FIREBASE_API_KEY,
     authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
@@ -605,27 +32,181 @@ const firebaseConfig = {
     measurementId: window._env_.FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-document.addEventListener("DOMContentLoaded", function () {
+let auth, db;
+
+// ✅ Inicialización Firebase
+document.addEventListener("DOMContentLoaded", () => {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase initialized.");
+        console.log("✅ Firebase inicializado correctamente.");
     }
+
     auth = firebase.auth();
     db = firebase.firestore();
 
-    // Auth State Check
-    auth.onAuthStateChanged((user) => {
+    // ✅ Check de autenticación
+    auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
             loadUserProfile(user.uid);
+            loadReferrals(user.uid);
+            listenForReferralUpdates(user.uid, user.email);
         } else {
-            window.location.href = 'login.html';
+            window.location.href = "login.html";
         }
     });
 });
 
-      
+// ✅ Guardar Referido
+document.addEventListener("DOMContentLoaded", () => {
+    const referralForm = document.getElementById("referralForm");
+    referralForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = document.getElementById("referralName").value.trim();
+        const email = document.getElementById("referralEmail").value.trim();
+        const phone = document.getElementById("referralPhone").value.trim();
+        const user = auth.currentUser;
+
+        if (!user) {
+            alert("Debes iniciar sesión para enviar referidos.");
+            return;
+        }
+
+        const referralId = Date.now().toString();
+
+        try {
+            await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
+                name,
+                email,
+                phone,
+                registered: false,
+                paid: false,
+                timestamp: firebase.firestore.Timestamp.now()
+            });
+
+            // Opcional: Notificación por correo
+            await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+                method: 'POST',
+                body: new URLSearchParams({
+                    name,
+                    email,
+                    phone,
+                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+                })
+            });
+
+            showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
+
+        } catch (error) {
+            console.error("❌ Error al enviar el referido:", error);
+            alert("Ocurrió un error al enviar el referido. Inténtalo nuevamente.");
+        }
+    });
+});
+
+// ✅ Función para mostrar popup de éxito
+function showSuccessPopup(title, message) {
+    const successMessage = document.createElement("div");
+    successMessage.innerHTML = `
+      <div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
+          background: #d4edda; color: #155724; padding: 20px; border-radius: 8px;
+          box-shadow: 0px 4px 12px rgba(0,0,0,0.15); z-index: 9999; text-align: center;">
+        <strong>${title}</strong>
+        <p>${message}</p>
+      </div>`;
+    document.body.appendChild(successMessage);
+    setTimeout(() => successMessage.remove(), 4000);
+}
+
+// ✅ Cargar Referidos del Usuario
+function loadReferrals(userId) {
+    const referralList = document.getElementById("referralList");
+    referralList.innerHTML = "<p>Cargando tus referidos...</p>";
+
+    db.collection("users").doc(userId).collection("referrals").orderBy("timestamp", "desc")
+        .onSnapshot(snapshot => {
+            if (snapshot.empty) {
+                referralList.innerHTML = "<p>No tienes referidos aún.</p>";
+                return;
+            }
+
+            let html = "";
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                html += `
+                    <div class="referral-item">
+                        <h4>${data.name || "Nombre no disponible"}</h4>
+                        <div class="referral-step">${data.timestamp ? "✅" : "⏳"} <span>${data.timestamp ? '1. Información enviada' : 'Esperando...'}</span></div>
+                        <div class="referral-step">${data.registered ? "✅" : "⏳"} <span>${data.registered ? '2. Cliente registrado' : 'Esperando...'}</span></div>
+                        <div class="referral-step">${data.paid ? "✅" : "⏳"} <span>${data.paid ? '3. Pago recibido' : 'Esperando...'}</span></div>
+                    </div>`;
+            });
+            referralList.innerHTML = html;
+        });
+}
+
+// ✅ Listener de Cambios en Referidos (Tiempo Real)
+function listenForReferralUpdates(userId, userEmail) {
+    const referralsRef = db.collection("users").doc(userId).collection("referrals");
+    const lastReferralStates = {};
+
+    referralsRef.onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+            const referral = change.doc.data();
+            const referralId = change.doc.id;
+
+            if (!lastReferralStates[referralId]) {
+                lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
+                return;
+            }
+
+            if (!lastReferralStates[referralId].registered && referral.registered) {
+                showDashboardNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
+                sendCustomerEmail(
+                    "🎉 Notificación de referido registrado",
+                    `Tu referido ${referral.name} se ha registrado exitosamente.`,
+                    userEmail
+                );
+            }
+
+            if (!lastReferralStates[referralId].paid && referral.paid) {
+                showDashboardNotification(`💸 Tu referido ${referral.name} completó su primer pago. ¡Bono desbloqueado! 🎁`);
+                sendCustomerEmail(
+                    "🎉 Notificación de bono desbloqueado",
+                    `¡Felicidades! Tu referido ${referral.name} completó su pago y has desbloqueado tu bono.`,
+                    userEmail
+                );
+            }
+
+            lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
+        });
+    });
+}
+
+// ✅ Notificación Interna del Dashboard
+function showDashboardNotification(message) {
+    const popup = document.getElementById("notificationPopup");
+    const messageEl = document.getElementById("notificationMessage");
+    if (!popup || !messageEl) return;
+    messageEl.textContent = message;
+    popup.style.display = "block";
+    setTimeout(() => popup.style.display = "none", 4000);
+}
+
+// ✅ Notificación por correo al cliente
+function sendCustomerEmail(subject, message, customerEmail) {
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: 'POST',
+        body: new URLSearchParams({
+            email: customerEmail,
+            subject,
+            message
+        })
+    });
+}
+
+     
   // Try to get the saved end time from localStorage
   var savedEndTime = localStorage.getItem("countdownEndTime");
 
@@ -656,8 +237,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }, 1000);
      
-// Global variables
-let auth, db;
 
     function upgradePlan() {
     const selectedPlan = document.getElementById("new-plan").value;
@@ -1213,6 +792,602 @@ function redirectToPayment() {
 </script>
 
     
+  <style>
+        /* Styles for Loyalty Card */
+        .loyalty-card {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .holes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            justify-items: center;
+            margin-bottom: 20px;
+        }
+
+        .hole {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease-in-out;
+            border: 2px dashed #ccc;
+            background-color: #fff;
+            color: #ccc;
+        }
+
+        .hole.completed {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+        }
+
+        .hole.star {
+            font-size: 24px;
+            color: gold;
+        }
+
+        .hole.star.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .rewards {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .reward-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .reward-card:hover {
+            background-color: #e6f7e6;
+        }
+
+        .reward-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .reward-info h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .reward-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .reward-status {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .reward-status.locked {
+            background-color: #ccc;
+            color: white;
+        }
+
+        .reward-status.unlocked {
+            background-color: #4caf50;
+            color: white;
+        }
+      .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 0 20px; /* optional: to align with Reprogramar box padding */
+    box-sizing: border-box;
+}
+
+.dashboard-section {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+      .orange-button {
+    padding: 10px 15px;
+    background-color: #ff6600;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.orange-button:hover {
+    background-color: #cc5500;
+}
+
+.reschedule-section p {
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.reschedule-section {
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+      .reschedule-section p {
+    margin: 5px 0; /* reduces unnecessary vertical spacing */
+    line-height: 1.4; /* clean look */
+}
+
+.reschedule-warning {
+    color: red;
+    font-weight: bold;
+}
+.countdown-container {
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+
+.countdown-container h2 {
+  color: #333;
+  font-size: 24px;
+}
+
+#countdown {
+  font-size: 30px;
+  font-weight: bold;
+  color: #e74c3c; /* Red color for urgency */
+  margin: 15px 0;
+}
+
+.cta-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.cta-button:hover {
+  background-color: #0056b3;
+}
+
+      #floating-offer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background: #fffbec;
+    border: 2px solid #ffc107;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    animation: pop-in 0.5s ease-out;
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+        
+    </nav>
+
+    
+    <!-- Header -->
+    <header>
+    <div class="header-container">
+        <h2 id="user-info">Cargando usuario...</h2>
+          </div>
+        </header>
+    
+        <button class="orange-button" onclick="logoutUser()" style="margin-left: 10px;">Cerrar Sesión</button>
+
+     <!-- Contact Button -->
+<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
+
+    <!-- Dashboard Content -->
+  <!-- Dashboard Content -->
+<section class="dashboard-section">
+
+    <!-- Grid Start -->
+    <div class="dashboard-grid">
+
+        <!-- User Info Card -->
+        <div class="card">
+            <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+            <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
+            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
+            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+            <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
+        </div>
+
+          <!-- Tip del Mes Card -->
+        <div class="card">
+            <h3>🚗✨ Tip del mes</h3>
+            <p><strong>🔧 Consejo experto:</strong> En AutoCuidado Club no vendemos repuestos ni aceites, te damos algo mejor: <strong>asesoría experta y sin estrés</strong>. Nuestro staff certificado te avisa exactamente cuándo cambiar aceite, filtros, o cualquier pieza. Te recomendamos solo las mejores marcas, en la tienda adecuada y al mejor precio. Y aún mejor: ¡nosotros nos encargamos de ir por las piezas, cambiarlas en el momento indicado y coordinamos todo el proceso por ti! 💪✨</p>
+            <p><strong>❄️ Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
+        </div>
+
+        
+        <!-- Payment Status Card -->
+        <div class="card">
+            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+
+            <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+                ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
+            </div>
+            <div id="complete-payment" style="margin-top: 10px; display: none;">
+                <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+                    Completa tu pago ahora 🔗
+                </a>
+            </div>
+            <!-- Countdown Timer Section -->
+<div class="countdown-container">
+  <h2>Hurry up! Limited-time offer</h2>
+  <p>Complete your payment to enjoy a <strong>45% discount</strong>!</p>
+  <div id="countdown"></div>
+  <p><strong>$35 Savings</strong> if you pay now.</p>
+  <button id="upgrade-now" class="cta-button">Upgrade Now</button>
+</div>
+
+        </div>
+
+        <!-- Plan Upgrade Card -->
+        <div class="card">
+            <h3>¿Te gustaría Mejorar de Suscripción?</h3>
+            <p><strong>Tipo de Plan Actual:</strong></p>
+            <p></p><span id="planType">Cargando...</span></p>
+            <p><strong>Descripción:</strong></p>
+            <p></p><span id="planMessage">Cargando...</span></p>
+
+            <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+
+            <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+                <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+                    Añade más vehículos: Mejora a Plan Plus 🚗✨
+                </button>
+            </div>
+
+            <label for="new-plan">Selecciona un nuevo plan:</label>
+            <select id="new-plan"></select>
+            <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
+        </div>
+    </div> <!-- End Grid -->
+      
+</section>
+
+           
+    <!-- Reschedule Section -->
+    <div class="card reschedule-section">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+        Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        </div>
+            <div id="reschedule-info" style="color: orange; font-weight: bold; margin-top: 10px; display: none;">
+    </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+       <button id="save-schedule-btn" onclick="updateSchedule()">
+<input type="hidden" id="selectedDay" name="selectedDay" required>
+<input type="hidden" id="selectedTime" name="selectedTime" required>
+
+    <strong>Guardar Nuevo Horario</strong>
+</button>
+    </div>
+
+<section class="referral-progress-section">
+  <h2>Mi Progreso de Referidos</h2>
+  <p>Comparte los datos de tus referidos directamente desde tu panel, y sigue su progreso hasta obtener tu recompensa 🎁</p>
+<section class="referral-submission-section">
+  <h2>Agregar un Nuevo Referido</h2>
+  <p>Comparte los datos de tu referido y sigue su progreso en tiempo real.</p>
+
+  <form id="referralForm">
+    <label for="referralName">Nombre del referido:</label>
+    <input type="text" id="referralName" name="referralName" required placeholder="Ej. Juan Pérez">
+
+    <label for="referralEmail">Correo electrónico del referido:</label>
+    <input type="email" id="referralEmail" name="referralEmail" required placeholder="correo@ejemplo.com">
+
+    <label for="referralPhone">Número de WhatsApp:</label>
+    <input type="text" id="referralPhone" name="referralPhone" required placeholder="+50312345678">
+
+    <button type="submit">Enviar Referido 🎉</button>
+  </form>
+</section>
+
+<style>
+.referral-submission-section {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-submission-section label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.referral-submission-section input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.referral-submission-section button {
+  background-color: #003366;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.referral-submission-section button:hover {
+  background-color: #ff6600;
+}
+</style>
+
+    
+  <div id="referralList">
+    <p>Cargando tus referidos...</p>
+  </div>
+</section>
+
+<style>
+.referral-progress-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+}
+
+.referral-step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.referral-step span {
+  margin-left: 10px;
+}
+
+.referral-step .completed {
+  color: green;
+  font-weight: bold;
+}
+
+.referral-step .pending {
+  color: orange;
+}
+
+    #notificationPopup {
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+</style>
+
+    
+    <!-- Loyalty Rewards Section -->
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
+            <div class="loyalty-card">
+                <p>Completa 8 meses continuos y desbloquea los beneficios🔥</p>
+                <div class="holes">
+                   <div class="hole">○</div>
+                    <p>Proceso de registro completo</p>
+                    <div class="hole">○</div>
+                    <p>Pago inicial procesado en tu suscripción</p>
+                    <div class="hole">○</div>
+                    <p>1er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>3er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>5to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>6to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>7to Mes de suscripción activo</p>
+                    <div class="hole star">★</div>
+                    <p>8to Mes de suscripción activo</p>
+                </div>
+                <div class="description">
+                    <p><strong>Progreso atual:</strong></p>
+                </div>
+            </div>
+
+           <!-- Rewards -->
+<div class="rewards">
+    <h3><i class="fas fa-gift"></i> Premios Disponibles 
+        <span class="reward-status locked" style="margin-left:10px;"><i class="fas fa-lock"></i> Bloqueado</span>
+    </h3>
+    
+    <div class="reward-row"> <!-- FLEX ROW CONTAINER -->
+        <div class="reward-card">
+            <div class="reward-icon">🎐</div>
+            <div class="reward-info">
+                <h4>Recarga de A/C</h4>
+                <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
+        </div>
+        <div class="reward-card">
+            <div class="reward-icon">🚗</div>
+            <div class="reward-info">
+                <h4>Carwash gratis</h4>
+                <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
+        </div>
+        <div class="reward-card">
+            <div class="reward-icon">📝</div>
+            <div class="reward-info">
+                <h4>Revisión extra del mes en curso</h4>
+                <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
+        </div>
+    </div> <!-- End Flex Row -->
+</div>
+
+    
+
+
+
+
+    
      <footer>
         <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
         <ul>
@@ -1244,7 +1419,25 @@ function redirectToPayment() {
 
         
     </footer>
-    
+
+            <!-- 🔔 Notification Pop-up -->
+<div id="notificationPopup" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #003366;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 9999;
+  max-width: 300px;
+  font-size: 14px;
+">
+  <span id="notificationMessage">Notificación aquí</span>
+</div>
+
 
 </body>
 </html>
