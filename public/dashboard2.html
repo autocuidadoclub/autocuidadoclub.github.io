@@ -240,6 +240,31 @@
   background-color: #0056b3;
 }
 
+      #floating-offer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background: #fffbec;
+    border: 2px solid #ffc107;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    animation: pop-in 0.5s ease-out;
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
     </style>
 </head>
 <body>
@@ -404,6 +429,89 @@
     <strong>Guardar Nuevo Horario</strong>
 </button>
     </div>
+
+    <!-- 📢 Referral Program - Dashboard Block -->
+<div class="card" style="margin-top: 20px;">
+  <h3>🎉 Programa de Recomendaciones</h3>
+  <p>Invita a tus amigos y gana beneficios exclusivos.</p>
+  <p><strong>Tu código de referido:</strong></p>
+  <input type="text" id="referralCodeDisplay" readonly style="width: 100%; padding: 8px; margin-bottom: 10px;">
+  <button onclick="copyReferralCode()" class="orange-button">Copiar Código</button>
+
+  <p style="margin-top: 15px;"><strong>Referidos completados:</strong> <span id="referralsCompleted">0</span></p>
+  <p><strong>Bonos disponibles:</strong> <span id="bonusesAvailable">0</span></p>
+
+  <button onclick="claimReferralBonus()" class="orange-button" style="margin-top: 10px;">Reclamar Bono 🎁</button>
+</div>
+
+<!-- 💡 Pop-up Recomienda -->
+<div id="referralPopup" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%);
+background:#fff8e1; border:2px solid #ffc107; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.2);
+z-index:9999; text-align:center; max-width:90%;">
+  <h3>🎁 ¡Recomienda a un amigo!</h3>
+  <p>Comparte tu código y gana bonos cada vez que alguien active su plan.</p>
+  <button onclick="closeReferralPopup()" style="margin-top:10px; background:#ff6600; color:#fff; padding:10px 15px; border:none; border-radius:5px;">Cerrar</button>
+</div>
+
+<script>
+// 👥 Show Referral Data
+function loadReferralData(userData) {
+  const userId = userData.uid;
+  document.getElementById("referralCodeDisplay").value = userId;
+
+  db.collection("referrals").doc(userId).get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById("referralsCompleted").innerText = data.completed || 0;
+      document.getElementById("bonusesAvailable").innerText = data.bonuses || 0;
+    } else {
+      document.getElementById("referralsCompleted").innerText = "0";
+      document.getElementById("bonusesAvailable").innerText = "0";
+    }
+  });
+}
+
+// 📋 Copy Referral Code
+function copyReferralCode() {
+  const copyText = document.getElementById("referralCodeDisplay");
+  copyText.select();
+  document.execCommand("copy");
+  alert("✅ Código copiado: " + copyText.value);
+}
+
+// 🎉 Claim Referral Bonus
+function claimReferralBonus() {
+  const user = firebase.auth().currentUser;
+  if (!user) return alert("Debes iniciar sesión.");
+
+  const referralRef = db.collection("referrals").doc(user.uid);
+  referralRef.get().then(doc => {
+    if (doc.exists && doc.data().bonuses > 0) {
+      referralRef.update({
+        bonuses: firebase.firestore.FieldValue.increment(-1)
+      }).then(() => {
+        alert("🎉 ¡Bono reclamado con éxito!");
+        loadReferralData({ uid: user.uid });
+      });
+    } else {
+      alert("❌ No tienes bonos disponibles.");
+    }
+  });
+}
+
+// 🚀 Show Pop-up on load
+window.addEventListener("load", function () {
+  setTimeout(() => {
+    document.getElementById("referralPopup").style.display = "block";
+  }, 2000);
+});
+
+// 🛑 Close Pop-up
+function closeReferralPopup() {
+  document.getElementById("referralPopup").style.display = "none";
+}
+</script>
+
 
    
     <!-- Loyalty Rewards Section -->
@@ -731,8 +839,70 @@ if (currentPlanType === "basic3m") {
         option.selected = true;
         newPlanSelect.appendChild(option);
     }
+
+    showFreeRescheduleOffer(userData);
+
+    // Check for first-time payment offer
+const now = new Date();
+const registrationDate = userData.registrationDate?.toDate?.() || null;
+
+   function checkFirstTimePaymentOffer(userData) {
+  const now = new Date();
+  const regDate = userData.registrationDate?.toDate?.() || new Date(userData.registrationDate.seconds * 1000);
+  const daysSinceRegister = Math.floor((now - regDate) / (1000 * 60 * 60 * 24));
+
+  const shouldShowOffer =
+    userData.monthsPaid === 0 &&
+    userData.paymentStatus === "Pending" &&
+    daysSinceRegister >= 0;
+
+  console.log("📌 Checking first-time offer:");
+  console.log("monthsPaid:", userData.monthsPaid);
+  console.log("paymentStatus:", userData.paymentStatus);
+  console.log("daysSinceRegister:", daysSinceRegister);
+  console.log("👉 shouldShowOffer:", shouldShowOffer);
+
+ if (shouldShowOffer) {
+  // Show UI offer
+  const promoDiv = document.createElement("div");
+  promoDiv.innerHTML = `
+    <div id="promo-popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
+                background:#fffbe6; padding:20px; border-radius:15px; border:2px solid #ff9800;
+                z-index:9999; box-shadow:0px 4px 12px rgba(0,0,0,0.15); text-align:center; max-width:90%;">
+      <h3>🎁 ¡Activa tu plan ahora!</h3>
+      <p>Recibe una oferta especial por ser nuevo cliente: <strong>Tu primer mes por solo $5</strong></p>
+      <button onclick="window.location.href='pago.html'" style="background:#ff6600; color:white;
+              border:none; padding:10px 20px; border-radius:8px; font-size:16px; margin-top:10px;">
+        Activar Plan Ahora
+      </button>
+      <br>
+      <button onclick="closePromoPopup()" style="margin-top:10px; background:#cccccc; color:#333; padding:8px 16px; border:none; border-radius:5px;">Cerrar</button>
+    </div>
+  `;
+  document.body.appendChild(promoDiv);
+
+
+  // ✅ Tag in PushEngage
+  if (typeof _pe !== "undefined") {
+    _pe.tagPushSubscriber('not_paid_yet');
+    console.log("📬 PushEngage tag applied: not_paid_yet");
+  }
 }
 
+}
+
+updateLoyaltyCard(userData);
+    showFreeRescheduleOffer(userData);
+checkFirstTimePaymentOffer(userData); // ✅ add this here
+}
+
+  // ✅ Function to close the popup
+  function closePromoPopup() {
+    const popup = document.getElementById("promo-popup");
+    if (popup) {
+      popup.remove();
+    }
+  }
 
 // Payment Status Function
 function handlePaymentStatus(userData) {
@@ -972,7 +1142,74 @@ function loadPaymentHistory() {
   });
 }
 
-    
+    function showFreeRescheduleOffer(userData) {
+        console.log("Verificando oferta gratuita de reprogramación...");
+  const now = new Date();
+  const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
+  const monthsUnpaid = lastPaymentDate
+    ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
+    : 3; // default to 3 if missing
+
+  if (
+    userData.monthsPaid === 0 &&
+    monthsUnpaid >= 2 &&
+    userData.freeRescheduleClaimed === false
+  ) {
+    console.log("✅ Condiciones cumplidas, mostrando oferta...");
+    const offerBox = document.createElement("div");
+    offerBox.innerHTML = `
+      <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
+        <h3>🎁 ¡Te regalamos una cita!</h3>
+        <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
+        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" #claimFreeReschedule {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+>Agendar ahora</button>
+      </div>
+    `;
+    document.body.prepend(offerBox);
+
+    document.getElementById("claimFreeReschedule").addEventListener("click", () => {
+      // Redirect to booking page or open modal
+      window.location.href = "agenda.html?gratis=true";
+
+      // Optionally mark it as claimed (or after they book)
+      db.collection("users").doc(userData.uid).update({
+        freeRescheduleClaimed: true
+      });
+    });
+  }
+}
+
+     if (typeof _pe !== "undefined") {
+  _pe.tagPushSubscriber('inactive_2months');
+}
+
+     function showFirstTimePaymentOffer() {
+  const offerBox = document.createElement("div");
+  offerBox.innerHTML = `
+    <div style="background:#fff4e5; border:2px solid #ffa500; padding:20px; margin:20px 0; border-radius:10px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:1000; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" id="first-payment-offer">
+      <span onclick="document.getElementById('first-payment-offer').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
+      <h3>🎉 ¡Activa tu plan ahora!</h3>
+      <p>Recibe un beneficio especial: tu primer mes por solo <strong>$5</strong>. 🚗✨</p>
+      <button style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" onclick="redirectToPayment()">Activar Plan Ahora</button>
+    </div>
+  `;
+  document.body.appendChild(offerBox);
+}
+
+function redirectToPayment() {
+  // Redirect to your payment page or PayPal link
+  window.location.href = "https://www.paypal.com/pay/basic1m"; // Example link
+}
+
+   
 </script>
 
     
