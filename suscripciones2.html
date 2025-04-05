@@ -96,15 +96,21 @@ async function registerUser(event) {
 
     let referredBy = null;
 
-    if (referralEmail) {
-        const querySnapshot = await db.collection("users").where("email", "==", referralEmail).get();
-        if (querySnapshot.empty) {
-            alert("Correo de referido no encontrado. Verifica por favor.");
-            return;
-        } else {
-            referredBy = referralEmail;
-        }
+if (referralEmail) {
+    if (referralEmail.toLowerCase() === email.toLowerCase()) {
+        alert("No puedes referirte a ti mismo.");
+        return;
     }
+
+    const querySnapshot = await db.collection("users").where("email", "==", referralEmail).get();
+    if (querySnapshot.empty) {
+        alert("Correo de referido no encontrado. Verifica por favor.");
+        return;
+    } else {
+        referredBy = referralEmail;
+    }
+}
+
 
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
