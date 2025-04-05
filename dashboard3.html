@@ -317,7 +317,14 @@ if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confir
     if (countdownContainer) countdownContainer.style.display = "block";
 }
 
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    const subscriptionCard = document.getElementById("subscription-upgrade-card");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    subscriptionCard.classList.remove("subscription-blurred");
+} else {
+    subscriptionCard.classList.add("subscription-blurred");
+}
+
+        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
    // After updating schedule info
 document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
 
@@ -1046,6 +1053,19 @@ function redirectToPayment() {
     }
 }
 
+      .subscription-blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  position: relative;
+}
+
+.subscription-blurred h3 {
+  filter: none;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+}
+
     </style>
 </head>
 <body>
@@ -1132,7 +1152,7 @@ function redirectToPayment() {
         </div>
 
         <!-- Plan Upgrade Card -->
-        <div class="card">
+        <div class="card" id="subscription-upgrade-card">
             <h3>¿Te gustaría Mejorar de Suscripción?</h3>
             <p><strong>Tipo de Plan Actual:</strong></p>
             <p></p><span id="planType">Cargando...</span></p>
