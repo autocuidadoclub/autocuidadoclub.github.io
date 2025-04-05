@@ -16,121 +16,106 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM fully loaded!");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("✅ DOM fully loaded!");
 
-    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
-        console.error("❌ Error: Firebase env.js no cargado.");
-        alert("❌ Firebase no está inicializado. Revisa env.js.");
+            if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+                console.error("❌ Error: Firebase env.js no cargado.");
+                alert("❌ Firebase no está inicializado. Revisa env.js.");
+                return;
+            }
+
+            const firebaseConfig = {
+                apiKey: window._env_.FIREBASE_API_KEY,
+                authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                projectId: window._env_.FIREBASE_PROJECT_ID,
+                storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+                appId: window._env_.FIREBASE_APP_ID,
+                measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+            };
+
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log("✅ Firebase inicializado correctamente");
+            }
+
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            const messaging = firebase.messaging();
+            let selectedPlanType = null;
+
+            const registrationContainer = document.getElementById("registration-container");
+            const planButtons = document.querySelectorAll(".plan-button");
+
+            planButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    selectedPlanType = this.getAttribute("data-plan");
+                    updateVehicleFields(selectedPlanType);
+                    registrationContainer.style.display = "block";
+                    registrationContainer.scrollIntoView({ behavior: "smooth" });
+                    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+                });
+            });
+
+            document.getElementById("registerForm").addEventListener("submit", registerUser);
+
+           function registerUser(event) {
+    event.preventDefault();
+
+    if (!selectedPlanType) {
+        alert("❌ Debes seleccionar un plan antes de registrarte.");
         return;
     }
 
-    // ✅ Firebase init
-    const firebaseConfig = {
-        apiKey: window._env_.FIREBASE_API_KEY,
-        authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-        projectId: window._env_.FIREBASE_PROJECT_ID,
-        storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-        appId: window._env_.FIREBASE_APP_ID,
-        measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-    };
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
+    const referralCode = document.getElementById("referralCode")?.value.trim(); // ✅ Optional safe
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase inicializado correctamente");
-    }
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    window.selectedPlanType = null;
-
-    const registrationContainer = document.getElementById("registration-container");
-    const planButtons = document.querySelectorAll(".plan-button");
-
-    // ✅ Plan selection event
-    planButtons.forEach(button => {
-        button.addEventListener("click", function () {
-            window.selectedPlanType = this.getAttribute("data-plan");
-            updateVehicleFields(window.selectedPlanType);
-            registrationContainer.style.display = "block";
-            registrationContainer.scrollIntoView({ behavior: "smooth" });
-            console.log(`✅ Plan seleccionado: ${window.selectedPlanType}`);
+    const vehicles = [];
+    document.querySelectorAll(".vehicle-entry").forEach(entry => {
+        vehicles.push({
+            plate: entry.querySelector(".plate").value || "",
+            model: entry.querySelector(".model").value || "",
+            brand: entry.querySelector(".brand").value || "",
+            year: entry.querySelector(".year").value || ""
         });
     });
 
-    // ✅ Registration form submission
-    document.getElementById("registerForm").addEventListener("submit", async function (event) {
+    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios.");
+        return;
+    }
 
-        event.preventDefault();
-
-        if (!window.selectedPlanType) {
-            alert("❌ Debes seleccionar un plan antes de registrarte.");
-            return;
-        }
-
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const department = document.getElementById("department").value;
-        const municipality = document.getElementById("municipality").value;
-        const selectedDay = document.getElementById("selectedDay").value;
-        const selectedTime = document.getElementById("selectedTime").value;
-        const referralEmail = document.getElementById("referralCode").value.trim();
-
-        const vehicles = [];
-        document.querySelectorAll(".vehicle-entry").forEach(entry => {
-            vehicles.push({
-                plate: entry.querySelector(".plate").value || "",
-                model: entry.querySelector(".model").value || "",
-                brand: entry.querySelector(".brand").value || "",
-                year: entry.querySelector(".year").value || ""
-            });
-        });
-
-        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-            alert("❌ Todos los campos son obligatorios.");
-            return;
-        }
-
-        let referredBy = null;
-        if (referralEmail) {
-            try {
-                const querySnapshot = await db.collection("users").where("email", "==", referralEmail).get();
-                if (querySnapshot.empty) {
-                    alert("❌ Correo de referido no encontrado. Verifica por favor.");
-                    return;
-                } else {
-                    referredBy = referralEmail;
-                    console.log("✅ Correo de referido válido:", referredBy);
-                }
-            } catch (error) {
-                console.error("❌ Error al verificar el correo de referido:", error);
-                alert("❌ Error al verificar el correo de referido: " + error.message);
-                return;
-            }
-        }
-
-        try {
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
             const userId = userCredential.user.uid;
             const paymentDate = new Date();
-            const nextPaymentDate = new Date(paymentDate);
+            const nextPaymentDate = new Date();
             nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
+            // ✅ Prepare user data
             const userData = {
                 uid: userId,
                 name,
                 email,
                 phone,
-                planType: window.selectedPlanType,
+                planType: selectedPlanType,
                 department,
                 municipality,
                 registrationDate: firebase.firestore.Timestamp.now(),
                 lastUpgradeDate: firebase.firestore.Timestamp.now(),
-                schedule: { day: selectedDay, time: selectedTime },
+                schedule: {
+                    day: selectedDay,
+                    time: selectedTime
+                },
                 paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
                 nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
                 paymentStatus: "Pending",
@@ -138,95 +123,68 @@ document.addEventListener("DOMContentLoaded", function () {
                 monthsPaid: 0,
                 vehicles,
                 freeRescheduleClaimed: false,
-                referredBy
+                referredBy: referrerrEmail || null
             };
 
-            await db.collection("users").doc(userId).set(userData);
+            // ✅ Save user profile
+            return db.collection("users").doc(userId).set(userData).then(() => {
+                // ✅ If referral code is used, update referrer data
+                if (referralCode && referralCode !== userId) {
+                    const referrerRef = db.collection("referrals").doc(referralCode);
 
-            // ✅ Referral bonus
-            if (referredBy) {
-                const referrerSnapshot = await db.collection("users").where("email", "==", referredBy).get();
-                if (!referrerSnapshot.empty) {
-                    const referrerDoc = referrerSnapshot.docs[0];
-                    const referrerId = referrerDoc.id;
-
-                    await db.collection("referrals").doc(referrerId).set({
+                    return referrerRef.set({
                         completed: firebase.firestore.FieldValue.increment(1),
                         bonuses: firebase.firestore.FieldValue.increment(1)
-                    }, { merge: true });
-
-                    console.log("🎉 Bono de referido aplicado para:", referredBy);
+                    }, { merge: true }).then(() => {
+                        console.log("🎉 Referral bonus applied for:", referralCode);
+                    }).catch(err => {
+                        console.error("❌ Error updating referral data:", err);
+                    });
                 }
-            }
+            });
+        })
+        .then(() => {
+            // ✅ Show success overlay
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = "9999";
+            overlay.innerHTML = `
+                <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
+                <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
+                <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+            `;
+            document.body.appendChild(overlay);
 
-            showSuccessOverlay();
+            const style = document.createElement("style");
+            style.innerHTML = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
 
-        } catch (error) {
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2500);
+        })
+        .catch((error) => {
             console.error("❌ Error en el registro:", error.message);
             alert("❌ Error en el registro: " + error.message);
-        }
-    });
+        });
+}
 
-    function updateVehicleFields(planType) {
-        const vehicleContainer = document.getElementById("vehicle-container");
-        vehicleContainer.innerHTML = "";
 
-        const maxVehicles = planType.includes("plus") ? 3 : 1;
-        for (let i = 0; i < maxVehicles; i++) {
-            const vehicleEntry = document.createElement("div");
-            vehicleEntry.classList.add("vehicle-entry");
-            vehicleEntry.innerHTML = `
-                <h4>Vehículo ${i + 1}</h4>
-                <label>Placa:</label>
-                <input type="text" class="plate" required>
-                <label>Modelo:</label>
-                <input type="text" class="model" required>
-                <label>Marca:</label>
-                <input type="text" class="brand" required>
-                <label>Año:</label>
-                <input type="number" class="year" required>
-            `;
-            vehicleContainer.appendChild(vehicleEntry);
-        }
-
-        console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
-    }
-
-    function showSuccessOverlay() {
-        const overlay = document.createElement("div");
-        overlay.style.position = "fixed";
-        overlay.style.top = "0";
-        overlay.style.left = "0";
-        overlay.style.width = "100%";
-        overlay.style.height = "100%";
-        overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-        overlay.style.display = "flex";
-        overlay.style.flexDirection = "column";
-        overlay.style.justifyContent = "center";
-        overlay.style.alignItems = "center";
-        overlay.style.zIndex = "9999";
-        overlay.innerHTML = `
-            <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-            <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-            <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-        `;
-        document.body.appendChild(overlay);
-
-        const style = document.createElement("style");
-        style.innerHTML = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 2500);
-    }
-});
-                  
+            
            window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
     const timeBlock = cell.innerText.trim();
@@ -1072,7 +1030,47 @@ button:hover {
   <input type="text" id="referralCode" name="referralCode" placeholder="Código de referido (opcional)">
 </div>
 
-           
+<script>
+// 🎉 Referral Tracking on Registration
+function handleRegistration(newUserId) {
+  const referralCode = document.getElementById("referralCode").value.trim();
+
+  if (referralCode && referralCode !== newUserId) {
+    const referrerRef = db.collection("referrals").doc(referralCode);
+
+    // Increment completed referrals and bonuses
+    referrerRef.set({
+      completed: firebase.firestore.FieldValue.increment(1),
+      bonuses: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true }).then(() => {
+      console.log("🎉 Referral data updated for referrer:", referralCode);
+
+      // ✅ Optionally, send push notification
+      if (typeof _pe !== "undefined") {
+        _pe.tagPushSubscriber('referral_completed');
+      }
+
+      // ✅ Optional: send confirmation email to referrer
+      /*
+      emailjs.send('service_id', 'template_id', {
+        to_email: referrerEmail, // You need to fetch this from Firestore
+        message: '¡Has ganado un nuevo bono por referir!'
+      }).then(response => {
+        console.log("Email sent", response);
+      }).catch(err => console.error("Email error", err));
+      */
+
+    }).catch(err => console.error("Error updating referrer:", err));
+
+    // Save referral in new user profile
+    db.collection("users").doc(newUserId).update({
+      referredBy: referralCode
+    });
+  }
+}
+</script>
+
+            
         <button type="submit">Registrarse</button>
     
         </div>
@@ -1179,7 +1177,69 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
+    const messaging = firebase.messaging();
+          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
+  .then((token) => {
+    console.log("✅ pushToken obtenido:", token);
+    return db.collection("users").doc(userId).set({
+      uid: userId,
+      name,
+      email,
+      phone,
+      planType: selectedPlanType,
+      department,
+      municipality,
+      registrationDate: firebase.firestore.Timestamp.now(),
+      lastUpgradeDate: firebase.firestore.Timestamp.now(),
+      schedule: {
+        day: selectedDay,
+        time: selectedTime
+      },
+      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+      paymentStatus: "Pending",
+      subscriptionStatus: "active",
+      monthsPaid: 0,
+      vehicles,
+      freeRescheduleClaimed: false,
+      referredBy: referredByEmail
+    });
+       if (referralCode && referralCode !== userId) {
+        await db.collection("referrals").doc(referralCode).set({
+          completed: firebase.firestore.FieldValue.increment(1),
+          bonuses: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true });
+        if (typeof _pe !== "undefined") {
+          _pe.tagPushSubscriber('referral_completed');
+        }
+      }
+
+      if (typeof _pe !== "undefined") {
+        _pe.tagPushSubscriber('not_paid_yet');
+      }
+
+      document.getElementById("successOverlay").style.display = "flex";
+      setTimeout(() => { window.location.href = "login.html"; }, 2500);
+
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("Error: " + error.message);
+    }
+  });
+
+
+        function getNextMonthDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+}
 
 // Then, inside the PayPal success logic or registration confirmation:
 const user = firebase.auth().currentUser;
