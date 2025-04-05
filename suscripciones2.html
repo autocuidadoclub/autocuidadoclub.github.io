@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ Registration form submission
     document.getElementById("registerForm").addEventListener("submit", async function (event) {
+
         event.preventDefault();
 
         if (!window.selectedPlanType) {
@@ -1185,56 +1186,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const nextPaymentDate = new Date();
         nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-    const messaging = firebase.messaging();
-          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
-  .then((token) => {
-    console.log("✅ pushToken obtenido:", token);
-    return db.collection("users").doc(userId).set({
-      uid: userId,
-      name,
-      email,
-      phone,
-      planType: selectedPlanType,
-      department,
-      municipality,
-      registrationDate: firebase.firestore.Timestamp.now(),
-      lastUpgradeDate: firebase.firestore.Timestamp.now(),
-      schedule: {
-        day: selectedDay,
-        time: selectedTime
-      },
-      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-      paymentStatus: "Pending",
-      subscriptionStatus: "active",
-      monthsPaid: 0,
-      vehicles,
-      freeRescheduleClaimed: false,
-      referredBy: referredByEmail
-    });
-       if (referralCode && referralCode !== userId) {
-        await db.collection("referrals").doc(referralCode).set({
-          completed: firebase.firestore.FieldValue.increment(1),
-          bonuses: firebase.firestore.FieldValue.increment(1)
-        }, { merge: true });
-        if (typeof _pe !== "undefined") {
-          _pe.tagPushSubscriber('referral_completed');
-        }
-      }
-
-      if (typeof _pe !== "undefined") {
-        _pe.tagPushSubscriber('not_paid_yet');
-      }
-
-      document.getElementById("successOverlay").style.display = "flex";
-      setTimeout(() => { window.location.href = "login.html"; }, 2500);
-
-    } catch (error) {
-      console.error("❌ Error:", error);
-      alert("Error: " + error.message);
-    }
-  });
-
+   await db.collection("users").doc(userId).set(userData);
 
         function getNextMonthDate() {
   const date = new Date();
