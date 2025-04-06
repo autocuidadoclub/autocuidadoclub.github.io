@@ -846,6 +846,33 @@ function populatePopupDepartments() {
     option.textContent = dept;
     departmentSelect.appendChild(option);
   }
+
+  // ✅ Add municipality change warning check
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+
+  const warningDiv = document.getElementById("municipality-warning");
+  const saveButton = document.getElementById("saveLocationButton");
+
+  db.collection("users").doc(user.uid).get().then(doc => {
+    const data = doc.data();
+    const lastChange = data.lastMunicipalityChange?.toDate();
+    const now = new Date();
+
+    if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+      const formattedDate = lastChange.toLocaleDateString("es-ES");
+      warningDiv.style.display = "block";
+      warningDiv.innerHTML = `⚠️ Solo puedes cambiar tu municipio una vez al mes. Último cambio: ${formattedDate}`;
+      saveButton.disabled = true;
+      saveButton.style.backgroundColor = "#ccc";
+      saveButton.style.cursor = "not-allowed";
+    } else {
+      warningDiv.style.display = "none";
+      saveButton.disabled = false;
+      saveButton.style.backgroundColor = "#003366";
+      saveButton.style.cursor = "pointer";
+    }
+  });
 }
 
 function updatePopupMunicipalities() {
@@ -1221,9 +1248,14 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   <p style="margin: 0; color: #333;">
     ¿Necesitas actualizar el municipio donde realizaremos la inspección? Puedes hacerlo 1 vez y lo ejecutaremos el mes próximo.
   </p>
-  <button onclick="openLocationPopup()" style="margin-top: 8px; background-color: #ff6600; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer;">
-    Cambiar Municipio
-  </button>
+  <div style="margin-top: 15px;">
+  <button id="saveLocationButton" onclick="saveLocationChange()" style="background-color: #003366; color: white; border: none; border-radius: 4px; padding: 8px 12px; margin-right: 5px;">Guardar</button>
+  <button onclick="closeLocationPopup()" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px;">Cancelar</button>
+</div>
+
+</div>
+<div id="municipality-warning" style="color: orange; font-weight: bold; margin-top: 10px; display: none;">
+  ⚠️ Solo puedes cambiar tu municipio una vez al mes.
 </div>
 
             <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
