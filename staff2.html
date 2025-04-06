@@ -186,32 +186,56 @@
       initializeDataTable(tableId);
     }
 
-    function findUsersByDate() {
-      const startDate = new Date(document.getElementById("startDate").value);
-      const endDate = new Date(document.getElementById("endDate").value);
-      endDate.setDate(endDate.getDate() + 1);
+   // ✅ Buscar usuarios por fecha
+function findUsersByDate() {
+  const startDate = new Date(document.getElementById("startDate").value);
+  const endDate = new Date(document.getElementById("endDate").value);
+  endDate.setDate(endDate.getDate() + 1); // Incluir todo el día seleccionado
 
-      const table = document.getElementById("paymentTable").getElementsByTagName('tbody')[0];
-      table.innerHTML = "";
+  const table = document.getElementById("paymentTable");
+  table.innerHTML = "";
 
-      db.collection("users")
-        .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-        .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
-        .get()
-        .then(snapshot => {
-          if (snapshot.empty) {
-            alert("No se encontraron usuarios en el rango de fechas.");
-            refreshDataTable('paymentTable');
-            return;
-          }
-          snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
-          refreshDataTable('paymentTable');
-        })
-        .catch(error => {
-          console.error("Error al buscar usuarios:", error);
-          alert("Error al buscar usuarios.");
-        });
-    }
+  db.collection("users")
+    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+    .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        alert("No se encontraron usuarios en el rango de fechas.");
+        return;
+      }
+      snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
+    })
+    .catch(error => {
+      console.error("Error al buscar usuarios:", error);
+      alert("Error al buscar usuarios.");
+    });
+}
+
+// ✅ Actualizar la tabla de resultados
+function updatePaymentTable(user, userId) {
+  const table = document.getElementById("paymentTable");
+  const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+  const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
+  const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+  const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+
+  table.innerHTML += `
+    <tr>
+      <td>${user.name || "No disponible"}</td>
+      <td>${user.email || "No disponible"}</td>
+      <td>${user.phone || "No disponible"}</td>
+      <td>${registrationDate}</td>
+      <td>${schedule}</td>
+      <td>${paymentDate}</td>
+      <td>${user.paymentStatus || "Pendiente"}</td>
+      <td>${nextPaymentDate}</td>
+      <td>
+        <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
+        <button onclick="viewPaymentHistory('${userId}')">Ver Historial</button>
+      </td>
+    </tr>`;
+}
 
     function updatePaymentTable(user, userId) {
       const table = document.getElementById("paymentTable").getElementsByTagName('tbody')[0];
