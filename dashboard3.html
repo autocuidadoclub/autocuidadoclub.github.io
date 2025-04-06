@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ Guardar Referido
 // 🔥 Referral Form Handling (Anti-duplicate, Realtime validation, Spinner, Button control)
+// 🔥 Gestión de Referidos (Validación en tiempo real, Spinner, Control del botón, Español)
 document.addEventListener("DOMContentLoaded", () => {
     const referralForm = document.getElementById("referralForm");
     const nameInput = document.getElementById("referralName");
@@ -67,19 +68,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = referralForm.querySelector("button[type='submit']");
 
     let currentUserEmail = null;
-    let emailExists = true; // Start as true to disable the button by default
+    let emailExists = true; // Inicia como true para desactivar el botón por defecto
 
-    // Disable autocomplete for all inputs
+    // Desactivar autocompletar en todos los campos
     referralForm.setAttribute("autocomplete", "off");
     nameInput.setAttribute("autocomplete", "off");
     emailInput.setAttribute("autocomplete", "off");
     phoneInput.setAttribute("autocomplete", "off");
 
-    // Disable copy/paste in email field for extra security
+    // Desactivar copiar/pegar en campo de email
     emailInput.addEventListener("paste", (e) => e.preventDefault());
     emailInput.addEventListener("copy", (e) => e.preventDefault());
 
-    // Create feedback message and spinner elements
+    // Crear elementos de feedback y spinner
     const feedbackContainer = document.createElement("div");
     feedbackContainer.style.display = "flex";
     feedbackContainer.style.alignItems = "center";
@@ -97,22 +98,22 @@ document.addEventListener("DOMContentLoaded", () => {
     feedbackContainer.appendChild(spinner);
     emailInput.parentNode.appendChild(feedbackContainer);
 
-    // Disable submit button initially
+    // Desactivar botón por defecto
     submitButton.disabled = true;
 
-    // Get current user email
+    // Obtener email del usuario actual
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUserEmail = user.email;
         }
     });
 
-    // Function to update submit button state
+    // Función para actualizar estado del botón
     const updateSubmitButtonState = () => {
         submitButton.disabled = emailExists;
     };
 
-    // Live check for email validity
+    // Verificación en tiempo real del correo
     emailInput.addEventListener("input", async () => {
         const email = emailInput.value.trim().toLowerCase();
 
@@ -126,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (email === currentUserEmail) {
             feedbackMessage.style.color = "red";
-            feedbackMessage.textContent = "❌ You cannot enter your own email as referral.";
+            feedbackMessage.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
             spinner.style.display = "none";
             emailExists = true;
             updateSubmitButtonState();
@@ -134,28 +135,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            // Show spinner
             spinner.style.display = "inline-block";
             feedbackMessage.style.color = "black";
-            feedbackMessage.textContent = "Checking email availability...";
+            feedbackMessage.textContent = "Verificando disponibilidad del correo...";
 
             const snapshot = await db.collectionGroup("referrals").where("email", "==", email).get();
 
-            spinner.style.display = "none"; // Hide spinner after check
+            spinner.style.display = "none";
 
             if (!snapshot.empty) {
                 feedbackMessage.style.color = "red";
-                feedbackMessage.textContent = "❌ This email is already registered by another customer.";
+                feedbackMessage.textContent = "❌ Este correo ya ha sido registrado por otro cliente.";
                 emailExists = true;
             } else {
                 feedbackMessage.style.color = "green";
-                feedbackMessage.textContent = "✅ Email is valid and available!";
+                feedbackMessage.textContent = "✅ ¡Correo disponible!";
                 emailExists = false;
             }
         } catch (error) {
-            console.error("Error checking email:", error);
+            console.error("Error al verificar el correo:", error);
             feedbackMessage.style.color = "red";
-            feedbackMessage.textContent = "❌ Error verifying this email. Please try again.";
+            feedbackMessage.textContent = "❌ Error al verificar este correo. Por favor intenta nuevamente.";
             spinner.style.display = "none";
             emailExists = true;
         }
@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateSubmitButtonState();
     });
 
-    // Handle form submission
+    // Manejar el envío del formulario
     referralForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -173,12 +173,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const user = auth.currentUser;
 
         if (!user) {
-            alert("You must be logged in to send referrals.");
+            alert("Debes iniciar sesión para enviar referidos.");
             return;
         }
 
         if (emailExists) {
-            alert("This email has already been registered. Please use a different one.");
+            alert("Este correo ya ha sido registrado. Por favor utiliza uno diferente.");
             return;
         }
 
@@ -194,20 +194,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 timestamp: firebase.firestore.Timestamp.now()
             });
 
-            // Optional: email notification to admin
+            // Notificación por correo opcional
             await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
                 method: 'POST',
                 body: new URLSearchParams({
                     name,
                     email,
                     phone,
-                    message: `New referral added by customer. Name: ${name}, Email: ${email}, Phone: ${phone}`
+                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
                 })
             });
 
-            showSuccessPopup("🎉 Referral successfully sent", "You can now track their progress in your dashboard.");
+            showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
-            // Reset form and feedback
             referralForm.reset();
             feedbackMessage.textContent = "";
             spinner.style.display = "none";
@@ -215,12 +214,13 @@ document.addEventListener("DOMContentLoaded", () => {
             updateSubmitButtonState();
 
         } catch (error) {
-            console.error("Error submitting referral:", error);
-            alert("There was an error submitting your referral. Please try again.");
+            console.error("Error al enviar el referido:", error);
+            alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
         }
     });
 });
 
+        
 // ✅ Función para mostrar popup de éxito
 function showSuccessPopup(title, message) {
     const successMessage = document.createElement("div");
