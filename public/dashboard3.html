@@ -150,60 +150,78 @@ document.addEventListener("DOMContentLoaded", () => {
     emailInput.addEventListener("input", checkOwnEmail);
 
     // ✅ Form submit
-    referralForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+  referralForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-        const name = nameInput.value.trim();
-        const email = emailInput.value.trim().toLowerCase();
-        const phone = phoneInput.value.trim();
-        const user = auth.currentUser;
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
+    const phone = phoneInput.value.trim();
+    const user = auth.currentUser;
 
-        if (!user) {
-            alert("Debes iniciar sesión para enviar referidos.");
-            return;
+    if (!user) {
+        alert("Debes iniciar sesión para enviar referidos.");
+        return;
+    }
+
+    if (isOwnEmail || !phoneValid) {
+        alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
+        return;
+    }
+
+    try {
+        // 🔍 Buscar en todos los usuarios si este correo ya está registrado
+        const existingUsers = await db.collection("users").where("email", "==", email).get();
+
+        if (!existingUsers.empty) {
+            const existingUser = existingUsers.docs[0].data();
+            const status = existingUser.paymentStatus || "Pending";
+
+            if (status === "Pending") {
+                alert("⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.");
+            } else {
+                alert("⚠️ Este referido ya está registrado y activo.");
+            }
+
+            return; // ❌ No guardar duplicado
         }
 
-        if (isOwnEmail || !phoneValid) {
-            alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
-            return;
-        }
+        // ✅ Guardar en la colección del usuario actual
+        const referralId = Date.now().toString();
 
-        try {
-            const referralId = Date.now().toString();
+        await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
+            name,
+            email,
+            phone,
+            registered: false,
+            paid: false,
+            timestamp: firebase.firestore.Timestamp.now()
+        });
 
-            await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
+        // ✅ Enviar correo al staff
+        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: 'POST',
+            body: new URLSearchParams({
                 name,
                 email,
                 phone,
-                registered: false,
-                paid: false,
-                timestamp: firebase.firestore.Timestamp.now()
-            });
+                message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+            })
+        });
 
-            await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-                method: 'POST',
-                body: new URLSearchParams({
-                    name,
-                    email,
-                    phone,
-                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
-                })
-            });
+        showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
-            showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
+        referralForm.reset();
+        emailFeedback.message.textContent = "";
+        phoneFeedback.message.textContent = "";
+        isOwnEmail = true;
+        phoneValid = false;
+        updateSubmitButtonState();
 
-            referralForm.reset();
-            emailFeedback.message.textContent = "";
-            phoneFeedback.message.textContent = "";
-            isOwnEmail = true;
-            phoneValid = false;
-            updateSubmitButtonState();
-
-        } catch (error) {
-            console.error("Error al enviar el referido:", error);
-            alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
-        }
-    });
+    } catch (error) {
+        console.error("Error al enviar el referido:", error);
+        alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
+    }
+});
 });
 
         
