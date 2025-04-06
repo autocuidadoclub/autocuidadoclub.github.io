@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -195,6 +196,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
+            sendCustomerEmail(
+    "🎉 Nuevo referido agregado - AutoCuidado Club",
+    `
+       ¡Has agregado un nuevo referido!
+        Nombre: ${name}
+        Email: ${email}
+        WhatsApp:https://wa.me/${phone.replace('+', '')}
+        Ahora puedes seguir el progreso de este referido directamente desde tu panel.
+    `,
+    user.email
+);
+
+            
             referralForm.reset();
             emailFeedback.message.textContent = "";
             phoneFeedback.message.textContent = "";
@@ -242,9 +256,9 @@ function loadReferrals(userId) {
                 html += `
                     <div class="referral-item">
                         <h4>${data.email || "Correo no disponible"}</h4>
-                        <div class="referral-step">${data.timestamp ? "✅" : "⏳"} <span>${data.timestamp ? '1. Información enviada' : 'Esperando...'}</span></div>
-                        <div class="referral-step">${data.registered ? "✅" : "⏳"} <span>${data.registered ? '2. Cliente registrado' : 'Esperando...'}</span></div>
-                        <div class="referral-step">${data.paid ? "✅" : "⏳"} <span>${data.paid ? '3. Pago recibido' : 'Esperando...'}</span></div>
+                        <div class="referral-step">${data.timestamp ? "✅" : "⏳"} <span>${data.timestamp ? '1. Información enviada' : '1. Información enviada: Esperando...'}</span></div>
+                        <div class="referral-step">${data.registered ? "✅" : "⏳"} <span>${data.registered ? '2. Cliente registrado' : '2. Cliente registrado: Esperando...'}</span></div>
+                        <div class="referral-step">${data.paid ? "✅" : "⏳"} <span>${data.paid ? '3. Cliente completo su suscripción: Pago recibido' : '3. Cliente completo su suscripción: Esperando...'}</span></div>
                     </div>`;
             });
             referralList.innerHTML = html;
@@ -268,20 +282,36 @@ function listenForReferralUpdates(userId, userEmail) {
 
             if (!lastReferralStates[referralId].registered && referral.registered) {
                 showDashboardNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
-                sendCustomerEmail(
-                    "🎉 Notificación de referido registrado",
-                    `Tu referido ${referral.name} se ha registrado exitosamente.`,
-                    userEmail
-                );
+               sendCustomerEmail(
+    "🎉 Tu referido se ha registrado - AutoCuidado Club",
+    `
+        ¡Tu referido ha completado el registro!
+        Nombre: ${referral.name}
+        Email:</strong> ${referral.email}
+       📲 WhatsApp:<https://wa.me/${referral.phone.replace('+', '')}" 
+        Sigue pendiente, recibirás otra notificación cuando complete su pago
+        
+    `,
+    userEmail
+);
+
             }
 
             if (!lastReferralStates[referralId].paid && referral.paid) {
                 showDashboardNotification(`💸 Tu referido ${referral.name} completó su primer pago. ¡Bono desbloqueado! 🎁`);
                 sendCustomerEmail(
-                    "🎉 Notificación de bono desbloqueado",
-                    `¡Felicidades! Tu referido ${referral.name} completó su pago y has desbloqueado tu bono.`,
-                    userEmail
-                );
+    "🎉 ¡Bono desbloqueado! - AutoCuidado Club",
+    `
+        Tu referido ha realizado su pago ✅
+        Nombre: ${referral.name}
+        Email: ${referral.email}
+       📲 WhatsApp: https://wa.me/${referral.phone.replace('+', '')}
+        🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.
+
+           `,
+    userEmail
+);
+
             }
 
             lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
@@ -301,15 +331,23 @@ function showDashboardNotification(message) {
 
 // ✅ Notificación por correo al cliente
 function sendCustomerEmail(subject, message, customerEmail) {
+    const styledMessage = `
+        ${message}
+      Síguenos en nuestras redes sociales: 
+      📘 https://www.instagram.com/autocuidadoclub
+      📷 https://www.facebook.com/profile.php?id=61566547237325
+    `;
+
     fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         method: 'POST',
         body: new URLSearchParams({
-            email: customerEmail,
-            subject,
-            message
-        })
+    email: customerEmail,
+    subject,
+    message: styledMessage // ❌ this sends as plain text
+})
     });
 }
+
 
      
   // Try to get the saved end time from localStorage
