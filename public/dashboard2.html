@@ -58,8 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ✅ Guardar Referido
-// 🔥 Referral Form Handling (Anti-duplicate, Realtime validation, Spinner, Button control)
-// 🔥 Gestión de Referidos (Validación en tiempo real, Spinner, Control del botón, Español)
+// ✅ Debounce helper function
 document.addEventListener("DOMContentLoaded", () => {
     const referralForm = document.getElementById("referralForm");
     const nameInput = document.getElementById("referralName");
@@ -68,102 +67,89 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = referralForm.querySelector("button[type='submit']");
 
     let currentUserEmail = null;
-    let emailExists = true; // Inicia como true para desactivar el botón por defecto
+    let isOwnEmail = true;
+    let phoneValid = false;
 
-    // Desactivar autocompletar en todos los campos
-    referralForm.setAttribute("autocomplete", "off");
-    nameInput.setAttribute("autocomplete", "off");
-    emailInput.setAttribute("autocomplete", "off");
-    phoneInput.setAttribute("autocomplete", "off");
+    // Disable autocomplete
+    [referralForm, nameInput, emailInput, phoneInput].forEach(input => input.setAttribute("autocomplete", "off"));
 
-    // Desactivar copiar/pegar en campo de email
+    // Prevent copy/paste in email
     emailInput.addEventListener("paste", (e) => e.preventDefault());
     emailInput.addEventListener("copy", (e) => e.preventDefault());
 
-    // Crear elementos de feedback y spinner
-    const feedbackContainer = document.createElement("div");
-    feedbackContainer.style.display = "flex";
-    feedbackContainer.style.alignItems = "center";
-    feedbackContainer.style.marginTop = "5px";
+    // Feedback containers
+    const createFeedbackContainer = (inputElement) => {
+        const container = document.createElement("div");
+        container.style.display = "flex";
+        container.style.alignItems = "center";
+        container.style.marginTop = "5px";
 
-    const feedbackMessage = document.createElement("span");
-    feedbackMessage.style.fontWeight = "bold";
+        const message = document.createElement("span");
+        message.style.fontWeight = "bold";
 
-    const spinner = document.createElement("span");
-    spinner.style.display = "none";
-    spinner.style.marginLeft = "8px";
-    spinner.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; // FontAwesome spinner
+        container.appendChild(message);
+        inputElement.parentNode.appendChild(container);
 
-    feedbackContainer.appendChild(feedbackMessage);
-    feedbackContainer.appendChild(spinner);
-    emailInput.parentNode.appendChild(feedbackContainer);
+        return { container, message };
+    };
 
-    // Desactivar botón por defecto
-    submitButton.disabled = true;
+    const emailFeedback = createFeedbackContainer(emailInput);
+    const phoneFeedback = createFeedbackContainer(phoneInput);
 
-    // Obtener email del usuario actual
+    const updateSubmitButtonState = () => {
+        submitButton.disabled = isOwnEmail || !phoneValid;
+    };
+
+    // ✅ Get current user email
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUserEmail = user.email;
         }
     });
 
-    // Función para actualizar estado del botón
-    const updateSubmitButtonState = () => {
-        submitButton.disabled = emailExists;
-    };
+    // ✅ WhatsApp number format validation
+    const validatePhoneNumber = () => {
+        const phone = phoneInput.value.trim();
+        const regex = /^\+503\d{8}$/;
 
-    // Verificación en tiempo real del correo
-    emailInput.addEventListener("input", async () => {
-        const email = emailInput.value.trim().toLowerCase();
-
-        if (email === "") {
-            feedbackMessage.textContent = "";
-            spinner.style.display = "none";
-            emailExists = true;
-            updateSubmitButtonState();
-            return;
-        }
-
-        if (email === currentUserEmail) {
-            feedbackMessage.style.color = "red";
-            feedbackMessage.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
-            spinner.style.display = "none";
-            emailExists = true;
-            updateSubmitButtonState();
-            return;
-        }
-
-        try {
-            spinner.style.display = "inline-block";
-            feedbackMessage.style.color = "black";
-            feedbackMessage.textContent = "Verificando disponibilidad del correo...";
-
-            const snapshot = await db.collectionGroup("referrals").where("email", "==", email).get();
-
-            spinner.style.display = "none";
-
-            if (!snapshot.empty) {
-                feedbackMessage.style.color = "red";
-                feedbackMessage.textContent = "❌ Este correo ya ha sido registrado por otro cliente.";
-                emailExists = true;
-            } else {
-                feedbackMessage.style.color = "green";
-                feedbackMessage.textContent = "✅ ¡Correo disponible!";
-                emailExists = false;
-            }
-        } catch (error) {
-            console.error("Error al verificar el correo:", error);
-            feedbackMessage.style.color = "red";
-            feedbackMessage.textContent = "❌ Error al verificar este correo. Por favor intenta nuevamente.";
-            spinner.style.display = "none";
-            emailExists = true;
+        if (regex.test(phone)) {
+            phoneFeedback.message.style.color = "green";
+            phoneFeedback.message.textContent = "✅ Número válido";
+            phoneValid = true;
+        } else {
+            phoneFeedback.message.style.color = "red";
+            phoneFeedback.message.textContent = "❌ Formato incorrecto. Usa: +503XXXXXXXX";
+            phoneValid = false;
         }
 
         updateSubmitButtonState();
-    });
+    };
 
-    // Manejar el envío del formulario
+    phoneInput.addEventListener("input", validatePhoneNumber);
+
+    // ✅ Simple own email check (no Firebase read!)
+    const checkOwnEmail = () => {
+        const email = emailInput.value.trim().toLowerCase();
+
+        if (email === "") {
+            emailFeedback.message.textContent = "";
+            isOwnEmail = true;
+        } else if (email === currentUserEmail) {
+            emailFeedback.message.style.color = "red";
+            emailFeedback.message.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
+            isOwnEmail = true;
+        } else {
+            emailFeedback.message.style.color = "green";
+            emailFeedback.message.textContent = "";
+            isOwnEmail = false;
+        }
+
+        updateSubmitButtonState();
+    };
+
+    emailInput.addEventListener("input", checkOwnEmail);
+
+    // ✅ Form submit
     referralForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -177,8 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (emailExists) {
-            alert("Este correo ya ha sido registrado. Por favor utiliza uno diferente.");
+        if (isOwnEmail || !phoneValid) {
+            alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
             return;
         }
 
@@ -194,7 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 timestamp: firebase.firestore.Timestamp.now()
             });
 
-            // Notificación por correo opcional
             await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
                 method: 'POST',
                 body: new URLSearchParams({
@@ -208,9 +193,10 @@ document.addEventListener("DOMContentLoaded", () => {
             showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
             referralForm.reset();
-            feedbackMessage.textContent = "";
-            spinner.style.display = "none";
-            emailExists = true;
+            emailFeedback.message.textContent = "";
+            phoneFeedback.message.textContent = "";
+            isOwnEmail = true;
+            phoneValid = false;
             updateSubmitButtonState();
 
         } catch (error) {
