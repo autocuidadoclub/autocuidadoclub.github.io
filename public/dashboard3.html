@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     emailInput.addEventListener("input", checkOwnEmail);
 
     // ✅ Form submit
-  referralForm.addEventListener("submit", async (event) => {
+ referralForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const name = nameInput.value.trim();
@@ -159,45 +159,58 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = auth.currentUser;
 
     if (!user) {
-        alert("Debes iniciar sesión para enviar referidos.");
+        showDashboardNotification("❌ Debes iniciar sesión para enviar referidos.");
         return;
     }
 
-    if (isOwnEmail || !phoneValid) {
-        alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
+    if (isOwnEmail) {
+        showDashboardNotification("❌ No puedes referir tu propio correo electrónico.");
+        return;
+    }
+
+    if (!phoneValid || phone === "") {
+        showDashboardNotification("❌ Por favor verifica que el número de WhatsApp sea válido.");
         return;
     }
 
     try {
-        // 🔍 Buscar en todos los usuarios si este correo ya está registrado
+        const referralId = Date.now().toString();
+
+        // ✅ Step 1: Check if this email has already been referred by ANY user
+        const allReferrals = await db.collectionGroup("referrals").where("email", "==", email).get();
+
+        if (!allReferrals.empty) {
+            showDashboardNotification("⚠️ Este referido ya fue asignado a otro cliente.");
+            return;
+        }
+
+        // ✅ Step 2: Check if user already exists in users collection
         const existingUsers = await db.collection("users").where("email", "==", email).get();
+
+        let registered = false;
+        let paid = false;
 
         if (!existingUsers.empty) {
             const existingUser = existingUsers.docs[0].data();
-            const status = existingUser.paymentStatus || "Pending";
+            registered = true;
+            paid = existingUser.paymentStatus === "Completed" || existingUser.paymentStatus === "Confirmado";
 
-            if (status === "Pending") {
-                alert("⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.");
-            } else {
-                alert("⚠️ Este referido ya está registrado y activo.");
-            }
-
-            return; // ❌ No guardar duplicado
+            showDashboardNotification("⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.");
+        } else {
+            showDashboardNotification("✅ Referido agregado correctamente. ¡Sigue su progreso en tu dashboard!");
         }
 
-        // ✅ Guardar en la colección del usuario actual
-        const referralId = Date.now().toString();
-
+        // ✅ Step 3: Save the referral under current user
         await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
             name,
             email,
             phone,
-            registered: false,
-            paid: false,
+            registered,
+            paid,
             timestamp: firebase.firestore.Timestamp.now()
         });
 
-        // ✅ Enviar correo al staff
+        // ✅ Step 4: Notify via email (optional)
         await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
             method: 'POST',
             body: new URLSearchParams({
@@ -219,10 +232,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (error) {
         console.error("Error al enviar el referido:", error);
-        alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
+        showDashboardNotification("❌ Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
     }
 });
-});
+
 
         
 // ✅ Función para mostrar popup de éxito
