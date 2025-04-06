@@ -202,14 +202,42 @@ if (phone.trim() === "" || !phoneValid) {
         }
 
         // ✅ Step 3: Save the referral under current user
-        await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
-            name,
-            email,
-            phone,
-            registered,
-            paid,
-            timestamp: firebase.firestore.Timestamp.now()
-        });
+       await db.runTransaction(async (transaction) => {
+  const globalQuery = await transaction.get(
+    db.collectionGroup("referrals").where("email", "==", email)
+  );
+
+  if (!globalQuery.empty) {
+    throw new Error("⚠️ Este referido ya fue asignado a otro cliente.");
+  }
+
+  const usersQuery = await transaction.get(
+    db.collection("users").where("email", "==", email)
+  );
+
+  let registered = false;
+  let paid = false;
+
+  if (!usersQuery.empty) {
+    const existingUser = usersQuery.docs[0].data();
+    registered = true;
+    paid = existingUser.paymentStatus === "Completed" || existingUser.paymentStatus === "Confirmado";
+    showDashboardNotification("⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.");
+  } else {
+    showDashboardNotification("✅ Referido agregado correctamente. ¡Sigue su progreso en tu dashboard!");
+  }
+
+  const referralRef = db.collection("users").doc(user.uid).collection("referrals").doc(referralId);
+  transaction.set(referralRef, {
+    name,
+    email,
+    phone,
+    registered,
+    paid,
+    timestamp: firebase.firestore.Timestamp.now()
+  });
+});
+
 
         // ✅ Step 4: Notify via email (optional)
         await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
