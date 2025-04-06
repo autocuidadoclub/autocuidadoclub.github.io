@@ -58,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ✅ Guardar Referido
-// ✅ Debounce helper function
 document.addEventListener("DOMContentLoaded", () => {
     const referralForm = document.getElementById("referralForm");
     const nameInput = document.getElementById("referralName");
@@ -69,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentUserEmail = null;
     let isOwnEmail = true;
     let phoneValid = false;
+    let emailExists = false;
+    let debounceTimeout;
 
     // Disable autocomplete
     [referralForm, nameInput, emailInput, phoneInput].forEach(input => input.setAttribute("autocomplete", "off"));
@@ -127,27 +128,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
     phoneInput.addEventListener("input", validatePhoneNumber);
 
-    // ✅ Simple own email check (no Firebase read!)
-    const checkOwnEmail = () => {
+    // ✅ Own email check + Database check (debounced)
+    const checkEmail = () => {
         const email = emailInput.value.trim().toLowerCase();
+
+        clearTimeout(debounceTimeout);
 
         if (email === "") {
             emailFeedback.message.textContent = "";
             isOwnEmail = true;
-        } else if (email === currentUserEmail) {
+            updateSubmitButtonState();
+            return;
+        }
+
+        if (email === currentUserEmail) {
             emailFeedback.message.style.color = "red";
             emailFeedback.message.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
             isOwnEmail = true;
-        } else {
-            emailFeedback.message.style.color = "green";
-            emailFeedback.message.textContent = "";
-            isOwnEmail = false;
+            updateSubmitButtonState();
+            return;
         }
 
-        updateSubmitButtonState();
+        debounceTimeout = setTimeout(async () => {
+            try {
+                const querySnapshot = await db.collection("users").where("email", "==", email).get();
+
+                if (!querySnapshot.empty) {
+                    const userData = querySnapshot.docs[0].data();
+                    emailExists = true;
+
+                    if (userData.paymentStatus === "Completed") {
+                        emailFeedback.message.style.color = "red";
+                        emailFeedback.message.textContent = "❌ Este usuario ya forma parte de AutoCuidado Club.";
+                        isOwnEmail = true;
+                    } else {
+                        emailFeedback.message.style.color = "orange";
+                        emailFeedback.message.textContent = "⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.";
+                        isOwnEmail = false;
+                    }
+                } else {
+                    emailFeedback.message.style.color = "green";
+                    emailFeedback.message.textContent = "";
+                    isOwnEmail = false;
+                    emailExists = false;
+                }
+                updateSubmitButtonState();
+            } catch (error) {
+                console.error("Error al verificar el correo:", error);
+                emailFeedback.message.style.color = "red";
+                emailFeedback.message.textContent = "❌ Error al verificar el correo. Intenta más tarde.";
+                isOwnEmail = true;
+                updateSubmitButtonState();
+            }
+        }, 500); // Debounce time: 500ms
     };
 
-    emailInput.addEventListener("input", checkOwnEmail);
+    emailInput.addEventListener("input", checkEmail);
 
     // ✅ Form submit
     referralForm.addEventListener("submit", async (event) => {
@@ -205,6 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
 
         
 // ✅ Función para mostrar popup de éxito
