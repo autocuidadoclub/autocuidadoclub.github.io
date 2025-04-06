@@ -168,13 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
 }
 
-if (phone.trim() === "") {
-    showDashboardNotification("❌ Por favor ingresa un número de WhatsApp.");
-    return;
-}
-
-if (!phoneValid) {
-    showDashboardNotification("❌ El número de WhatsApp no es válido. Usa el formato +503XXXXXXXX");
+if (phone.trim() === "" || !phoneValid) {
+    showDashboardNotification("❌ El número de WhatsApp es obligatorio y debe tener el formato correcto: +503XXXXXXXX");
     return;
 }
 
