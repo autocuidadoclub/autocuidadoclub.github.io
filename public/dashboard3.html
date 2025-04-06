@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -195,27 +196,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
             showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
-           function sendCustomerEmail(subject, message, customerEmail) {
-    const styledMessage = `
-<div style="background-color:#003366; color:white; padding:20px; border-radius:8px; text-align:center;">
-    ${message}
-</div>
-<div style="margin-top:20px; text-align:center;">
-    <p style="margin-bottom:8px;">Síguenos en nuestras redes sociales:</p>
-    <a href="https://www.instagram.com/autocuidadoclub" style="color:#E1306C; margin:0 10px;">Instagram</a> |
-    <a href="https://www.facebook.com/profile.php?id=61566547237325" style="color:#1877F2; margin:0 10px;">Facebook</a>
-</div>
-    `;
+            sendCustomerEmail(
+    "🎉 Nuevo referido agregado - AutoCuidado Club",
+    `
+        <h3>¡Has agregado un nuevo referido!</h3>
+        <p><strong>Nombre:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>WhatsApp:</strong> <a href="https://wa.me/${phone.replace('+', '')}" style="color:#25D366;">${phone}</a></p>
+        <p>Ahora puedes seguir el progreso de este referido directamente desde tu panel.</p>
+    `,
+    user.email
+);
 
-    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: 'POST',
-        body: new URLSearchParams({
-            email: customerEmail,
-            subject: subject,
-            html: styledMessage
-        })
+            
+            referralForm.reset();
+            emailFeedback.message.textContent = "";
+            phoneFeedback.message.textContent = "";
+            isOwnEmail = true;
+            phoneValid = false;
+            updateSubmitButtonState();
+
+        } catch (error) {
+            console.error("Error al enviar el referido:", error);
+            alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
+        }
     });
-}
+});
 
         
 // ✅ Función para mostrar popup de éxito
