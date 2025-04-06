@@ -810,7 +810,111 @@ function redirectToPayment() {
   window.location.href = "https://www.paypal.com/pay/basic1m"; // Example link
 }
 
-   
+ // 🔥 Open and close popup functions
+function openLocationPopup() {
+  document.getElementById("locationPopup").style.display = "block";
+}
+
+function closeLocationPopup() {
+  document.getElementById("locationPopup").style.display = "none";
+}
+
+// 🔥 Populate department and municipalities
+const locations = {
+  "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
+  "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
+  "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
+  "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+  "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
+  "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
+  "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+  "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+  "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
+  "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
+  "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
+  "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+  "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
+};
+
+
+function populatePopupDepartments() {
+  const departmentSelect = document.getElementById("popupDepartment");
+  departmentSelect.innerHTML = '<option value="">Seleccione un departamento</option>';
+  for (const dept in locations) {
+    const option = document.createElement("option");
+    option.value = dept;
+    option.textContent = dept;
+    departmentSelect.appendChild(option);
+  }
+}
+
+function updatePopupMunicipalities() {
+  const department = document.getElementById("popupDepartment").value;
+  const municipalitySelect = document.getElementById("popupMunicipality");
+  municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>';
+  if (locations[department]) {
+    locations[department].forEach(muni => {
+      const option = document.createElement("option");
+      option.value = muni;
+      option.textContent = muni;
+      municipalitySelect.appendChild(option);
+    });
+  }
+}
+
+// 🔥 Save location change to Firestore
+function saveLocationChange() {
+  const department = document.getElementById("popupDepartment").value;
+  const municipality = document.getElementById("popupMunicipality").value;
+
+  if (!department || !municipality) {
+    alert("❌ Por favor selecciona un departamento y municipio.");
+    return;
+  }
+
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Debes estar autenticado para cambiar tu ubicación.");
+    return;
+  }
+
+  const userRef = db.collection("users").doc(user.uid);
+  userRef.get().then(doc => {
+    if (!doc.exists) {
+      alert("❌ Usuario no encontrado.");
+      return;
+    }
+
+    const userData = doc.data();
+    const lastChange = userData.lastMunicipalityChange ? userData.lastMunicipalityChange.toDate() : null;
+    const now = new Date();
+
+    if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+      alert("⚠️ Solo puedes cambiar tu municipio una vez al mes.");
+      return;
+    }
+
+    userRef.update({
+      department,
+      municipality,
+      lastMunicipalityChange: firebase.firestore.Timestamp.now()
+    }).then(() => {
+      alert(`✅ Ubicación actualizada a: ${department}, ${municipality}`);
+      document.getElementById("user-municipality").innerText = municipality;
+      closeLocationPopup();
+    }).catch(error => {
+      console.error("❌ Error actualizando ubicación:", error);
+      alert("❌ Error actualizando ubicación. Intenta nuevamente.");
+    });
+  }).catch(error => {
+    console.error("❌ Error consultando usuario:", error);
+    alert("❌ Error consultando usuario. Intenta nuevamente.");
+  });
+}
+
+// Initialize departments on load
+document.addEventListener("DOMContentLoaded", populatePopupDepartments);
+  
 </script>
 
     
@@ -1111,8 +1215,56 @@ function redirectToPayment() {
             <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
             <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
             <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
-            <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+          <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+
+<div class="disclaimer-box" style="background-color: #f8f8f8; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 13px;">
+  <p style="margin: 0; color: #333;">
+    ¿Necesitas actualizar el municipio donde realizaremos la inspección? Puedes hacerlo 1 vez y lo ejecutaremos el mes próximo.
+  </p>
+  <button onclick="openLocationPopup()" style="margin-top: 8px; background-color: #ff6600; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer;">
+    Cambiar Municipio
+  </button>
+</div>
+
             <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
+
+           <div id="locationPopup" style="
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+  z-index: 10000;
+  width: 300px;
+  text-align: center;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+">
+
+  <h3>📍 Cambiar Ubicación</h3>
+  <p>Selecciona tu nuevo departamento y municipio:</p>
+
+  <label for="popupDepartment">Departamento:</label>
+  <select id="popupDepartment" onchange="updatePopupMunicipalities()" style="width: 100%; padding: 6px; margin-bottom: 10px;">
+    <option value="">Seleccione un departamento</option>
+  </select>
+
+  <label for="popupMunicipality">Municipio:</label>
+  <select id="popupMunicipality" style="width: 100%; padding: 6px;">
+    <option value="">Seleccione un municipio</option>
+  </select>
+
+  <div style="margin-top: 15px;">
+    <button onclick="saveLocationChange()" style="background-color: #003366; color: white; border: none; border-radius: 4px; padding: 8px 12px; margin-right: 5px;">Guardar</button>
+    <button onclick="closeLocationPopup()" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px;">Cancelar</button>
+  </div>
+</div>
+
         </div>
 
           <!-- Tip del Mes Card -->
