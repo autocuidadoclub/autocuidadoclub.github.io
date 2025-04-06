@@ -343,10 +343,11 @@ function sendCustomerEmail(subject, message, customerEmail) {
     fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         method: 'POST',
         body: new URLSearchParams({
-            email: customerEmail,
-            subject,
-            message: styledMessage
-        })
+    email: customerEmail,
+    subject,
+    html: styledMessage // ✅ this will render the HTML properly
+})
+
     });
 }
 
