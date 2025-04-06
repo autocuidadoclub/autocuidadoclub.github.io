@@ -8,6 +8,30 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      text-align: center;
+      padding: 8px;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .form-control {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -26,79 +50,77 @@
     <h2>Panel de Gestión para el Staff</h2>
 
     <h3 class="section-title">Buscar Usuarios por Fecha</h3>
-<div class="form-control">
-  <label for="startDate">Desde:</label>
-  <input type="date" id="startDate">
-</div>
-<div class="form-control">
-  <label for="endDate">Hasta:</label>
-  <input type="date" id="endDate">
-</div>
-<button onclick="findUsersByDate()">Buscar Usuarios</button>
-
-<table>
-  <thead>
-    <tr>
-      <th>Usuario</th>
-      <th>Email</th>
-      <th>Teléfono</th>
-      <th>Fecha de Registro</th>
-      <th>Horario Seleccionado</th>
-      <th>Fecha de Pago</th>
-      <th>Estado del Pago</th>
-      <th>Próximo Pago</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody id="paymentTable"></tbody>
-</table>
-
-
-    <div>
-      <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
-      <div class="form-control">
-        <label for="rescheduleStartDate">Desde:</label>
-        <input type="date" id="rescheduleStartDate" />
-      </div>
-      <div class="form-control">
-        <label for="rescheduleEndDate">Hasta:</label>
-        <input type="date" id="rescheduleEndDate" />
-      </div>
-      <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>Horario Seleccionado</th>
-            <th>Última Reprogramación</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="rescheduleTable"></tbody>
-      </table>
+    <div class="form-control">
+      <label for="startDate">Desde:</label>
+      <input type="date" id="startDate">
     </div>
+    <div class="form-control">
+      <label for="endDate">Hasta:</label>
+      <input type="date" id="endDate">
+    </div>
+    <button onclick="findUsersByDate()">Buscar Usuarios</button>
+    <button onclick="exportTableToExcel('paymentTable', 'Usuarios')">Exportar a Excel</button>
+
+    <table id="paymentTable">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Fecha de Registro</th>
+          <th>Horario Seleccionado</th>
+          <th>Fecha de Pago</th>
+          <th>Estado del Pago</th>
+          <th>Próximo Pago</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
+    <div class="form-control">
+      <label for="rescheduleStartDate">Desde:</label>
+      <input type="date" id="rescheduleStartDate" />
+    </div>
+    <div class="form-control">
+      <label for="rescheduleEndDate">Hasta:</label>
+      <input type="date" id="rescheduleEndDate" />
+    </div>
+    <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
+    <button onclick="exportTableToExcel('rescheduleTable', 'Reprogramaciones')">Exportar a Excel</button>
+
+    <table id="rescheduleTable">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Horario Seleccionado</th>
+          <th>Última Reprogramación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </section>
 
-   <h3>📜 Historial de pago por cliente</h3>
-<input type="text" id="searchEmail" placeholder="Buscar por email...">
-<button onclick="getPaymentHistoryByEmail()">Buscar</button>
+  <h3>📜 Historial de pago por cliente</h3>
+  <input type="text" id="searchEmail" placeholder="Buscar por email...">
+  <button onclick="getPaymentHistoryByEmail()">Buscar</button>
+  <button onclick="exportTableToExcel('staffHistoryTable', 'HistorialPago')">Exportar a Excel</button>
 
-<table id="staffHistoryTable" style="margin-top: 10px; display: none;">
-  <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Monto</th>
-      <th>Método</th>
-      <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody id="staffHistoryBody"></tbody>
-</table>
-
-
+  <table id="staffHistoryTable" style="margin-top: 10px; display: none;">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Monto</th>
+        <th>Método</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="staffHistoryBody"></tbody>
+  </table>
 
   <script src="env.js"></script>
   <script>
@@ -119,7 +141,6 @@
 
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const serverKey = "YOUR_SERVER_KEY_HERE";
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -135,201 +156,190 @@
         window.location.href = "login.html";
       }
     });
-    
-function findUsersByDate() {
-  const startDate = new Date(document.getElementById("startDate").value);
-  const endDate = new Date(document.getElementById("endDate").value);
-  endDate.setDate(endDate.getDate() + 1); // Para incluir el día completo
 
-  const table = document.getElementById("paymentTable");
-  table.innerHTML = "";
+    function exportTableToExcel(tableId, filename = '') {
+      const table = document.getElementById(tableId);
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+      XLSX.writeFile(wb, `${filename}.xlsx`);
+    }
 
-  db.collection("users")
-    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-    .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
-    .get()
-    .then(snapshot => {
-      if (snapshot.empty) {
-        alert("No se encontraron usuarios en el rango de fechas.");
-        return;
+    function initializeDataTable(tableId) {
+      $(`#${tableId}`).DataTable({
+        pageLength: 50,
+        lengthChange: false,
+        language: {
+          search: "Buscar:",
+          paginate: {
+            next: "Siguiente",
+            previous: "Anterior"
+          },
+          info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+          zeroRecords: "No se encontraron resultados"
+        }
+      });
+    }
+
+    function refreshDataTable(tableId) {
+      if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
+        $(`#${tableId}`).DataTable().destroy();
       }
-      snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
-    })
-    .catch(error => {
-      console.error("Error al buscar usuarios:", error);
-      alert("Error al buscar usuarios.");
-    });
-}
+      initializeDataTable(tableId);
+    }
 
-function updatePaymentTable(user, userId) {
-  const table = document.getElementById("paymentTable");
-  const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
-  const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  table.innerHTML += `
-    <tr>
-      <td>${user.name}</td>
-      <td>${user.email}</td>
-      <td>${user.phone || "No disponible"}</td>
-      <td>${registrationDate}</td>
-      <td>${schedule}</td>
-      <td>${paymentDate}</td>
-      <td>${user.paymentStatus || "Pendiente"}</td>
-      <td>${nextPaymentDate}</td>
-      <td>
-        <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
-        ${pushBtn}
-        <button onclick="viewPaymentHistory('${userId}')">Ver Historial</button>
+    function findUsersByDate() {
+      const startDate = new Date(document.getElementById("startDate").value);
+      const endDate = new Date(document.getElementById("endDate").value);
+      endDate.setDate(endDate.getDate() + 1);
 
-      </td>
-    </tr>`;
-}
+      const table = document.getElementById("paymentTable").getElementsByTagName('tbody')[0];
+      table.innerHTML = "";
 
-    function getPaymentHistoryByEmail() {
-  const email = document.getElementById("searchEmail").value.trim();
-  if (!email) return alert("Escribe el correo del cliente.");
-
-  db.collection("users").where("email", "==", email).get()
-    .then((querySnapshot) => {
-      if (querySnapshot.empty) {
-        alert("No se encontró ningún cliente con ese correo.");
-        return;
-      }
-
-      const doc = querySnapshot.docs[0];
-      const history = doc.data().paymentHistory || [];
-      const body = document.getElementById("staffHistoryBody");
-      const table = document.getElementById("staffHistoryTable");
-      body.innerHTML = "";
-
-      if (history.length === 0) {
-        body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
-      } else {
-        history.forEach(entry => {
-          const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
-          body.innerHTML += `
-            <tr>
-              <td>${date}</td>
-              <td>$${entry.amount || "N/A"}</td>
-              <td>${entry.method || "-"}</td>
-              <td>${entry.status || "-"}</td>
-            </tr>`;
+      db.collection("users")
+        .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get()
+        .then(snapshot => {
+          if (snapshot.empty) {
+            alert("No se encontraron usuarios en el rango de fechas.");
+            refreshDataTable('paymentTable');
+            return;
+          }
+          snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
+          refreshDataTable('paymentTable');
+        })
+        .catch(error => {
+          console.error("Error al buscar usuarios:", error);
+          alert("Error al buscar usuarios.");
         });
-      }
+    }
 
-      table.style.display = "table";
-    })
-    .catch((error) => {
-      console.error("❌ Error buscando historial de pago:", error);
-      alert("Error al buscar historial.");
-    });
-}
+    function updatePaymentTable(user, userId) {
+      const table = document.getElementById("paymentTable").getElementsByTagName('tbody')[0];
+      const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+      const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
+      const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
+      const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
 
-    
-async function confirmPayment(userId) {
-  try {
-    console.log("🔍 Confirming payment for:", userId);
-
-    const paymentDate = new Date();
-    const nextPaymentDate = new Date();
-    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-    await db.collection("users").doc(userId).update({
-      paymentStatus: "Confirmado",
-      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-    });
-
-    alert("✅ Pago confirmado.");
-    findUsersByDate(); // Refresh table
-  } catch (error) {
-    console.error("❌ Error al actualizar el pago:", error);
-    alert("❌ Error al actualizar el pago. Revisa la consola.");
-  }
-}
-
+      table.innerHTML += `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.phone || "No disponible"}</td>
+          <td>${registrationDate}</td>
+          <td>${schedule}</td>
+          <td>${paymentDate}</td>
+          <td>${user.paymentStatus || "Pendiente"}</td>
+          <td>${nextPaymentDate}</td>
+          <td><button onclick="confirmPayment('${userId}')">Confirmar Pago</button></td>
+        </tr>`;
+    }
 
     function findRescheduledUsers() {
       const startDate = new Date(document.getElementById("rescheduleStartDate").value);
       const endDate = new Date(document.getElementById("rescheduleEndDate").value);
       endDate.setDate(endDate.getDate() + 1);
-      const rescheduleTable = document.getElementById("rescheduleTable");
-      rescheduleTable.innerHTML = "";
+      const table = document.getElementById("rescheduleTable").getElementsByTagName('tbody')[0];
+      table.innerHTML = "";
 
       db.collection("users")
         .where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
         .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
         .get()
-        .then((querySnapshot) => {
-          if (querySnapshot.empty) {
+        .then(snapshot => {
+          if (snapshot.empty) {
             alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
+            refreshDataTable('rescheduleTable');
             return;
           }
 
-          querySnapshot.forEach((doc) => {
+          snapshot.forEach(doc => {
             const user = doc.data();
-            const lastReschedule = user.lastReschedule
-              ? user.lastReschedule.toDate().toLocaleDateString("es-ES")
-              : "No registrada";
-            const schedule = user.schedule
-              ? `${user.schedule.day}, ${user.schedule.time}`
-              : "No asignado";
+            const lastReschedule = user.lastReschedule ? user.lastReschedule.toDate().toLocaleDateString("es-ES") : "No registrada";
+            const schedule = user.schedule ? `${user.schedule.day}, ${user.schedule.time}` : "No asignado";
 
-            rescheduleTable.innerHTML += `
+            table.innerHTML += `
               <tr>
                 <td>${user.name}</td>
                 <td>${user.email}</td>
                 <td>${user.phone || "No disponible"}</td>
                 <td>${schedule}</td>
                 <td>${lastReschedule}</td>
-                </tr>`;
+                <td>-</td>
+              </tr>`;
           });
+          refreshDataTable('rescheduleTable');
         })
-        .catch((error) => {
-          console.error("Error fetching reprogramaciones:", error);
+        .catch(error => {
+          console.error("Error al buscar reprogramaciones:", error);
           alert("Error al buscar reprogramaciones.");
         });
     }
 
-    function viewPaymentHistory(userId) {
-  const body = document.getElementById("staffHistoryBody");
-  const table = document.getElementById("staffHistoryTable");
-  body.innerHTML = "";
+    function confirmPayment(userId) {
+      const paymentDate = new Date();
+      const nextPaymentDate = new Date();
+      nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-  db.collection("users").doc(userId).get().then(doc => {
-    if (!doc.exists) {
-      body.innerHTML = '<tr><td colspan="4">Usuario no encontrado.</td></tr>';
-      table.style.display = "table";
-      return;
-    }
-
-    const data = doc.data();
-    const history = data.paymentHistory || [];
-
-    if (history.length === 0) {
-      body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
-    } else {
-      history.forEach(entry => {
-        const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
-        body.innerHTML += `
-          <tr>
-            <td>${date}</td>
-            <td>$${entry.amount || "N/A"}</td>
-            <td>${entry.method || "-"}</td>
-            <td>${entry.status || "-"}</td>
-          </tr>`;
+      db.collection("users").doc(userId).update({
+        paymentStatus: "Confirmado",
+        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
+      }).then(() => {
+        alert("✅ Pago confirmado.");
+        findUsersByDate();
+      }).catch(error => {
+        console.error("❌ Error al actualizar el pago:", error);
+        alert("Error al actualizar el pago.");
       });
     }
 
-    table.style.display = "table";
-  }).catch(err => {
-    console.error("❌ Error al cargar historial:", err);
-    alert("Error al mostrar historial.");
-  });
-}
+    function getPaymentHistoryByEmail() {
+      const email = document.getElementById("searchEmail").value.trim();
+      if (!email) return alert("Escribe el correo del cliente.");
 
-    
+      const body = document.getElementById("staffHistoryBody");
+      const table = document.getElementById("staffHistoryTable");
+      body.innerHTML = "";
+
+      db.collection("users").where("email", "==", email).get()
+        .then(querySnapshot => {
+          if (querySnapshot.empty) {
+            alert("No se encontró ningún cliente con ese correo.");
+            return;
+          }
+
+          const doc = querySnapshot.docs[0];
+          const history = doc.data().paymentHistory || [];
+
+          if (history.length === 0) {
+            body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
+          } else {
+            history.forEach(entry => {
+              const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
+              body.innerHTML += `
+                <tr>
+                  <td>${date}</td>
+                  <td>$${entry.amount || "N/A"}</td>
+                  <td>${entry.method || "-"}</td>
+                  <td>${entry.status || "-"}</td>
+                </tr>`;
+            });
+          }
+          table.style.display = "table";
+          refreshDataTable('staffHistoryTable');
+        })
+        .catch(error => {
+          console.error("❌ Error buscando historial de pago:", error);
+          alert("Error al buscar historial.");
+        });
+    }
+
+    $(document).ready(function() {
+      initializeDataTable('paymentTable');
+      initializeDataTable('rescheduleTable');
+      initializeDataTable('staffHistoryTable');
+    });
+
   </script>
 </body>
 </html>
