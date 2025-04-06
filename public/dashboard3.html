@@ -195,6 +195,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
+            sendCustomerEmail(
+    "🎉 Nuevo referido agregado - AutoCuidado Club",
+    `
+        <h3>¡Has agregado un nuevo referido!</h3>
+        <p><strong>Nombre:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>WhatsApp:</strong> <a href="https://wa.me/${phone.replace('+', '')}" style="color:#25D366;">${phone}</a></p>
+        <p>Ahora puedes seguir el progreso de este referido directamente desde tu panel.</p>
+    `,
+    user.email
+);
+
+            
             referralForm.reset();
             emailFeedback.message.textContent = "";
             phoneFeedback.message.textContent = "";
@@ -268,20 +281,34 @@ function listenForReferralUpdates(userId, userEmail) {
 
             if (!lastReferralStates[referralId].registered && referral.registered) {
                 showDashboardNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
-                sendCustomerEmail(
-                    "🎉 Notificación de referido registrado",
-                    `Tu referido ${referral.name} se ha registrado exitosamente.`,
-                    userEmail
-                );
+               sendCustomerEmail(
+    "🎉 Tu referido se ha registrado - AutoCuidado Club",
+    `
+        <h3>¡Tu referido ha completado el registro!</h3>
+        <p><strong>Nombre:</strong> ${referral.name}</p>
+        <p><strong>Email:</strong> ${referral.email}</p>
+        <p><strong>WhatsApp:</strong> <a href="https://wa.me/${referral.phone.replace('+', '')}" style="color:#25D366;">${referral.phone}</a></p>
+        <p>Sigue pendiente, recibirás otra notificación cuando complete su pago.</p>
+    `,
+    userEmail
+);
+
             }
 
             if (!lastReferralStates[referralId].paid && referral.paid) {
                 showDashboardNotification(`💸 Tu referido ${referral.name} completó su primer pago. ¡Bono desbloqueado! 🎁`);
                 sendCustomerEmail(
-                    "🎉 Notificación de bono desbloqueado",
-                    `¡Felicidades! Tu referido ${referral.name} completó su pago y has desbloqueado tu bono.`,
-                    userEmail
-                );
+    "🎉 ¡Bono desbloqueado! - AutoCuidado Club",
+    `
+        <h3>Tu referido ha realizado su pago ✅</h3>
+        <p><strong>Nombre:</strong> ${referral.name}</p>
+        <p><strong>Email:</strong> ${referral.email}</p>
+        <p><strong>WhatsApp:</strong> <a href="https://wa.me/${referral.phone.replace('+', '')}" style="color:#25D366;">${referral.phone}</a></p>
+        <p>🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.</p>
+    `,
+    userEmail
+);
+
             }
 
             lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
@@ -301,15 +328,27 @@ function showDashboardNotification(message) {
 
 // ✅ Notificación por correo al cliente
 function sendCustomerEmail(subject, message, customerEmail) {
+    const styledMessage = `
+        <div style="background-color:#003366; color:white; padding:20px; border-radius:8px; text-align:center;">
+            ${message}
+        </div>
+        <div style="margin-top:20px; text-align:center;">
+            <p style="margin-bottom:8px;">Síguenos en nuestras redes sociales:</p>
+            <a href="https://www.instagram.com/autocuidadoclub" style="color:#E1306C; margin:0 10px;">Instagram</a> |
+            <a href="https://www.facebook.com/profile.php?id=61566547237325" style="color:#1877F2; margin:0 10px;">Facebook</a>
+        </div>
+    `;
+
     fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         method: 'POST',
         body: new URLSearchParams({
             email: customerEmail,
             subject,
-            message
+            message: styledMessage
         })
     });
 }
+
 
      
   // Try to get the saved end time from localStorage
