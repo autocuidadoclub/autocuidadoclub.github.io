@@ -150,123 +150,62 @@ document.addEventListener("DOMContentLoaded", () => {
     emailInput.addEventListener("input", checkOwnEmail);
 
     // ✅ Form submit
- referralForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+    referralForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim().toLowerCase();
-    const phone = phoneInput.value.trim();
-    const user = auth.currentUser;
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const phone = phoneInput.value.trim();
+        const user = auth.currentUser;
 
-    if (!user) {
-        showDashboardNotification("❌ Debes iniciar sesión para enviar referidos.");
-        return;
-    }
-
-    if (isOwnEmail) {
-    showDashboardNotification("❌ No puedes referir tu propio correo electrónico.");
-    return;
-}
-
-if (phone.trim() === "" || !phoneValid) {
-    showDashboardNotification("❌ El número de WhatsApp es obligatorio y debe tener el formato correcto: +503XXXXXXXX");
-    return;
-}
-
-
-    try {
-        const referralId = Date.now().toString();
-
-        // ✅ Step 1: Check if this email has already been referred by ANY user
-        const allReferrals = await db.collectionGroup("referrals").where("email", "==", email).get();
-
-        if (!allReferrals.empty) {
-            showDashboardNotification("⚠️ Este referido ya fue asignado a otro cliente.");
+        if (!user) {
+            alert("Debes iniciar sesión para enviar referidos.");
             return;
         }
 
-        // ✅ Step 2: Check if user already exists in users collection
-        const existingUsers = await db.collection("users").where("email", "==", email).get();
-
-        let registered = false;
-        let paid = false;
-
-        if (!existingUsers.empty) {
-            const existingUser = existingUsers.docs[0].data();
-            registered = true;
-            paid = existingUser.paymentStatus === "Completed" || existingUser.paymentStatus === "Confirmado";
-
-            showDashboardNotification("⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.");
-        } else {
-            showDashboardNotification("✅ Referido agregado correctamente. ¡Sigue su progreso en tu dashboard!");
+        if (isOwnEmail || !phoneValid) {
+            alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
+            return;
         }
 
-        // ✅ Step 3: Save the referral under current user
-       await db.runTransaction(async (transaction) => {
-  const globalQuery = await transaction.get(
-    db.collectionGroup("referrals").where("email", "==", email)
-  );
+        try {
+            const referralId = Date.now().toString();
 
-  if (!globalQuery.empty) {
-    throw new Error("⚠️ Este referido ya fue asignado a otro cliente.");
-  }
-
-  const usersQuery = await transaction.get(
-    db.collection("users").where("email", "==", email)
-  );
-
-  let registered = false;
-  let paid = false;
-
-  if (!usersQuery.empty) {
-    const existingUser = usersQuery.docs[0].data();
-    registered = true;
-    paid = existingUser.paymentStatus === "Completed" || existingUser.paymentStatus === "Confirmado";
-    showDashboardNotification("⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.");
-  } else {
-    showDashboardNotification("✅ Referido agregado correctamente. ¡Sigue su progreso en tu dashboard!");
-  }
-
-  const referralRef = db.collection("users").doc(user.uid).collection("referrals").doc(referralId);
-  transaction.set(referralRef, {
-    name,
-    email,
-    phone,
-    registered,
-    paid,
-    timestamp: firebase.firestore.Timestamp.now()
-  });
-});
-
-
-        // ✅ Step 4: Notify via email (optional)
-        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-            method: 'POST',
-            body: new URLSearchParams({
+            await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
                 name,
                 email,
                 phone,
-                message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
-            })
-        });
+                registered: false,
+                paid: false,
+                timestamp: firebase.firestore.Timestamp.now()
+            });
 
-        showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
+            await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+                method: 'POST',
+                body: new URLSearchParams({
+                    name,
+                    email,
+                    phone,
+                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+                })
+            });
 
-        referralForm.reset();
-        emailFeedback.message.textContent = "";
-        phoneFeedback.message.textContent = "";
-        isOwnEmail = true;
-        phoneValid = false;
-        updateSubmitButtonState();
+            showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
-    } catch (error) {
-        console.error("Error al enviar el referido:", error);
-        showDashboardNotification("❌ Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
-    }
+            referralForm.reset();
+            emailFeedback.message.textContent = "";
+            phoneFeedback.message.textContent = "";
+            isOwnEmail = true;
+            phoneValid = false;
+            updateSubmitButtonState();
+
+        } catch (error) {
+            console.error("Error al enviar el referido:", error);
+            alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
+        }
+    });
 });
 
-
-}); // ✅ Important closing
         
 // ✅ Función para mostrar popup de éxito
 function showSuccessPopup(title, message) {
