@@ -195,24 +195,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
             showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
 
-            function sendCustomerEmail(subject, message, customerEmail) {
+           function sendCustomerEmail(subject, message, customerEmail) {
     const styledMessage = `
-        <div style="background-color:#003366; color:white; padding:20px; border-radius:8px; text-align:center;">
-            ${message}
-        </div>
-        <div style="margin-top:20px; text-align:center;">
-            <p style="margin-bottom:8px;">Síguenos en nuestras redes sociales:</p>
-            <a href="https://www.instagram.com/autocuidadoclub" style="color:#E1306C; margin:0 10px;">Instagram</a> |
-            <a href="https://www.facebook.com/profile.php?id=61566547237325" style="color:#1877F2; margin:0 10px;">Facebook</a>
-        </div>
+<div style="background-color:#003366; color:white; padding:20px; border-radius:8px; text-align:center;">
+    ${message}
+</div>
+<div style="margin-top:20px; text-align:center;">
+    <p style="margin-bottom:8px;">Síguenos en nuestras redes sociales:</p>
+    <a href="https://www.instagram.com/autocuidadoclub" style="color:#E1306C; margin:0 10px;">Instagram</a> |
+    <a href="https://www.facebook.com/profile.php?id=61566547237325" style="color:#1877F2; margin:0 10px;">Facebook</a>
+</div>
     `;
 
     fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         method: 'POST',
         body: new URLSearchParams({
             email: customerEmail,
-            subject,
-            html: styledMessage // ✅ use "html" instead of "message"
+            subject: subject,
+            html: styledMessage
         })
     });
 }
