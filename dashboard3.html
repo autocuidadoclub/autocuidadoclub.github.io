@@ -45,16 +45,18 @@ document.addEventListener("DOMContentLoaded", () => {
     db = firebase.firestore();
 
     // ✅ Check de autenticación
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-            loadUserProfile(user.uid);
-            loadReferrals(user.uid);
-            listenForReferralUpdates(user.uid, user.email);
-        } else {
-            window.location.href = "login.html";
-        }
-    });
+  auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+        loadUserProfile(user.uid);
+        loadReferrals(user.uid);
+        listenForReferralUpdates(user.uid, user.email);
+        listenToReferredUserPayments(user.uid); // ✅ Add this line
+    } else {
+        window.location.href = "login.html";
+    }
+});
+
 });
 
 // ✅ Guardar Referido
