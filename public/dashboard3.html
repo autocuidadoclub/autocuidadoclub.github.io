@@ -51,8 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
         loadUserProfile(user.uid);
         loadReferrals(user.uid);
         listenForReferralUpdates(user.uid, user.email);
-        listenToReferredUserPayments(user.uid); // ✅ Add this line
-    } else {
+        listenToReferredUserPayments(user.uid);
+        listenToReferredUserRegistrations(user.uid); // ✅ Add this line
+        } else {
         window.location.href = "login.html";
     }
 });
@@ -1052,6 +1053,45 @@ function saveLocationChange() {
         });
     }).catch(error => {
         console.error("Error loading referrals for real-time payment listener:", error);
+    });
+}
+
+function listenToReferredUserRegistrations(userId) {
+    const referralsRef = db.collection("users").doc(userId).collection("referrals");
+
+    referralsRef.get().then(snapshot => {
+        snapshot.forEach(referralDoc => {
+            const referralData = referralDoc.data();
+
+            if (!referralData.email) return;
+
+            db.collection("users").where("email", "==", referralData.email).onSnapshot(userSnapshot => {
+                userSnapshot.forEach(userDoc => {
+                    const userData = userDoc.data();
+
+                    if (!referralData.registered) {
+                        // Update referral to mark as registered
+                        referralsRef.doc(referralDoc.id).update({
+                            registered: true
+                        }).then(() => {
+                            console.log(`✅ Referral ${referralData.email} marked as registered automatically.`);
+
+                            showDashboardNotification(`🎉 Tu referido ${referralData.email} se ha registrado en AutoCuidado Club.`);
+
+                            sendCustomerEmail(
+                                "🎉 Notificación de referido registrado",
+                                `Tu referido ${referralData.email} se ha registrado exitosamente.`,
+                                firebase.auth().currentUser.email
+                            );
+                        }).catch(error => {
+                            console.error("Error updating referral registered status:", error);
+                        });
+                    }
+                });
+            });
+        });
+    }).catch(error => {
+        console.error("Error loading referrals for real-time registration listener:", error);
     });
 }
 
