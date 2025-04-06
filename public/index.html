@@ -67,6 +67,53 @@
         }
     </script>
 
+    <script>
+// Detect iPhone Safari users who have NOT installed PWA
+function isIos() {
+  return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+}
+
+function isInStandaloneMode() {
+  return ('standalone' in window.navigator) && window.navigator.standalone;
+}
+
+window.addEventListener('load', () => {
+  if (isIos() && !isInStandaloneMode()) {
+    showAddToHomeScreenPopup();
+  }
+});
+
+// Show custom popup
+function showAddToHomeScreenPopup() {
+  const popup = document.createElement('div');
+  popup.style.position = 'fixed';
+  popup.style.bottom = '20px';
+  popup.style.left = '20px';
+  popup.style.right = '20px';
+  popup.style.background = '#ffffff';
+  popup.style.border = '1px solid #ddd';
+  popup.style.borderRadius = '12px';
+  popup.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+  popup.style.padding = '16px';
+  popup.style.zIndex = '9999';
+  popup.style.fontFamily = 'Arial, sans-serif';
+  popup.style.textAlign = 'center';
+
+  popup.innerHTML = `
+    <strong>📲 Instala AutoCuidado Club</strong><br>
+    Para recibir notificaciones de tu suscripción, añade la app a tu pantalla de inicio.<br><br>
+    <span style="font-size: 14px;">Presiona el botón <strong>Compartir</strong> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Share_icon_iOS.svg/24px-Share_icon_iOS.svg.png" alt="Share Icon" style="height: 18px; vertical-align: middle;"> y luego selecciona <strong>“Añadir a la pantalla de inicio”</strong>.</span><br><br>
+    <button id="dismissPopup" style="background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;">Entendido</button>
+  `;
+
+  document.body.appendChild(popup);
+
+  document.getElementById('dismissPopup').addEventListener('click', () => {
+    popup.style.display = 'none';
+  });
+}
+</script>
+
     
     <!-- Navigation -->
   <nav class="navbar">
