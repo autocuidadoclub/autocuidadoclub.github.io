@@ -820,22 +820,11 @@ function closeLocationPopup() {
 }
 
 // 🔥 Populate department and municipalities
-const locations = {
+const locations = { 
   "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
-  "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
-  "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
-  "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
-  "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
-  "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
-  "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
   "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
-  "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
-  "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
-  "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
-  "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
-  "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
+  // ... Add the rest (use the same list from your registration page)
 };
-
 
 function populatePopupDepartments() {
   const departmentSelect = document.getElementById("popupDepartment");
@@ -846,33 +835,6 @@ function populatePopupDepartments() {
     option.textContent = dept;
     departmentSelect.appendChild(option);
   }
-
-  // ✅ Add municipality change warning check
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-
-  const warningDiv = document.getElementById("municipality-warning");
-  const saveButton = document.getElementById("saveLocationButton");
-
-  db.collection("users").doc(user.uid).get().then(doc => {
-    const data = doc.data();
-    const lastChange = data.lastMunicipalityChange?.toDate();
-    const now = new Date();
-
-    if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
-      const formattedDate = lastChange.toLocaleDateString("es-ES");
-      warningDiv.style.display = "block";
-      warningDiv.innerHTML = `⚠️ Solo puedes cambiar tu municipio una vez al mes. Último cambio: ${formattedDate}`;
-      saveButton.disabled = true;
-      saveButton.style.backgroundColor = "#ccc";
-      saveButton.style.cursor = "not-allowed";
-    } else {
-      warningDiv.style.display = "none";
-      saveButton.disabled = false;
-      saveButton.style.backgroundColor = "#003366";
-      saveButton.style.cursor = "pointer";
-    }
-  });
 }
 
 function updatePopupMunicipalities() {
@@ -1248,40 +1210,6 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   <p style="margin: 0; color: #333;">
     ¿Necesitas actualizar el municipio donde realizaremos la inspección? Puedes hacerlo 1 vez y lo ejecutaremos el mes próximo.
   </p>
-  <div style="margin-top: 15px;">
-  <button id="saveLocationButton" onclick="saveLocationChange()" style="background-color: #003366; color: white; border: none; border-radius: 4px; padding: 8px 12px; margin-right: 5px;">Guardar</button>
-  <button onclick="closeLocationPopup()" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px;">Cancelar</button>
-</div>
-
-</div>
-<div id="municipality-warning" style="color: orange; font-weight: bold; margin-top: 10px; display: none;">
-  ⚠️ Solo puedes cambiar tu municipio una vez al mes.
-</div>
-
-            <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
-
-           <div id="locationPopup" style="
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-  z-index: 10000;
-  width: 300px;
-  text-align: center;
-  max-width: 90%;
-  max-height: 90%;
-  overflow-y: auto;
-">
-
- <div class="disclaimer-box" style="background-color: #f8f8f8; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 13px;">
-  <p style="margin: 0; color: #333;">
-    ¿Necesitas actualizar el municipio donde realizaremos la inspección? Puedes hacerlo 1 vez y lo ejecutaremos el mes próximo.
-  </p>
   <button onclick="openLocationPopup()" style="margin-top: 8px; background-color: #ff6600; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer;">
     Cambiar Municipio
   </button>
@@ -1310,7 +1238,6 @@ background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 15px r
   </div>
 </div>
 
-           </div>
         </div>
 
           <!-- Tip del Mes Card -->
