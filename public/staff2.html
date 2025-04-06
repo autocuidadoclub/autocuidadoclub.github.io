@@ -8,15 +8,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<!-- Excel Export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 </head>
 <body>
   <nav class="navbar">
@@ -45,7 +36,7 @@
 </div>
 <button onclick="findUsersByDate()">Buscar Usuarios</button>
 
-<table id="paymentTable">
+<table>
   <thead>
     <tr>
       <th>Usuario</th>
@@ -75,7 +66,7 @@
       </div>
       <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
 
-     <table id="rescheduleTable">
+      <table>
         <thead>
           <tr>
             <th>Usuario</th>
@@ -90,6 +81,7 @@
       </table>
     </div>
   </section>
+
 
 
   <h3>📜 Historial de pago por cliente</h3>
@@ -145,50 +137,14 @@
         window.location.href = "login.html";
       }
     });
-    function initializeDataTable(tableId) {
-  $(`#${tableId}`).DataTable({
-    pageLength: 50,
-    lengthChange: false,
-    language: {
-      search: "Buscar:",
-      paginate: {
-        next: "Siguiente",
-        previous: "Anterior"
-      },
-      info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-      zeroRecords: "No se encontraron resultados"
-    }
-  });
-}
-
-function refreshDataTable(tableId) {
-  if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
-    $(`#${tableId}`).DataTable().destroy();
-  }
-  initializeDataTable(tableId);
-}
-
-// Initialize tables on page load
-$(document).ready(function () {
-  initializeDataTable('paymentTable');
-  initializeDataTable('rescheduleTable');
-  initializeDataTable('staffHistoryTable');
-});
-
-// Optional: Export to Excel
-function exportTableToExcel(tableId, filename = '') {
-  const table = document.getElementById(tableId);
-  const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-  XLSX.writeFile(wb, `${filename}.xlsx`);
-}
-
+    
 function findUsersByDate() {
   const startDate = new Date(document.getElementById("startDate").value);
   const endDate = new Date(document.getElementById("endDate").value);
-  endDate.setDate(endDate.getDate() + 1);
+  endDate.setDate(endDate.getDate() + 1); // Para incluir el día completo
 
-  const tableBody = document.getElementById("paymentTable").getElementsByTagName('tbody')[0];
-  tableBody.innerHTML = ""; // Clear old data
+  const table = document.getElementById("paymentTable");
+  table.innerHTML = "";
 
   db.collection("users")
     .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
@@ -197,11 +153,9 @@ function findUsersByDate() {
     .then(snapshot => {
       if (snapshot.empty) {
         alert("No se encontraron usuarios en el rango de fechas.");
-        refreshDataTable('paymentTable');
         return;
       }
       snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
-      refreshDataTable('paymentTable'); // Refresh DataTable after data loaded
     })
     .catch(error => {
       console.error("Error al buscar usuarios:", error);
@@ -210,7 +164,7 @@ function findUsersByDate() {
 }
 
 function updatePaymentTable(user, userId) {
-  const tableBody = document.getElementById("paymentTable").getElementsByTagName('tbody')[0];
+  const table = document.getElementById("paymentTable");
   const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
   const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
   const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
@@ -219,7 +173,7 @@ function updatePaymentTable(user, userId) {
     ? `<button onclick="sendPushNotification('${user.pushToken}', 'Hola ${user.name}, tu inspección es ${schedule}.')">Push</button>`
     : "No token";
 
-  tableBody.innerHTML += `
+  table.innerHTML += `
     <tr>
       <td>${user.name}</td>
       <td>${user.email}</td>
@@ -231,8 +185,9 @@ function updatePaymentTable(user, userId) {
       <td>${nextPaymentDate}</td>
       <td>
         <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
-        ${pushBtn}<br>
+        ${pushBtn}
         <button onclick="viewPaymentHistory('${userId}')">Ver Historial</button>
+
       </td>
     </tr>`;
 }
