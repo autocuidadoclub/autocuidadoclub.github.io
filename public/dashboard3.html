@@ -138,10 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             emailFeedback.message.style.color = "red";
             emailFeedback.message.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
             isOwnEmail = true;
-        } else if (phone.trim() === "") {
-        showDashboardNotification("❌ Por favor ingresa un número de WhatsApp antes de enviar el referido.");
-        return;
-    }else {
+        } else {
             emailFeedback.message.style.color = "green";
             emailFeedback.message.textContent = "";
             isOwnEmail = false;
