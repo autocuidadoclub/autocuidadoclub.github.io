@@ -1014,6 +1014,46 @@ function saveLocationChange() {
   });
 }
 
+        function listenToReferredUserPayments(userId) {
+    const referralsRef = db.collection("users").doc(userId).collection("referrals");
+
+    referralsRef.get().then(snapshot => {
+        snapshot.forEach(referralDoc => {
+            const referralData = referralDoc.data();
+
+            if (!referralData.email) return;
+
+            db.collection("users").where("email", "==", referralData.email).onSnapshot(userSnapshot => {
+                userSnapshot.forEach(userDoc => {
+                    const userData = userDoc.data();
+
+                    if (userData.paymentStatus === "Confirmado" && !referralData.paid) {
+                        // Update referral to mark as paid
+                        referralsRef.doc(referralDoc.id).update({
+                            paid: true
+                        }).then(() => {
+                            console.log(`✅ Referral ${referralData.email} marked as paid automatically.`);
+
+                            showDashboardNotification(`🎉 Tu referido ${referralData.email} completó su pago. ¡Bono desbloqueado! 🎁`);
+
+                            sendCustomerEmail(
+                                "🎉 Tu bono ha sido desbloqueado",
+                                `¡Felicidades! Tu referido ${referralData.email} completó su pago y has desbloqueado tu bono.`,
+                                firebase.auth().currentUser.email
+                            );
+                        }).catch(error => {
+                            console.error("Error updating referral status:", error);
+                        });
+                    }
+                });
+            });
+        });
+    }).catch(error => {
+        console.error("Error loading referrals for real-time payment listener:", error);
+    });
+}
+
+        
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   
