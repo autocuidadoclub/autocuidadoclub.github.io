@@ -199,11 +199,11 @@ document.addEventListener("DOMContentLoaded", () => {
             sendCustomerEmail(
     "🎉 Nuevo referido agregado - AutoCuidado Club",
     `
-        <h3>¡Has agregado un nuevo referido!</h3>
-        <p><strong>Nombre:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>WhatsApp:</strong> <a href="https://wa.me/${phone.replace('+', '')}" style="color:#25D366;">${phone}</a></p>
-        <p>Ahora puedes seguir el progreso de este referido directamente desde tu panel.</p>
+       ¡Has agregado un nuevo referido!
+        Nombre: ${name}
+        Email: ${email}
+        WhatsApp:https://wa.me/${phone.replace('+', '')}
+        Ahora puedes seguir el progreso de este referido directamente desde tu panel.
     `,
     user.email
 );
@@ -285,11 +285,15 @@ function listenForReferralUpdates(userId, userEmail) {
                sendCustomerEmail(
     "🎉 Tu referido se ha registrado - AutoCuidado Club",
     `
-        <h3>¡Tu referido ha completado el registro!</h3>
-        <p><strong>Nombre:</strong> ${referral.name}</p>
-        <p><strong>Email:</strong> ${referral.email}</p>
-        <p><strong>WhatsApp:</strong> <a href="https://wa.me/${referral.phone.replace('+', '')}" style="color:#25D366;">${referral.phone}</a></p>
-        <p>Sigue pendiente, recibirás otra notificación cuando complete su pago.</p>
+        ¡Tu referido ha completado el registro!
+        Nombre: ${referral.name}
+        Email:</strong> ${referral.email}
+       📲 WhatsApp:<https://wa.me/${referral.phone.replace('+', '')}" 
+        Sigue pendiente, recibirás otra notificación cuando complete su pago
+
+         Síguenos en nuestras redes sociales: 
+      📘 https://www.instagram.com/autocuidadoclub
+      📷 https://www.facebook.com/profile.php?id=61566547237325
     `,
     userEmail
 );
@@ -301,11 +305,15 @@ function listenForReferralUpdates(userId, userEmail) {
                 sendCustomerEmail(
     "🎉 ¡Bono desbloqueado! - AutoCuidado Club",
     `
-        <h3>Tu referido ha realizado su pago ✅</h3>
-        <p><strong>Nombre:</strong> ${referral.name}</p>
-        <p><strong>Email:</strong> ${referral.email}</p>
-        <p><strong>WhatsApp:</strong> <a href="https://wa.me/${referral.phone.replace('+', '')}" style="color:#25D366;">${referral.phone}</a></p>
-        <p>🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.</p>
+        Tu referido ha realizado su pago ✅
+        Nombre: ${referral.name}
+        Email: ${referral.email}
+       📲 WhatsApp: https://wa.me/${referral.phone.replace('+', '')}
+        🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.
+
+         Síguenos en nuestras redes sociales: 
+      📘 https://www.instagram.com/autocuidadoclub
+      📷 https://www.facebook.com/profile.php?id=61566547237325
     `,
     userEmail
 );
@@ -330,14 +338,10 @@ function showDashboardNotification(message) {
 // ✅ Notificación por correo al cliente
 function sendCustomerEmail(subject, message, customerEmail) {
     const styledMessage = `
-        <div style="background-color:#003366; color:white; padding:20px; border-radius:8px; text-align:center;">
-            ${message}
-        </div>
-        <div style="margin-top:20px; text-align:center;">
-            <p style="margin-bottom:8px;">Síguenos en nuestras redes sociales:</p>
-            <a href="https://www.instagram.com/autocuidadoclub" style="color:#E1306C; margin:0 10px;">Instagram</a> |
-            <a href="https://www.facebook.com/profile.php?id=61566547237325" style="color:#1877F2; margin:0 10px;">Facebook</a>
-        </div>
+        ${message}
+      Síguenos en nuestras redes sociales: 
+      📘 https://www.instagram.com/autocuidadoclub
+      📷 https://www.facebook.com/profile.php?id=61566547237325
     `;
 
     fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
@@ -345,9 +349,8 @@ function sendCustomerEmail(subject, message, customerEmail) {
         body: new URLSearchParams({
     email: customerEmail,
     subject,
-    html: styledMessage // ✅ this will render the HTML properly
+    message: styledMessage // ❌ this sends as plain text
 })
-
     });
 }
 
