@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ✅ Guardar Referido
+// ✅ Debounce helper function
 document.addEventListener("DOMContentLoaded", () => {
     const referralForm = document.getElementById("referralForm");
     const nameInput = document.getElementById("referralName");
@@ -68,8 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentUserEmail = null;
     let isOwnEmail = true;
     let phoneValid = false;
-    let emailExists = false;
-    let debounceTimeout;
 
     // Disable autocomplete
     [referralForm, nameInput, emailInput, phoneInput].forEach(input => input.setAttribute("autocomplete", "off"));
@@ -128,138 +127,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
     phoneInput.addEventListener("input", validatePhoneNumber);
 
-    // ✅ Own email check + Database check (debounced)
-    const checkEmail = () => {
+    // ✅ Simple own email check (no Firebase read!)
+    const checkOwnEmail = () => {
         const email = emailInput.value.trim().toLowerCase();
-
-        clearTimeout(debounceTimeout);
 
         if (email === "") {
             emailFeedback.message.textContent = "";
             isOwnEmail = true;
-            updateSubmitButtonState();
-            return;
-        }
-
-        if (email === currentUserEmail) {
+        } else if (email === currentUserEmail) {
             emailFeedback.message.style.color = "red";
             emailFeedback.message.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
             isOwnEmail = true;
-            updateSubmitButtonState();
+        } else {
+            emailFeedback.message.style.color = "green";
+            emailFeedback.message.textContent = "";
+            isOwnEmail = false;
+        }
+
+        updateSubmitButtonState();
+    };
+
+    emailInput.addEventListener("input", checkOwnEmail);
+
+    // ✅ Form submit
+    referralForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const phone = phoneInput.value.trim();
+        const user = auth.currentUser;
+
+        if (!user) {
+            alert("Debes iniciar sesión para enviar referidos.");
             return;
         }
 
-        debounceTimeout = setTimeout(async () => {
-            try {
-                const querySnapshot = await db.collection("users").where("email", "==", email).get();
-
-                if (!querySnapshot.empty) {
-                    const userData = querySnapshot.docs[0].data();
-                    emailExists = true;
-
-                    if (userData.paymentStatus === "Completed") {
-                        emailFeedback.message.style.color = "red";
-                        emailFeedback.message.textContent = "❌ Este usuario ya forma parte de AutoCuidado Club.";
-                        isOwnEmail = true;
-                    } else {
-                        emailFeedback.message.style.color = "orange";
-                        emailFeedback.message.textContent = "⚠️ Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.";
-                        isOwnEmail = false;
-                    }
-                } else {
-                    emailFeedback.message.style.color = "green";
-                    emailFeedback.message.textContent = "";
-                    isOwnEmail = false;
-                    emailExists = false;
-                }
-                updateSubmitButtonState();
-            } catch (error) {
-                console.error("Error al verificar el correo:", error);
-                emailFeedback.message.style.color = "red";
-                emailFeedback.message.textContent = "❌ Error al verificar el correo. Intenta más tarde.";
-                isOwnEmail = true;
-                updateSubmitButtonState();
-            }
-        }, 500); // Debounce time: 500ms
-    };
-
-    emailInput.addEventListener("input", checkEmail);
-
-    // ✅ Form submit
-  referralForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim().toLowerCase();
-    const phone = phoneInput.value.trim();
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("Debes iniciar sesión para enviar referidos.");
-        return;
-    }
-
-    if (isOwnEmail || !phoneValid) {
-        alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
-        return;
-    }
-
-    try {
-        // ✅ Before saving, check if user exists in your DB
-        const querySnapshot = await db.collection("users").where("email", "==", email).get();
-        let userAlreadyExists = false;
-        let userPaid = false;
-
-        if (!querySnapshot.empty) {
-            const userData = querySnapshot.docs[0].data();
-            userAlreadyExists = true;
-            userPaid = userData.paymentStatus === "Completed";
+        if (isOwnEmail || !phoneValid) {
+            alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
+            return;
         }
 
-        // ✅ Save referral
-        const referralId = Date.now().toString();
-        await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
-            name,
-            email,
-            phone,
-            registered: false,
-            paid: false,
-            timestamp: firebase.firestore.Timestamp.now()
-        });
+        try {
+            const referralId = Date.now().toString();
 
-        // ✅ Optional email notification
-        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-            method: 'POST',
-            body: new URLSearchParams({
+            await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
                 name,
                 email,
                 phone,
-                message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
-            })
-        });
+                registered: false,
+                paid: false,
+                timestamp: firebase.firestore.Timestamp.now()
+            });
 
-        // ✅ Show appropriate success message
-        if (userAlreadyExists && !userPaid) {
-            showSuccessPopup("🎉 Referido enviado con éxito", "Este referido ya se registró, solo necesita completar su pago para desbloquear tu recompensa.");
-        } else {
+            await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+                method: 'POST',
+                body: new URLSearchParams({
+                    name,
+                    email,
+                    phone,
+                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+                })
+            });
+
             showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
+
+            referralForm.reset();
+            emailFeedback.message.textContent = "";
+            phoneFeedback.message.textContent = "";
+            isOwnEmail = true;
+            phoneValid = false;
+            updateSubmitButtonState();
+
+        } catch (error) {
+            console.error("Error al enviar el referido:", error);
+            alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
         }
-
-        // ✅ Reset form cleanly
-        referralForm.reset();
-        emailFeedback.message.textContent = "";
-        phoneFeedback.message.textContent = "";
-        isOwnEmail = true;
-        phoneValid = false;
-        updateSubmitButtonState();
-
-    } catch (error) {
-        console.error("Error al enviar el referido:", error);
-        alert("Ocurrió un error al enviar el referido. Por favor intenta nuevamente.");
-    }
+    });
 });
-
-
 
         
 // ✅ Función para mostrar popup de éxito
