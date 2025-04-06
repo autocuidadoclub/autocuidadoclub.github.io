@@ -58,24 +58,133 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ✅ Guardar Referido
+// 🔥 Referral Form Handling (Anti-duplicate, Realtime validation, Spinner, Button control)
 document.addEventListener("DOMContentLoaded", () => {
     const referralForm = document.getElementById("referralForm");
-    referralForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    const nameInput = document.getElementById("referralName");
+    const emailInput = document.getElementById("referralEmail");
+    const phoneInput = document.getElementById("referralPhone");
+    const submitButton = referralForm.querySelector("button[type='submit']");
 
-        const name = document.getElementById("referralName").value.trim();
-        const email = document.getElementById("referralEmail").value.trim();
-        const phone = document.getElementById("referralPhone").value.trim();
-        const user = auth.currentUser;
+    let currentUserEmail = null;
+    let emailExists = true; // Start as true to disable the button by default
 
-        if (!user) {
-            alert("Debes iniciar sesión para enviar referidos.");
+    // Disable autocomplete for all inputs
+    referralForm.setAttribute("autocomplete", "off");
+    nameInput.setAttribute("autocomplete", "off");
+    emailInput.setAttribute("autocomplete", "off");
+    phoneInput.setAttribute("autocomplete", "off");
+
+    // Disable copy/paste in email field for extra security
+    emailInput.addEventListener("paste", (e) => e.preventDefault());
+    emailInput.addEventListener("copy", (e) => e.preventDefault());
+
+    // Create feedback message and spinner elements
+    const feedbackContainer = document.createElement("div");
+    feedbackContainer.style.display = "flex";
+    feedbackContainer.style.alignItems = "center";
+    feedbackContainer.style.marginTop = "5px";
+
+    const feedbackMessage = document.createElement("span");
+    feedbackMessage.style.fontWeight = "bold";
+
+    const spinner = document.createElement("span");
+    spinner.style.display = "none";
+    spinner.style.marginLeft = "8px";
+    spinner.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; // FontAwesome spinner
+
+    feedbackContainer.appendChild(feedbackMessage);
+    feedbackContainer.appendChild(spinner);
+    emailInput.parentNode.appendChild(feedbackContainer);
+
+    // Disable submit button initially
+    submitButton.disabled = true;
+
+    // Get current user email
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUserEmail = user.email;
+        }
+    });
+
+    // Function to update submit button state
+    const updateSubmitButtonState = () => {
+        submitButton.disabled = emailExists;
+    };
+
+    // Live check for email validity
+    emailInput.addEventListener("input", async () => {
+        const email = emailInput.value.trim().toLowerCase();
+
+        if (email === "") {
+            feedbackMessage.textContent = "";
+            spinner.style.display = "none";
+            emailExists = true;
+            updateSubmitButtonState();
             return;
         }
 
-        const referralId = Date.now().toString();
+        if (email === currentUserEmail) {
+            feedbackMessage.style.color = "red";
+            feedbackMessage.textContent = "❌ You cannot enter your own email as referral.";
+            spinner.style.display = "none";
+            emailExists = true;
+            updateSubmitButtonState();
+            return;
+        }
 
         try {
+            // Show spinner
+            spinner.style.display = "inline-block";
+            feedbackMessage.style.color = "black";
+            feedbackMessage.textContent = "Checking email availability...";
+
+            const snapshot = await db.collectionGroup("referrals").where("email", "==", email).get();
+
+            spinner.style.display = "none"; // Hide spinner after check
+
+            if (!snapshot.empty) {
+                feedbackMessage.style.color = "red";
+                feedbackMessage.textContent = "❌ This email is already registered by another customer.";
+                emailExists = true;
+            } else {
+                feedbackMessage.style.color = "green";
+                feedbackMessage.textContent = "✅ Email is valid and available!";
+                emailExists = false;
+            }
+        } catch (error) {
+            console.error("Error checking email:", error);
+            feedbackMessage.style.color = "red";
+            feedbackMessage.textContent = "❌ Error verifying this email. Please try again.";
+            spinner.style.display = "none";
+            emailExists = true;
+        }
+
+        updateSubmitButtonState();
+    });
+
+    // Handle form submission
+    referralForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const phone = phoneInput.value.trim();
+        const user = auth.currentUser;
+
+        if (!user) {
+            alert("You must be logged in to send referrals.");
+            return;
+        }
+
+        if (emailExists) {
+            alert("This email has already been registered. Please use a different one.");
+            return;
+        }
+
+        try {
+            const referralId = Date.now().toString();
+
             await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
                 name,
                 email,
@@ -85,22 +194,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 timestamp: firebase.firestore.Timestamp.now()
             });
 
-            // Opcional: Notificación por correo
+            // Optional: email notification to admin
             await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
                 method: 'POST',
                 body: new URLSearchParams({
                     name,
                     email,
                     phone,
-                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+                    message: `New referral added by customer. Name: ${name}, Email: ${email}, Phone: ${phone}`
                 })
             });
 
-            showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
+            showSuccessPopup("🎉 Referral successfully sent", "You can now track their progress in your dashboard.");
+
+            // Reset form and feedback
+            referralForm.reset();
+            feedbackMessage.textContent = "";
+            spinner.style.display = "none";
+            emailExists = true;
+            updateSubmitButtonState();
 
         } catch (error) {
-            console.error("❌ Error al enviar el referido:", error);
-            alert("Ocurrió un error al enviar el referido. Inténtalo nuevamente.");
+            console.error("Error submitting referral:", error);
+            alert("There was an error submitting your referral. Please try again.");
         }
     });
 });
