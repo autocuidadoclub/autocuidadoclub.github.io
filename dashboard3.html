@@ -1290,7 +1290,9 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   <select id="popupMunicipality" style="width: 100%; padding: 6px;">
     <option value="">Seleccione un municipio</option>
   </select>
-
+  <button onclick="openLocationPopup()" style="margin-top: 8px; background-color: #ff6600; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer;">
+    Cambiar Municipio
+  </button>
   <div style="margin-top: 15px;">
     <button onclick="saveLocationChange()" style="background-color: #003366; color: white; border: none; border-radius: 4px; padding: 8px 12px; margin-right: 5px;">Guardar</button>
     <button onclick="closeLocationPopup()" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px;">Cancelar</button>
