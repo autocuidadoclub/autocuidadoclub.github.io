@@ -256,9 +256,9 @@ function loadReferrals(userId) {
                 html += `
                     <div class="referral-item">
                         <h4>${data.email || "Correo no disponible"}</h4>
-                        <div class="referral-step">${data.timestamp ? "✅" : "⏳"} <span>${data.timestamp ? '1. Información enviada' : 'Esperando...'}</span></div>
-                        <div class="referral-step">${data.registered ? "✅" : "⏳"} <span>${data.registered ? '2. Cliente registrado' : 'Esperando...'}</span></div>
-                        <div class="referral-step">${data.paid ? "✅" : "⏳"} <span>${data.paid ? '3. Pago recibido' : 'Esperando...'}</span></div>
+                        <div class="referral-step">${data.timestamp ? "✅" : "⏳"} <span>${data.timestamp ? '1. Información enviada' : '1. Información enviada: Esperando...'}</span></div>
+                        <div class="referral-step">${data.registered ? "✅" : "⏳"} <span>${data.registered ? '2. Cliente registrado' : '2. Cliente registrado: Esperando...'}</span></div>
+                        <div class="referral-step">${data.paid ? "✅" : "⏳"} <span>${data.paid ? '3. Cliente completo su suscripción: Pago recibido' : '3. Cliente completo su suscripción: Esperando...'}</span></div>
                     </div>`;
             });
             referralList.innerHTML = html;
