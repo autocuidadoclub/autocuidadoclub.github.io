@@ -59,14 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ Guardar Referido
 // ✅ Debounce helper function
-function debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-}
-
 document.addEventListener("DOMContentLoaded", () => {
     const referralForm = document.getElementById("referralForm");
     const nameInput = document.getElementById("referralName");
@@ -75,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = referralForm.querySelector("button[type='submit']");
 
     let currentUserEmail = null;
-    let emailExists = true;
+    let isOwnEmail = true;
     let phoneValid = false;
 
     // Disable autocomplete
@@ -95,26 +87,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const message = document.createElement("span");
         message.style.fontWeight = "bold";
 
-        const spinner = document.createElement("span");
-        spinner.style.display = "none";
-        spinner.style.marginLeft = "8px";
-        spinner.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-
         container.appendChild(message);
-        container.appendChild(spinner);
         inputElement.parentNode.appendChild(container);
 
-        return { container, message, spinner };
+        return { container, message };
     };
 
     const emailFeedback = createFeedbackContainer(emailInput);
     const phoneFeedback = createFeedbackContainer(phoneInput);
 
     const updateSubmitButtonState = () => {
-        submitButton.disabled = emailExists || !phoneValid;
+        submitButton.disabled = isOwnEmail || !phoneValid;
     };
 
-    // Get current user email
+    // ✅ Get current user email
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUserEmail = user.email;
@@ -141,58 +127,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     phoneInput.addEventListener("input", validatePhoneNumber);
 
-    // ✅ Email availability check
-    const checkEmailAvailability = async () => {
+    // ✅ Simple own email check (no Firebase read!)
+    const checkOwnEmail = () => {
         const email = emailInput.value.trim().toLowerCase();
 
         if (email === "") {
             emailFeedback.message.textContent = "";
-            emailFeedback.spinner.style.display = "none";
-            emailExists = true;
-            updateSubmitButtonState();
-            return;
-        }
-
-        if (email === currentUserEmail) {
+            isOwnEmail = true;
+        } else if (email === currentUserEmail) {
             emailFeedback.message.style.color = "red";
             emailFeedback.message.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
-            emailFeedback.spinner.style.display = "none";
-            emailExists = true;
-            updateSubmitButtonState();
-            return;
-        }
-
-        try {
-            emailFeedback.spinner.style.display = "inline-block";
-            emailFeedback.message.style.color = "black";
-            emailFeedback.message.textContent = "Verificando disponibilidad del correo...";
-
-            const snapshot = await db.collectionGroup("referrals").where("email", "==", email).get();
-
-            emailFeedback.spinner.style.display = "none";
-
-            if (!snapshot.empty) {
-                emailFeedback.message.style.color = "red";
-                emailFeedback.message.textContent = "❌ Este correo ya ha sido registrado por otro cliente.";
-                emailExists = true;
-            } else {
-                emailFeedback.message.style.color = "green";
-                emailFeedback.message.textContent = "✅ ¡Correo disponible!";
-                emailExists = false;
-            }
-        } catch (error) {
-            console.error("Error al verificar el correo:", error);
-            emailFeedback.message.style.color = "red";
-            emailFeedback.message.textContent = "❌ Error al verificar este correo. Por favor intenta nuevamente.";
-            emailFeedback.spinner.style.display = "none";
-            emailExists = true;
+            isOwnEmail = true;
+        } else {
+            emailFeedback.message.style.color = "green";
+            emailFeedback.message.textContent = "";
+            isOwnEmail = false;
         }
 
         updateSubmitButtonState();
     };
 
-    const debouncedCheckEmail = debounce(checkEmailAvailability, 500);
-    emailInput.addEventListener("input", debouncedCheckEmail);
+    emailInput.addEventListener("input", checkOwnEmail);
 
     // ✅ Form submit
     referralForm.addEventListener("submit", async (event) => {
@@ -208,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (emailExists || !phoneValid) {
+        if (isOwnEmail || !phoneValid) {
             alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
             return;
         }
@@ -239,9 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             referralForm.reset();
             emailFeedback.message.textContent = "";
-            emailFeedback.spinner.style.display = "none";
             phoneFeedback.message.textContent = "";
-            emailExists = true;
+            isOwnEmail = true;
             phoneValid = false;
             updateSubmitButtonState();
 
