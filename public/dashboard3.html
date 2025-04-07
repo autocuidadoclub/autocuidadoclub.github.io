@@ -282,35 +282,16 @@ function listenForReferralUpdates(userId, userEmail) {
 
             if (!lastReferralStates[referralId].registered && referral.registered) {
                 showDashboardNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
-               sendCustomerEmail(
-    "🎉 Tu referido se ha registrado - AutoCuidado Club",
-    `
-        ¡Tu referido ha completado el registro!
-        Nombre: ${referral.name}
-        Email:</strong> ${referral.email}
-       📲 WhatsApp:<https://wa.me/${referral.phone.replace('+', '')}" 
-        Sigue pendiente, recibirás otra notificación cuando complete su pago
-        
-    `,
-    userEmail
-);
+             
+                notifyReferralRegistered(userEmail, referral.email, referral.name, referral.phone);
 
             }
 
             if (!lastReferralStates[referralId].paid && referral.paid) {
                 showDashboardNotification(`💸 Tu referido ${referral.name} completó su primer pago. ¡Bono desbloqueado! 🎁`);
-                sendCustomerEmail(
-    "🎉 ¡Bono desbloqueado! - AutoCuidado Club",
-    `
-        Tu referido ha realizado su pago ✅
-        Nombre: ${referral.name}
-        Email: ${referral.email}
-       📲 WhatsApp: https://wa.me/${referral.phone.replace('+', '')}
-        🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.
 
-           `,
-    userEmail
-);
+                notifyReferralPaid(userEmail, referral.email, referral.name, referral.phone);
+
 
             }
 
@@ -329,25 +310,83 @@ function showDashboardNotification(message) {
     setTimeout(() => popup.style.display = "none", 4000);
 }
 
-// ✅ Notificación por correo al cliente
-function sendCustomerEmail(subject, message, customerEmail) {
+function sendEmail(destinationEmail, subject, message) {
     const styledMessage = `
         ${message}
-      Síguenos en nuestras redes sociales: 
-      📘 https://www.instagram.com/autocuidadoclub
-      📷 https://www.facebook.com/profile.php?id=61566547237325
+        <br><br>
+        Síguenos en nuestras redes sociales:<br>
+        📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+        📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+        💬 WhatsApp: https://wa.me/50376064756
     `;
 
-    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+    return fetch("https://formsubmit.co/ajax/" + destinationEmail, {
         method: 'POST',
         body: new URLSearchParams({
-    email: customerEmail,
-    subject,
-    message: styledMessage // ❌ this sends as plain text
-})
+            email: destinationEmail,
+            subject,
+            message: styledMessage
+        })
     });
 }
 
+        function notifyNewReferral(referrerEmail, referralEmail, referralName, referralPhone) {
+    const subject = "🎉 Nuevo referido agregado - AutoCuidado Club";
+    const message = `
+        ¡Se ha agregado un nuevo referido!<br><br>
+        <strong>Nombre:</strong> ${referralName}<br>
+        <strong>Email:</strong> ${referralEmail}<br>
+        <strong>WhatsApp:</strong> <a href="https://wa.me/${referralPhone.replace('+', '')}" style="color:#25D366;">${referralPhone}</a><br>
+    `;
+
+    sendEmail("info@autocuidadoclub.com", subject, message);
+    sendEmail(referrerEmail, subject, message);
+    sendEmail(referralEmail, subject, `
+        ¡Hola ${referralName}!<br><br>
+        Te damos la bienvenida a AutoCuidado Club. Tu contacto ha sido compartido para recibir información exclusiva sobre mantenimiento personalizado para tu vehículo 🚗.<br><br>
+        Pronto recibirás más detalles de nuestro equipo. 😉
+    `);
+}
+
+function notifyReferralRegistered(referrerEmail, referralEmail, referralName, referralPhone) {
+    const subject = "🎉 Tu referido se ha registrado - AutoCuidado Club";
+    const message = `
+        ¡Tu referido ha completado el registro!<br><br>
+        <strong>Nombre:</strong> ${referralName}<br>
+        <strong>Email:</strong> ${referralEmail}<br>
+        <strong>WhatsApp:</strong> <a href="https://wa.me/${referralPhone.replace('+', '')}" style="color:#25D366;">${referralPhone}</a><br>
+        Sigue pendiente, recibirás otra notificación cuando complete su pago.
+    `;
+
+    sendEmail("info@autocuidadoclub.com", subject, message);
+    sendEmail(referrerEmail, subject, message);
+    sendEmail(referralEmail, subject, `
+        ¡Hola ${referralName}!<br><br>
+        Has completado tu registro con éxito en AutoCuidado Club 🚗.<br>
+        El siguiente paso es completar tu pago para activar todos tus beneficios. 💳<br><br>
+        Nuestro equipo está listo para asistirte en lo que necesites.
+    `);
+}
+
+function notifyReferralPaid(referrerEmail, referralEmail, referralName, referralPhone) {
+    const subject = "🎉 ¡Tu referido completó el pago! - AutoCuidado Club";
+    const message = `
+        ¡Tu referido ha realizado su pago! ✅<br><br>
+        <strong>Nombre:</strong> ${referralName}<br>
+        <strong>Email:</strong> ${referralEmail}<br>
+        <strong>WhatsApp:</strong> <a href="https://wa.me/${referralPhone.replace('+', '')}" style="color:#25D366;">${referralPhone}</a><br>
+        🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.
+    `;
+
+    sendEmail("info@autocuidadoclub.com", subject, message);
+    sendEmail(referrerEmail, subject, message);
+    sendEmail(referralEmail, subject, `
+        ¡Hola ${referralName}!<br><br>
+        Hemos confirmado tu pago exitoso 🧾.<br>
+        Te damos la bienvenida oficial a AutoCuidado Club 🚗.<br><br>
+        Nuestro equipo estará en contacto contigo para coordinar todos los detalles de tu plan.
+    `);
+}
 
      
   // Try to get the saved end time from localStorage
@@ -1116,14 +1155,8 @@ function listenToReferredUserRegistrations(userId) {
 
                             showDashboardNotification(`🎉 Tu referido ${referralData.email} se ha registrado en AutoCuidado Club.`);
 
-                            sendCustomerEmail(
-                                "🎉 Notificación de referido registrado",
-                                `Tu referido ${referralData.email} se ha registrado exitosamente.`,
-                                firebase.auth().currentUser.email
-                            );
-                        }).catch(error => {
-                            console.error("Error updating referral registered status:", error);
-                        });
+                        notifyNewReferral(user.email, email, name, phone);
+
                     }
                 });
             });
