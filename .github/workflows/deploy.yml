@@ -69,7 +69,7 @@ jobs:
       - name: Deploy to Firebase Hosting
         run: |
           echo "🚀 Deploying to Firebase Hosting..."
-          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only hosting --project=${{ secrets.bookings-autocuidad-club }}
+          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
           echo "✅ Firebase Hosting deployed successfully."
 
   # ✅ Deploy to GitHub Pages
