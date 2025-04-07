@@ -1,0 +1,32 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches:
+      - main # Or your working branch (check your branch name)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: cd functions && npm install
+
+    - name: Deploy to Firebase
+      uses: w9jds/firebase-action@v12.9.0
+      with:
+        args: deploy --only functions
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+        ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+        ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+        ZOHO_ACCOUNT_ID: ${{ secrets.ZOHO_ACCOUNT_ID }}
