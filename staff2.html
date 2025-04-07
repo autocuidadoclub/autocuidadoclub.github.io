@@ -291,7 +291,7 @@ async function findUsersByDate() {
 function updatePaymentTable(user, userId) {
   const table = document.getElementById("paymentTable");
   const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const schedule = user.selectedSchedule || "No asignado"; // ✅ Campo correcto ahora
+  const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado"; // ✅ Campo correcto ahora
   const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
   const municipio = user.municipality || "No registrado";
   const departamento = user.department || "No registrado";
@@ -525,13 +525,7 @@ function selectScheduleBox(cell) {
     const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
     const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
     const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
-
-    // Update the hidden input field to include both the day and time block
-    const scheduleField = document.getElementById("selectedSchedule");
-    if (scheduleField) {
-        scheduleField.value = `${day} - ${timeBlock}`;
-    }
-
+   
     console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
 }
 
