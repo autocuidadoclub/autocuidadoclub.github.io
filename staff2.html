@@ -81,7 +81,7 @@ table td, table th {
       <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
 
       <table>
-       <thead>
+      <thead>
   <tr>
     <th>Usuario</th>
     <th>Email</th>
@@ -90,10 +90,9 @@ table td, table th {
     <th>Departamento</th>
     <th>Municipio</th>
     <th>Tipo de Cambio</th>
+    <th>Fecha y Hora de Cambio</th>
   </tr>
 </thead>
-
-
         <tbody id="rescheduleTable"></tbody>
       </table>
     </div>
@@ -269,7 +268,7 @@ async function confirmPayment(userId) {
   }
 }
 
-   function findRescheduledUsers() {
+  function findRescheduledUsers() {
   const startDate = new Date(document.getElementById("rescheduleStartDate").value);
   const endDate = new Date(document.getElementById("rescheduleEndDate").value);
   endDate.setDate(endDate.getDate() + 1);
@@ -300,9 +299,20 @@ async function confirmPayment(userId) {
 
           // 🧩 Build change type text
           let changeType = [];
-          if (isRescheduleInRange) changeType.push("Reprogramación de Horario");
-          if (isMunicipalityChangeInRange) changeType.push("Cambio de Municipio");
-          if (isDepartmentChangeInRange) changeType.push("Cambio de Departamento");
+          let changeDetails = [];
+
+          if (isRescheduleInRange) {
+            changeType.push("Reprogramación de Horario");
+            changeDetails.push(`Horario: ${lastReschedule.toLocaleDateString("es-ES")} ${lastReschedule.toLocaleTimeString("es-ES")}`);
+          }
+          if (isMunicipalityChangeInRange) {
+            changeType.push("Cambio de Municipio");
+            changeDetails.push(`Municipio: ${lastMunicipalityChange.toLocaleDateString("es-ES")} ${lastMunicipalityChange.toLocaleTimeString("es-ES")}`);
+          }
+          if (isDepartmentChangeInRange) {
+            changeType.push("Cambio de Departamento");
+            changeDetails.push(`Departamento: ${lastDepartmentChange.toLocaleDateString("es-ES")} ${lastDepartmentChange.toLocaleTimeString("es-ES")}`);
+          }
 
           rescheduleTable.innerHTML += `
             <tr>
@@ -313,6 +323,7 @@ async function confirmPayment(userId) {
               <td>${department}</td>
               <td>${municipality}</td>
               <td>${changeType.join(" / ")}</td>
+              <td>${changeDetails.join("<br>")}</td>
             </tr>`;
         }
       });
