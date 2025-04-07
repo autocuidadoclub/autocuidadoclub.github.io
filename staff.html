@@ -291,7 +291,7 @@ async function findUsersByDate() {
 function updatePaymentTable(user, userId) {
   const table = document.getElementById("paymentTable");
   const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
+  const schedule = user.selectedSchedule || "No asignado"; // ✅ Campo correcto ahora
   const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
   const municipio = user.municipality || "No registrado";
   const departamento = user.department || "No registrado";
@@ -309,9 +309,10 @@ function updatePaymentTable(user, userId) {
       <td>${user.paymentStatus || "Pendiente"}</td>
       <td>
         <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
-        </td>
+      </td>
     </tr>`;
 }
+
 
 
     function getPaymentHistoryByEmail() {
@@ -602,8 +603,7 @@ function selectScheduleBox(cell) {
       document.getElementById("staffClientName").innerText = user.name || "-";
       document.getElementById("currentMunicipality").innerText = user.municipality || "-";
       document.getElementById("currentDepartment").innerText = user.department || "-";
-      document.getElementById("currentSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
-
+      document.getElementById("currentSchedule").innerText = user.selectedSchedule || "-";
       document.getElementById("staffControlForm").style.display = "block";
      
       if (user.staffLastChangeNote) {
@@ -619,51 +619,86 @@ function selectScheduleBox(cell) {
     });
 }
 
-    function saveStaffClientChanges() {
+  function saveStaffClientChanges() {
   if (!selectedStaffUserId) {
-    alert("Por favor busca primero un cliente.");
+    showCustomAlert("❌ Por favor busca primero un cliente.", "error");
     return;
   }
 
- const newDepartment = document.getElementById("department").value.trim();
-const newMunicipality = document.getElementById("municipality").value.trim();
+  // Leer datos actuales visibles en la interfaz
+  const currentDepartment = document.getElementById("currentDepartment").innerText.trim();
+  const currentMunicipality = document.getElementById("currentMunicipality").innerText.trim();
+  const currentSchedule = document.getElementById("currentSchedule").innerText.trim();
 
+  const newDepartment = document.getElementById("department").value.trim();
+  const newMunicipality = document.getElementById("municipality").value.trim();
 
-  if (!newDepartment || !newMunicipality) {
-    alert("Por favor seleccione el nuevo departamento y municipio.");
+  const selectedCell = document.querySelector(".schedule-table td.selected-box");
+  let isScheduleChanged = false;
+  let selectedScheduleText = "";
+
+  if (selectedCell) {
+    const dayIndex = selectedCell.cellIndex;
+    const timeBlock = selectedCell.innerText.trim();
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "";
+
+    selectedScheduleText = `${day} - ${timeBlock}`;
+
+    if (selectedScheduleText !== currentSchedule && day && timeBlock && timeBlock !== "-") {
+      isScheduleChanged = true;
+    }
+  }
+
+  const isDepartmentChanged = newDepartment && newDepartment !== currentDepartment;
+  const isMunicipalityChanged = newMunicipality && newMunicipality !== currentMunicipality;
+
+  // 🧩 Validación especial: Si cambia departamento, debe seleccionar municipio
+  if (isDepartmentChanged && !newMunicipality) {
+    showCustomAlert("❌ Si cambias el departamento, debes seleccionar también el municipio.", "error");
     return;
   }
 
-  if (!staffSelectedDay || !staffSelectedTime) {
-    alert("Por favor seleccione el nuevo día y horario.");
+  // 🧩 Validación final: si no hay cambios
+  if (!isDepartmentChanged && !isMunicipalityChanged && !isScheduleChanged) {
+    showCustomAlert("❌ No se detectaron cambios para guardar.", "error");
     return;
   }
 
-const now = new Date();
-const formattedDate = now.toLocaleDateString("es-ES");
-const formattedTime = now.toLocaleTimeString("es-ES");
-const changeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
+  // Preparar actualizaciones
+  const updates = {};
+  const nowTimestamp = firebase.firestore.Timestamp.now();
+  const now = new Date();
+  const formattedDate = now.toLocaleDateString("es-ES");
+  const formattedTime = now.toLocaleTimeString("es-ES");
+  const changeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
+  updates.staffLastChangeNote = changeNote;
 
-const updates = {
-  department: newDepartment,
-  municipality: newMunicipality,
-  schedule: { day: staffSelectedDay, time: staffSelectedTime },
-  lastReschedule: firebase.firestore.Timestamp.now(),
-  lastMunicipalityChange: firebase.firestore.Timestamp.now(),
-  lastDepartmentChange: firebase.firestore.Timestamp.now(),
-  staffLastChangeNote: changeNote
-};
+  if (isDepartmentChanged) {
+    updates.department = newDepartment;
+    updates.lastDepartmentChange = nowTimestamp;
+  }
 
+  if (isMunicipalityChanged) {
+    updates.municipality = newMunicipality;
+    updates.lastMunicipalityChange = nowTimestamp;
+  }
 
+  if (isScheduleChanged) {
+    updates.selectedSchedule = selectedScheduleText;
+    updates.lastReschedule = nowTimestamp;
+  }
+
+  // Guardar cambios en Firestore
   db.collection("users").doc(selectedStaffUserId).update(updates)
-   .then(() => {
-  showCustomAlert("✅ Cambios guardados correctamente.", "success");
-  setTimeout(() => location.reload(), 1500);
-})
-.catch(error => {
-  console.error("❌ Error al guardar cambios:", error);
-  showCustomAlert("❌ Error al guardar cambios.", "error");
-});
+    .then(() => {
+      showCustomAlert("✅ Cambios guardados correctamente.", "success");
+      setTimeout(() => location.reload(), 1500);
+    })
+    .catch(error => {
+      console.error("❌ Error al guardar cambios:", error);
+      showCustomAlert("❌ Error al guardar cambios.", "error");
+    });
 }
 
 function showCustomAlert(message, type = "success") {
