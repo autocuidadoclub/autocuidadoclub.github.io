@@ -332,10 +332,10 @@ function sendEmail(destinationEmail, subject, message) {
         function notifyNewReferral(referrerEmail, referralEmail, referralName, referralPhone) {
     const subject = "🎉 Nuevo referido agregado - AutoCuidado Club";
     const message = `
-        ¡Se ha agregado un nuevo referido!<br><br>
-        <strong>Nombre:</strong> ${referralName}<br>
-        <strong>Email:</strong> ${referralEmail}<br>
-        <strong>WhatsApp:</strong> <a href="https://wa.me/${referralPhone.replace('+', '')}" style="color:#25D366;">${referralPhone}</a><br>
+        ¡Se ha agregado un nuevo referido!
+        Nombre:> ${referralName}
+        Email: ${referralEmail}
+        WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
     `;
 
     sendEmail("info@autocuidadoclub.com", subject, message);
@@ -350,19 +350,19 @@ function sendEmail(destinationEmail, subject, message) {
 function notifyReferralRegistered(referrerEmail, referralEmail, referralName, referralPhone) {
     const subject = "🎉 Tu referido se ha registrado - AutoCuidado Club";
     const message = `
-        ¡Tu referido ha completado el registro!<br><br>
-        <strong>Nombre:</strong> ${referralName}<br>
-        <strong>Email:</strong> ${referralEmail}<br>
-        <strong>WhatsApp:</strong> <a href="https://wa.me/${referralPhone.replace('+', '')}" style="color:#25D366;">${referralPhone}</a><br>
+        ¡Tu referido ha completado el registro!
+        Nombre: ${referralName}
+        Email: ${referralEmail}<br>
+        WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
         Sigue pendiente, recibirás otra notificación cuando complete su pago.
     `;
 
     sendEmail("info@autocuidadoclub.com", subject, message);
     sendEmail(referrerEmail, subject, message);
     sendEmail(referralEmail, subject, `
-        ¡Hola ${referralName}!<br><br>
-        Has completado tu registro con éxito en AutoCuidado Club 🚗.<br>
-        El siguiente paso es completar tu pago para activar todos tus beneficios. 💳<br><br>
+        ¡Hola ${referralName}!
+        Has completado tu registro con éxito en AutoCuidado Club 🚗.
+        El siguiente paso es completar tu pago para activar todos tus beneficios. 💳
         Nuestro equipo está listo para asistirte en lo que necesites.
     `);
 }
@@ -370,19 +370,19 @@ function notifyReferralRegistered(referrerEmail, referralEmail, referralName, re
 function notifyReferralPaid(referrerEmail, referralEmail, referralName, referralPhone) {
     const subject = "🎉 ¡Tu referido completó el pago! - AutoCuidado Club";
     const message = `
-        ¡Tu referido ha realizado su pago! ✅<br><br>
-        <strong>Nombre:</strong> ${referralName}<br>
-        <strong>Email:</strong> ${referralEmail}<br>
-        <strong>WhatsApp:</strong> <a href="https://wa.me/${referralPhone.replace('+', '')}" style="color:#25D366;">${referralPhone}</a><br>
+        ¡Tu referido ha realizado su pago! ✅
+        Nombre: ${referralName}
+        Email: ${referralEmail}
+        WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
         🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.
     `;
 
     sendEmail("info@autocuidadoclub.com", subject, message);
     sendEmail(referrerEmail, subject, message);
     sendEmail(referralEmail, subject, `
-        ¡Hola ${referralName}!<br><br>
-        Hemos confirmado tu pago exitoso 🧾.<br>
-        Te damos la bienvenida oficial a AutoCuidado Club 🚗.<br><br>
+        ¡Hola ${referralName}!
+        Hemos confirmado tu pago exitoso 🧾.
+        Te damos la bienvenida oficial a AutoCuidado Club 🚗.
         Nuestro equipo estará en contacto contigo para coordinar todos los detalles de tu plan.
     `);
 }
