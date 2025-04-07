@@ -51,7 +51,7 @@ table td, table th {
 <button onclick="findUsersByDate()">Buscar Usuarios</button>
 <button onclick="exportTableToExcel()">Exportar a Excel</button>
 
-<table>
+<table id="usersFullTable">
   <thead>
   <tr>
     <th>Usuario</th>
@@ -83,7 +83,7 @@ table td, table th {
       <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
       <button onclick="exportTableToExcel()">Exportar a Excel</button>
 
-      <table>
+      <table id="rescheduleFullTable">
       <thead>
   <tr>
     <th>Usuario</th>
@@ -405,30 +405,27 @@ async function confirmPayment(userId) {
 
 
 function exportTableToExcel() {
-  const table = document.querySelector("#rescheduleTable").parentElement.querySelector("table");
-  
+  const table = document.getElementById("rescheduleFullTable");
+
   if (!table || table.rows.length <= 1) {
     alert("No hay datos para exportar.");
     return;
   }
 
-  // Convert HTML table to SheetJS worksheet
   const workbook = XLSX.utils.table_to_book(table, { sheet: "Reprogramaciones" });
-
-  // Generate and download Excel file
   XLSX.writeFile(workbook, "reprogramaciones.xlsx");
 }
 
-    function exportUsersToExcel() {
-  const table = document.querySelector("#paymentTable").parentElement.querySelector("table");
-  
+
+   function exportUsersToExcel() {
+  const table = document.getElementById("usersFullTable");
+
   if (!table || table.rows.length <= 1) {
     alert("No hay datos para exportar.");
     return;
   }
 
   const workbook = XLSX.utils.table_to_book(table, { sheet: "Usuarios" });
-
   XLSX.writeFile(workbook, "usuarios.xlsx");
 }
 
