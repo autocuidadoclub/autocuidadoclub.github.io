@@ -25,6 +25,7 @@ jobs:
         uses: w9jds/firebase-action@v12.9.0
         with:
           args: deploy --only functions --project bookings-autocuidad-club
+          firebaseServiceAccount: ${{ secrets.GCP_SA_KEY }}
         env:
           ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
           ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
