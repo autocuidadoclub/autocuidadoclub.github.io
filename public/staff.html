@@ -8,7 +8,21 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
+
+  <style>
+   table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+table td, table th {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+  </style>
+  
 <body>
   <nav class="navbar">
     <ul>
@@ -35,21 +49,23 @@
   <input type="date" id="endDate">
 </div>
 <button onclick="findUsersByDate()">Buscar Usuarios</button>
+<button onclick="exportTableToExcel()">Exportar a Excel</button>
 
-<table>
+<table id="usersFullTable">
   <thead>
-    <tr>
-      <th>Usuario</th>
-      <th>Email</th>
-      <th>Teléfono</th>
-      <th>Fecha de Registro</th>
-      <th>Horario Seleccionado</th>
-      <th>Fecha de Pago</th>
-      <th>Estado del Pago</th>
-      <th>Próximo Pago</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
+  <tr>
+    <th>Usuario</th>
+    <th>Email</th>
+    <th>Teléfono</th>
+    <th>Municipio</th>
+    <th>Departamento</th>
+    <th>Fecha de Registro</th>
+    <th>Horario Seleccionado</th>
+    <th>Fecha de Pago</th>
+    <th>Estado del Pago</th>
+    <th>Acciones</th>
+  </tr>
+</thead>
   <tbody id="paymentTable"></tbody>
 </table>
 
@@ -65,29 +81,27 @@
         <input type="date" id="rescheduleEndDate" />
       </div>
       <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
+      <button onclick="exportTableToExcel()">Exportar a Excel</button>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>Horario Seleccionado</th>
-            <th>Última Reprogramación</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+      <table id="rescheduleFullTable">
+      <thead>
+  <tr>
+    <th>Usuario</th>
+    <th>Email</th>
+    <th>Teléfono</th>
+    <th>Horario Seleccionado</th>
+    <th>Departamento</th>
+    <th>Municipio</th>
+    <th>Tipo de Cambio</th>
+    <th>Fecha y Hora de Cambio</th>
+  </tr>
+</thead>
         <tbody id="rescheduleTable"></tbody>
       </table>
     </div>
   </section>
 
-  <h2>Notificaciones Personalizadas</h2>
-  <div id="user-buttons" class="user-button-grid"></div>
 
-  <h2>Notificación Global</h2>
-  <textarea id="globalMessage" placeholder="Escribe aquí el mensaje para todos"></textarea><br />
-  <button onclick="sendGlobalNotification()">Enviar Notificación Global</button>
 
   <h3>📜 Historial de pago por cliente</h3>
 <input type="text" id="searchEmail" placeholder="Buscar por email...">
@@ -143,59 +157,98 @@
       }
     });
     
-function findUsersByDate() {
-  const startDate = new Date(document.getElementById("startDate").value);
-  const endDate = new Date(document.getElementById("endDate").value);
-  endDate.setDate(endDate.getDate() + 1); // Para incluir el día completo
+async function findUsersByDate() {
+  const startDateInput = document.getElementById("startDate").value;
+  const endDateInput = document.getElementById("endDate").value;
+
+  if (!startDateInput || !endDateInput) {
+    alert("Por favor, selecciona ambas fechas.");
+    return;
+  }
+
+  const startDate = new Date(startDateInput);
+  const endDate = new Date(endDateInput);
+  endDate.setDate(endDate.getDate() + 1); // Incluir el día completo
 
   const table = document.getElementById("paymentTable");
   table.innerHTML = "";
 
-  db.collection("users")
-    .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-    .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
-    .get()
-    .then(snapshot => {
-      if (snapshot.empty) {
-        alert("No se encontraron usuarios en el rango de fechas.");
-        return;
-      }
-      snapshot.forEach(doc => updatePaymentTable(doc.data(), doc.id));
-    })
-    .catch(error => {
-      console.error("Error al buscar usuarios:", error);
-      alert("Error al buscar usuarios.");
+  try {
+    // Run parallel optimized queries ✅
+    const [registrationSnapshot, municipalitySnapshot, departmentSnapshot] = await Promise.all([
+      db.collection("users")
+        .where("registrationDate", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("registrationDate", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get(),
+
+      db.collection("users")
+        .where("lastMunicipalityChange", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("lastMunicipalityChange", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get(),
+
+      db.collection("users")
+        .where("lastDepartmentChange", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("lastDepartmentChange", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get(),
+    ]);
+
+    // Merge results and remove duplicates ✅
+    const userMap = new Map();
+
+    const addToMap = (snapshot) => {
+      snapshot.forEach(doc => {
+        if (!userMap.has(doc.id)) {
+          userMap.set(doc.id, doc.data());
+        }
+      });
+    };
+
+    addToMap(registrationSnapshot);
+    addToMap(municipalitySnapshot);
+    addToMap(departmentSnapshot);
+
+    if (userMap.size === 0) {
+      alert("No se encontraron usuarios en el rango de fechas.");
+      return;
+    }
+
+    userMap.forEach((user, userId) => {
+      updatePaymentTable(user, userId);
     });
+
+    console.log(`✅ Usuarios encontrados: ${userMap.size}`);
+  } catch (error) {
+    console.error("❌ Error al buscar usuarios:", error);
+    alert("Error al buscar usuarios.");
+  }
 }
+
 
 function updatePaymentTable(user, userId) {
   const table = document.getElementById("paymentTable");
   const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
   const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
   const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const pushBtn = user.pushToken
-    ? `<button onclick="sendPushNotification('${user.pushToken}', 'Hola ${user.name}, tu inspección es ${schedule}.')">Push</button>`
-    : "No token";
+  const municipio = user.municipality || "No registrado";
+  const departamento = user.department || "No registrado";
 
   table.innerHTML += `
-    <tr>
-      <td>${user.name}</td>
+    <tr style="border-bottom: 1px solid #ccc;">
+      <td>${user.name || "Sin nombre"}</td>
       <td>${user.email}</td>
       <td>${user.phone || "No disponible"}</td>
+      <td>${municipio}</td>
+      <td>${departamento}</td>
       <td>${registrationDate}</td>
       <td>${schedule}</td>
       <td>${paymentDate}</td>
       <td>${user.paymentStatus || "Pendiente"}</td>
-      <td>${nextPaymentDate}</td>
       <td>
         <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
-        ${pushBtn}
-        <button onclick="viewPaymentHistory('${userId}')">Ver Historial</button>
-
-      </td>
+        </td>
     </tr>`;
 }
+
 
     function getPaymentHistoryByEmail() {
   const email = document.getElementById("searchEmail").value.trim();
@@ -260,97 +313,123 @@ async function confirmPayment(userId) {
   }
 }
 
+  async function findRescheduledUsers() {
+  const startDate = new Date(document.getElementById("rescheduleStartDate").value);
+  const endDate = new Date(document.getElementById("rescheduleEndDate").value);
+  endDate.setDate(endDate.getDate() + 1);
 
-   async function sendPushNotification(token, message) {
+  const rescheduleTable = document.getElementById("rescheduleTable");
+  rescheduleTable.innerHTML = "";
+
   try {
-    const response = await fetch("https://fcm.googleapis.com/fcm/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "key=" + serverKey
-      },
-      body: JSON.stringify({
-        to: token,
-        notification: {
-          title: "AutoCuidado Club",
-          body: message,
-          icon: "https://www.autocuidadoclub.com/assets/logo-noti.png"
-        }
-      })
-    });
-
-    if (!response.ok) {
-      const errorDetails = await response.text();
-      throw new Error(`HTTP ${response.status} - ${errorDetails}`);
-    }
-
-    alert("✅ Notificación enviada con éxito.");
-  } catch (error) {
-    console.error("❌ Error al enviar notificación:", error);
-    alert("🚫 Error al enviar la notificación. Revisa la consola.");
-  }
-}
-
-    function sendGlobalNotification() {
-      const message = document.getElementById("globalMessage").value;
-      if (!message) return alert("Escribe un mensaje primero");
-
-      db.collection("users")
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            const user = doc.data();
-            if (user.pushToken) {
-              sendPushNotification(user.pushToken, message);
-            }
-          });
-        });
-    }
-
-    function findRescheduledUsers() {
-      const startDate = new Date(document.getElementById("rescheduleStartDate").value);
-      const endDate = new Date(document.getElementById("rescheduleEndDate").value);
-      endDate.setDate(endDate.getDate() + 1);
-      const rescheduleTable = document.getElementById("rescheduleTable");
-      rescheduleTable.innerHTML = "";
-
+    // Run parallel filtered queries ✅
+    const [reschedules, municipalityChanges, departmentChanges] = await Promise.all([
       db.collection("users")
         .where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
         .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
-        .get()
-        .then((querySnapshot) => {
-          if (querySnapshot.empty) {
-            alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
-            return;
-          }
+        .get(),
 
-          querySnapshot.forEach((doc) => {
-            const user = doc.data();
-            const lastReschedule = user.lastReschedule
-              ? user.lastReschedule.toDate().toLocaleDateString("es-ES")
-              : "No registrada";
-            const schedule = user.schedule
-              ? `${user.schedule.day}, ${user.schedule.time}`
-              : "No asignado";
+      db.collection("users")
+        .where("lastMunicipalityChange", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("lastMunicipalityChange", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get(),
 
-            rescheduleTable.innerHTML += `
-              <tr>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.phone || "No disponible"}</td>
-                <td>${schedule}</td>
-                <td>${lastReschedule}</td>
-                <td>
-                  ${user.pushToken ? `<button onclick=\"sendPushNotification('${user.pushToken}', 'Hola ${user.name}, ¿deseas reprogramar tu inspección del ${lastReschedule}?')\">Push</button>` : "No token"}
-                </td>
-              </tr>`;
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching reprogramaciones:", error);
-          alert("Error al buscar reprogramaciones.");
-        });
+      db.collection("users")
+        .where("lastDepartmentChange", ">=", firebase.firestore.Timestamp.fromDate(startDate))
+        .where("lastDepartmentChange", "<", firebase.firestore.Timestamp.fromDate(endDate))
+        .get(),
+    ]);
+
+    // Merge documents and avoid duplicates ✅
+    const userMap = new Map();
+
+    const addToMap = (snapshot, changeType) => {
+      snapshot.forEach(doc => {
+        const user = doc.data();
+        const existing = userMap.get(doc.id) || { data: user, changes: new Set(), dates: [] };
+
+        existing.changes.add(changeType);
+
+        if (changeType === "Horario" && user.lastReschedule) {
+          existing.dates.push(`Horario: ${user.lastReschedule.toDate().toLocaleDateString("es-ES")} ${user.lastReschedule.toDate().toLocaleTimeString("es-ES")}`);
+        }
+        if (changeType === "Municipio" && user.lastMunicipalityChange) {
+          existing.dates.push(`Municipio: ${user.lastMunicipalityChange.toDate().toLocaleDateString("es-ES")} ${user.lastMunicipalityChange.toDate().toLocaleTimeString("es-ES")}`);
+        }
+        if (changeType === "Departamento" && user.lastDepartmentChange) {
+          existing.dates.push(`Departamento: ${user.lastDepartmentChange.toDate().toLocaleDateString("es-ES")} ${user.lastDepartmentChange.toDate().toLocaleTimeString("es-ES")}`);
+        }
+
+        userMap.set(doc.id, existing);
+      });
+    };
+
+    addToMap(reschedules, "Horario");
+    addToMap(municipalityChanges, "Municipio");
+    addToMap(departmentChanges, "Departamento");
+
+    if (userMap.size === 0) {
+      alert("No se encontraron usuarios con cambios en el rango de fechas.");
+      return;
     }
+
+    // Display merged results ✅
+    userMap.forEach(({ data: user, changes, dates }) => {
+      const schedule = user.schedule ? `${user.schedule.day}, ${user.schedule.time}` : "No asignado";
+      const department = user.department || "No registrado";
+      const municipality = user.municipality || "No registrado";
+      const changeTypes = Array.from(changes).map(type => {
+        if (type === "Horario") return "Reprogramación de Horario";
+        if (type === "Municipio") return "Cambio de Municipio";
+        if (type === "Departamento") return "Cambio de Departamento";
+      }).join(" / ");
+
+      rescheduleTable.innerHTML += `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.phone || "No disponible"}</td>
+          <td>${schedule}</td>
+          <td>${department}</td> 
+          <td>${municipality}</td>
+          <td>${changeTypes}</td>
+          <td>${dates.join("<br>")}</td>
+        </tr>`;
+    });
+
+    console.log(`✅ Optimized query completed. Total users found: ${userMap.size}`);
+  } catch (error) {
+    console.error("❌ Error fetching optimized changes:", error);
+    alert("Error al buscar cambios.");
+  }
+}
+
+
+function exportTableToExcel() {
+  const table = document.getElementById("rescheduleFullTable");
+
+  if (!table || table.rows.length <= 1) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  const workbook = XLSX.utils.table_to_book(table, { sheet: "Reprogramaciones" });
+  XLSX.writeFile(workbook, "reprogramaciones.xlsx");
+}
+
+
+   function exportUsersToExcel() {
+  const table = document.getElementById("usersFullTable");
+
+  if (!table || table.rows.length <= 1) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  const workbook = XLSX.utils.table_to_book(table, { sheet: "Usuarios" });
+  XLSX.writeFile(workbook, "usuarios.xlsx");
+}
+
 
     function viewPaymentHistory(userId) {
   const body = document.getElementById("staffHistoryBody");
