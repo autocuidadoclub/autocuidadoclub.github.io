@@ -618,8 +618,9 @@ function selectScheduleBox(cell) {
     return;
   }
 
-  const newDepartment = document.getElementById("staffDepartment").value.trim();
-  const newMunicipality = document.getElementById("staffMunicipality").value.trim();
+ const newDepartment = document.getElementById("department").value.trim();
+const newMunicipality = document.getElementById("municipality").value.trim();
+
 
   if (!newDepartment || !newMunicipality) {
     alert("Por favor seleccione el nuevo departamento y municipio.");
