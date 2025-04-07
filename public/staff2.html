@@ -603,8 +603,7 @@ function selectScheduleBox(cell) {
       document.getElementById("staffClientName").innerText = user.name || "-";
       document.getElementById("currentMunicipality").innerText = user.municipality || "-";
       document.getElementById("currentDepartment").innerText = user.department || "-";
-      document.getElementById("currentSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
-
+      document.getElementById("currentSchedule").innerText = user.selectedSchedule || "-";
       document.getElementById("staffControlForm").style.display = "block";
      
       if (user.staffLastChangeNote) {
