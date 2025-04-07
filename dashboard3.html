@@ -1115,11 +1115,12 @@ function saveLocationChange() {
 
                             showDashboardNotification(`🎉 Tu referido ${referralData.email} completó su pago. ¡Bono desbloqueado! 🎁`);
 
-                            sendCustomerEmail(
+                            sendEmail(
+                                firebase.auth().currentUser.email,
                                 "🎉 Tu bono ha sido desbloqueado",
-                                `¡Felicidades! Tu referido ${referralData.email} completó su pago y has desbloqueado tu bono.`,
-                                firebase.auth().currentUser.email
+                                `¡Felicidades! Tu referido ${referralData.email} completó su pago y has desbloqueado tu bono.`
                             );
+
                         }).catch(error => {
                             console.error("Error updating referral status:", error);
                         });
