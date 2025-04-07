@@ -621,53 +621,59 @@ function selectScheduleBox(cell) {
 
    function saveStaffClientChanges() {
   if (!selectedStaffUserId) {
-    showCustomAlert("Por favor busca primero un cliente.", "error");
+    alert("Por favor busca primero un cliente.");
     return;
   }
+
+  // Leer los valores actuales en la base de datos
+  const currentDepartment = document.getElementById("currentDepartment").innerText.trim();
+  const currentMunicipality = document.getElementById("currentMunicipality").innerText.trim();
+  const currentSchedule = document.getElementById("currentSchedule").innerText.trim();
 
   const newDepartment = document.getElementById("department").value.trim();
   const newMunicipality = document.getElementById("municipality").value.trim();
 
-  // Get current displayed values
-  const currentMunicipality = document.getElementById("currentMunicipality").innerText.trim();
-  const currentDepartment = document.getElementById("currentDepartment").innerText.trim();
-  const currentSchedule = document.getElementById("currentSchedule").innerText.trim();
+  const isDepartmentChanged = newDepartment && newDepartment !== currentDepartment;
+  const isMunicipalityChanged = newMunicipality && newMunicipality !== currentMunicipality;
+  const isScheduleChanged = staffSelectedDay && staffSelectedTime && (`${staffSelectedDay} - ${staffSelectedTime}` !== currentSchedule);
 
-  const updates = {};
-  let changesMade = false;
-
-  // Check municipality change
-  if (newMunicipality && newMunicipality !== currentMunicipality) {
-    updates.municipality = newMunicipality;
-    updates.lastMunicipalityChange = firebase.firestore.Timestamp.now();
-    changesMade = true;
-  }
-
-  // Check department change
-  if (newDepartment && newDepartment !== currentDepartment) {
-    updates.department = newDepartment;
-    updates.lastDepartmentChange = firebase.firestore.Timestamp.now();
-    changesMade = true;
-  }
-
-  // Check schedule change
-  const newSchedule = `${staffSelectedDay} - ${staffSelectedTime}`;
-  if (staffSelectedDay && staffSelectedTime && newSchedule !== currentSchedule) {
-    updates.schedule = { day: staffSelectedDay, time: staffSelectedTime };
-    updates.lastReschedule = firebase.firestore.Timestamp.now();
-    changesMade = true;
-  }
-
-  if (!changesMade) {
-    showCustomAlert("No se detectaron cambios para guardar.", "error");
+  // 🧩 Validación especial: Si cambia departamento, debe seleccionar municipio
+  if (isDepartmentChanged && !newMunicipality) {
+    showCustomAlert("❌ Si cambias el departamento, debes seleccionar también el municipio.", "error");
     return;
   }
 
+  // 🧩 Validación si no hay cambios
+  if (!isDepartmentChanged && !isMunicipalityChanged && !isScheduleChanged) {
+    showCustomAlert("❌ No se detectaron cambios para guardar.", "error");
+    return;
+  }
+
+  // Preparamos los cambios
+  const updates = {};
+  const nowTimestamp = firebase.firestore.Timestamp.now();
   const now = new Date();
   const formattedDate = now.toLocaleDateString("es-ES");
   const formattedTime = now.toLocaleTimeString("es-ES");
-  updates.staffLastChangeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
+  const changeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
+  updates.staffLastChangeNote = changeNote;
 
+  if (isDepartmentChanged) {
+    updates.department = newDepartment;
+    updates.lastDepartmentChange = nowTimestamp;
+  }
+
+  if (isMunicipalityChanged) {
+    updates.municipality = newMunicipality;
+    updates.lastMunicipalityChange = nowTimestamp;
+  }
+
+  if (isScheduleChanged) {
+    updates.schedule = { day: staffSelectedDay, time: staffSelectedTime };
+    updates.lastReschedule = nowTimestamp;
+  }
+
+  // Actualizamos en Firebase
   db.collection("users").doc(selectedStaffUserId).update(updates)
     .then(() => {
       showCustomAlert("✅ Cambios guardados correctamente.", "success");
@@ -678,6 +684,7 @@ function selectScheduleBox(cell) {
       showCustomAlert("❌ Error al guardar cambios.", "error");
     });
 }
+
 
 function showCustomAlert(message, type = "success") {
   const alertBox = document.getElementById("customAlert");
