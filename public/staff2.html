@@ -101,32 +101,88 @@ table td, table th {
     </div>
   </section>
 
-<section id="staffEditSection" style="margin-top: 40px;">
-  <h3>🔧 Modificar Cliente Existente</h3>
-  <input type="email" id="staffEditEmail" placeholder="Correo del cliente..." />
-  <button onclick="loadUserForStaffEdit()">Buscar Cliente</button>
+<section id="staffControlSection" style="margin-top: 40px;">
+  <h3>🔧 Modificar Horario y Ubicación del Cliente</h3>
+  <input type="email" id="staffSearchEmail" placeholder="Correo del cliente..." />
+  <button onclick="loadStaffUser()">Buscar Cliente</button>
 
-  <div id="staffEditForm" style="display:none; margin-top: 20px;">
-    <p><strong>Nombre:</strong> <span id="staffUserName"></span></p>
-    <p><strong>Municipio Actual:</strong> <span id="staffUserMunicipality"></span></p>
-    <p><strong>Departamento Actual:</strong> <span id="staffUserDepartment"></span></p>
-    <p><strong>Horario Actual:</strong> <span id="staffUserSchedule"></span></p>
+  <div id="staffControlForm" style="display:none; margin-top: 20px;">
+    <h4>Cliente: <span id="staffClientName">-</span></h4>
+    <p>Municipio actual: <span id="currentMunicipality">-</span></p>
+    <p>Departamento actual: <span id="currentDepartment">-</span></p>
+    <p>Horario actual: <span id="currentSchedule">-</span></p>
 
-    <label>Nuevo Municipio:</label><br />
-    <input type="text" id="newMunicipality" placeholder="Nuevo municipio" /><br />
+    <h4>Seleccione Nuevo Horario:</h4>
+    <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
 
-    <label>Nuevo Departamento:</label><br />
-    <input type="text" id="newDepartment" placeholder="Nuevo departamento" /><br />
-
-    <label>Nuevo Día:</label><br />
-    <input type="text" id="newDay" placeholder="Lunes, Martes, etc." /><br />
-
-    <label>Nuevo Horario:</label><br />
-    <input type="text" id="newTime" placeholder="Ejemplo: 10:00" /><br />
-
-    <button onclick="saveStaffUserChanges()">Guardar Cambios</button>
+     <h4>Seleccione una nueva ubicación</h4>
+   <label for="department">Departamento:</label>
+    <select id="department" onchange="updateMunicipalities()" required>
+        <option value="">Seleccione un departamento</option>
+    </select>
+    
+    <label for="municipality">Municipio:</label>
+    <select id="municipality" required>
+        <option value="">Seleccione un municipio</option>
+    </select>
+   
+    <br />
+    <button onclick="saveStaffClientChanges()">Guardar Cambios</button>
   </div>
 </section>
+
+ <div id="customAlert" style="
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50; /* default green */
+  color: white;
+  padding: 15px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 9999;
+  font-weight: bold;
+">
+  ✅ Mensaje de ejemplo.
+</div>
 
 
   <script src="env.js"></script>
@@ -441,11 +497,68 @@ function exportTableToExcel() {
 
    let staffSelectedUserId = null;
 
-function loadUserForStaffEdit() {
-  const email = document.getElementById("staffEditEmail").value.trim();
+let selectedStaffUserId = null;
+let staffSelectedDay = "";
+let staffSelectedTime = "";
+
+// Update your existing selectScheduleBox function to store day/time in these variables:
+function selectScheduleBox(cell) {
+  const cells = document.querySelectorAll(".schedule-table tbody td");
+  const timeBlock = cell.innerText.trim();
+
+  if (timeBlock === "-" || timeBlock === "") {
+    alert("Por favor, seleccione un horario válido.");
+    return;
+  }
+
+  cells.forEach((c) => c.classList.remove("selected-box"));
+  cell.classList.add("selected-box");
+
+  const dayIndex = cell.cellIndex;
+  const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+  const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+  staffSelectedDay = day;
+  staffSelectedTime = timeBlock;
+
+  document.getElementById("confirmation-message").innerText = `${day} - ${timeBlock}`;
+}
+
+    function populateStaffDepartments() {
+  const departmentSelect = document.getElementById("staffDepartment");
+  departmentSelect.innerHTML = '<option value="">Seleccione un departamento</option>';
+
+  for (const department in locations) {
+    const option = document.createElement("option");
+    option.value = department;
+    option.textContent = department;
+    departmentSelect.appendChild(option);
+  }
+}
+
+function updateStaffMunicipalities() {
+  const selectedDepartment = document.getElementById("staffDepartment").value;
+  const municipalitySelect = document.getElementById("staffMunicipality");
+  municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>';
+
+  if (locations[selectedDepartment]) {
+    locations[selectedDepartment].forEach(municipality => {
+      const option = document.createElement("option");
+      option.value = municipality;
+      option.textContent = municipality;
+      municipalitySelect.appendChild(option);
+    });
+  }
+}
+
+// Init on page load
+document.addEventListener("DOMContentLoaded", populateStaffDepartments);
+
+    function loadStaffUser() {
+  const email = document.getElementById("staffSearchEmail").value.trim();
 
   if (!email) {
-    alert("Por favor ingresa un correo de cliente.");
+    alert("Por favor ingrese un correo de cliente.");
     return;
   }
 
@@ -458,15 +571,14 @@ function loadUserForStaffEdit() {
 
       const doc = querySnapshot.docs[0];
       const user = doc.data();
+      selectedStaffUserId = doc.id;
 
-      staffSelectedUserId = doc.id;
+      document.getElementById("staffClientName").innerText = user.name || "-";
+      document.getElementById("currentMunicipality").innerText = user.municipality || "-";
+      document.getElementById("currentDepartment").innerText = user.department || "-";
+      document.getElementById("currentSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
 
-      document.getElementById("staffUserName").innerText = user.name || "No registrado";
-      document.getElementById("staffUserMunicipality").innerText = user.municipality || "No registrado";
-      document.getElementById("staffUserDepartment").innerText = user.department || "No registrado";
-      document.getElementById("staffUserSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
-
-      document.getElementById("staffEditForm").style.display = "block";
+      document.getElementById("staffControlForm").style.display = "block";
     })
     .catch(error => {
       console.error("❌ Error al buscar cliente:", error);
@@ -474,44 +586,63 @@ function loadUserForStaffEdit() {
     });
 }
 
-    function saveStaffUserChanges() {
-  if (!staffSelectedUserId) {
+    function saveStaffClientChanges() {
+  if (!selectedStaffUserId) {
     alert("Por favor busca primero un cliente.");
     return;
   }
 
-  const newMunicipality = document.getElementById("newMunicipality").value.trim();
-  const newDepartment = document.getElementById("newDepartment").value.trim();
-  const newDay = document.getElementById("newDay").value.trim();
-  const newTime = document.getElementById("newTime").value.trim();
+  const newDepartment = document.getElementById("staffDepartment").value.trim();
+  const newMunicipality = document.getElementById("staffMunicipality").value.trim();
 
-  const updates = {};
-  if (newMunicipality) {
-    updates.municipality = newMunicipality;
-    updates.lastMunicipalityChange = firebase.firestore.Timestamp.now();
-  }
-  if (newDepartment) {
-    updates.department = newDepartment;
-    updates.lastDepartmentChange = firebase.firestore.Timestamp.now();
-  }
-  if (newDay || newTime) {
-    updates.schedule = {
-      day: newDay || "No especificado",
-      time: newTime || "No especificado"
-    };
-    updates.lastReschedule = firebase.firestore.Timestamp.now();
+  if (!newDepartment || !newMunicipality) {
+    alert("Por favor seleccione el nuevo departamento y municipio.");
+    return;
   }
 
-  db.collection("users").doc(staffSelectedUserId).update(updates)
-    .then(() => {
-      alert("✅ Cambios guardados correctamente.");
-      location.reload();
-    })
-    .catch(error => {
-      console.error("❌ Error al guardar cambios:", error);
-      alert("Error al guardar cambios.");
-    });
+  if (!staffSelectedDay || !staffSelectedTime) {
+    alert("Por favor seleccione el nuevo día y horario.");
+    return;
+  }
+
+  const updates = {
+    department: newDepartment,
+    municipality: newMunicipality,
+    schedule: { day: staffSelectedDay, time: staffSelectedTime },
+    lastReschedule: firebase.firestore.Timestamp.now(),
+    lastMunicipalityChange: firebase.firestore.Timestamp.now(),
+    lastDepartmentChange: firebase.firestore.Timestamp.now()
+  };
+
+  db.collection("users").doc(selectedStaffUserId).update(updates)
+   .then(() => {
+  showCustomAlert("✅ Cambios guardados correctamente.", "success");
+  setTimeout(() => location.reload(), 1500);
+})
+.catch(error => {
+  console.error("❌ Error al guardar cambios:", error);
+  showCustomAlert("❌ Error al guardar cambios.", "error");
+});
 }
+
+function showCustomAlert(message, type = "success") {
+  const alertBox = document.getElementById("customAlert");
+  alertBox.textContent = message;
+
+  // Set color based on type
+  if (type === "success") {
+    alertBox.style.backgroundColor = "#4CAF50"; // green
+  } else if (type === "error") {
+    alertBox.style.backgroundColor = "#f44336"; // red
+  }
+
+  alertBox.style.display = "block";
+
+  setTimeout(() => {
+    alertBox.style.display = "none";
+  }, 3000);
+}
+
 
     
   </script>
