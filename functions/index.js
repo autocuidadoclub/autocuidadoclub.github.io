@@ -1,10 +1,4 @@
-const functions = require("firebase-functions");
-
-exports.processSubscription = functions
-  .region("us-central1") // ✅ Ensure it matches your Firebase region
-  .https.onRequest((req, res) => {
-    res.status(200).send("Cloud Function Deployed Successfully!");
-  });
+// functions/index.js
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
@@ -12,54 +6,74 @@ const axios = require('axios');
 
 admin.initializeApp();
 
-// ✅ Function to get new access token from Zoho
+// 🔑 Environment variables from GitHub Secrets
+const {
+  ZOHO_CLIENT_ID,
+  ZOHO_CLIENT_SECRET,
+  ZOHO_REFRESH_TOKEN,
+  ZOHO_API_DOMAIN,
+  ZOHO_USER_ID
+} = process.env;
+
+// 🚀 Function to get new access token using refresh token
 async function getZohoAccessToken() {
-  const response = await axios.post('https://accounts.zoho.com/oauth/v2/token', null, {
+  const response = await axios.post(`${ZOHO_API_DOMAIN}/oauth/v2/token`, null, {
     params: {
-      refresh_token: process.env.ZOHO_REFRESH_TOKEN,
-      client_id: process.env.ZOHO_CLIENT_ID,
-      client_secret: process.env.ZOHO_CLIENT_SECRET,
-      grant_type: 'refresh_token',
+      refresh_token: ZOHO_REFRESH_TOKEN,
+      client_id: ZOHO_CLIENT_ID,
+      client_secret: ZOHO_CLIENT_SECRET,
+      grant_type: 'refresh_token'
     }
   });
   return response.data.access_token;
 }
 
-// ✅ Main Function to send Email
-exports.sendZohoEmail = functions.https.onRequest(async (req, res) => {
+// 🚀 Function to send email via Zoho API
+async function sendZohoMail(toEmail, subject, bodyContent) {
+  const accessToken = await getZohoAccessToken();
+
+  const payload = {
+    fromAddress: 'info@autocuidadoclub.com', // 🛠️ Replace with your sending email
+    toAddress: toEmail,
+    subject,
+    content: bodyContent,
+    mailFormat: 'html'
+  };
+
+  const response = await axios.post(`${ZOHO_API_DOMAIN}/mail/v1/accounts/${ZOHO_USER_ID}/messages`, payload, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  console.log('Email sent:', response.data);
+  return response.data;
+}
+
+// 📩 Example trigger — Referral email (trigger manually or from Firestore)
+exports.sendReferralEmail = functions.https.onRequest(async (req, res) => {
   try {
-    const accessToken = await getZohoAccessToken();
+    const { referrerName, referrerEmail, referralName, referralEmail, referralPhone } = req.body;
 
-    const emailData = {
-      fromAddress: 'info@autocuidadoclub.com',
-      toAddress: 'test@example.com', // Later: dynamic email from referral
-      subject: '🎉 Nuevo referido agregado en AutoCuidado Club!',
-      content: `
-        ¡Hola [Nombre del Cliente]!
+    const subject = '🎉 ¡Nuevo referido agregado en AutoCuidado Club!';
+    const body = `
+      ¡Hola ${referrerName}!<br><br>
+      Has agregado un nuevo referido a AutoCuidado Club 🚗✨<br><br>
+      📋 Datos del referido:<br>
+      - Nombre: ${referralName}<br>
+      - Email: ${referralEmail}<br>
+      - WhatsApp: https://wa.me/${referralPhone}<br><br>
+      Recuerda que puedes seguir el progreso de tus referidos directamente desde tu panel de cliente.<br>
+      Te notificaremos automáticamente cuando tu referido se registre y complete su pago para que disfrutes de tus recompensas 🎁<br><br>
+      ¡Gracias por confiar en AutoCuidado Club!
+    `;
 
-        Has agregado un nuevo referido a AutoCuidado Club 🚗✨
-
-        📋 Datos del referido:
-        - Nombre: [Nombre del referido]
-        - Email: [Email del referido]
-        - WhatsApp: https://wa.me/[Teléfono sin +]
-
-        Recuerda que puedes seguir el progreso de tus referidos directamente desde tu panel de cliente.
-
-        ¡Gracias por confiar en AutoCuidado Club!
-      `,
-      mailFormat: 'html',
-    };
-
-    await axios.post(`https://mail.zoho.com/api/accounts/${process.env.ZOHO_ACCOUNT_ID}/messages`, emailData, {
-      headers: {
-        Authorization: `Zoho-oauthtoken ${accessToken}`,
-      }
-    });
-
-    res.status(200).send('✅ Email enviado correctamente.');
+    await sendZohoMail(referrerEmail, subject, body);
+    res.status(200).send('Referral email sent successfully!');
   } catch (error) {
-    console.error('❌ Error al enviar email:', error.response?.data || error.message);
-    res.status(500).send('Error al enviar email.');
+    console.error('Error sending referral email:', error);
+    res.status(500).send('Error sending email');
   }
 });
+
+// ✅ Add more functions for registration and payment notifications here.
