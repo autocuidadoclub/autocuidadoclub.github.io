@@ -9,6 +9,20 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
+
+  <style>
+
+    table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+table td, table th {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+  </style>
+  
 <body>
   <nav class="navbar">
     <ul>
@@ -38,18 +52,19 @@
 
 <table>
   <thead>
-    <tr>
-      <th>Usuario</th>
-      <th>Email</th>
-      <th>Teléfono</th>
-      <th>Fecha de Registro</th>
-      <th>Horario Seleccionado</th>
-      <th>Fecha de Pago</th>
-      <th>Estado del Pago</th>
-      <th>Próximo Pago</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
+  <tr>
+    <th>Usuario</th>
+    <th>Email</th>
+    <th>Teléfono</th>
+    <th>Municipio</th>
+    <th>Departamento</th>
+    <th>Fecha de Registro</th>
+    <th>Horario Seleccionado</th>
+    <th>Fecha de Pago</th>
+    <th>Estado del Pago</th>
+    <th>Acciones</th>
+  </tr>
+</thead>
   <tbody id="paymentTable"></tbody>
 </table>
 
@@ -168,29 +183,27 @@ function updatePaymentTable(user, userId) {
   const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
   const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
   const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const nextPaymentDate = user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const pushBtn = user.pushToken
-    ? `<button onclick="sendPushNotification('${user.pushToken}', 'Hola ${user.name}, tu inspección es ${schedule}.')">Push</button>`
-    : "No token";
+  const municipio = user.municipality || "No registrado";
+  const departamento = user.department || "No registrado";
 
   table.innerHTML += `
-    <tr>
-      <td>${user.name}</td>
+    <tr style="border-bottom: 1px solid #ccc;">
+      <td>${user.name || "Sin nombre"}</td>
       <td>${user.email}</td>
       <td>${user.phone || "No disponible"}</td>
+      <td>${municipio}</td>
+      <td>${departamento}</td>
       <td>${registrationDate}</td>
       <td>${schedule}</td>
       <td>${paymentDate}</td>
       <td>${user.paymentStatus || "Pendiente"}</td>
-      <td>${nextPaymentDate}</td>
       <td>
         <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
-        ${pushBtn}
         <button onclick="viewPaymentHistory('${userId}')">Ver Historial</button>
-
       </td>
     </tr>`;
 }
+
 
     function getPaymentHistoryByEmail() {
   const email = document.getElementById("searchEmail").value.trim();
