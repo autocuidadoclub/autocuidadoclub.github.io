@@ -603,7 +603,7 @@ function selectScheduleBox(cell) {
       document.getElementById("staffClientName").innerText = user.name || "-";
       document.getElementById("currentMunicipality").innerText = user.municipality || "-";
       document.getElementById("currentDepartment").innerText = user.department || "-";
-      document.getElementById("currentSchedule").innerText = user.selectedSchedule || "-";
+      document.getElementById("currentSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
       document.getElementById("staffControlForm").style.display = "block";
      
       if (user.staffLastChangeNote) {
@@ -685,9 +685,14 @@ function selectScheduleBox(cell) {
   }
 
   if (isScheduleChanged) {
-    updates.selectedSchedule = selectedScheduleText;
-    updates.lastReschedule = nowTimestamp;
-  }
+  const [selectedDay, selectedTime] = selectedScheduleText.split(" - ");
+  updates.schedule = {
+    day: selectedDay.trim(),
+    time: selectedTime.trim()
+  };
+  updates.lastReschedule = nowTimestamp;
+}
+
 
   // Guardar cambios en Firestore
   db.collection("users").doc(selectedStaffUserId).update(updates)
