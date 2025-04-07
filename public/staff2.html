@@ -503,56 +503,82 @@ let staffSelectedTime = "";
 
 // Update your existing selectScheduleBox function to store day/time in these variables:
 function selectScheduleBox(cell) {
-  const cells = document.querySelectorAll(".schedule-table tbody td");
-  const timeBlock = cell.innerText.trim();
+    const cells = document.querySelectorAll(".schedule-table tbody td");
 
-  if (timeBlock === "-" || timeBlock === "") {
-    alert("Por favor, seleccione un horario válido.");
-    return;
-  }
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
 
-  cells.forEach((c) => c.classList.remove("selected-box"));
-  cell.classList.add("selected-box");
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
+    }
 
-  const dayIndex = cell.cellIndex;
-  const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-  const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
 
-  staffSelectedDay = day;
-  staffSelectedTime = timeBlock;
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
 
-  document.getElementById("confirmation-message").innerText = `${day} - ${timeBlock}`;
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
+    }
+
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
 }
 
-    function populateStaffDepartments() {
-  const departmentSelect = document.getElementById("staffDepartment");
-  departmentSelect.innerHTML = '<option value="">Seleccione un departamento</option>';
+        const locations = {
+            "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
+            "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
+            "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
+            "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+            "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
+            "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
+            "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+            "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+            "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
+            "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
+            "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
+            "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+            "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
+        };
+        const departmentSelect = document.getElementById("department");
+        const municipalitySelect = document.getElementById("municipality");
 
-  for (const department in locations) {
-    const option = document.createElement("option");
-    option.value = department;
-    option.textContent = department;
-    departmentSelect.appendChild(option);
-  }
-}
+        // Populate the departments dropdown
+        function populateDepartments() {
+            for (const department in locations) {
+                const option = document.createElement("option");
+                option.value = department;
+                option.textContent = department;
+                departmentSelect.appendChild(option);
+            }
+        }
 
-function updateStaffMunicipalities() {
-  const selectedDepartment = document.getElementById("staffDepartment").value;
-  const municipalitySelect = document.getElementById("staffMunicipality");
-  municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>';
+        // Update municipalities based on selected department
+        function updateMunicipalities() {
+            const selectedDepartment = departmentSelect.value;
+            municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>'; // Reset municipalities
 
-  if (locations[selectedDepartment]) {
-    locations[selectedDepartment].forEach(municipality => {
-      const option = document.createElement("option");
-      option.value = municipality;
-      option.textContent = municipality;
-      municipalitySelect.appendChild(option);
-    });
-  }
-}
+            if (locations[selectedDepartment]) {
+                locations[selectedDepartment].forEach(municipality => {
+                    const option = document.createElement("option");
+                    option.value = municipality;
+                    option.textContent = municipality;
+                    municipalitySelect.appendChild(option);
+                });
+            }
+        }
 
-// Init on page load
-document.addEventListener("DOMContentLoaded", populateStaffDepartments);
+        // Initialize departments on page load
+        document.addEventListener("DOMContentLoaded", populateDepartments);
 
     function loadStaffUser() {
   const email = document.getElementById("staffSearchEmail").value.trim();
