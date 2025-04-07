@@ -101,24 +101,32 @@ table td, table th {
     </div>
   </section>
 
+<section id="staffEditSection" style="margin-top: 40px;">
+  <h3>🔧 Modificar Cliente Existente</h3>
+  <input type="email" id="staffEditEmail" placeholder="Correo del cliente..." />
+  <button onclick="loadUserForStaffEdit()">Buscar Cliente</button>
 
+  <div id="staffEditForm" style="display:none; margin-top: 20px;">
+    <p><strong>Nombre:</strong> <span id="staffUserName"></span></p>
+    <p><strong>Municipio Actual:</strong> <span id="staffUserMunicipality"></span></p>
+    <p><strong>Departamento Actual:</strong> <span id="staffUserDepartment"></span></p>
+    <p><strong>Horario Actual:</strong> <span id="staffUserSchedule"></span></p>
 
-  <h3>📜 Historial de pago por cliente</h3>
-<input type="text" id="searchEmail" placeholder="Buscar por email...">
-<button onclick="getPaymentHistoryByEmail()">Buscar</button>
+    <label>Nuevo Municipio:</label><br />
+    <input type="text" id="newMunicipality" placeholder="Nuevo municipio" /><br />
 
-<table id="staffHistoryTable" style="margin-top: 10px; display: none;">
-  <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Monto</th>
-      <th>Método</th>
-      <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody id="staffHistoryBody"></tbody>
-</table>
+    <label>Nuevo Departamento:</label><br />
+    <input type="text" id="newDepartment" placeholder="Nuevo departamento" /><br />
 
+    <label>Nuevo Día:</label><br />
+    <input type="text" id="newDay" placeholder="Lunes, Martes, etc." /><br />
+
+    <label>Nuevo Horario:</label><br />
+    <input type="text" id="newTime" placeholder="Ejemplo: 10:00" /><br />
+
+    <button onclick="saveStaffUserChanges()">Guardar Cambios</button>
+  </div>
+</section>
 
 
   <script src="env.js"></script>
@@ -431,41 +439,78 @@ function exportTableToExcel() {
 }
 
 
-    function viewPaymentHistory(userId) {
-  const body = document.getElementById("staffHistoryBody");
-  const table = document.getElementById("staffHistoryTable");
-  body.innerHTML = "";
+   let staffSelectedUserId = null;
 
-  db.collection("users").doc(userId).get().then(doc => {
-    if (!doc.exists) {
-      body.innerHTML = '<tr><td colspan="4">Usuario no encontrado.</td></tr>';
-      table.style.display = "table";
-      return;
-    }
+function loadUserForStaffEdit() {
+  const email = document.getElementById("staffEditEmail").value.trim();
 
-    const data = doc.data();
-    const history = data.paymentHistory || [];
+  if (!email) {
+    alert("Por favor ingresa un correo de cliente.");
+    return;
+  }
 
-    if (history.length === 0) {
-      body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
-    } else {
-      history.forEach(entry => {
-        const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
-        body.innerHTML += `
-          <tr>
-            <td>${date}</td>
-            <td>$${entry.amount || "N/A"}</td>
-            <td>${entry.method || "-"}</td>
-            <td>${entry.status || "-"}</td>
-          </tr>`;
-      });
-    }
+  db.collection("users").where("email", "==", email).get()
+    .then(querySnapshot => {
+      if (querySnapshot.empty) {
+        alert("Cliente no encontrado.");
+        return;
+      }
 
-    table.style.display = "table";
-  }).catch(err => {
-    console.error("❌ Error al cargar historial:", err);
-    alert("Error al mostrar historial.");
-  });
+      const doc = querySnapshot.docs[0];
+      const user = doc.data();
+
+      staffSelectedUserId = doc.id;
+
+      document.getElementById("staffUserName").innerText = user.name || "No registrado";
+      document.getElementById("staffUserMunicipality").innerText = user.municipality || "No registrado";
+      document.getElementById("staffUserDepartment").innerText = user.department || "No registrado";
+      document.getElementById("staffUserSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
+
+      document.getElementById("staffEditForm").style.display = "block";
+    })
+    .catch(error => {
+      console.error("❌ Error al buscar cliente:", error);
+      alert("Error al buscar cliente.");
+    });
+}
+
+    function saveStaffUserChanges() {
+  if (!staffSelectedUserId) {
+    alert("Por favor busca primero un cliente.");
+    return;
+  }
+
+  const newMunicipality = document.getElementById("newMunicipality").value.trim();
+  const newDepartment = document.getElementById("newDepartment").value.trim();
+  const newDay = document.getElementById("newDay").value.trim();
+  const newTime = document.getElementById("newTime").value.trim();
+
+  const updates = {};
+  if (newMunicipality) {
+    updates.municipality = newMunicipality;
+    updates.lastMunicipalityChange = firebase.firestore.Timestamp.now();
+  }
+  if (newDepartment) {
+    updates.department = newDepartment;
+    updates.lastDepartmentChange = firebase.firestore.Timestamp.now();
+  }
+  if (newDay || newTime) {
+    updates.schedule = {
+      day: newDay || "No especificado",
+      time: newTime || "No especificado"
+    };
+    updates.lastReschedule = firebase.firestore.Timestamp.now();
+  }
+
+  db.collection("users").doc(staffSelectedUserId).update(updates)
+    .then(() => {
+      alert("✅ Cambios guardados correctamente.");
+      location.reload();
+    })
+    .catch(error => {
+      console.error("❌ Error al guardar cambios:", error);
+      alert("Error al guardar cambios.");
+    });
 }
 
     
