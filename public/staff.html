@@ -101,24 +101,88 @@ table td, table th {
     </div>
   </section>
 
+<section id="staffControlSection" style="margin-top: 40px;">
+  <h3>🔧 Modificar Horario y Ubicación del Cliente</h3>
+  <input type="email" id="staffSearchEmail" placeholder="Correo del cliente..." />
+  <button onclick="loadStaffUser()">Buscar Cliente</button>
 
+  <div id="staffControlForm" style="display:none; margin-top: 20px;">
+    <h4>Cliente: <span id="staffClientName">-</span></h4>
+    <p>Municipio actual: <span id="currentMunicipality">-</span></p>
+    <p>Departamento actual: <span id="currentDepartment">-</span></p>
+    <p>Horario actual: <span id="currentSchedule">-</span></p>
 
-  <h3>📜 Historial de pago por cliente</h3>
-<input type="text" id="searchEmail" placeholder="Buscar por email...">
-<button onclick="getPaymentHistoryByEmail()">Buscar</button>
+    <h4>Seleccione Nuevo Horario:</h4>
+    <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
 
-<table id="staffHistoryTable" style="margin-top: 10px; display: none;">
-  <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Monto</th>
-      <th>Método</th>
-      <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody id="staffHistoryBody"></tbody>
-</table>
+     <h4>Seleccione una nueva ubicación</h4>
+   <label for="department">Departamento:</label>
+    <select id="department" onchange="updateMunicipalities()" required>
+        <option value="">Seleccione un departamento</option>
+    </select>
+    
+    <label for="municipality">Municipio:</label>
+    <select id="municipality" required>
+        <option value="">Seleccione un municipio</option>
+    </select>
+   
+    <br />
+    <button onclick="saveStaffClientChanges()">Guardar Cambios</button>
+  </div>
+</section>
 
+ <div id="customAlert" style="
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50; /* default green */
+  color: white;
+  padding: 15px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 9999;
+  font-weight: bold;
+">
+  ✅ Mensaje de ejemplo.
+</div>
 
 
   <script src="env.js"></script>
@@ -431,42 +495,195 @@ function exportTableToExcel() {
 }
 
 
-    function viewPaymentHistory(userId) {
-  const body = document.getElementById("staffHistoryBody");
-  const table = document.getElementById("staffHistoryTable");
-  body.innerHTML = "";
+   let staffSelectedUserId = null;
 
-  db.collection("users").doc(userId).get().then(doc => {
-    if (!doc.exists) {
-      body.innerHTML = '<tr><td colspan="4">Usuario no encontrado.</td></tr>';
-      table.style.display = "table";
-      return;
+let selectedStaffUserId = null;
+let staffSelectedDay = "";
+let staffSelectedTime = "";
+
+// Update your existing selectScheduleBox function to store day/time in these variables:
+function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+
+    // Get the clicked cell's text
+    const timeBlock = cell.innerText.trim();
+
+    // Validate the clicked cell
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("Por favor, seleccione un horario válido.");
+        return; // Do not allow selection of invalid cells
     }
 
-    const data = doc.data();
-    const history = data.paymentHistory || [];
+    // Remove selection from all other cells
+    cells.forEach((c) => c.classList.remove("selected-box"));
 
-    if (history.length === 0) {
-      body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
-    } else {
-      history.forEach(entry => {
-        const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
-        body.innerHTML += `
-          <tr>
-            <td>${date}</td>
-            <td>$${entry.amount || "N/A"}</td>
-            <td>${entry.method || "-"}</td>
-            <td>${entry.status || "-"}</td>
-          </tr>`;
-      });
+    // Highlight the selected cell
+    cell.classList.add("selected-box");
+
+    // Get the corresponding day from the column header
+    const dayIndex = cell.cellIndex; // Get the column index of the clicked cell
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    // Update the hidden input field to include both the day and time block
+    const scheduleField = document.getElementById("selectedSchedule");
+    if (scheduleField) {
+        scheduleField.value = `${day} - ${timeBlock}`;
     }
 
-    table.style.display = "table";
-  }).catch(err => {
-    console.error("❌ Error al cargar historial:", err);
-    alert("Error al mostrar historial.");
-  });
+    console.log(`Horario seleccionado: ${day} - ${timeBlock}`);
 }
+
+        const locations = {
+            "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
+            "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
+            "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
+            "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+            "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
+            "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
+            "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+            "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+            "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
+            "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
+            "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
+            "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+            "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
+        };
+        const departmentSelect = document.getElementById("department");
+        const municipalitySelect = document.getElementById("municipality");
+
+        // Populate the departments dropdown
+        function populateDepartments() {
+            for (const department in locations) {
+                const option = document.createElement("option");
+                option.value = department;
+                option.textContent = department;
+                departmentSelect.appendChild(option);
+            }
+        }
+
+        // Update municipalities based on selected department
+        function updateMunicipalities() {
+            const selectedDepartment = departmentSelect.value;
+            municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>'; // Reset municipalities
+
+            if (locations[selectedDepartment]) {
+                locations[selectedDepartment].forEach(municipality => {
+                    const option = document.createElement("option");
+                    option.value = municipality;
+                    option.textContent = municipality;
+                    municipalitySelect.appendChild(option);
+                });
+            }
+        }
+
+        // Initialize departments on page load
+        document.addEventListener("DOMContentLoaded", populateDepartments);
+
+    function loadStaffUser() {
+  const email = document.getElementById("staffSearchEmail").value.trim();
+
+  if (!email) {
+    alert("Por favor ingrese un correo de cliente.");
+    return;
+  }
+
+  db.collection("users").where("email", "==", email).get()
+    .then(querySnapshot => {
+      if (querySnapshot.empty) {
+        alert("Cliente no encontrado.");
+        return;
+      }
+
+      const doc = querySnapshot.docs[0];
+      const user = doc.data();
+      selectedStaffUserId = doc.id;
+
+      document.getElementById("staffClientName").innerText = user.name || "-";
+      document.getElementById("currentMunicipality").innerText = user.municipality || "-";
+      document.getElementById("currentDepartment").innerText = user.department || "-";
+      document.getElementById("currentSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
+
+      document.getElementById("staffControlForm").style.display = "block";
+     
+      if (user.staffLastChangeNote) {
+  const note = document.createElement("p");
+  note.innerText = "📝 " + user.staffLastChangeNote;
+  document.getElementById("staffControlForm").prepend(note);
+}
+
+    })
+    .catch(error => {
+      console.error("❌ Error al buscar cliente:", error);
+      alert("Error al buscar cliente.");
+    });
+}
+
+    function saveStaffClientChanges() {
+  if (!selectedStaffUserId) {
+    alert("Por favor busca primero un cliente.");
+    return;
+  }
+
+ const newDepartment = document.getElementById("department").value.trim();
+const newMunicipality = document.getElementById("municipality").value.trim();
+
+
+  if (!newDepartment || !newMunicipality) {
+    alert("Por favor seleccione el nuevo departamento y municipio.");
+    return;
+  }
+
+  if (!staffSelectedDay || !staffSelectedTime) {
+    alert("Por favor seleccione el nuevo día y horario.");
+    return;
+  }
+
+const now = new Date();
+const formattedDate = now.toLocaleDateString("es-ES");
+const formattedTime = now.toLocaleTimeString("es-ES");
+const changeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
+
+const updates = {
+  department: newDepartment,
+  municipality: newMunicipality,
+  schedule: { day: staffSelectedDay, time: staffSelectedTime },
+  lastReschedule: firebase.firestore.Timestamp.now(),
+  lastMunicipalityChange: firebase.firestore.Timestamp.now(),
+  lastDepartmentChange: firebase.firestore.Timestamp.now(),
+  staffLastChangeNote: changeNote
+};
+
+
+  db.collection("users").doc(selectedStaffUserId).update(updates)
+   .then(() => {
+  showCustomAlert("✅ Cambios guardados correctamente.", "success");
+  setTimeout(() => location.reload(), 1500);
+})
+.catch(error => {
+  console.error("❌ Error al guardar cambios:", error);
+  showCustomAlert("❌ Error al guardar cambios.", "error");
+});
+}
+
+function showCustomAlert(message, type = "success") {
+  const alertBox = document.getElementById("customAlert");
+  alertBox.textContent = message;
+
+  // Set color based on type
+  if (type === "success") {
+    alertBox.style.backgroundColor = "#4CAF50"; // green
+  } else if (type === "error") {
+    alertBox.style.backgroundColor = "#f44336"; // red
+  }
+
+  alertBox.style.display = "block";
+
+  setTimeout(() => {
+    alertBox.style.display = "none";
+  }, 3000);
+}
+
 
     
   </script>
