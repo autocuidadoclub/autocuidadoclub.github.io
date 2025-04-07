@@ -605,6 +605,13 @@ function selectScheduleBox(cell) {
       document.getElementById("currentSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
 
       document.getElementById("staffControlForm").style.display = "block";
+     
+      if (user.staffLastChangeNote) {
+  const note = document.createElement("p");
+  note.innerText = "📝 " + user.staffLastChangeNote;
+  document.getElementById("staffControlForm").prepend(note);
+}
+
     })
     .catch(error => {
       console.error("❌ Error al buscar cliente:", error);
@@ -632,14 +639,21 @@ const newMunicipality = document.getElementById("municipality").value.trim();
     return;
   }
 
-  const updates = {
-    department: newDepartment,
-    municipality: newMunicipality,
-    schedule: { day: staffSelectedDay, time: staffSelectedTime },
-    lastReschedule: firebase.firestore.Timestamp.now(),
-    lastMunicipalityChange: firebase.firestore.Timestamp.now(),
-    lastDepartmentChange: firebase.firestore.Timestamp.now()
-  };
+const now = new Date();
+const formattedDate = now.toLocaleDateString("es-ES");
+const formattedTime = now.toLocaleTimeString("es-ES");
+const changeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
+
+const updates = {
+  department: newDepartment,
+  municipality: newMunicipality,
+  schedule: { day: staffSelectedDay, time: staffSelectedTime },
+  lastReschedule: firebase.firestore.Timestamp.now(),
+  lastMunicipalityChange: firebase.firestore.Timestamp.now(),
+  lastDepartmentChange: firebase.firestore.Timestamp.now(),
+  staffLastChangeNote: changeNote
+};
+
 
   db.collection("users").doc(selectedStaffUserId).update(updates)
    .then(() => {
