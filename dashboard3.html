@@ -1146,7 +1146,6 @@ function listenToReferredUserRegistrations(userId) {
                     const userData = userDoc.data();
 
                     if (!referralData.registered) {
-                        // Update referral to mark as registered
                         referralsRef.doc(referralDoc.id).update({
                             registered: true
                         }).then(() => {
@@ -1154,8 +1153,17 @@ function listenToReferredUserRegistrations(userId) {
 
                             showDashboardNotification(`🎉 Tu referido ${referralData.email} se ha registrado en AutoCuidado Club.`);
 
-                        notifyNewReferral(user.email, email, name, phone);
-
+                            if (auth.currentUser) {
+                                notifyNewReferral(
+                                    auth.currentUser.email,
+                                    referralData.email,
+                                    referralData.name,
+                                    referralData.phone
+                                );
+                            }
+                        }).catch(error => {
+                            console.error("Error updating referral as registered:", error);
+                        });
                     }
                 });
             });
@@ -1164,6 +1172,7 @@ function listenToReferredUserRegistrations(userId) {
         console.error("Error loading referrals for real-time registration listener:", error);
     });
 }
+
 
         
 // Initialize departments on load
