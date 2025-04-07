@@ -685,9 +685,7 @@ function selectScheduleBox(cell) {
   }
 
   if (isScheduleChanged) {
-    // Guardamos también el horario seleccionado
-    const [selectedDay, selectedTime] = selectedScheduleText.split(" - ");
-    updates.schedule = { day: selectedDay.trim(), time: selectedTime.trim() };
+    updates.selectedSchedule = selectedScheduleText;
     updates.lastReschedule = nowTimestamp;
   }
 
@@ -702,8 +700,6 @@ function selectScheduleBox(cell) {
       showCustomAlert("❌ Error al guardar cambios.", "error");
     });
 }
-
-
 
 function showCustomAlert(message, type = "success") {
   const alertBox = document.getElementById("customAlert");
