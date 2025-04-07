@@ -619,13 +619,13 @@ function selectScheduleBox(cell) {
     });
 }
 
-   function saveStaffClientChanges() {
+  function saveStaffClientChanges() {
   if (!selectedStaffUserId) {
-    alert("Por favor busca primero un cliente.");
+    showCustomAlert("❌ Por favor busca primero un cliente.", "error");
     return;
   }
 
-  // Leer los valores actuales en la base de datos
+  // Leer datos actuales visibles en la interfaz
   const currentDepartment = document.getElementById("currentDepartment").innerText.trim();
   const currentMunicipality = document.getElementById("currentMunicipality").innerText.trim();
   const currentSchedule = document.getElementById("currentSchedule").innerText.trim();
@@ -633,9 +633,25 @@ function selectScheduleBox(cell) {
   const newDepartment = document.getElementById("department").value.trim();
   const newMunicipality = document.getElementById("municipality").value.trim();
 
+  const selectedCell = document.querySelector(".schedule-table td.selected-box");
+  let isScheduleChanged = false;
+  let selectedScheduleText = "";
+
+  if (selectedCell) {
+    const dayIndex = selectedCell.cellIndex;
+    const timeBlock = selectedCell.innerText.trim();
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "";
+
+    selectedScheduleText = `${day} - ${timeBlock}`;
+
+    if (selectedScheduleText !== currentSchedule && day && timeBlock && timeBlock !== "-") {
+      isScheduleChanged = true;
+    }
+  }
+
   const isDepartmentChanged = newDepartment && newDepartment !== currentDepartment;
   const isMunicipalityChanged = newMunicipality && newMunicipality !== currentMunicipality;
-  const isScheduleChanged = staffSelectedDay && staffSelectedTime && (`${staffSelectedDay} - ${staffSelectedTime}` !== currentSchedule);
 
   // 🧩 Validación especial: Si cambia departamento, debe seleccionar municipio
   if (isDepartmentChanged && !newMunicipality) {
@@ -643,13 +659,13 @@ function selectScheduleBox(cell) {
     return;
   }
 
-  // 🧩 Validación si no hay cambios
+  // 🧩 Validación final: si no hay cambios
   if (!isDepartmentChanged && !isMunicipalityChanged && !isScheduleChanged) {
     showCustomAlert("❌ No se detectaron cambios para guardar.", "error");
     return;
   }
 
-  // Preparamos los cambios
+  // Preparar actualizaciones
   const updates = {};
   const nowTimestamp = firebase.firestore.Timestamp.now();
   const now = new Date();
@@ -669,11 +685,13 @@ function selectScheduleBox(cell) {
   }
 
   if (isScheduleChanged) {
-    updates.schedule = { day: staffSelectedDay, time: staffSelectedTime };
+    // Guardamos también el horario seleccionado
+    const [selectedDay, selectedTime] = selectedScheduleText.split(" - ");
+    updates.schedule = { day: selectedDay.trim(), time: selectedTime.trim() };
     updates.lastReschedule = nowTimestamp;
   }
 
-  // Actualizamos en Firebase
+  // Guardar cambios en Firestore
   db.collection("users").doc(selectedStaffUserId).update(updates)
     .then(() => {
       showCustomAlert("✅ Cambios guardados correctamente.", "success");
@@ -684,6 +702,7 @@ function selectScheduleBox(cell) {
       showCustomAlert("❌ Error al guardar cambios.", "error");
     });
 }
+
 
 
 function showCustomAlert(message, type = "success") {
