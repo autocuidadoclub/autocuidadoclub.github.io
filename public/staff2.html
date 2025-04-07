@@ -81,16 +81,17 @@ table td, table th {
       <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
 
       <table>
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>Horario Seleccionado</th>
-            <th>Última Reprogramación</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+       <thead>
+  <tr>
+    <th>Usuario</th>
+    <th>Email</th>
+    <th>Teléfono</th>
+    <th>Horario Seleccionado</th>
+    <th>Última Modificación</th>
+    <th>Tipo de Cambio</th>
+  </tr>
+</thead>
+
         <tbody id="rescheduleTable"></tbody>
       </table>
     </div>
@@ -314,49 +315,67 @@ async function confirmPayment(userId) {
     }
 
     function findRescheduledUsers() {
-      const startDate = new Date(document.getElementById("rescheduleStartDate").value);
-      const endDate = new Date(document.getElementById("rescheduleEndDate").value);
-      endDate.setDate(endDate.getDate() + 1);
-      const rescheduleTable = document.getElementById("rescheduleTable");
-      rescheduleTable.innerHTML = "";
+  const startDate = new Date(document.getElementById("rescheduleStartDate").value);
+  const endDate = new Date(document.getElementById("rescheduleEndDate").value);
+  endDate.setDate(endDate.getDate() + 1);
 
-      db.collection("users")
-        .where("lastReschedule", ">=", firebase.firestore.Timestamp.fromDate(startDate))
-        .where("lastReschedule", "<", firebase.firestore.Timestamp.fromDate(endDate))
-        .get()
-        .then((querySnapshot) => {
-          if (querySnapshot.empty) {
-            alert("No se encontraron usuarios con reprogramaciones en el rango de fechas.");
-            return;
-          }
+  const rescheduleTable = document.getElementById("rescheduleTable");
+  rescheduleTable.innerHTML = "";
 
-          querySnapshot.forEach((doc) => {
-            const user = doc.data();
-            const lastReschedule = user.lastReschedule
-              ? user.lastReschedule.toDate().toLocaleDateString("es-ES")
-              : "No registrada";
-            const schedule = user.schedule
-              ? `${user.schedule.day}, ${user.schedule.time}`
-              : "No asignado";
+  db.collection("users").get()
+    .then((querySnapshot) => {
+      let found = false;
 
-            rescheduleTable.innerHTML += `
-              <tr>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.phone || "No disponible"}</td>
-                <td>${schedule}</td>
-                <td>${lastReschedule}</td>
-                <td>
-                  ${user.pushToken ? `<button onclick=\"sendPushNotification('${user.pushToken}', 'Hola ${user.name}, ¿deseas reprogramar tu inspección del ${lastReschedule}?')\">Push</button>` : "No token"}
-                </td>
-              </tr>`;
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching reprogramaciones:", error);
-          alert("Error al buscar reprogramaciones.");
-        });
-    }
+      querySnapshot.forEach((doc) => {
+        const user = doc.data();
+        const lastReschedule = user.lastReschedule?.toDate();
+        const lastMunicipalityChange = user.lastMunicipalityChange?.toDate();
+        const lastDepartmentChange = user.lastDepartmentChange?.toDate();
+
+        const isRescheduleInRange = lastReschedule && lastReschedule >= startDate && lastReschedule <= endDate;
+        const isMunicipalityChangeInRange = lastMunicipalityChange && lastMunicipalityChange >= startDate && lastMunicipalityChange <= endDate;
+        const isDepartmentChangeInRange = lastDepartmentChange && lastDepartmentChange >= startDate && lastDepartmentChange <= endDate;
+
+        if (isRescheduleInRange || isMunicipalityChangeInRange || isDepartmentChangeInRange) {
+          found = true;
+
+          const schedule = user.schedule ? `${user.schedule.day}, ${user.schedule.time}` : "No asignado";
+          const lastRescheduleDate = lastReschedule ? lastReschedule.toLocaleDateString("es-ES") : "-";
+          const lastMunicipalityDate = lastMunicipalityChange ? lastMunicipalityChange.toLocaleDateString("es-ES") : "-";
+          const lastDepartmentDate = lastDepartmentChange ? lastDepartmentChange.toLocaleDateString("es-ES") : "-";
+
+          // 🧩 Build change type text
+          let changeType = [];
+          if (isRescheduleInRange) changeType.push("Reprogramación de Horario");
+          if (isMunicipalityChangeInRange) changeType.push("Cambio de Municipio");
+          if (isDepartmentChangeInRange) changeType.push("Cambio de Departamento");
+
+          rescheduleTable.innerHTML += `
+            <tr>
+              <td>${user.name}</td>
+              <td>${user.email}</td>
+              <td>${user.phone || "No disponible"}</td>
+              <td>${schedule}</td>
+              <td>
+                Horario: ${lastRescheduleDate}<br>
+                Municipio: ${lastMunicipalityDate}<br>
+                Departamento: ${lastDepartmentDate}
+              </td>
+              <td>${changeType.join(" / ")}</td>
+            </tr>`;
+        }
+      });
+
+      if (!found) {
+        alert("No se encontraron usuarios con cambios en el rango de fechas.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching cambios:", error);
+      alert("Error al buscar cambios.");
+    });
+}
+
 
     function viewPaymentHistory(userId) {
   const body = document.getElementById("staffHistoryBody");
