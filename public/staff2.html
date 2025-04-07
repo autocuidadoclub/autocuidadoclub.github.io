@@ -8,6 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 
   <style>
@@ -48,6 +49,7 @@ table td, table th {
   <input type="date" id="endDate">
 </div>
 <button onclick="findUsersByDate()">Buscar Usuarios</button>
+<button onclick="exportTableToExcel()">Exportar a Excel</button>
 
 <table>
   <thead>
@@ -79,6 +81,7 @@ table td, table th {
         <input type="date" id="rescheduleEndDate" />
       </div>
       <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
+      <button onclick="exportTableToExcel()">Exportar a Excel</button>
 
       <table>
       <thead>
@@ -338,6 +341,33 @@ async function confirmPayment(userId) {
     });
 }
 
+function exportTableToExcel() {
+  const table = document.querySelector("#rescheduleTable").parentElement.querySelector("table");
+  
+  if (!table || table.rows.length <= 1) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  // Convert HTML table to SheetJS worksheet
+  const workbook = XLSX.utils.table_to_book(table, { sheet: "Reprogramaciones" });
+
+  // Generate and download Excel file
+  XLSX.writeFile(workbook, "reprogramaciones.xlsx");
+}
+
+    function exportUsersToExcel() {
+  const table = document.querySelector("#paymentTable").parentElement.querySelector("table");
+  
+  if (!table || table.rows.length <= 1) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  const workbook = XLSX.utils.table_to_book(table, { sheet: "Usuarios" });
+
+  XLSX.writeFile(workbook, "usuarios.xlsx");
+}
 
 
     function viewPaymentHistory(userId) {
