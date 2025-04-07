@@ -291,7 +291,7 @@ async function findUsersByDate() {
 function updatePaymentTable(user, userId) {
   const table = document.getElementById("paymentTable");
   const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
-  const schedule = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "No asignado";
+  const schedule = user.selectedSchedule || "No asignado"; // ✅ Campo correcto ahora
   const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "Sin fecha";
   const municipio = user.municipality || "No registrado";
   const departamento = user.department || "No registrado";
@@ -309,9 +309,10 @@ function updatePaymentTable(user, userId) {
       <td>${user.paymentStatus || "Pendiente"}</td>
       <td>
         <button onclick="confirmPayment('${userId}')">Confirmar Pago</button><br>
-        </td>
+      </td>
     </tr>`;
 }
+
 
 
     function getPaymentHistoryByEmail() {
