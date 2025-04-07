@@ -23,11 +23,12 @@ jobs:
 
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@v12.9.0
-        with:
-          args: deploy --only functions --project bookings-autocuidad-club
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
-          ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
-          ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
-          ZOHO_ACCOUNT_ID: ${{ secrets.ZOHO_USER_ID }}
+       with:
+  args: deploy --only functions --project bookings-autocuidad-club
+env:
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+  ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+  ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+  ZOHO_ACCOUNT_ID: ${{ secrets.ZOHO_ACCOUNT_ID }}
+
