@@ -1123,29 +1123,35 @@ document.addEventListener("DOMContentLoaded", function () {
           return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
   .then((token) => {
     console.log("✅ pushToken obtenido:", token);
-    return db.collection("users").doc(userId).set({
-      uid: userId,
-      name,
-      email,
-      phone,
-      planType: selectedPlanType,
-      department,
-      municipality,
-      registrationDate: firebase.firestore.Timestamp.now(),
-      lastUpgradeDate: firebase.firestore.Timestamp.now(),
-      schedule: {
-        day: selectedDay,
-        time: selectedTime
-      },
-      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-      paymentStatus: "Pending",
-      subscriptionStatus: "active",
-      monthsPaid: 0,
-      vehicles,
-      freeRescheduleClaimed: false,
-      referredBy: referredByEmail
-    });
+   return db.collection("users").doc(userId).set({
+  uid: userId,
+  name,
+  email,
+  phone,
+  planType: selectedPlanType,
+  department,
+  municipality,
+  registrationDate: firebase.firestore.Timestamp.now(),
+  lastUpgradeDate: firebase.firestore.Timestamp.now(),
+  schedule: {
+    day: selectedDay,
+    time: selectedTime
+  },
+  paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+  nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+  paymentStatus: "Pending",
+  subscriptionStatus: "active",
+  monthsPaid: 0,
+  vehicles,
+  freeRescheduleClaimed: false,
+  referredBy: referredByEmail,
+
+  // 🧩 Loyalty Program Fields
+  loyaltyCycle: 0,
+  lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+  paymentHistory: []
+});
+
        if (referralCode && referralCode !== userId) {
         await db.collection("referrals").doc(referralCode).set({
           completed: firebase.firestore.FieldValue.increment(1),
