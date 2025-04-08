@@ -847,53 +847,44 @@ function updateSchedule() {
 
 // Loyalty Card
 function updateLoyaltyCard(userData) {
-  const holes = document.querySelectorAll('.hole');
-  let progress = 0;
+    const holes = document.querySelectorAll('.hole');
+    let progress = 0;
 
-  // Step 1: Registration
-  if (userData.registrationDate) {
-    holes[0].classList.add('completed');
-    progress++;
-  }
+    // First hole - Registration complete
+    if (userData.registrationDate) {
+        holes[0].classList.add('completed');
+        progress++;
+    }
 
-  // Step 2: Payment processed (first payment)
-  const regDate = userData.registrationDate?.toDate ? userData.registrationDate.toDate() : new Date(userData.registrationDate.seconds * 1000);
-  const payDate = userData.paymentDate?.toDate ? userData.paymentDate.toDate() : new Date(userData.paymentDate.seconds * 1000);
+    // Second hole - Payment processed ONLY if paymentStatus Completed AND paymentDate ≠ registrationDate
+    const regDate = userData.registrationDate?.toDate ? userData.registrationDate.toDate() : (userData.registrationDate ? new Date(userData.registrationDate.seconds * 1000) : null);
+    const payDate = userData.paymentDate?.toDate ? userData.paymentDate.toDate() : (userData.paymentDate ? new Date(userData.paymentDate.seconds * 1000) : null);
 
-  if (userData.paymentStatus === "Completed" && payDate && regDate && payDate.getTime() !== regDate.getTime()) {
-    holes[1].classList.add('completed');
-    progress++;
-  }
+    if (userData.paymentStatus === "Completed" && payDate && regDate && payDate.getTime() !== regDate.getTime()) {
+        holes[1].classList.add('completed');
+        progress++;
+    }
 
-  // Step 3: Count recent payments (only last 24 max!)
-  const paymentHistory = userData.paymentHistory || [];
-  const recentHistory = paymentHistory.slice(-24); // Always keep last 24 months
+    // Consecutive paid months
+    if (userData.subscriptionStatus === "active" && userData.monthsPaid > 0) {
+        let consecutiveMonths = userData.monthsPaid;
+        if (userData.lastMissedPayment) consecutiveMonths = 0;
 
-  const completedMonths = recentHistory.filter(p => p.status === "Completed" || p.status === "Confirmado").length;
+        for (let i = 0; i < consecutiveMonths; i++) {
+            if (progress + 1 < holes.length) {
+                holes[progress + 1].classList.add('completed');
+                progress++;
+            }
+        }
+    }
 
-  // Progress based on completed months
-  for (let i = 0; i < Math.min(completedMonths, holes.length - 2); i++) {
-    holes[progress].classList.add('completed');
-    progress++;
-  }
-
-  // Step 4: Progress display
-  const progressDescription = document.querySelector('.description p strong');
-  if (progressDescription) {
+    // Update Progress Text
+    const progressDescription = document.querySelector('.description p strong');
+if (progressDescription) {
     progressDescription.textContent = `Progreso Actual: ${progress} de 8 pasos completados.`;
-  }
-
-  // Step 5: Optional archive/reset visual notice
-  if (completedMonths >= 24) {
-    const loyaltyCard = document.querySelector('.loyalty-card');
-    const resetNotice = document.createElement('p');
-    resetNotice.style.color = 'orange';
-    resetNotice.style.marginTop = '10px';
-    resetNotice.textContent = '🔄 Ciclo de lealtad completado. ¡Se reinicia tu progreso para seguir acumulando beneficios!';
-    loyaltyCard.appendChild(resetNotice);
-  }
 }
 
+}
 
     // Place this in the JS script block of dashboard3.html
 // 📜 View Payment History Function
@@ -907,17 +898,7 @@ function loadPaymentHistory() {
 
   db.collection("users").doc(user.uid).get().then(doc => {
     const data = doc.data();
-    let history = data.paymentHistory || [];
-
-    // ✅ Keep only the last 24 payments
-    if (history.length > 24) {
-      history = history.slice(-24); // Get last 24 entries
-
-      // Optional: update Firestore to remove old entries
-      db.collection("users").doc(user.uid).update({
-        paymentHistory: history
-      });
-    }
+    const history = data.paymentHistory || [];
 
     if (history.length === 0) {
       body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
@@ -1191,39 +1172,6 @@ function listenToReferredUserRegistrations(userId) {
         console.error("Error loading referrals for real-time registration listener:", error);
     });
 }
-
-async function exportAllUserData() {
-    const usersRef = db.collection("users");
-    const snapshot = await usersRef.get();
-
-    if (snapshot.empty) {
-        alert("No se encontraron usuarios en la base de datos.");
-        return;
-    }
-
-    const data = [];
-    snapshot.forEach(doc => {
-        const user = doc.data();
-        user.uid = doc.id; // Add UID
-        data.push(user);
-    });
-
-   function convertToCSV(objArray) {
-    const array = [Object.keys(objArray[0])].concat(objArray.map(item => Object.values(item)));
-    return array.map(row => row.join(",")).join("\n");
-}
-
-const csv = convertToCSV(data);
-const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = `usuarios_export_${new Date().toISOString().slice(0,10)}.csv`;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-
-URL.revokeObjectURL(url);
 
 
         
@@ -1515,8 +1463,6 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
 <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
     <i class="fas fa-headset"></i> Contactar Staff
 </button>
-
-    <button onclick="exportAllUserData()" style="padding: 10px 15px; background-color: #003366; color: white; border: none; border-radius: 5px; margin-top: 20px;">📥 Descargar Datos de Usuarios</button>
 
     <!-- Dashboard Content -->
   <!-- Dashboard Content -->
