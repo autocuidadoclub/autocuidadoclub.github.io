@@ -850,43 +850,56 @@ function updateLoyaltyCard(userData) {
     const holes = document.querySelectorAll('.hole');
     let progress = 0;
 
-    // First hole - Registration complete
+    // Step 1: Registration complete
     if (userData.registrationDate) {
-        holes[0].classList.add('completed');
+        holes[progress].classList.add('completed');
         progress++;
     }
 
-    // Second hole - Payment processed ONLY if paymentStatus Completed AND paymentDate ≠ registrationDate
-    const regDate = userData.registrationDate?.toDate ? userData.registrationDate.toDate() : (userData.registrationDate ? new Date(userData.registrationDate.seconds * 1000) : null);
-    const payDate = userData.paymentDate?.toDate ? userData.paymentDate.toDate() : (userData.paymentDate ? new Date(userData.paymentDate.seconds * 1000) : null);
-
-    if (userData.paymentStatus === "Completed" && payDate && regDate && payDate.getTime() !== regDate.getTime()) {
-        holes[1].classList.add('completed');
+    // Step 2: Payment confirmed
+    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+        holes[progress].classList.add('completed');
         progress++;
     }
 
-    // Consecutive paid months
-    if (userData.subscriptionStatus === "active" && userData.monthsPaid > 0) {
-        let consecutiveMonths = userData.monthsPaid;
-        if (userData.lastMissedPayment) consecutiveMonths = 0;
+    // Step 3+: Validate payment history months
+    const paymentHistory = userData.paymentHistory || [];
+    const uniqueMonths = new Set();
 
-        for (let i = 0; i < consecutiveMonths; i++) {
-            if (progress + 1 < holes.length) {
-                holes[progress + 1].classList.add('completed');
-                progress++;
-            }
+    paymentHistory.forEach(entry => {
+        const date = entry.date?.toDate ? entry.date.toDate() : (entry.date ? new Date(entry.date.seconds * 1000) : null);
+        if (date) {
+            const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+            uniqueMonths.add(monthYear);
+        }
+    });
+
+    const uniqueMonthCount = uniqueMonths.size;
+
+    // Progress with each unique payment month
+    for (let i = 0; i < uniqueMonthCount && progress < holes.length; i++) {
+        holes[progress].classList.add('completed');
+        progress++;
+    }
+
+    // Update progress text
+    const progressDescription = document.querySelector('.description p strong');
+    if (progressDescription) {
+        progressDescription.textContent = `Progreso Actual: ${progress} de 8 pasos completados.`;
+    }
+
+    // If complete — unlock rewards
+    if (uniqueMonthCount >= 8) {
+        const rewardStatus = document.querySelector('.reward-status');
+        if (rewardStatus) {
+            rewardStatus.textContent = "🎉 Desbloqueado";
+            rewardStatus.classList.remove('locked');
+            rewardStatus.classList.add('unlocked');
         }
     }
-
-    // Update Progress Text
-    const progressDescription = document.querySelector('.description p strong');
-if (progressDescription) {
-    progressDescription.textContent = `Progreso Actual: ${progress} de 8 pasos completados.`;
 }
 
-}
-
-    // Place this in the JS script block of dashboard3.html
+        // Place this in the JS script block of dashboard3.html
 // 📜 View Payment History Function
 function loadPaymentHistory() {
   const user = firebase.auth().currentUser;
