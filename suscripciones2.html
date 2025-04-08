@@ -122,6 +122,11 @@
                 monthsPaid: 0,
                 vehicles,
                 freeRescheduleClaimed: false,
+                  
+               loyaltyCycle: 0,
+               lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+               paymentHistory: []
+
                           };
 
             // ✅ Save user profile
