@@ -360,23 +360,56 @@ async function confirmPayment(userId) {
   try {
     console.log("🔍 Confirming payment for:", userId);
 
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      alert("Usuario no encontrado.");
+      return;
+    }
+
+    const userData = userDoc.data();
+    const currentMonthsPaid = userData.monthsPaid || 0;
+    const newMonthsPaid = currentMonthsPaid + 1;
+
     const paymentDate = new Date();
     const nextPaymentDate = new Date();
     nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-    await db.collection("users").doc(userId).update({
+    // Prepare payment history entry (keep growing, no reset until 24+)
+    const newPaymentEntry = {
+      date: firebase.firestore.Timestamp.fromDate(paymentDate),
+      amount: userData.subscriptionAmount || 0,
+      method: "Confirmado por Staff",
+      status: "Completado"
+    };
+
+    // Prepare updates
+    const updates = {
       paymentStatus: "Confirmado",
       paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate)
-    });
+      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+      monthsPaid: newMonthsPaid >= 8 ? 0 : newMonthsPaid, // ✅ Reset monthsPaid at 8
+      paymentHistory: firebase.firestore.FieldValue.arrayUnion(newPaymentEntry) // ✅ Keep adding to history
+    };
 
-    alert("✅ Pago confirmado.");
+    await userRef.update(updates);
+
+    alert(`✅ Pago confirmado. Meses acumulados: ${newMonthsPaid >= 8 ? 0 : newMonthsPaid}`);
+
+    // Optional: log loyalty reset
+    if (newMonthsPaid >= 8) {
+      console.log("⭐️ Ciclo de lealtad completado y reiniciado para:", userData.email);
+    }
+
     findUsersByDate(); // Refresh table
+
   } catch (error) {
     console.error("❌ Error al actualizar el pago:", error);
     alert("❌ Error al actualizar el pago. Revisa la consola.");
   }
 }
+
 
   async function findRescheduledUsers() {
   const startDate = new Date(document.getElementById("rescheduleStartDate").value);
