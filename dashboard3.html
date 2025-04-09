@@ -2034,6 +2034,41 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
     <button onclick="handleRedeemConfirmation(false)" style="background-color: #f44336; color: white; border: none; border-radius: 4px; padding: 8px 12px;">No por ahora ❌</button>
 </div>
 
+    <!-- 🎁 Redeem Rewards Modal Form -->
+<div id="redeemRewardsModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: 300px;
+    text-align: center;
+    max-width: 90%;
+">
+    <h3>🎁 Solicitud de Premios</h3>
+    <form id="redeemRewardsForm">
+        <label for="redeemName">Nombre:</label>
+        <input type="text" id="redeemName" name="redeemName" required placeholder="Tu nombre completo">
+
+        <label for="redeemEmail">Email:</label>
+        <input type="email" id="redeemEmail" name="redeemEmail" required readonly>
+
+        <label for="redeemPhone">Teléfono:</label>
+        <input type="text" id="redeemPhone" name="redeemPhone" required placeholder="+50312345678">
+
+        <label for="redeemMonth">Mes de Redención:</label>
+        <input type="text" id="redeemMonth" name="redeemMonth" required readonly>
+
+        <button type="submit" style="margin-top: 10px; background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px;">Enviar Solicitud ✅</button>
+        <button type="button" onclick="document.getElementById('redeemRewardsModal').style.display='none';" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px; margin-top: 10px;">Cancelar</button>
+    </form>
+</div>
+
 
 <script>
 // 🎉 Open Redeem Modal
