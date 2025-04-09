@@ -846,41 +846,43 @@ function updateSchedule() {
 }
 
 // Loyalty Card
+// ✅ Final version: Update Loyalty Card Visual + Rewards Unlock + Redeem Form Trigger
 function updateLoyaltyCard(userData) {
     const holes = document.querySelectorAll('.hole');
     let progress = 0;
 
-    // Step 1: Registration complete
+    // Step 1: Registration complete ✅
     if (userData.registrationDate) {
         holes[progress].classList.add('completed');
         progress++;
     }
 
-    // Step 2: Payment confirmed
+    // Step 2: Initial payment confirmed ✅
     if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
         holes[progress].classList.add('completed');
         progress++;
     }
 
-    // Step 3+: Validate payment history months
+    // Step 3+: Based on unique months in paymentHistory
     const paymentHistory = userData.paymentHistory || [];
     const uniqueMonths = new Set();
 
     paymentHistory.forEach(entry => {
-        const date = entry.date?.toDate ? entry.date.toDate() : (entry.date ? new Date(entry.date.seconds * 1000) : null);
-        if (date) {
-            const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-            uniqueMonths.add(monthYear);
-        }
+        const date = entry.date?.toDate ? entry.date.toDate() : new Date(entry.date.seconds * 1000);
+        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+        uniqueMonths.add(monthYear);
     });
 
     const uniqueMonthCount = uniqueMonths.size;
 
-    // Progress with each unique payment month
-    for (let i = 0; i < uniqueMonthCount && progress < holes.length; i++) {
-        holes[progress].classList.add('completed');
-        progress++;
-    }
+    const holeSteps = [2, 4, 6, 7, 8, 9]; // Corresponding unique month milestones
+
+    holeSteps.forEach((step, index) => {
+        if (uniqueMonthCount >= step && progress < holes.length) {
+            holes[progress].classList.add('completed');
+            progress++;
+        }
+    });
 
     // Update progress text
     const progressDescription = document.querySelector('.description p strong');
@@ -888,16 +890,97 @@ function updateLoyaltyCard(userData) {
         progressDescription.textContent = `Progreso Actual: ${progress} de 8 pasos completados.`;
     }
 
-    // If complete — unlock rewards
-    if (uniqueMonthCount >= 8) {
-        const rewardStatus = document.querySelector('.reward-status');
+    const rewardStatus = document.querySelector('.reward-status');
+    const redeemButton = document.getElementById('redeemRewardsButton');
+
+    if (uniqueMonthCount >= 9) {
         if (rewardStatus) {
             rewardStatus.textContent = "🎉 Desbloqueado";
             rewardStatus.classList.remove('locked');
             rewardStatus.classList.add('unlocked');
         }
+
+        if (redeemButton && !userData.rewardsRedeemed) {
+            redeemButton.style.display = 'inline-block'; // Show redeem button
+        }
+
+        // ✅ Send email ONCE to notify completion
+        if (!userData.rewardsUnlockedEmailSent) {
+            db.collection("users").doc(userData.uid).update({
+                rewardsUnlockedEmailSent: true
+            }).then(() => {
+                sendEmail(userData.email, "🎉 ¡Premios desbloqueados!", `
+                    ¡Felicidades ${userData.name}!
+                    Has completado tu ciclo de lealtad y tus premios ahora están disponibles 🎁.
+                    Ingresa a tu dashboard y haz clic en "Redimir Premios" para solicitarlos.
+                `);
+            }).catch(console.error);
+        }
+    } else {
+        if (rewardStatus) {
+            rewardStatus.textContent = "🔒 Bloqueado";
+            rewardStatus.classList.remove('unlocked');
+            rewardStatus.classList.add('locked');
+        }
+        if (redeemButton) {
+            redeemButton.style.display = 'none'; // Hide if not eligible
+        }
     }
 }
+
+// ✅ Redeem Prize Form Submission (Safe)
+document.addEventListener("DOMContentLoaded", () => {
+    const redeemForm = document.getElementById("redeemRewardsForm");
+    const redeemButton = document.getElementById("redeemRewardsButton");
+
+    if (redeemForm && redeemButton) {
+        redeemForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            redeemButton.disabled = true; // Disable to prevent double click
+
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert("Debes estar autenticado para redimir tus premios.");
+                redeemButton.disabled = false;
+                return;
+            }
+
+            const name = redeemForm.redeemName.value.trim();
+            const email = redeemForm.redeemEmail.value.trim();
+            const phone = redeemForm.redeemPhone.value.trim();
+            const month = redeemForm.redeemMonth.value.trim();
+
+            try {
+                await db.collection("users").doc(user.uid).update({
+                    rewardsRedeemed: true,
+                    redeemRequest: {
+                        name,
+                        email,
+                        phone,
+                        month,
+                        timestamp: firebase.firestore.Timestamp.now()
+                    }
+                });
+
+                // Optional: send notification to admin
+                sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
+                    Cliente: ${name}<br>
+                    Email: ${email}<br>
+                    WhatsApp: ${phone}<br>
+                    Mes seleccionado: ${month}
+                `);
+
+                alert("Premios enviados, espera confirmación de nuestro equipo.");
+                document.getElementById("redeemRewardsModal").style.display = "none";
+            } catch (error) {
+                console.error("Error al enviar premios:", error);
+                alert("Error al enviar tu solicitud. Intenta nuevamente.");
+                redeemButton.disabled = false;
+            }
+        });
+    }
+});
+
 
         // Place this in the JS script block of dashboard3.html
 // 📜 View Payment History Function
