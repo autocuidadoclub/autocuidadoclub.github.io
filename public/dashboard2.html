@@ -190,6 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     email,
                     phone,
                     message: `Nuevo referido agregado por cliente actual. Cliente que refirió: ${user.email}, Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+                    referrer: user.email // ✅ Add this line
                 })
             });
 
@@ -336,7 +337,7 @@ function sendEmail(destinationEmail, subject, message) {
         Nombre: ${referralName}
         Email: ${referralEmail}
         WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
-    `;
+        referrer: user.email // ✅ Add this line    `;
 
     sendEmail("info@autocuidadoclub.com", subject, message);
     sendEmail(referrerEmail, subject, message);
@@ -355,6 +356,7 @@ function notifyReferralRegistered(referrerEmail, referralEmail, referralName, re
         Nombre: ${referralName}
         Email: ${referralEmail}<br>
         WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
+        referrer: user.email // ✅ Add this line
         Sigue pendiente, recibirás otra notificación cuando complete su pago.
     `;
 
@@ -375,6 +377,7 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
         Nombre: ${referralName}
         Email: ${referralEmail}
         WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
+        referrer: user.email // ✅ Add this line
         🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.
     `;
 
@@ -970,6 +973,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     Email: ${email}<br>
                     WhatsApp: ${phone}<br>
                     Mes seleccionado: ${month}
+                    referrer: user.email // ✅ Add this line
                 `);
 
                 alert("Premios enviados, espera confirmación de nuestro equipo.");
@@ -1351,9 +1355,10 @@ function submitUpgradeRequest() {
     }
 
     sendEmail("info@autocuidadoclub.com", "🚗 Solicitud de mejora de plan - AutoCuidado Club", `
-        Cliente: ${name}<br>
-        Email: ${user.email}<br>
-        Teléfono: ${phone}<br>
+        Cliente: ${name}
+        Email: ${user.email}
+        Teléfono: ${phone}
+        referrer: user.email // ✅ Add this line
         🚗 Solicita añadir más vehículos y mejorar su plan actual.
     `).then(() => {
         alert("✅ Solicitud enviada con éxito. Nuestro equipo te contactará pronto.");
