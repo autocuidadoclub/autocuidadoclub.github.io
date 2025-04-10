@@ -1269,6 +1269,98 @@ function listenToReferredUserRegistrations(userId) {
     });
 }
 
+function handleRedeemConfirmation(isYes) {
+    const popup = document.getElementById("redeemConfirmationPopup");
+    popup.style.display = "none";
+    window.onclick = null; // Clean up the click listener
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para continuar.");
+        return;
+    }
+
+    if (isYes) {
+        // ✅ Prefill email and month in the form
+        const redeemForm = document.getElementById("redeemRewardsForm");
+        redeemForm.redeemEmail.value = user.email;
+
+        const nextMonthDate = new Date();
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+        const options = { month: 'long', year: 'numeric' };
+        redeemForm.redeemMonth.value = nextMonthDate.toLocaleDateString('es-ES', options);
+
+        document.getElementById("redeemRewardsModal").style.display = "block";
+    } else {
+        incrementNoClickCount();
+    }
+}
+
+        function incrementNoClickCount() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.update({
+        loyaltyNoClickCount: firebase.firestore.FieldValue.increment(1)
+    }).then(() => {
+        console.log("✅ 'No por ahora' o cierre del popup registrado exitosamente.");
+    }).catch(error => {
+        console.error("Error registrando 'No por ahora':", error);
+    });
+}
+
+        function openUpgradeModal() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para solicitar una mejora de plan.");
+        return;
+    }
+
+    // Prefill fields if possible
+    db.collection("users").doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            document.getElementById("upgradeName").value = data.name || "";
+            document.getElementById("upgradePhone").value = data.phone || "";
+        }
+    });
+
+    document.getElementById("upgradeModal").style.display = "block";
+}
+
+function closeUpgradeModal() {
+    document.getElementById("upgradeModal").style.display = "none";
+}
+
+function submitUpgradeRequest() {
+    const name = document.getElementById("upgradeName").value.trim();
+    const phone = document.getElementById("upgradePhone").value.trim();
+    const user = firebase.auth().currentUser;
+
+    if (!name || !phone) {
+        alert("❌ Por favor completa todos los campos.");
+        return;
+    }
+
+    if (!user) {
+        alert("Debes estar autenticado para solicitar la mejora de plan.");
+        return;
+    }
+
+    sendEmail("info@autocuidadoclub.com", "🚗 Solicitud de mejora de plan - AutoCuidado Club", `
+        Cliente: ${name}<br>
+        Email: ${user.email}<br>
+        Teléfono: ${phone}<br>
+        🚗 Solicita añadir más vehículos y mejorar su plan actual.
+    `).then(() => {
+        alert("✅ Solicitud enviada con éxito. Nuestro equipo te contactará pronto.");
+        closeUpgradeModal();
+    }).catch(error => {
+        console.error("❌ Error enviando solicitud:", error);
+        alert("❌ Error al enviar la solicitud. Intenta nuevamente.");
+    });
+}
 
         
 // Initialize departments on load
@@ -1689,10 +1781,46 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
         <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
         <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-            <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-                Añade más vehículos: Mejora a Plan Plus 🚗✨
-            </button>
-        </div>
+    <button onclick="openUpgradeModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+        Añade más vehículos: Mejora a Plan Plus 🚗✨
+    </button>
+</div>
+
+
+<!-- Modal for Upgrade Request -->
+<div id="upgradeModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: 300px;
+    text-align: center;
+    max-width: 90%;
+">
+    <h3>🚗 Solicitud para añadir más vehículos</h3>
+    <p>¡Estás a un paso de disfrutar AutoCuidado Club para todos tus vehículos! Completa la solicitud y nuestro equipo te contactará para actualizar tu plan.</p>
+
+    <label for="upgradeName">Nombre:</label>
+    <input type="text" id="upgradeName" placeholder="Tu nombre completo" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+    <label for="upgradePhone">Teléfono:</label>
+    <input type="text" id="upgradePhone" placeholder="+50312345678" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+    <button onclick="submitUpgradeRequest()" style="background-color:#4caf50; color:white; padding:8px 12px; border:none; border-radius:4px; margin-top:8px;">
+        Enviar Solicitud ✅
+    </button>
+    <br>
+    <button onclick="closeUpgradeModal()" style="background-color:#ccc; color:#333; border:none; border-radius:4px; padding:8px 12px; margin-top:10px;">
+        Cancelar
+    </button>
+</div>
+
 
         <label for="new-plan">Selecciona un nuevo plan:</label>
         <select id="new-plan"></select>
@@ -1973,6 +2101,28 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
    
 
 <!-- 🎁 Redeem Rewards Modal Form -->
+<div id="redeemConfirmationPopup" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: 300px;
+    text-align: center;
+    max-width: 90%;
+">
+    <h3>🎉 ¿Deseas disfrutar tus premios el próximo mes?</h3>
+    <p>Confirma si deseas solicitar tus premios para el próximo mes.</p>
+    <button onclick="handleRedeemConfirmation(true)" style="background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px; margin-right: 8px;">Sí quiero ✅</button>
+    <button onclick="handleRedeemConfirmation(false)" style="background-color: #f44336; color: white; border: none; border-radius: 4px; padding: 8px 12px;">No por ahora ❌</button>
+</div>
+
+    <!-- 🎁 Redeem Rewards Modal Form -->
 <div id="redeemRewardsModal" style="
     display: none;
     position: fixed;
@@ -1988,24 +2138,41 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
     text-align: center;
     max-width: 90%;
 ">
-
-    <h3>🎉 Solicita tus Premios</h3>
+    <h3>🎁 Solicitud de Premios</h3>
     <form id="redeemRewardsForm">
-        <input type="text" name="redeemName" placeholder="Tu nombre" required style="width:100%; margin-bottom: 10px; padding: 8px;">
-        <input type="email" name="redeemEmail" placeholder="Tu correo electrónico" required style="width:100%; margin-bottom: 10px; padding: 8px;">
-        <input type="text" name="redeemPhone" placeholder="Tu número de WhatsApp" required style="width:100%; margin-bottom: 10px; padding: 8px;">
-        <input type="text" name="redeemMonth" placeholder="Mes de redención" required style="width:100%; margin-bottom: 15px; padding: 8px;">
-        <button type="submit" style="background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px;">Enviar Solicitud 🎁</button>
-    </form>
+        <label for="redeemName">Nombre:</label>
+        <input type="text" id="redeemName" name="redeemName" required placeholder="Tu nombre completo">
 
-    <button onclick="document.getElementById('redeemRewardsModal').style.display='none';" style="margin-top: 10px; background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px;">Cancelar</button>
+        <label for="redeemEmail">Email:</label>
+        <input type="email" id="redeemEmail" name="redeemEmail" required readonly>
+
+        <label for="redeemPhone">Teléfono:</label>
+        <input type="text" id="redeemPhone" name="redeemPhone" required placeholder="+50312345678">
+
+        <label for="redeemMonth">Mes de Redención:</label>
+        <input type="text" id="redeemMonth" name="redeemMonth" required readonly>
+
+        <button type="submit" style="margin-top: 10px; background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px;">Enviar Solicitud ✅</button>
+        <button type="button" onclick="document.getElementById('redeemRewardsModal').style.display='none';" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px; margin-top: 10px;">Cancelar</button>
+    </form>
 </div>
+
 
 <script>
 // 🎉 Open Redeem Modal
 document.getElementById("redeemRewardsButton").addEventListener("click", () => {
-    document.getElementById("redeemRewardsModal").style.display = "block";
+    const popup = document.getElementById("redeemConfirmationPopup");
+    popup.style.display = "block";
+
+    // Optional: close if clicked outside
+    window.onclick = function(event) {
+        if (event.target === popup) {
+            incrementNoClickCount();
+            popup.style.display = "none";
+        }
+    };
 });
+
 </script>
 
 </section>
