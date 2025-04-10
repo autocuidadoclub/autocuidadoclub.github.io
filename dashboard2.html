@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     name,
                     email,
                     phone,
-                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+                    message: `Nuevo referido agregado por cliente actual. Cliente que refirió: ${user.email}, Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
                 })
             });
 
@@ -328,11 +328,12 @@ function sendEmail(destinationEmail, subject, message) {
     });
 }
 
-        function notifyNewReferral(referrerEmail, referralEmail, referralName, referralPhone) {
+    function notifyNewReferral(referrerEmail, referralEmail, referralName, referralPhone) {
     const subject = "🎉 Nuevo referido agregado - AutoCuidado Club";
     const message = `
         ¡Se ha agregado un nuevo referido!
-        Nombre:> ${referralName}
+        Cliente que refirió: ${user.email}
+        Nombre: ${referralName}
         Email: ${referralEmail}
         WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
     `;
@@ -350,6 +351,7 @@ function notifyReferralRegistered(referrerEmail, referralEmail, referralName, re
     const subject = "🎉 Tu referido se ha registrado - AutoCuidado Club";
     const message = `
         ¡Tu referido ha completado el registro!
+        Cliente que refirió: ${user.email}
         Nombre: ${referralName}
         Email: ${referralEmail}<br>
         WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
