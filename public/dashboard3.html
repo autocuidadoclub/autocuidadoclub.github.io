@@ -43,6 +43,31 @@ document.addEventListener("DOMContentLoaded", () => {
     auth = firebase.auth();
     db = firebase.firestore();
 
+async function validateReferralEmailGlobal(referralEmail) {
+    try {
+        const usersRef = db.collection('users');
+        const referralsRef = db.collectionGroup('referrals');
+
+        // Check if email already exists in users
+        const userQuery = await usersRef.where('email', '==', referralEmail).get();
+        if (!userQuery.empty) {
+            return { valid: false, message: 'Este usuario ya forma parte del programa, no puedes referirlo.' };
+        }
+
+        // Check if email already exists in any referrals (global search)
+        const referralQuery = await referralsRef.where('email', '==', referralEmail).get();
+        if (!referralQuery.empty) {
+            return { valid: false, message: 'Este usuario ya ha sido referido previamente.' };
+        }
+
+        return { valid: true };
+    } catch (error) {
+        console.error('Error al validar correo global:', error);
+        return { valid: false, message: 'Error al validar el correo. Intenta nuevamente.' };
+    }
+}
+
+    
     // ✅ Check de autenticación
   auth.onAuthStateChanged(user => {
     if (user) {
@@ -171,6 +196,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // ✅ Validate global users and referrals before submission
+const globalValidation = await validateReferralEmailGlobal(email);
+if (!globalValidation.valid) {
+    showErrorPopup("Estimado cliente", globalValidation.message);
+    return;
+}
         try {
             const referralId = Date.now().toString();
 
@@ -1413,6 +1444,30 @@ async function submitAdditionalVehicles() {
         console.error("❌ Error añadiendo vehículos:", error);
         alert("Ocurrió un error al guardar tus vehículos. Intenta nuevamente.");
     }
+}
+
+        function showErrorPopup(title, message) {
+    const errorMessage = document.createElement("div");
+    errorMessage.innerHTML = `
+      <div style="
+          position: fixed;
+          top: 20%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: #ffe6e6;
+          color: #b30000;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+          z-index: 9999;
+          text-align: center;
+        ">
+        <strong>${title}</strong>
+        <p>${message}</p>
+      </div>
+    `;
+    document.body.appendChild(errorMessage);
+    setTimeout(() => errorMessage.remove(), 4000);
 }
 
         
