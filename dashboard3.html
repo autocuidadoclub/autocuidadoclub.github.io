@@ -1313,75 +1313,9 @@ function handleRedeemConfirmation(isYes) {
         function openUpgradeModal() {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Debes estar autenticado para solicitar la mejora de plan.");
+        alert("Debes estar autenticado para solicitar una mejora de plan.");
         return;
     }
-
-    // Prefill user info
-    db.collection("users").doc(user.uid).get().then(doc => {
-        const userData = doc.data();
-        document.getElementById("userName").value = userData.name || "";
-        document.getElementById("userPhone").value = userData.phone || "";
-    });
-
-    document.getElementById("addVehiclesModal").style.display = "block";
-}
-
-function closeUpgradeModal() {
-    document.getElementById("addVehiclesModal").style.display = "none";
-}
-
-document.getElementById("addVehiclesForm").addEventListener("submit", async function(event) {
-    event.preventDefault();
-
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Debes estar autenticado para enviar la solicitud.");
-        return;
-    }
-
-    const name = document.getElementById("userName").value.trim();
-    const phone = document.getElementById("userPhone").value.trim();
-    const plate = document.getElementById("vehiclePlate").value.trim();
-    const brand = document.getElementById("vehicleBrand").value.trim();
-    const model = document.getElementById("vehicleModel").value.trim();
-    const year = document.getElementById("vehicleYear").value.trim();
-
-    try {
-        const userRef = db.collection("users").doc(user.uid);
-
-        // Update user plan to Plus and add vehicle
-        await userRef.update({
-            planType: "plus3m", // or "plus6m" or "plus12m" depending on your logic
-            vehicles: firebase.firestore.FieldValue.arrayUnion({
-                plate,
-                brand,
-                model,
-                year
-            })
-        });
-
-        // Send email to staff
-        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-            method: 'POST',
-            body: new URLSearchParams({
-                name,
-                phone,
-                email: user.email,
-                message: `Solicitud de añadir vehículo.\n\nCliente: ${name}\nEmail: ${user.email}\nTeléfono: ${phone}\n\nVehículo:\nPlaca: ${plate}\nMarca: ${brand}\nModelo: ${model}\nAño: ${year}`
-            })
-        });
-
-        alert("✅ Solicitud enviada con éxito. Nuestro equipo te contactará pronto.");
-        closeUpgradeModal();
-        loadUserProfile(user.uid); // Refresh info
-
-    } catch (error) {
-        console.error("Error al enviar la solicitud:", error);
-        alert("❌ Ocurrió un error al enviar tu solicitud. Intenta nuevamente.");
-    }
-});
-
 
     // Prefill fields if possible
     db.collection("users").doc(user.uid).get().then(doc => {
@@ -1846,16 +1780,15 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
 
         <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
-       <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+        <div id="add-vehicles-button" style="margin-top:10px; display:none;">
     <button onclick="openUpgradeModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
         Añade más vehículos: Mejora a Plan Plus 🚗✨
     </button>
 </div>
 
 
-
 <!-- Modal for Upgrade Request -->
-<div id="addVehiclesModal" style="
+<div id="upgradeModal" style="
     display: none;
     position: fixed;
     top: 50%;
@@ -1873,31 +1806,19 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
     <h3>🚗 Solicitud para añadir más vehículos</h3>
     <p>¡Estás a un paso de disfrutar AutoCuidado Club para todos tus vehículos! Completa la solicitud y nuestro equipo te contactará para actualizar tu plan.</p>
 
-    <form id="addVehiclesForm">
-        <label for="userName">Nombre:</label>
-        <input type="text" id="userName" name="userName" required placeholder="Tu nombre completo">
+    <label for="upgradeName">Nombre:</label>
+    <input type="text" id="upgradeName" placeholder="Tu nombre completo" required style="width:100%; padding:8px; margin-bottom:10px;">
 
-        <label for="userPhone">Teléfono:</label>
-        <input type="text" id="userPhone" name="userPhone" required placeholder="+503xxxxxxxx">
+    <label for="upgradePhone">Teléfono:</label>
+    <input type="text" id="upgradePhone" placeholder="+50312345678" required style="width:100%; padding:8px; margin-bottom:10px;">
 
-        <hr style="margin: 15px 0;">
-
-        <h4>Vehículo Adicional</h4>
-        <label for="vehiclePlate">Placa:</label>
-        <input type="text" id="vehiclePlate" name="vehiclePlate" required placeholder="Ej. P123456">
-
-        <label for="vehicleBrand">Marca:</label>
-        <input type="text" id="vehicleBrand" name="vehicleBrand" required placeholder="Ej. Toyota">
-
-        <label for="vehicleModel">Modelo:</label>
-        <input type="text" id="vehicleModel" name="vehicleModel" required placeholder="Ej. Corolla">
-
-        <label for="vehicleYear">Año:</label>
-        <input type="number" id="vehicleYear" name="vehicleYear" required placeholder="Ej. 2020">
-
-        <button type="submit" style="margin-top: 10px; background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px;">Enviar Solicitud ✅</button>
-        <button type="button" onclick="closeUpgradeModal()" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px; margin-top: 10px;">Cancelar</button>
-    </form>
+    <button onclick="submitUpgradeRequest()" style="background-color:#4caf50; color:white; padding:8px 12px; border:none; border-radius:4px; margin-top:8px;">
+        Enviar Solicitud ✅
+    </button>
+    <br>
+    <button onclick="closeUpgradeModal()" style="background-color:#ccc; color:#333; border:none; border-radius:4px; padding:8px 12px; margin-top:10px;">
+        Cancelar
+    </button>
 </div>
 
 
