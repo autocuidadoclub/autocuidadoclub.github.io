@@ -1310,12 +1310,25 @@ function handleRedeemConfirmation(isYes) {
     });
 }
 
-        function openUpgradeModal() {
+       function openUpgradeModal() {
     const user = firebase.auth().currentUser;
     if (!user) {
         alert("Debes estar autenticado para solicitar la mejora de plan.");
         return;
     }
+
+    // Prefill fields if possible
+    db.collection("users").doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            document.getElementById("upgradeName").value = data.name || "";
+            document.getElementById("upgradePhone").value = data.phone || "";
+        }
+    });
+
+    document.getElementById("upgradeModal").style.display = "block";
+} // ✅ Add this closing bracket!
+
 
    
 function closeUpgradeModal() {
