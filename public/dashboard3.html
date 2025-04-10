@@ -1310,6 +1310,58 @@ function handleRedeemConfirmation(isYes) {
     });
 }
 
+        function openUpgradeModal() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para solicitar una mejora de plan.");
+        return;
+    }
+
+    // Prefill fields if possible
+    db.collection("users").doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            document.getElementById("upgradeName").value = data.name || "";
+            document.getElementById("upgradePhone").value = data.phone || "";
+        }
+    });
+
+    document.getElementById("upgradeModal").style.display = "block";
+}
+
+function closeUpgradeModal() {
+    document.getElementById("upgradeModal").style.display = "none";
+}
+
+function submitUpgradeRequest() {
+    const name = document.getElementById("upgradeName").value.trim();
+    const phone = document.getElementById("upgradePhone").value.trim();
+    const user = firebase.auth().currentUser;
+
+    if (!name || !phone) {
+        alert("❌ Por favor completa todos los campos.");
+        return;
+    }
+
+    if (!user) {
+        alert("Debes estar autenticado para solicitar la mejora de plan.");
+        return;
+    }
+
+    sendEmail("info@autocuidadoclub.com", "🚗 Solicitud de mejora de plan - AutoCuidado Club", `
+        Cliente: ${name}<br>
+        Email: ${user.email}<br>
+        Teléfono: ${phone}<br>
+        🚗 Solicita añadir más vehículos y mejorar su plan actual.
+    `).then(() => {
+        alert("✅ Solicitud enviada con éxito. Nuestro equipo te contactará pronto.");
+        closeUpgradeModal();
+    }).catch(error => {
+        console.error("❌ Error enviando solicitud:", error);
+        alert("❌ Error al enviar la solicitud. Intenta nuevamente.");
+    });
+}
+
         
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
@@ -1728,11 +1780,46 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
 
         <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
-        <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-            <button onclick="upgradeToPlus()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-                Añade más vehículos: Mejora a Plan Plus 🚗✨
-            </button>
-        </div>
+<div id="add-vehicles-button" style="margin-top:10px; display:none;">
+    <button onclick="openUpgradeModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+        Añade más vehículos: Mejora a Plan Plus 🚗✨
+    </button>
+</div>
+
+<!-- Modal for Upgrade Request -->
+<div id="upgradeModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: 300px;
+    text-align: center;
+    max-width: 90%;
+">
+    <h3>🚗 Solicitud para añadir más vehículos</h3>
+    <p>¡Estás a un paso de disfrutar AutoCuidado Club para todos tus vehículos! Completa la solicitud y nuestro equipo te contactará para actualizar tu plan.</p>
+
+    <label for="upgradeName">Nombre:</label>
+    <input type="text" id="upgradeName" placeholder="Tu nombre completo" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+    <label for="upgradePhone">Teléfono:</label>
+    <input type="text" id="upgradePhone" placeholder="+50312345678" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+    <button onclick="submitUpgradeRequest()" style="background-color:#4caf50; color:white; padding:8px 12px; border:none; border-radius:4px; margin-top:8px;">
+        Enviar Solicitud ✅
+    </button>
+    <br>
+    <button onclick="closeUpgradeModal()" style="background-color:#ccc; color:#333; border:none; border-radius:4px; padding:8px 12px; margin-top:10px;">
+        Cancelar
+    </button>
+</div>
+
 
         <label for="new-plan">Selecciona un nuevo plan:</label>
         <select id="new-plan"></select>
