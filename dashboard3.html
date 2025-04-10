@@ -43,31 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     auth = firebase.auth();
     db = firebase.firestore();
 
-    async function validateReferralEmailGlobal(referralEmail) {
-    try {
-        const usersRef = db.collection('users');
-        const referralsRef = db.collectionGroup('referrals');
-
-        // Check if email already exists in users
-        const userQuery = await usersRef.where('email', '==', referralEmail).get();
-        if (!userQuery.empty) {
-            return { valid: false, message: '❌ Este usuario ya forma parte del programa, no puedes referirlo.' };
-        }
-
-        // Check if email already exists in any referrals
-        const referralQuery = await referralsRef.where('email', '==', referralEmail).get();
-        if (!referralQuery.empty) {
-            return { valid: false, message: '❌ Este usuario ya ha sido referido anteriormente.' };
-        }
-
-        return { valid: true };
-    } catch (error) {
-        console.error('Error al validar correo global:', error);
-        return { valid: false, message: 'Error al validar el correo. Intenta nuevamente.' };
-    }
-}
-
-    // ✅ Check de autenticación
+       // ✅ Check de autenticación
   auth.onAuthStateChanged(user => {
     if (user) {
         document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
@@ -354,6 +330,32 @@ function listenForReferralUpdates(userId, userEmail) {
     });
 }
 
+         async function validateReferralEmailGlobal(referralEmail) {
+    try {
+        const usersRef = db.collection('users');
+        const referralsRef = db.collectionGroup('referrals');
+
+        // Check if email already exists in users
+        const userQuery = await usersRef.where('email', '==', referralEmail).get();
+        if (!userQuery.empty) {
+            return { valid: false, message: '❌ Este usuario ya forma parte del programa, no puedes referirlo.' };
+        }
+
+        // Check if email already exists in any referrals
+        const referralQuery = await referralsRef.where('email', '==', referralEmail).get();
+        if (!referralQuery.empty) {
+            return { valid: false, message: '❌ Este usuario ya ha sido referido anteriormente.' };
+        }
+
+        return { valid: true };
+    } catch (error) {
+        console.error('Error al validar correo global:', error);
+        return { valid: false, message: 'Error al validar el correo. Intenta nuevamente.' };
+    }
+}
+
+
+        
 // ✅ Notificación Interna del Dashboard
 function showDashboardNotification(message) {
     const popup = document.getElementById("notificationPopup");
