@@ -1317,16 +1317,7 @@ function handleRedeemConfirmation(isYes) {
         return;
     }
 
-    // Prefill user info
-    db.collection("users").doc(user.uid).get().then(doc => {
-        const userData = doc.data();
-        document.getElementById("userName").value = userData.name || "";
-        document.getElementById("userPhone").value = userData.phone || "";
-    });
-
-    document.getElementById("addVehiclesModal").style.display = "block";
-}
-
+   
 function closeUpgradeModal() {
     document.getElementById("addVehiclesModal").style.display = "none";
 }
