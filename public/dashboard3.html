@@ -43,88 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
     auth = firebase.auth();
     db = firebase.firestore();
 
-    // ✅ Redeem Prize Form Submission (Safe)
-document.addEventListener("DOMContentLoaded", () => {
-    const redeemForm = document.getElementById("redeemRewardsForm");
-    const redeemButton = document.getElementById("redeemRewardsButton");
-
-    if (redeemForm && redeemButton) {
-        redeemForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            redeemButton.disabled = true; // Disable to prevent double click
-
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                alert("Debes estar autenticado para redimir tus premios.");
-                redeemButton.disabled = false;
-                return;
-            }
-
-            const name = redeemForm.redeemName.value.trim();
-            const email = redeemForm.redeemEmail.value.trim();
-            const phone = redeemForm.redeemPhone.value.trim();
-            const month = redeemForm.redeemMonth.value.trim();
-
-            try {
-                await db.collection("users").doc(user.uid).update({
-                    rewardsRedeemed: true,
-                    redeemRequest: {
-                        name,
-                        email,
-                        phone,
-                        month,
-                        timestamp: firebase.firestore.Timestamp.now()
-                    }
-                });
-
-                // Optional: send notification to admin
-                sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
-                    Cliente: ${name}<br>
-                    Email: ${email}<br>
-                    WhatsApp: ${phone}<br>
-                    Mes seleccionado: ${month}
-                `);
-
-                alert("Premios enviados, espera confirmación de nuestro equipo.");
-                document.getElementById("redeemRewardsModal").style.display = "none";
-            } catch (error) {
-                console.error("Error al enviar premios:", error);
-                alert("Error al enviar tu solicitud. Intenta nuevamente.");
-                redeemButton.disabled = false;
-            }
-        });
-    }
-});
-
-
-async function validateReferralEmailGlobal(referralEmail) {
-    if (!referralEmail || referralEmail.trim() === "") {
-        console.warn('⚠️ Correo electrónico vacío durante validación global.');
-        return { valid: false, message: 'Correo electrónico inválido.' };
-    }
-
-    try {
-        const usersRef = db.collection('users');
-        const referralsRef = db.collectionGroup('referrals');
-
-        const userQuery = await usersRef.where('email', '==', referralEmail).get();
-        if (!userQuery.empty) {
-            return { valid: false, message: 'Este usuario ya forma parte del programa, no puedes referirlo.' };
-        }
-
-        const referralQuery = await referralsRef.where('email', '==', referralEmail).get();
-        if (!referralQuery.empty) {
-            return { valid: false, message: 'Este usuario ya ha sido referido previamente.' };
-        }
-
-        return { valid: true };
-    } catch (error) {
-        console.error('Error al validar correo global:', error);
-        return { valid: false, message: 'Error al validar el correo. Intenta nuevamente.' };
-    }
-}
-
-    
     // ✅ Check de autenticación
   auth.onAuthStateChanged(user => {
     if (user) {
@@ -253,12 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // ✅ Validate global users and referrals before submission
-const globalValidation = await validateReferralEmailGlobal(email); 
-if (!globalValidation.valid) {
-    showErrorPopup("Estimado cliente", globalValidation.message);
-    return;
-}
         try {
             const referralId = Date.now().toString();
 
@@ -1016,6 +928,60 @@ function updateLoyaltyCard(userData) {
     }
 }
 
+// ✅ Redeem Prize Form Submission (Safe)
+document.addEventListener("DOMContentLoaded", () => {
+    const redeemForm = document.getElementById("redeemRewardsForm");
+    const redeemButton = document.getElementById("redeemRewardsButton");
+
+    if (redeemForm && redeemButton) {
+        redeemForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            redeemButton.disabled = true; // Disable to prevent double click
+
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert("Debes estar autenticado para redimir tus premios.");
+                redeemButton.disabled = false;
+                return;
+            }
+
+            const name = redeemForm.redeemName.value.trim();
+            const email = redeemForm.redeemEmail.value.trim();
+            const phone = redeemForm.redeemPhone.value.trim();
+            const month = redeemForm.redeemMonth.value.trim();
+
+            try {
+                await db.collection("users").doc(user.uid).update({
+                    rewardsRedeemed: true,
+                    redeemRequest: {
+                        name,
+                        email,
+                        phone,
+                        month,
+                        timestamp: firebase.firestore.Timestamp.now()
+                    }
+                });
+
+                // Optional: send notification to admin
+                sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
+                    Cliente: ${name}<br>
+                    Email: ${email}<br>
+                    WhatsApp: ${phone}<br>
+                    Mes seleccionado: ${month}
+                `);
+
+                alert("Premios enviados, espera confirmación de nuestro equipo.");
+                document.getElementById("redeemRewardsModal").style.display = "none";
+            } catch (error) {
+                console.error("Error al enviar premios:", error);
+                alert("Error al enviar tu solicitud. Intenta nuevamente.");
+                redeemButton.disabled = false;
+            }
+        });
+    }
+});
+
+
         // Place this in the JS script block of dashboard3.html
 // 📜 View Payment History Function
 function loadPaymentHistory() {
@@ -1396,83 +1362,6 @@ function submitUpgradeRequest() {
     });
 }
 
-        function openAddVehiclesModal() {
-    document.getElementById("addVehiclesModal").style.display = "block";
-}
-
-function closeAddVehiclesModal() {
-    document.getElementById("addVehiclesModal").style.display = "none";
-}
-
-async function submitAdditionalVehicles() {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Debes estar autenticado para añadir vehículos.");
-        return;
-    }
-
-    const vehicle1 = {
-        brand: document.getElementById("vehicle1Brand").value.trim(),
-        model: document.getElementById("vehicle1Model").value.trim(),
-        plate: document.getElementById("vehicle1Plate").value.trim(),
-        year: document.getElementById("vehicle1Year").value.trim()
-    };
-
-    const vehicle2 = {
-        brand: document.getElementById("vehicle2Brand").value.trim(),
-        model: document.getElementById("vehicle2Model").value.trim(),
-        plate: document.getElementById("vehicle2Plate").value.trim(),
-        year: document.getElementById("vehicle2Year").value.trim()
-    };
-
-    const vehiclesToAdd = [];
-    if (vehicle1.brand || vehicle1.model || vehicle1.plate || vehicle1.year) vehiclesToAdd.push(vehicle1);
-    if (vehicle2.brand || vehicle2.model || vehicle2.plate || vehicle2.year) vehiclesToAdd.push(vehicle2);
-
-    if (vehiclesToAdd.length === 0) {
-        alert("Por favor ingresa al menos un vehículo.");
-        return;
-    }
-
-    try {
-        const userRef = db.collection("users").doc(user.uid);
-        await userRef.update({
-            vehicles: firebase.firestore.FieldValue.arrayUnion(...vehiclesToAdd)
-        });
-
-        alert("✅ Vehículos añadidos exitosamente.");
-        closeAddVehiclesModal();
-        loadUserProfile(user.uid); // Refresh UI
-    } catch (error) {
-        console.error("❌ Error añadiendo vehículos:", error);
-        alert("Ocurrió un error al guardar tus vehículos. Intenta nuevamente.");
-    }
-}
-
-        function showErrorPopup(title, message) {
-    const errorMessage = document.createElement("div");
-    errorMessage.innerHTML = `
-      <div style="
-          position: fixed;
-          top: 20%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: #ffe6e6;
-          color: #b30000;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-          z-index: 9999;
-          text-align: center;
-        ">
-        <strong>${title}</strong>
-        <p>${message}</p>
-      </div>
-    `;
-    document.body.appendChild(errorMessage);
-    setTimeout(() => errorMessage.remove(), 4000);
-}
-
         
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
@@ -1808,57 +1697,6 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   overflow-y: auto;
 ">
 
-
-<!-- 🚗 Modal to Add Extra Vehicles -->
-<div id="addVehiclesModal" style="
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-    z-index: 10000;
-    width: 300px;
-    text-align: center;
-    max-width: 90%;
-">
-    <h3>🚗 Añadir Vehículos Extras</h3>
-    <p>Completa los campos para registrar hasta 2 vehículos adicionales en tu cuenta.</p>
-
-    <!-- Vehicle 1 -->
-    <label>Vehículo 1 - Marca:</label>
-    <input type="text" id="vehicle1Brand" placeholder="Ej. Toyota" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Modelo:</label>
-    <input type="text" id="vehicle1Model" placeholder="Ej. Corolla" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Placa:</label>
-    <input type="text" id="vehicle1Plate" placeholder="Ej. P123456" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Año:</label>
-    <input type="text" id="vehicle1Year" placeholder="Ej. 2020" style="width:100%; padding:8px; margin-bottom:8px;">
-
-    <!-- Vehicle 2 -->
-    <label>Vehículo 2 - Marca:</label>
-    <input type="text" id="vehicle2Brand" placeholder="Ej. Honda" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Modelo:</label>
-    <input type="text" id="vehicle2Model" placeholder="Ej. Civic" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Placa:</label>
-    <input type="text" id="vehicle2Plate" placeholder="Ej. P654321" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Año:</label>
-    <input type="text" id="vehicle2Year" placeholder="Ej. 2022" style="width:100%; padding:8px; margin-bottom:8px;">
-
-    <button onclick="submitAdditionalVehicles()" style="background-color:#4caf50; color:white; padding:8px 12px; border:none; border-radius:4px; margin-top:10px;">
-        Guardar Vehículos ✅
-    </button>
-    <br>
-    <button onclick="closeAddVehiclesModal()" style="background-color:#ccc; color:#333; border:none; border-radius:4px; padding:8px 12px; margin-top:10px;">
-        Cancelar
-    </button>
-</div>
-
-               
-
   <h3>📍 Cambiar Ubicación</h3>
   <p>Selecciona tu nuevo departamento y municipio:</p>
 
@@ -1943,9 +1781,9 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
         <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
         <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-   <button onclick="openAddVehiclesModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-    Añade más vehículos: Mejora a Plan Plus 🚗✨
-</button>
+    <button onclick="openUpgradeModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+        Añade más vehículos: Mejora a Plan Plus 🚗✨
+    </button>
 </div>
 
 
