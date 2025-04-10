@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // ✅ Validate global users and referrals before submission
-const globalValidation = await validateReferralEmailGlobal(email);
+const globalValidation = await validateReferralEmailGlobal(email); 
 if (!globalValidation.valid) {
     showErrorPopup("Estimado cliente", globalValidation.message);
     return;
