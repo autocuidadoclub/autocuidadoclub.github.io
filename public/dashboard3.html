@@ -43,6 +43,60 @@ document.addEventListener("DOMContentLoaded", () => {
     auth = firebase.auth();
     db = firebase.firestore();
 
+    // ✅ Redeem Prize Form Submission (Safe)
+document.addEventListener("DOMContentLoaded", () => {
+    const redeemForm = document.getElementById("redeemRewardsForm");
+    const redeemButton = document.getElementById("redeemRewardsButton");
+
+    if (redeemForm && redeemButton) {
+        redeemForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            redeemButton.disabled = true; // Disable to prevent double click
+
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert("Debes estar autenticado para redimir tus premios.");
+                redeemButton.disabled = false;
+                return;
+            }
+
+            const name = redeemForm.redeemName.value.trim();
+            const email = redeemForm.redeemEmail.value.trim();
+            const phone = redeemForm.redeemPhone.value.trim();
+            const month = redeemForm.redeemMonth.value.trim();
+
+            try {
+                await db.collection("users").doc(user.uid).update({
+                    rewardsRedeemed: true,
+                    redeemRequest: {
+                        name,
+                        email,
+                        phone,
+                        month,
+                        timestamp: firebase.firestore.Timestamp.now()
+                    }
+                });
+
+                // Optional: send notification to admin
+                sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
+                    Cliente: ${name}<br>
+                    Email: ${email}<br>
+                    WhatsApp: ${phone}<br>
+                    Mes seleccionado: ${month}
+                `);
+
+                alert("Premios enviados, espera confirmación de nuestro equipo.");
+                document.getElementById("redeemRewardsModal").style.display = "none";
+            } catch (error) {
+                console.error("Error al enviar premios:", error);
+                alert("Error al enviar tu solicitud. Intenta nuevamente.");
+                redeemButton.disabled = false;
+            }
+        });
+    }
+});
+
+
 async function validateReferralEmailGlobal(referralEmail) {
     try {
         const usersRef = db.collection('users');
@@ -958,60 +1012,6 @@ function updateLoyaltyCard(userData) {
         }
     }
 }
-
-// ✅ Redeem Prize Form Submission (Safe)
-document.addEventListener("DOMContentLoaded", () => {
-    const redeemForm = document.getElementById("redeemRewardsForm");
-    const redeemButton = document.getElementById("redeemRewardsButton");
-
-    if (redeemForm && redeemButton) {
-        redeemForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            redeemButton.disabled = true; // Disable to prevent double click
-
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                alert("Debes estar autenticado para redimir tus premios.");
-                redeemButton.disabled = false;
-                return;
-            }
-
-            const name = redeemForm.redeemName.value.trim();
-            const email = redeemForm.redeemEmail.value.trim();
-            const phone = redeemForm.redeemPhone.value.trim();
-            const month = redeemForm.redeemMonth.value.trim();
-
-            try {
-                await db.collection("users").doc(user.uid).update({
-                    rewardsRedeemed: true,
-                    redeemRequest: {
-                        name,
-                        email,
-                        phone,
-                        month,
-                        timestamp: firebase.firestore.Timestamp.now()
-                    }
-                });
-
-                // Optional: send notification to admin
-                sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
-                    Cliente: ${name}<br>
-                    Email: ${email}<br>
-                    WhatsApp: ${phone}<br>
-                    Mes seleccionado: ${month}
-                `);
-
-                alert("Premios enviados, espera confirmación de nuestro equipo.");
-                document.getElementById("redeemRewardsModal").style.display = "none";
-            } catch (error) {
-                console.error("Error al enviar premios:", error);
-                alert("Error al enviar tu solicitud. Intenta nuevamente.");
-                redeemButton.disabled = false;
-            }
-        });
-    }
-});
-
 
         // Place this in the JS script block of dashboard3.html
 // 📜 View Payment History Function
