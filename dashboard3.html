@@ -98,17 +98,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 async function validateReferralEmailGlobal(referralEmail) {
+    if (!referralEmail || referralEmail.trim() === "") {
+        console.warn('⚠️ Correo electrónico vacío durante validación global.');
+        return { valid: false, message: 'Correo electrónico inválido.' };
+    }
+
     try {
         const usersRef = db.collection('users');
         const referralsRef = db.collectionGroup('referrals');
 
-        // Check if email already exists in users
         const userQuery = await usersRef.where('email', '==', referralEmail).get();
         if (!userQuery.empty) {
             return { valid: false, message: 'Este usuario ya forma parte del programa, no puedes referirlo.' };
         }
 
-        // Check if email already exists in any referrals (global search)
         const referralQuery = await referralsRef.where('email', '==', referralEmail).get();
         if (!referralQuery.empty) {
             return { valid: false, message: 'Este usuario ya ha sido referido previamente.' };
