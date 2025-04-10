@@ -263,7 +263,7 @@ function showErrorPopup(title, message) {
         <p>${message}</p>
       </div>
     `;
-    document.body.append
+    document.body.appendChild(errorMessage); // ✅ FIXED appendChild
     setTimeout(() => errorMessage.remove(), 4000);
 }
 
