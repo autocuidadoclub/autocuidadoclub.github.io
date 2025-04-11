@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     auth = firebase.auth();
     db = firebase.firestore();
 
-    // ✅ Check de autenticación
+       // ✅ Check de autenticación
   auth.onAuthStateChanged(user => {
     if (user) {
         document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
@@ -160,6 +160,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = emailInput.value.trim().toLowerCase();
         const phone = phoneInput.value.trim();
         const user = auth.currentUser;
+        // ✅ Validate against global users and referrals
+        const globalValidation = await validateReferralEmailGlobal(email);
+        if (!globalValidation.valid) {
+            showErrorPopup("Estimado cliente", globalValidation.message);
+            return;
+        }
 
         if (!user) {
             alert("Debes iniciar sesión para enviar referidos.");
@@ -236,6 +242,32 @@ function showSuccessPopup(title, message) {
     setTimeout(() => successMessage.remove(), 4000);
 }
 
+        // ✅ Función para mostrar popup de error
+function showErrorPopup(title, message) {
+    const errorMessage = document.createElement("div");
+    errorMessage.innerHTML = `
+      <div style="
+          position: fixed;
+          top: 20%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: #ffe6e6;
+          color: #b30000;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+          z-index: 9999;
+          text-align: center;
+        ">
+        <strong>${title}</strong>
+        <p>${message}</p>
+      </div>
+    `;
+    document.body.appendChild(errorMessage); // ✅ FIXED
+    setTimeout(() => errorMessage.remove(), 4000);
+}
+
+
 // ✅ Cargar Referidos del Usuario
 function loadReferrals(userId) {
     const referralList = document.getElementById("referralList");
@@ -298,6 +330,104 @@ function listenForReferralUpdates(userId, userEmail) {
     });
 }
 
+async function validateReferralEmailGlobal(referralEmail) {
+    try {
+        const usersRef = db.collection('users');
+        const referralsRef = db.collectionGroup('referrals');
+
+        const currentUser = firebase.auth().currentUser;
+        let referrerName = "Cliente";
+        let referrerEmail = currentUser?.email || "Desconocido";
+
+        if (!currentUser) {
+            return { valid: false, message: "❌ Usuario no autenticado. Intenta nuevamente." };
+        }
+
+        // ✅ Check user's own referrals subcollection for duplicates
+        const userReferralsSnapshot = await db.collection('users').doc(currentUser.uid).collection('referrals')
+            .where('email', '==', referralEmail)
+            .get();
+
+        if (!userReferralsSnapshot.empty) {
+            console.log("🚫 Este correo ya fue referido por el usuario actual.");
+            return { valid: false, message: "❌ Ya has referido este correo anteriormente." };
+        }
+
+        // ✅ Fetch referrer name for personalized notifications
+        const referrerDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (referrerDoc.exists) {
+            const referrerData = referrerDoc.data();
+            referrerName = referrerData.name || referrerEmail;
+        }
+
+        // ✅ Step 1: Check if email already exists in users collection
+        const userQuerySnapshot = await usersRef.where('email', '==', referralEmail).get();
+
+        if (!userQuerySnapshot.empty) {
+            const userDoc = userQuerySnapshot.docs[0];
+            const userData = userDoc.data();
+
+            console.log("📌 Usuario encontrado en base de datos:", userData);
+
+            if (userData.paymentStatus === "Confirmado") {
+                return { valid: false, message: "❌ Este usuario ya ha completado su suscripción. No es elegible para referidos." };
+            }
+
+            if (userData.paymentStatus === "Pending") {
+                const emailSubject = `🎯 Nuevo referido de: ${referrerName} - Cliente pendiente de pago`;
+
+                showDashboardNotification(`👋 Cliente referenciado pendiente de pago: ${userData.name} (${userData.email})`);
+
+                sendEmail("info@autocuidadoclub.com", emailSubject, `
+                    Se ha referenciado un cliente existente que aún no ha completado su pago.<br><br>
+                    Nombre: ${userData.name}<br>
+                    Email: ${userData.email}<br>
+                    Teléfono: ${userData.phone}<br>
+                    Plan: ${userData.planType}<br>
+                    Departamento: ${userData.department || 'N/A'}<br>
+                    Municipio: ${userData.municipality || 'N/A'}<br><br>
+                    📞 Recomendación: Contactar manualmente para cerrar la venta.
+                `);
+
+                sendEmail("info@autocuidadoclub.com", "🎉 ¡Has sido referido a AutoCuidado Club!", `
+                    ¡Hola ${userData.name || "amigo"}!<br><br>
+                    Tu contacto ha sido compartido por tu amigo <strong>${referrerEmail}</strong> para que disfrutes de los beneficios de AutoCuidado Club 🚗.<br><br>
+                    Ayuda a tu amigo a desbloquear su premio completando tu suscripción inicial y ambos ganan.<br><br>
+                    ✅ Beneficios exclusivos<br>
+                    ✅ Seguimiento personalizado para tu vehículo<br>
+                    ✅ Bonos de mantenimiento y regalos<br><br>
+                    <a href="https://www.autocuidadoclub.com/suscripciones.html" style="background-color:#003366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Activa tu plan ahora 🚀</a><br><br>
+                    ¡Bienvenido a AutoCuidado Club!<br><br>
+                    Síguenos en nuestras redes sociales:<br>
+                    📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+                    📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+                    💬 WhatsApp: https://wa.me/50376064756
+                `);
+
+                console.log("✅ Notificación y correos enviados para cliente pendiente de pago.");
+
+                return { valid: true };
+            }
+        }
+
+        // ✅ Step 2: Check if email exists in global referrals
+        const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
+
+        if (!referralQuerySnapshot.empty) {
+            return { valid: false, message: "❌ Este usuario ya ha sido referido anteriormente." };
+        }
+
+        console.log("✅ Correo válido para referidos, puedes continuar.");
+        return { valid: true };
+
+    } catch (error) {
+        console.error("❌ Error al validar correo global:", error);
+        return { valid: false, message: "Error al validar el correo. Intenta nuevamente." };
+    }
+}
+
+
+        
 // ✅ Notificación Interna del Dashboard
 function showDashboardNotification(message) {
     const popup = document.getElementById("notificationPopup");
