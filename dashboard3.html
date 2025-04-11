@@ -330,7 +330,7 @@ function listenForReferralUpdates(userId, userEmail) {
     });
 }
 
-       async function validateReferralEmailGlobal(referralEmail) {
+async function validateReferralEmailGlobal(referralEmail) {
     try {
         const usersRef = db.collection('users');
         const referralsRef = db.collectionGroup('referrals');
@@ -386,7 +386,44 @@ function listenForReferralUpdates(userId, userEmail) {
                 // 📩 Send motivation email for internal follow-up
                 sendEmail("info@autocuidadoclub.com", "🎉 ¡Has sido referido a AutoCuidado Club!", `
                     ¡Hola ${userData.name || "amigo"}!<br><br>
-                    Tu contacto ha sido compartido por tu amigo <strong>${referrerEmail}</strong> para que
+                    Tu contacto ha sido compartido por tu amigo <strong>${referrerEmail}</strong> para que disfrutes de los beneficios de AutoCuidado Club 🚗.<br><br>
+                    Ayuda a tu amigo a desbloquear su premio completando tu suscripción inicial y ambos ganan.<br><br>
+                    ✅ Beneficios exclusivos<br>
+                    ✅ Seguimiento personalizado para tu vehículo<br>
+                    ✅ Bonos de mantenimiento y regalos<br><br>
+                    <a href="https://www.autocuidadoclub.com/suscripciones.html" style="background-color:#003366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Activa tu plan ahora 🚀</a><br><br>
+                    ¡Bienvenido a AutoCuidado Club!<br><br>
+                    Síguenos en nuestras redes sociales:<br>
+                    📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+                    📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+                    💬 WhatsApp: https://wa.me/50376064756
+                `);
+
+                console.log("✅ Notificación y correos enviados para cliente pendiente de pago.");
+
+                // ✅ Stop here and allow the referral — skip referral duplication check
+                return { valid: true };
+            }
+        }
+
+        // Step 2: If not found in users, check if already referred in referrals
+        const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
+
+        if (!referralQuerySnapshot.empty) {
+            console.log("🚫 Este correo ya ha sido referido anteriormente.");
+            return { valid: false, message: "❌ Este usuario ya ha sido referido anteriormente." };
+        }
+
+        // Step 3: Passed all checks, it's a valid referral
+        console.log("✅ Correo válido para referidos, puedes continuar.");
+        return { valid: true };
+
+    } catch (error) {
+        console.error("❌ Error al validar correo global:", error);
+        return { valid: false, message: "Error al validar el correo. Intenta nuevamente." };
+    }
+}
+
 
         
 // ✅ Notificación Interna del Dashboard
