@@ -343,7 +343,14 @@ async function validateReferralEmailGlobal(referralEmail) {
             return { valid: false, message: "❌ Usuario no autenticado. Intenta nuevamente." };
         }
 
-        // ✅ Check user's own referrals subcollection for duplicates
+        // ✅ 🚨 First, check global referrals across all clients
+        const globalReferralSnapshot = await referralsRef.where('email', '==', referralEmail).get();
+        if (!globalReferralSnapshot.empty) {
+            console.log("🚫 Este correo ya está referenciado por otro cliente.");
+            return { valid: false, message: "❌ Este correo ya está siendo utilizado en otro programa de referidos." };
+        }
+
+        // ✅ Check user's own referrals subcollection for duplicates (double safety)
         const userReferralsSnapshot = await db.collection('users').doc(currentUser.uid).collection('referrals')
             .where('email', '==', referralEmail)
             .get();
@@ -408,13 +415,6 @@ async function validateReferralEmailGlobal(referralEmail) {
 
                 return { valid: true };
             }
-        }
-
-        // ✅ Step 2: Check if email exists in global referrals
-        const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
-
-        if (!referralQuerySnapshot.empty) {
-            return { valid: false, message: "❌ Este usuario ya ha sido referido anteriormente." };
         }
 
         console.log("✅ Correo válido para referidos, puedes continuar.");
