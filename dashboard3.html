@@ -338,27 +338,29 @@ async function validateReferralEmailGlobal(referralEmail) {
         const currentUser = firebase.auth().currentUser;
         let referrerName = "Cliente";
         let referrerEmail = currentUser?.email || "Desconocido";
-        let currentUserData = null;
 
-        if (currentUser) {
-            const referrerDoc = await db.collection('users').doc(currentUser.uid).get();
-            if (referrerDoc.exists) {
-                const referrerData = referrerDoc.data();
-                referrerName = referrerData.name || referrerEmail;
-                currentUserData = referrerData;
-            }
+        if (!currentUser) {
+            return { valid: false, message: "❌ Usuario no autenticado. Intenta nuevamente." };
         }
 
-        // Step 0: ✅ Check if the user already referred this email
-        if (currentUserData && currentUserData.referrals) {
-            const alreadyReferred = Object.keys(currentUserData.referrals).some(email => email === referralEmail);
-            if (alreadyReferred) {
-                console.log("🚫 Este correo ya fue referido por el usuario actual.");
-                return { valid: false, message: "❌ Ya has referido este correo anteriormente." };
-            }
+        // ✅ Check user's own referrals subcollection for duplicates
+        const userReferralsSnapshot = await db.collection('users').doc(currentUser.uid).collection('referrals')
+            .where('email', '==', referralEmail)
+            .get();
+
+        if (!userReferralsSnapshot.empty) {
+            console.log("🚫 Este correo ya fue referido por el usuario actual.");
+            return { valid: false, message: "❌ Ya has referido este correo anteriormente." };
         }
 
-        // Step 1: Check if email already exists in users
+        // ✅ Fetch referrer name for personalized notifications
+        const referrerDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (referrerDoc.exists) {
+            const referrerData = referrerDoc.data();
+            referrerName = referrerData.name || referrerEmail;
+        }
+
+        // ✅ Step 1: Check if email already exists in users collection
         const userQuerySnapshot = await usersRef.where('email', '==', referralEmail).get();
 
         if (!userQuerySnapshot.empty) {
@@ -408,7 +410,7 @@ async function validateReferralEmailGlobal(referralEmail) {
             }
         }
 
-        // Step 2: Check if email exists in global referrals
+        // ✅ Step 2: Check if email exists in global referrals
         const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
 
         if (!referralQuerySnapshot.empty) {
