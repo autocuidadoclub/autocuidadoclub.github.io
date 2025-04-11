@@ -9,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
 </head>
 
   <style>
@@ -36,6 +37,19 @@ table td, table th {
     <h1>Gestión de Clientes</h1>
   </header>
 
+  <button onclick="exportAllReferralsToExcel()" style="
+    margin-top: 20px;
+    background-color: #003366;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+">
+    📥 Exportar Todos los Referidos a Excel
+</button>
+
+  
   <section id="restricted-content" style="display: none;">
     <h2>Panel de Gestión para el Staff</h2>
 
@@ -315,6 +329,62 @@ function updatePaymentTable(user, userId) {
     </tr>`;
 }
 
+async function exportAllReferralsToExcel() {
+    try {
+        const currentUser = firebase.auth().currentUser;
+        if (!currentUser) {
+            alert("Debes iniciar sesión para exportar referidos.");
+            return;
+        }
+
+        const referralsSnapshot = await db.collectionGroup("referrals").get();
+
+        if (referralsSnapshot.empty) {
+            alert("No hay referidos para exportar.");
+            return;
+        }
+
+        const data = [];
+
+        for (const doc of referralsSnapshot.docs) {
+            const referral = doc.data();
+
+            // Get parent document (referrer user)
+            const pathParts = doc.ref.path.split('/');
+            const userId = pathParts[1];
+
+            const userDoc = await db.collection("users").doc(userId).get();
+            const userData = userDoc.exists ? userDoc.data() : {};
+
+            data.push({
+                "Referrer Nombre": userData.name || "Desconocido",
+                "Referrer Email": userData.email || "Desconocido",
+                "Referrer Teléfono": userData.phone || "Desconocido",
+                "Nombre del Referido": referral.name || "",
+                "Correo del Referido": referral.email || "",
+                "WhatsApp del Referido": referral.phone || "",
+                "Estado 1: Info Enviada": referral.timestamp ? "✅" : "⏳",
+                "Estado 2: Registrado": referral.registered ? "✅" : "⏳",
+                "Estado 3: Pago Completado": referral.paid ? "✅" : "⏳",
+                "Fecha de Registro": referral.timestamp?.toDate().toLocaleString("es-ES") || "",
+            });
+        }
+
+        // Generate Excel
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Todos Referidos");
+
+        const exportFileName = `Todos_Referidos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        XLSX.writeFile(workbook, exportFileName);
+
+        alert("✅ Exportación global completada. Revisa tu archivo Excel.");
+
+    } catch (error) {
+        console.error("❌ Error al exportar referidos globales:", error);
+        alert("Error al exportar los referidos. Intenta nuevamente.");
+    }
+}
 
 
     function getPaymentHistoryByEmail() {
