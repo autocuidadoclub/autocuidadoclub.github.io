@@ -330,27 +330,41 @@ function listenForReferralUpdates(userId, userEmail) {
     });
 }
 
-         async function validateReferralEmailGlobal(referralEmail) {
+        async function validateReferralEmailGlobal(referralEmail) {
     try {
         const usersRef = db.collection('users');
         const referralsRef = db.collectionGroup('referrals');
 
-        // Check if email already exists in users
-        const userQuery = await usersRef.where('email', '==', referralEmail).get();
-        if (!userQuery.empty) {
-            return { valid: false, message: '❌ Este usuario ya forma parte del programa, no puedes referirlo.' };
+        // Step 1: Check if email already exists in users
+        const userQuerySnapshot = await usersRef.where('email', '==', referralEmail).get();
+
+        if (!userQuerySnapshot.empty) {
+            const userDoc = userQuerySnapshot.docs[0];
+            const userData = userDoc.data();
+
+            console.log("📌 Usuario encontrado en base de datos:", userData);
+
+            if (userData.paymentStatus === "Confirmado") {
+                return { valid: false, message: "❌ Este usuario ya ha completado su suscripción. No es elegible para referidos." };
+            } else {
+                console.log("✅ Usuario existente pero no ha pagado, se permite referir.");
+                // ✅ Optional: you can even fire an email or notification here to push conversion!
+            }
         }
 
-        // Check if email already exists in any referrals
-        const referralQuery = await referralsRef.where('email', '==', referralEmail).get();
-        if (!referralQuery.empty) {
-            return { valid: false, message: '❌ Este usuario ya ha sido referido anteriormente.' };
+        // Step 2: Check if email exists in any referrals
+        const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
+
+        if (!referralQuerySnapshot.empty) {
+            return { valid: false, message: "❌ Este usuario ya ha sido referido anteriormente." };
         }
 
+        // Step 3: Passed all checks, it's a valid referral
         return { valid: true };
+
     } catch (error) {
-        console.error('Error al validar correo global:', error);
-        return { valid: false, message: 'Error al validar el correo. Intenta nuevamente.' };
+        console.error("Error al validar correo global:", error);
+        return { valid: false, message: "Error al validar el correo. Intenta nuevamente." };
     }
 }
 
