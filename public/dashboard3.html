@@ -338,19 +338,41 @@ function listenForReferralUpdates(userId, userEmail) {
         // Step 1: Check if email already exists in users
         const userQuerySnapshot = await usersRef.where('email', '==', referralEmail).get();
 
-        if (!userQuerySnapshot.empty) {
-            const userDoc = userQuerySnapshot.docs[0];
-            const userData = userDoc.data();
+       if (!userQuerySnapshot.empty) {
+    const userDoc = userQuerySnapshot.docs[0];
+    const userData = userDoc.data();
 
-            console.log("📌 Usuario encontrado en base de datos:", userData);
+    console.log("📌 Usuario encontrado en base de datos:", userData);
 
-            if (userData.paymentStatus === "Confirmado") {
-                return { valid: false, message: "❌ Este usuario ya ha completado su suscripción. No es elegible para referidos." };
-            } else {
-                console.log("✅ Usuario existente pero no ha pagado, se permite referir.");
-                // ✅ Optional: you can even fire an email or notification here to push conversion!
-            }
-        }
+    // 1️⃣ Case: Paid
+    if (userData.paymentStatus === "Confirmado") {
+        return { valid: false, message: "❌ Este usuario ya ha completado su suscripción. No es elegible para referidos." };
+    }
+
+    // 2️⃣ Case: Unpaid (trigger notification + email)
+    if (userData.paymentStatus === "Pending") {
+        // 🔔 Dashboard notification
+        showDashboardNotification(`👋 Cliente referenciado pendiente de pago: ${userData.name} (${userData.email})`);
+
+        // 📩 Staff email alert
+        sendEmail("info@autocuidadoclub.com", "👋 Cliente referenciado pendiente de pago", `
+            Se ha referenciado un cliente existente que aún no ha completado su pago.<br><br>
+            Nombre: ${userData.name}<br>
+            Email: ${userData.email}<br>
+            Teléfono: ${userData.phone}<br>
+            Plan: ${userData.planType}<br>
+            Departamento: ${userData.department || 'N/A'}<br>
+            Municipio: ${userData.municipality || 'N/A'}<br><br>
+            📞 Recomendación: Contactar manualmente para cerrar la venta.
+        `);
+
+        console.log("✅ Notificación y correo enviados para cliente pendiente de pago.");
+    }
+
+    // ✅ In any case (Pending), allow to refer
+    console.log("✅ Usuario existente pero no ha pagado, se permite referir.");
+}
+
 
         // Step 2: Check if email exists in any referrals
         const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
