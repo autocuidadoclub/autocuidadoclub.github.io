@@ -350,29 +350,40 @@ function listenForReferralUpdates(userId, userEmail) {
     }
 
     // 2️⃣ Case: Unpaid (trigger notification + email)
-    if (userData.paymentStatus === "Pending") {
-        // 🔔 Dashboard notification
-        showDashboardNotification(`👋 Cliente referenciado pendiente de pago: ${userData.name} (${userData.email})`);
+   if (userData.paymentStatus === "Pending") {
+    // 🔔 Show staff dashboard notification
+    showDashboardNotification(`👋 Cliente referenciado pendiente de pago: ${userData.name} (${userData.email})`);
 
-        // 📩 Staff email alert
-        sendEmail("info@autocuidadoclub.com", "👋 Cliente referenciado pendiente de pago", `
-            Se ha referenciado un cliente existente que aún no ha completado su pago.<br><br>
-            Nombre: ${userData.name}<br>
-            Email: ${userData.email}<br>
-            Teléfono: ${userData.phone}<br>
-            Plan: ${userData.planType}<br>
-            Departamento: ${userData.department || 'N/A'}<br>
-            Municipio: ${userData.municipality || 'N/A'}<br><br>
-            📞 Recomendación: Contactar manualmente para cerrar la venta.
-        `);
+    // 📩 Send alert to staff email (summary of the referred unpaid client)
+    sendEmail("info@autocuidadoclub.com", "👋 Cliente referenciado pendiente de pago", `
+        Se ha referenciado un cliente existente que aún no ha completado su pago.<br><br>
+        Nombre: ${userData.name}<br>
+        Email: ${userData.email}<br>
+        Teléfono: ${userData.phone}<br>
+        Plan: ${userData.planType}<br>
+        Departamento: ${userData.department || 'N/A'}<br>
+        Municipio: ${userData.municipality || 'N/A'}<br><br>
+        📞 Recomendación: Contactar manualmente para cerrar la venta.
+    `);
 
-        console.log("✅ Notificación y correo enviados para cliente pendiente de pago.");
-    }
+    // 📩 Send motivation email for staff tracking (copy of the potential client motivation)
+    sendEmail("info@autocuidadoclub.com", "🎉 ¡Has sido referido a AutoCuidado Club!", `
+        ¡Hola ${userData.name || "amigo"}!<br><br>
+        Tu contacto ha sido compartido por tu amigo <strong>${user.email}</strong> para que disfrutes de los beneficios de AutoCuidado Club 🚗.<br><br>
+        Ayuda a tu amigo a desbloquear su premio completando tu suscripción inicial y ambos ganan.<br><br>
+        ✅ Beneficios exclusivos<br>
+        ✅ Seguimiento personalizado para tu vehículo<br>
+        ✅ Bonos de mantenimiento y regalos<br><br>
+        <a href="https://www.autocuidadoclub.com/suscripciones.html" style="background-color:#003366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Activa tu plan ahora 🚀</a><br><br>
+        ¡Bienvenido a AutoCuidado Club!<br><br>
+        Síguenos en nuestras redes sociales:<br>
+        📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+        📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+        💬 WhatsApp: https://wa.me/50376064756
+    `);
 
-    // ✅ In any case (Pending), allow to refer
-    console.log("✅ Usuario existente pero no ha pagado, se permite referir.");
+    console.log("✅ Notificación y correo enviados para cliente pendiente de pago.");
 }
-
 
         // Step 2: Check if email exists in any referrals
         const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
