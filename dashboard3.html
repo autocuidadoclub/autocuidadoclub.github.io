@@ -330,60 +330,75 @@ function listenForReferralUpdates(userId, userEmail) {
     });
 }
 
-        async function validateReferralEmailGlobal(referralEmail) {
+       async function validateReferralEmailGlobal(referralEmail) {
     try {
         const usersRef = db.collection('users');
         const referralsRef = db.collectionGroup('referrals');
 
+        // Get current logged-in user data (referrer)
+        const currentUser = firebase.auth().currentUser;
+        let referrerName = "Cliente";
+        let referrerEmail = currentUser?.email || "Desconocido";
+
+        // Fetch referrer name from Firestore for better subject
+        if (currentUser) {
+            const referrerDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (referrerDoc.exists) {
+                const referrerData = referrerDoc.data();
+                referrerName = referrerData.name || referrerEmail;
+            }
+        }
+
         // Step 1: Check if email already exists in users
         const userQuerySnapshot = await usersRef.where('email', '==', referralEmail).get();
 
-       if (!userQuerySnapshot.empty) {
-    const userDoc = userQuerySnapshot.docs[0];
-    const userData = userDoc.data();
+        if (!userQuerySnapshot.empty) {
+            const userDoc = userQuerySnapshot.docs[0];
+            const userData = userDoc.data();
 
-    console.log("📌 Usuario encontrado en base de datos:", userData);
+            console.log("📌 Usuario encontrado en base de datos:", userData);
 
-    // 1️⃣ Case: Paid
-    if (userData.paymentStatus === "Confirmado") {
-        return { valid: false, message: "❌ Este usuario ya ha completado su suscripción. No es elegible para referidos." };
-    }
+            if (userData.paymentStatus === "Confirmado") {
+                return { valid: false, message: "❌ Este usuario ya ha completado su suscripción. No es elegible para referidos." };
+            }
 
-    // 2️⃣ Case: Unpaid (trigger notification + email)
-   if (userData.paymentStatus === "Pending") {
-    // 🔔 Show staff dashboard notification
-    showDashboardNotification(`👋 Cliente referenciado pendiente de pago: ${userData.name} (${userData.email})`);
+            if (userData.paymentStatus === "Pending") {
+                const emailSubject = `🎯 Nuevo referido de: ${referrerName} - Cliente pendiente de pago`;
 
-    // 📩 Send alert to staff email (summary of the referred unpaid client)
-    sendEmail("info@autocuidadoclub.com", "👋 Cliente referenciado pendiente de pago", `
-        Se ha referenciado un cliente existente que aún no ha completado su pago.<br><br>
-        Nombre: ${userData.name}<br>
-        Email: ${userData.email}<br>
-        Teléfono: ${userData.phone}<br>
-        Plan: ${userData.planType}<br>
-        Departamento: ${userData.department || 'N/A'}<br>
-        Municipio: ${userData.municipality || 'N/A'}<br><br>
-        📞 Recomendación: Contactar manualmente para cerrar la venta.
-    `);
+                // 🔔 Show staff dashboard notification
+                showDashboardNotification(`👋 Cliente referenciado pendiente de pago: ${userData.name} (${userData.email})`);
 
-    // 📩 Send motivation email for staff tracking (copy of the potential client motivation)
-    sendEmail("info@autocuidadoclub.com", "🎉 ¡Has sido referido a AutoCuidado Club!", `
-        ¡Hola ${userData.name || "amigo"}!<br><br>
-        Tu contacto ha sido compartido por tu amigo <strong>${user.email}</strong> para que disfrutes de los beneficios de AutoCuidado Club 🚗.<br><br>
-        Ayuda a tu amigo a desbloquear su premio completando tu suscripción inicial y ambos ganan.<br><br>
-        ✅ Beneficios exclusivos<br>
-        ✅ Seguimiento personalizado para tu vehículo<br>
-        ✅ Bonos de mantenimiento y regalos<br><br>
-        <a href="https://www.autocuidadoclub.com/suscripciones.html" style="background-color:#003366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Activa tu plan ahora 🚀</a><br><br>
-        ¡Bienvenido a AutoCuidado Club!<br><br>
-        Síguenos en nuestras redes sociales:<br>
-        📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
-        📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
-        💬 WhatsApp: https://wa.me/50376064756
-    `);
+                // 📩 Send alert to staff email
+                sendEmail("info@autocuidadoclub.com", emailSubject, `
+                    Se ha referenciado un cliente existente que aún no ha completado su pago.<br><br>
+                    Nombre: ${userData.name}<br>
+                    Email: ${userData.email}<br>
+                    Teléfono: ${userData.phone}<br>
+                    Plan: ${userData.planType}<br>
+                    Departamento: ${userData.department || 'N/A'}<br>
+                    Municipio: ${userData.municipality || 'N/A'}<br><br>
+                    📞 Recomendación: Contactar manualmente para cerrar la venta.
+                `);
 
-    console.log("✅ Notificación y correo enviados para cliente pendiente de pago.");
-}
+                // 📩 Send motivational email for tracking (optional copy for internal follow-up)
+                sendEmail("info@autocuidadoclub.com", "🎉 ¡Has sido referido a AutoCuidado Club!", `
+                    ¡Hola ${userData.name || "amigo"}!<br><br>
+                    Tu contacto ha sido compartido por tu amigo <strong>${referrerEmail}</strong> para que disfrutes de los beneficios de AutoCuidado Club 🚗.<br><br>
+                    Ayuda a tu amigo a desbloquear su premio completando tu suscripción inicial y ambos ganan.<br><br>
+                    ✅ Beneficios exclusivos<br>
+                    ✅ Seguimiento personalizado para tu vehículo<br>
+                    ✅ Bonos de mantenimiento y regalos<br><br>
+                    <a href="https://www.autocuidadoclub.com/suscripciones.html" style="background-color:#003366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Activa tu plan ahora 🚀</a><br><br>
+                    ¡Bienvenido a AutoCuidado Club!<br><br>
+                    Síguenos en nuestras redes sociales:<br>
+                    📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+                    📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+                    💬 WhatsApp: https://wa.me/50376064756
+                `);
+
+                console.log("✅ Notificación y correo enviados para cliente pendiente de pago.");
+            }
+        }
 
         // Step 2: Check if email exists in any referrals
         const referralQuerySnapshot = await referralsRef.where('email', '==', referralEmail).get();
@@ -400,7 +415,6 @@ function listenForReferralUpdates(userId, userEmail) {
         return { valid: false, message: "Error al validar el correo. Intenta nuevamente." };
     }
 }
-
 
         
 // ✅ Notificación Interna del Dashboard
