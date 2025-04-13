@@ -2024,21 +2024,34 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
     </div>
 
     <!-- ✅ Wrap the content that we want to blur -->
-    <div class="subscription-blur-target">
-        <p><strong>Tipo de Plan Actual:</strong></p>
-        <p><span id="planType">Cargando...</span></p>
-        <p><strong>Descripción:</strong></p>
-        <p><span id="planMessage">Cargando...</span></p>
+<div class="subscription-blur-target">
+    <p><strong>Tipo de Plan Actual:</strong></p>
+    <p><span id="planType">Cargando...</span></p>
 
-        <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+    <p><strong>Descripción:</strong></p>
+    <p><span id="planMessage">Cargando...</span></p>
 
-        <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-<button onclick="openAddVehiclesModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-    Añade más vehículos: Mejora a Plan Plus 🚗✨
-</button>
+    <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
-</div>
+    <!-- ✅ Add the missing select and button -->
+    <div style="margin-top: 15px;">
+        <label for="new-plan"><strong>Selecciona tu nuevo plan:</strong></label>
+        <select id="new-plan" style="width: 100%; padding: 8px; margin-top: 5px;">
+            <option selected disabled>Cargando opciones...</option>
+        </select>
+
+        <button onclick="upgradePlan()" class="orange-button" style="margin-top: 10px;">
+            Actualizar Plan 🚀
+        </button>
     </div>
+
+    <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+        <button onclick="openAddVehiclesModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+            Añade más vehículos: Mejora a Plan Plus 🚗✨
+        </button>
+    </div>
+</div>
+
         </div>
         
             
