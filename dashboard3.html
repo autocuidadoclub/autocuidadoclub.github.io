@@ -753,10 +753,6 @@ if (motivationalText) {
 
     // Populate the select options
     const newPlanSelect = document.getElementById("new-plan");
-    newPlanSelect.innerHTML = ""; // Clear first
-    const currentLevel = currentPlan ? currentPlan.level : 0;
-
-    let optionsAdded = false;
     newPlanSelect.innerHTML = ""; // Clean existing options
 const currentLevel = currentPlan ? currentPlan.level : 0;
 let optionsAdded = false;
@@ -779,18 +775,7 @@ if (!optionsAdded) {
     newPlanSelect.appendChild(option);
 }
 
-newPlanSelect.appendChild(option);
-optionsAdded = true;
-}
-
-if (!optionsAdded) {
-    const option = document.createElement("option");
-    option.text = "No hay planes superiores disponibles";
-    option.disabled = true;
-    option.selected = true;
-    newPlanSelect.appendChild(option);
-}
-        
+       
     showFreeRescheduleOffer(userData);
 
     // Check for first-time payment offer
