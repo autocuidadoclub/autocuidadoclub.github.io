@@ -439,7 +439,7 @@ function showDashboardNotification(message) {
     setTimeout(() => popup.style.display = "none", 4000);
 }
 
-function sendEmail(destinationEmail, subject, message) {
+function sendEmail(destinationEmail, subject, acmessage) {
     const styledMessage = `
         ${message}
         <br><br>
@@ -587,6 +587,7 @@ if (lastUpgradeDate) {
         });
 
         // ✅ Send email to staff notifying the change
+        console.log("📧 Enviando correo de cambio de plan a staff...");
         await sendEmail(
             "info@autocuidadoclub.com",
             "🚨 Cambio de plan de suscripción - AutoCuidado Club",
@@ -596,7 +597,11 @@ if (lastUpgradeDate) {
                 Cliente: ${user.email}<br><br>
                 🚗 Verifica y ajusta la facturación de este cliente.
             `
-        );
+        ).then(() => {
+    console.log("✅ Correo enviado correctamente al staff.");
+}).catch(error => {
+    console.error("❌ Error al enviar correo al staff:", error);
+});
 
         alert(`✅ ¡Tu plan ha sido actualizado exitosamente a: ${selectedPlan}!`);
 
