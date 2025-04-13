@@ -1970,94 +1970,33 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
 
 </div>
 
-        <!-- 🚗 Modal to Add Extra Vehicles -->
-<div id="addVehiclesModal" style="
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-    z-index: 10000;
-    width: 300px;
-    text-align: center;
-    max-width: 90%;
-">
-    <h3>🚗 Añadir Vehículos Extras</h3>
-    <p>Completa los campos para registrar hasta 2 vehículos adicionales en tu cuenta.</p>
+      <!-- 🚗 Centralized Vehicle Management Section -->
+<div class="card">
+  <h3><i class="fas fa-car"></i> Mis Vehículos Registrados</h3>
+  <div id="vehiclesList">
+    <p>Cargando vehículos...</p>
+  </div>
 
-    <!-- Vehicle 1 -->
-    <label>Vehículo 1 - Marca:</label>
-    <input type="text" id="vehicle1Brand" placeholder="Ej. Toyota" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Modelo:</label>
-    <input type="text" id="vehicle1Model" placeholder="Ej. Corolla" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Placa:</label>
-    <input type="text" id="vehicle1Plate" placeholder="Ej. P123456" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Año:</label>
-    <input type="text" id="vehicle1Year" placeholder="Ej. 2020" style="width:100%; padding:8px; margin-bottom:8px;">
+  <div id="addVehicleForm" style="margin-top: 20px;">
+    <h4>Añadir Nuevo Vehículo</h4>
+    <label for="newBrand">Marca:</label>
+    <input type="text" id="newBrand" placeholder="Ej. Toyota">
 
-    <!-- Vehicle 2 -->
-    <label>Vehículo 2 - Marca:</label>
-    <input type="text" id="vehicle2Brand" placeholder="Ej. Honda" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Modelo:</label>
-    <input type="text" id="vehicle2Model" placeholder="Ej. Civic" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Placa:</label>
-    <input type="text" id="vehicle2Plate" placeholder="Ej. P654321" style="width:100%; padding:8px; margin-bottom:8px;">
-    <label>Año:</label>
-    <input type="text" id="vehicle2Year" placeholder="Ej. 2022" style="width:100%; padding:8px; margin-bottom:8px;">
+    <label for="newModel">Modelo:</label>
+    <input type="text" id="newModel" placeholder="Ej. Corolla">
 
-    <button onclick="submitAdditionalVehicles()" style="background-color:#4caf50; color:white; padding:8px 12px; border:none; border-radius:4px; margin-top:10px;">
-        Guardar Vehículos ✅
-    </button>
-    <br>
-    <button onclick="closeAddVehiclesModal()" style="background-color:#ccc; color:#333; border:none; border-radius:4px; padding:8px 12px; margin-top:10px;">
-        Cancelar
-    </button>
-</div>
+    <label for="newPlate">Placa:</label>
+    <input type="text" id="newPlate" placeholder="Ej. P123456">
 
+    <label for="newYear">Año:</label>
+    <input type="number" id="newYear" placeholder="Ej. 2020">
 
-<!-- Modal for Upgrade Request -->
-<div id="upgradeModal" style="
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-    z-index: 10000;
-    width: 300px;
-    text-align: center;
-    max-width: 90%;
-">
-    <h3>🚗 Solicitud para añadir más vehículos</h3>
-    <p>¡Estás a un paso de disfrutar AutoCuidado Club para todos tus vehículos! Completa la solicitud y nuestro equipo te contactará para actualizar tu plan.</p>
+    <button onclick="addNewVehicle()" class="orange-button">Añadir Vehículo 🚗</button>
+  </div>
 
-    <label for="upgradeName">Nombre:</label>
-    <input type="text" id="upgradeName" placeholder="Tu nombre completo" required style="width:100%; padding:8px; margin-bottom:10px;">
-
-    <label for="upgradePhone">Teléfono:</label>
-    <input type="text" id="upgradePhone" placeholder="+50312345678" required style="width:100%; padding:8px; margin-bottom:10px;">
-
-    <button onclick="submitUpgradeRequest()" style="background-color:#4caf50; color:white; padding:8px 12px; border:none; border-radius:4px; margin-top:8px;">
-        Enviar Solicitud ✅
-    </button>
-    <br>
-    <button onclick="closeUpgradeModal()" style="background-color:#ccc; color:#333; border:none; border-radius:4px; padding:8px 12px; margin-top:10px;">
-        Cancelar
-    </button>
-</div>
-
-
-        <label for="new-plan">Selecciona un nuevo plan:</label>
-        <select id="new-plan"></select>
-        <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
-    </div>
+  <p style="margin-top: 10px; font-size: 13px; color: #777;">
+    * Solo podrás modificar los vehículos después de finalizar tu periodo de suscripción actual.
+  </p>
 </div>
 
            
