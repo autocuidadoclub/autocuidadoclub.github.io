@@ -579,20 +579,6 @@ if (lastUpgradeDate) {
         return;
     }
 }
-
-
-        // ✅ Check if last upgrade was less than 1 month ago
-        const lastUpgradeDate = userData.lastPlanUpgradeDate?.toDate();
-        const now = new Date();
-
-        if (lastUpgradeDate) {
-            const diffMonths = (now.getFullYear() - lastUpgradeDate.getFullYear()) * 12 + (now.getMonth() - lastUpgradeDate.getMonth());
-            if (diffMonths < 1) {
-                alert(`⚠️ Solo puedes solicitar una mejora de plan una vez por ciclo mensual. Por favor espera hasta el próximo mes para realizar otro cambio.`);
-                return;
-            }
-        }
-
         // ✅ Update Firestore with the new plan and timestamp
         await userRef.update({
             planType: selectedPlan,
