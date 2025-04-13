@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -760,7 +761,10 @@ if (motivationalText) {
         if (plan.level > currentLevel) { // Only higher plans
             const option = document.createElement("option");
             option.value = key;
-            
+            for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.level > currentLevel) { // Only higher plans
+        const option = document.createElement("option");
+        option.value = key;
 
         // ✅ Enhance text for Plus plans
         if (key.startsWith("plus")) {
