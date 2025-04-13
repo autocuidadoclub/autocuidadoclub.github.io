@@ -2043,6 +2043,55 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
         <button onclick="upgradePlan()" class="orange-button" style="margin-top: 10px;">
             Actualizar Plan 🚀
         </button>
+        newPlanSelect.addEventListener("change", function () {
+    const selectedPlan = this.value;
+    const addVehicleForm = document.getElementById("addVehicleForm");
+
+    if (selectedPlan.startsWith("plus")) {
+        // ✅ Mostrar formulario para vehículos
+        addVehicleForm.style.display = "block";
+
+        // ✅ Mostrar popup motivacional
+        const popup = document.createElement("div");
+        popup.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                text-align: center;
+                max-width: 90%;
+                animation: fadeIn 0.5s;
+            ">
+                <h3>🎉 ¡Aprovecha esta oportunidad!</h3>
+                <p>No dejes pasar la oportunidad de tener todos tus vehículos bajo el programa de mantenimiento en nuestro club.</p>
+                <button onclick="this.parentElement.remove()" style="
+                    background-color: #003366;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 8px 12px;
+                    margin-top: 10px;
+                    cursor: pointer;
+                ">Cerrar</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        // ✅ Scroll hacia la sección de vehículos para motivar acción
+        addVehicleForm.scrollIntoView({ behavior: "smooth" });
+
+    } else {
+        // ✅ Ocultar si no es Plus
+        addVehicleForm.style.display = "none";
+    }
+});
+
     </div>
 
     <div id="add-vehicles-button" style="margin-top:10px; display:none;">
@@ -2219,6 +2268,10 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   transition: filter 0.3s ease;
 }
 
+ @keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -60%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}   
 
 </style>
 
