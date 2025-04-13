@@ -760,7 +760,23 @@ if (motivationalText) {
         if (plan.level > currentLevel) { // Only higher plans
             const option = document.createElement("option");
             option.value = key;
+            for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.level > currentLevel) { // Only higher plans
+        const option = document.createElement("option");
+        option.value = key;
+
+        // ✅ Enhance text for Plus plans
+        if (key.startsWith("plus")) {
+            option.text = `${plan.name} — 🚗 Añade más vehículos y ahorra más`;
+        } else {
             option.text = plan.name;
+        }
+
+        newPlanSelect.appendChild(option);
+        optionsAdded = true;
+    }
+}
+
             newPlanSelect.appendChild(option);
             optionsAdded = true;
         }
