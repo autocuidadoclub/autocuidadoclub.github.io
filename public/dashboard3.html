@@ -599,6 +599,13 @@ if (lastUpgradeDate) {
 
         alert(`✅ ¡Tu plan ha sido actualizado exitosamente a: ${selectedPlan}!`);
 
+// ✅ Smooth scroll to vehicle form
+document.getElementById("addVehicleForm").scrollIntoView({ behavior: "smooth" });
+
+// ✅ Refresh user profile
+loadUserProfile(user.uid);
+
+
         // ✅ If Plus plan, show the vehicle add form
         if (selectedPlan.startsWith("plus")) {
             document.getElementById("addVehicleForm").style.display = "block";
