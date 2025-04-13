@@ -779,20 +779,18 @@ if (!optionsAdded) {
     newPlanSelect.appendChild(option);
 }
 
+newPlanSelect.appendChild(option);
+optionsAdded = true;
+}
 
-            newPlanSelect.appendChild(option);
-            optionsAdded = true;
-        }
-    }
-
-    if (!optionsAdded) {
-        const option = document.createElement("option");
-        option.text = "No hay planes superiores disponibles";
-        option.disabled = true;
-        option.selected = true;
-        newPlanSelect.appendChild(option);
-    }
-
+if (!optionsAdded) {
+    const option = document.createElement("option");
+    option.text = "No hay planes superiores disponibles";
+    option.disabled = true;
+    option.selected = true;
+    newPlanSelect.appendChild(option);
+}
+        
     showFreeRescheduleOffer(userData);
 
     // Check for first-time payment offer
