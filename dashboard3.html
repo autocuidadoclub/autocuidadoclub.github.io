@@ -757,26 +757,28 @@ if (motivationalText) {
     const currentLevel = currentPlan ? currentPlan.level : 0;
 
     let optionsAdded = false;
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.level > currentLevel) { // Only higher plans
-            const option = document.createElement("option");
-            option.value = key;
-            for (const [key, plan] of Object.entries(availablePlans)) {
-    if (plan.level > currentLevel) { // Only higher plans
+    newPlanSelect.innerHTML = ""; // Clean existing options
+const currentLevel = currentPlan ? currentPlan.level : 0;
+let optionsAdded = false;
+
+for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.level > currentLevel) {
         const option = document.createElement("option");
         option.value = key;
-
-        // ✅ Enhance text for Plus plans
-        if (key.startsWith("plus")) {
-            option.text = `${plan.name} — 🚗 Añade más vehículos y ahorra más`;
-        } else {
-            option.text = plan.name;
-        }
-
+        option.text = key.startsWith("plus") ? `${plan.name} — 🚗 Añade más vehículos y ahorra más` : plan.name;
         newPlanSelect.appendChild(option);
         optionsAdded = true;
     }
 }
+
+if (!optionsAdded) {
+    const option = document.createElement("option");
+    option.text = "No hay planes superiores disponibles";
+    option.disabled = true;
+    option.selected = true;
+    newPlanSelect.appendChild(option);
+}
+
 
             newPlanSelect.appendChild(option);
             optionsAdded = true;
