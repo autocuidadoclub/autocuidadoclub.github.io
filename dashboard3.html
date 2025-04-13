@@ -700,24 +700,6 @@ if (motivationalText) {
     motivationalDiv.innerHTML = motivationalText;
     motivationalDiv.style.display = "block";
 }
-
-    // Dedicated Add Vehicles Button
-const addVehiclesButton = document.getElementById("add-vehicles-button");
-
-// Logic
-if (currentPlanType === "basic3m") {
-    addVehiclesButton.style.display = "block";
-    addVehiclesButton.setAttribute("data-target-plan", "plus3m");
-} else if (currentPlanType === "basic6m") {
-    addVehiclesButton.style.display = "block";
-    addVehiclesButton.setAttribute("data-target-plan", "plus6m");
-} else if (currentPlanType === "basic12m") {
-    addVehiclesButton.style.display = "block";
-    addVehiclesButton.setAttribute("data-target-plan", "plus12m");
-} else {
-    addVehiclesButton.style.display = "none"; // Already Plus, no need
-}
-
     
     // Set description
     const planMessageElement = document.getElementById("planMessage");
@@ -848,27 +830,82 @@ function getPaypalLink(planType) {
 }
 
 // Load Vehicles Function
-function loadVehicles(vehicles) {
-    const vehiclesList = document.getElementById("vehicles-list");
-    vehiclesList.innerHTML = "";
+function loadVehicles(vehicles = []) {
+  const vehiclesList = document.getElementById("vehiclesList");
+  vehiclesList.innerHTML = "";
 
-    if (!vehicles || vehicles.length === 0) {
-        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
-        return;
+  if (!vehicles.length) {
+    vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+    return;
+  }
+
+  vehicles.forEach((vehicle, index) => {
+    vehiclesList.innerHTML += `
+      <div class="vehicle-card">
+        <h4>Vehículo ${index + 1}</h4>
+        <p><strong>Marca:</strong> ${vehicle.brand}</p>
+        <p><strong>Modelo:</strong> ${vehicle.model}</p>
+        <p><strong>Placa:</strong> ${vehicle.plate}</p>
+        <p><strong>Año:</strong> ${vehicle.year}</p>
+      </div>
+    `;
+  });
+}
+
+async function addNewVehicle() {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Debes estar autenticado para añadir vehículos.");
+    return;
+  }
+
+  const brand = document.getElementById("newBrand").value.trim();
+  const model = document.getElementById("newModel").value.trim();
+  const plate = document.getElementById("newPlate").value.trim();
+  const year = document.getElementById("newYear").value.trim();
+
+  if (!brand || !model || !plate || !year) {
+    alert("Completa todos los campos para añadir el vehículo.");
+    return;
+  }
+
+  try {
+    const userRef = db.collection("users").doc(user.uid);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) throw new Error("Usuario no encontrado.");
+
+    const userData = userDoc.data();
+    const vehicles = userData.vehicles || [];
+
+    // ✅ Check plan type and vehicle limit
+    const plan = userData.planType || "basic3m";
+    const maxVehicles = plan.startsWith("plus") ? 3 : 1;
+
+    if (vehicles.length >= maxVehicles) {
+      alert(`Tu plan actual permite hasta ${maxVehicles} vehículos.`);
+      return;
     }
 
-    vehicles.forEach((vehicle, index) => {
-        vehiclesList.innerHTML += `
-            <div class="vehicle-card">
-                <h4>Vehículo ${index + 1}</h4>
-                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-            </div>
-        `;
-    });
+    // ✅ Add vehicle
+    vehicles.push({ brand, model, plate, year });
+
+    await userRef.update({ vehicles });
+
+    alert("🚗 Vehículo añadido correctamente.");
+    loadVehicles(vehicles);
+
+    // Clear form
+    document.getElementById("newBrand").value = "";
+    document.getElementById("newModel").value = "";
+    document.getElementById("newPlate").value = "";
+    document.getElementById("newYear").value = "";
+
+  } catch (error) {
+    console.error("Error añadiendo vehículo:", error);
+    alert("Error al añadir el vehículo. Intenta nuevamente.");
+  }
 }
+
 
 function upgradeToPlus() {
     const targetPlan = document.getElementById("add-vehicles-button").getAttribute("data-target-plan");
