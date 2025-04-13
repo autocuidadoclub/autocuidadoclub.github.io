@@ -548,7 +548,7 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
   }, 1000);
      
 
-    function upgradePlan() {
+async function upgradePlan() {
     const selectedPlan = document.getElementById("new-plan").value;
     if (!selectedPlan) {
         alert("❌ Por favor selecciona un nuevo plan válido.");
@@ -561,25 +561,73 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
         return;
     }
 
-    // Confirm with user
-    if (!confirm(`¿Estás seguro que deseas cambiar tu suscripción a: ${selectedPlan}?`)) {
+    const confirmation = confirm(`¿Estás seguro que deseas cambiar tu suscripción a: ${selectedPlan}?`);
+    if (!confirmation) return;
+
+    try {
+        const userRef = db.collection("users").doc(user.uid);
+        const userDoc = await userRef.get();
+        const userData = userDoc.data();
+
+        const lastUpgradeDate = userData.lastPlanUpgradeDate?.toDate();
+const now = new Date();
+
+if (lastUpgradeDate) {
+    const diffMonths = (now.getFullYear() - lastUpgradeDate.getFullYear()) * 12 + (now.getMonth() - lastUpgradeDate.getMonth());
+    if (diffMonths < 1) {
+        alert(`⚠️ Solo puedes solicitar una mejora de plan una vez por ciclo mensual. Por favor espera hasta el próximo mes para realizar otro cambio.`);
         return;
     }
+}
 
-    const userRef = db.collection("users").doc(user.uid);
 
-    // Update Firestore
-    userRef.update({
-        planType: selectedPlan
-    }).then(() => {
+        // ✅ Check if last upgrade was less than 1 month ago
+        const lastUpgradeDate = userData.lastPlanUpgradeDate?.toDate();
+        const now = new Date();
+
+        if (lastUpgradeDate) {
+            const diffMonths = (now.getFullYear() - lastUpgradeDate.getFullYear()) * 12 + (now.getMonth() - lastUpgradeDate.getMonth());
+            if (diffMonths < 1) {
+                alert(`⚠️ Solo puedes solicitar una mejora de plan una vez por ciclo mensual. Por favor espera hasta el próximo mes para realizar otro cambio.`);
+                return;
+            }
+        }
+
+        // ✅ Update Firestore with the new plan and timestamp
+        await userRef.update({
+            planType: selectedPlan,
+            lastPlanUpgradeDate: firebase.firestore.Timestamp.now()
+        });
+
+        // ✅ Send email to staff notifying the change
+        await sendEmail(
+            "info@autocuidadoclub.com",
+            "🚨 Cambio de plan de suscripción - AutoCuidado Club",
+            `
+                El cliente ha solicitado un cambio de plan.<br><br>
+                Plan nuevo seleccionado: <strong>${selectedPlan}</strong><br>
+                Cliente: ${user.email}<br><br>
+                🚗 Verifica y ajusta la facturación de este cliente.
+            `
+        );
+
         alert(`✅ ¡Tu plan ha sido actualizado exitosamente a: ${selectedPlan}!`);
-        // Reload user profile to refresh info
+
+        // ✅ If Plus plan, show the vehicle add form
+        if (selectedPlan.startsWith("plus")) {
+            document.getElementById("addVehicleForm").style.display = "block";
+            showDashboardNotification("🚗 Ahora puedes añadir hasta 3 vehículos a tu cuenta.");
+        }
+
+        // ✅ Refresh user profile
         loadUserProfile(user.uid);
-    }).catch((error) => {
+
+    } catch (error) {
         console.error("❌ Error al actualizar el plan:", error);
         alert("Ocurrió un error al actualizar tu plan. Por favor, intenta nuevamente.");
-    });
+    }
 }
+
 
     
 // Logout Function
