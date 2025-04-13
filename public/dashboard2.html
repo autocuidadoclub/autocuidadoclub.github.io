@@ -548,7 +548,7 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
   }, 1000);
      
 
-    function upgradePlan() {
+async function upgradePlan() {
     const selectedPlan = document.getElementById("new-plan").value;
     if (!selectedPlan) {
         alert("❌ Por favor selecciona un nuevo plan válido.");
@@ -561,25 +561,59 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
         return;
     }
 
-    // Confirm with user
-    if (!confirm(`¿Estás seguro que deseas cambiar tu suscripción a: ${selectedPlan}?`)) {
+    const confirmation = confirm(`¿Estás seguro que deseas cambiar tu suscripción a: ${selectedPlan}?`);
+    if (!confirmation) return;
+
+    try {
+        const userRef = db.collection("users").doc(user.uid);
+        const userDoc = await userRef.get();
+        const userData = userDoc.data();
+
+        const lastUpgradeDate = userData.lastPlanUpgradeDate?.toDate();
+const now = new Date();
+
+if (lastUpgradeDate) {
+    const diffMonths = (now.getFullYear() - lastUpgradeDate.getFullYear()) * 12 + (now.getMonth() - lastUpgradeDate.getMonth());
+    if (diffMonths < 1) {
+        alert(`⚠️ Solo puedes solicitar una mejora de plan una vez por ciclo mensual. Por favor espera hasta el próximo mes para realizar otro cambio.`);
         return;
     }
+}
+        // ✅ Update Firestore with the new plan and timestamp
+        await userRef.update({
+            planType: selectedPlan,
+            lastPlanUpgradeDate: firebase.firestore.Timestamp.now()
+        });
 
-    const userRef = db.collection("users").doc(user.uid);
+        // ✅ Send email to staff notifying the change
+        await sendEmail(
+            "info@autocuidadoclub.com",
+            "🚨 Cambio de plan de suscripción - AutoCuidado Club",
+            `
+                El cliente ha solicitado un cambio de plan.<br><br>
+                Plan nuevo seleccionado: <strong>${selectedPlan}</strong><br>
+                Cliente: ${user.email}<br><br>
+                🚗 Verifica y ajusta la facturación de este cliente.
+            `
+        );
 
-    // Update Firestore
-    userRef.update({
-        planType: selectedPlan
-    }).then(() => {
         alert(`✅ ¡Tu plan ha sido actualizado exitosamente a: ${selectedPlan}!`);
-        // Reload user profile to refresh info
+
+        // ✅ If Plus plan, show the vehicle add form
+        if (selectedPlan.startsWith("plus")) {
+            document.getElementById("addVehicleForm").style.display = "block";
+            showDashboardNotification("🚗 Ahora puedes añadir hasta 3 vehículos a tu cuenta.");
+        }
+
+        // ✅ Refresh user profile
         loadUserProfile(user.uid);
-    }).catch((error) => {
+
+    } catch (error) {
         console.error("❌ Error al actualizar el plan:", error);
         alert("Ocurrió un error al actualizar tu plan. Por favor, intenta nuevamente.");
-    });
+    }
 }
+
 
     
 // Logout Function
@@ -700,24 +734,6 @@ if (motivationalText) {
     motivationalDiv.innerHTML = motivationalText;
     motivationalDiv.style.display = "block";
 }
-
-    // Dedicated Add Vehicles Button
-const addVehiclesButton = document.getElementById("add-vehicles-button");
-
-// Logic
-if (currentPlanType === "basic3m") {
-    addVehiclesButton.style.display = "block";
-    addVehiclesButton.setAttribute("data-target-plan", "plus3m");
-} else if (currentPlanType === "basic6m") {
-    addVehiclesButton.style.display = "block";
-    addVehiclesButton.setAttribute("data-target-plan", "plus6m");
-} else if (currentPlanType === "basic12m") {
-    addVehiclesButton.style.display = "block";
-    addVehiclesButton.setAttribute("data-target-plan", "plus12m");
-} else {
-    addVehiclesButton.style.display = "none"; // Already Plus, no need
-}
-
     
     // Set description
     const planMessageElement = document.getElementById("planMessage");
@@ -848,27 +864,82 @@ function getPaypalLink(planType) {
 }
 
 // Load Vehicles Function
-function loadVehicles(vehicles) {
-    const vehiclesList = document.getElementById("vehicles-list");
-    vehiclesList.innerHTML = "";
+function loadVehicles(vehicles = []) {
+  const vehiclesList = document.getElementById("vehiclesList");
+  vehiclesList.innerHTML = "";
 
-    if (!vehicles || vehicles.length === 0) {
-        vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
-        return;
+  if (!vehicles.length) {
+    vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+    return;
+  }
+
+  vehicles.forEach((vehicle, index) => {
+    vehiclesList.innerHTML += `
+      <div class="vehicle-card">
+        <h4>Vehículo ${index + 1}</h4>
+        <p><strong>Marca:</strong> ${vehicle.brand}</p>
+        <p><strong>Modelo:</strong> ${vehicle.model}</p>
+        <p><strong>Placa:</strong> ${vehicle.plate}</p>
+        <p><strong>Año:</strong> ${vehicle.year}</p>
+      </div>
+    `;
+  });
+}
+
+async function addNewVehicle() {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Debes estar autenticado para añadir vehículos.");
+    return;
+  }
+
+  const brand = document.getElementById("newBrand").value.trim();
+  const model = document.getElementById("newModel").value.trim();
+  const plate = document.getElementById("newPlate").value.trim();
+  const year = document.getElementById("newYear").value.trim();
+
+  if (!brand || !model || !plate || !year) {
+    alert("Completa todos los campos para añadir el vehículo.");
+    return;
+  }
+
+  try {
+    const userRef = db.collection("users").doc(user.uid);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) throw new Error("Usuario no encontrado.");
+
+    const userData = userDoc.data();
+    const vehicles = userData.vehicles || [];
+
+    // ✅ Check plan type and vehicle limit
+    const plan = userData.planType || "basic3m";
+    const maxVehicles = plan.startsWith("plus") ? 3 : 1;
+
+    if (vehicles.length >= maxVehicles) {
+      alert(`Tu plan actual permite hasta ${maxVehicles} vehículos.`);
+      return;
     }
 
-    vehicles.forEach((vehicle, index) => {
-        vehiclesList.innerHTML += `
-            <div class="vehicle-card">
-                <h4>Vehículo ${index + 1}</h4>
-                <p><strong>Placa:</strong> ${vehicle.plate || "N/A"}</p>
-                <p><strong>Marca:</strong> ${vehicle.brand || "N/A"}</p>
-                <p><strong>Modelo:</strong> ${vehicle.model || "N/A"}</p>
-                <p><strong>Año:</strong> ${vehicle.year || "N/A"}</p>
-            </div>
-        `;
-    });
+    // ✅ Add vehicle
+    vehicles.push({ brand, model, plate, year });
+
+    await userRef.update({ vehicles });
+
+    alert("🚗 Vehículo añadido correctamente.");
+    loadVehicles(vehicles);
+
+    // Clear form
+    document.getElementById("newBrand").value = "";
+    document.getElementById("newModel").value = "";
+    document.getElementById("newPlate").value = "";
+    document.getElementById("newYear").value = "";
+
+  } catch (error) {
+    console.error("Error añadiendo vehículo:", error);
+    alert("Error al añadir el vehículo. Intenta nuevamente.");
+  }
 }
+
 
 function upgradeToPlus() {
     const targetPlan = document.getElementById("add-vehicles-button").getAttribute("data-target-plan");
@@ -1492,6 +1563,59 @@ function submitUpgradeRequest() {
     });
 }
 
+function openAddVehiclesModal() {
+    document.getElementById("addVehiclesModal").style.display = "block";
+}
+
+function closeAddVehiclesModal() {
+    document.getElementById("addVehiclesModal").style.display = "none";
+}
+
+async function submitAdditionalVehicles() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para añadir vehículos.");
+        return;
+    }
+
+    const vehicle1 = {
+        brand: document.getElementById("vehicle1Brand").value.trim(),
+        model: document.getElementById("vehicle1Model").value.trim(),
+        plate: document.getElementById("vehicle1Plate").value.trim(),
+        year: document.getElementById("vehicle1Year").value.trim()
+    };
+
+    const vehicle2 = {
+        brand: document.getElementById("vehicle2Brand").value.trim(),
+        model: document.getElementById("vehicle2Model").value.trim(),
+        plate: document.getElementById("vehicle2Plate").value.trim(),
+        year: document.getElementById("vehicle2Year").value.trim()
+    };
+
+    const vehiclesToAdd = [];
+    if (vehicle1.brand || vehicle1.model || vehicle1.plate || vehicle1.year) vehiclesToAdd.push(vehicle1);
+    if (vehicle2.brand || vehicle2.model || vehicle2.plate || vehicle2.year) vehiclesToAdd.push(vehicle2);
+
+    if (vehiclesToAdd.length === 0) {
+        alert("Por favor ingresa al menos un vehículo.");
+        return;
+    }
+
+    try {
+        const userRef = db.collection("users").doc(user.uid);
+        await userRef.update({
+            vehicles: firebase.firestore.FieldValue.arrayUnion(...vehiclesToAdd)
+        });
+
+        alert("✅ Vehículos añadidos exitosamente.");
+        closeAddVehiclesModal();
+        loadUserProfile(user.uid); // Refresh UI
+    } catch (error) {
+        console.error("❌ Error añadiendo vehículos:", error);
+        alert("Ocurrió un error al guardar tus vehículos. Intenta nuevamente.");
+    }
+}
+        
         
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
@@ -1807,9 +1931,7 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   </button>
 </div>
 
-            <p><strong>Vehículos:</strong> <span id="vehicles-list">Cargando...</span></p>
-
-           <div id="locationPopup" style="
+            <div id="locationPopup" style="
   display: none;
   position: fixed;
   top: 50%;
@@ -1902,60 +2024,67 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
     </div>
 
     <!-- ✅ Wrap the content that we want to blur -->
-    <div class="subscription-blur-target">
-        <p><strong>Tipo de Plan Actual:</strong></p>
-        <p><span id="planType">Cargando...</span></p>
-        <p><strong>Descripción:</strong></p>
-        <p><span id="planMessage">Cargando...</span></p>
+<div class="subscription-blur-target">
+    <p><strong>Tipo de Plan Actual:</strong></p>
+    <p><span id="planType">Cargando...</span></p>
 
-        <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+    <p><strong>Descripción:</strong></p>
+    <p><span id="planMessage">Cargando...</span></p>
 
-        <div id="add-vehicles-button" style="margin-top:10px; display:none;">
-    <button onclick="openUpgradeModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
-        Añade más vehículos: Mejora a Plan Plus 🚗✨
-    </button>
-</div>
+    <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
 
+    <!-- ✅ Add the missing select and button -->
+    <div style="margin-top: 15px;">
+        <label for="new-plan"><strong>Selecciona tu nuevo plan:</strong></label>
+        <select id="new-plan" style="width: 100%; padding: 8px; margin-top: 5px;">
+            <option selected disabled>Cargando opciones...</option>
+        </select>
 
-<!-- Modal for Upgrade Request -->
-<div id="upgradeModal" style="
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-    z-index: 10000;
-    width: 300px;
-    text-align: center;
-    max-width: 90%;
-">
-    <h3>🚗 Solicitud para añadir más vehículos</h3>
-    <p>¡Estás a un paso de disfrutar AutoCuidado Club para todos tus vehículos! Completa la solicitud y nuestro equipo te contactará para actualizar tu plan.</p>
-
-    <label for="upgradeName">Nombre:</label>
-    <input type="text" id="upgradeName" placeholder="Tu nombre completo" required style="width:100%; padding:8px; margin-bottom:10px;">
-
-    <label for="upgradePhone">Teléfono:</label>
-    <input type="text" id="upgradePhone" placeholder="+50312345678" required style="width:100%; padding:8px; margin-bottom:10px;">
-
-    <button onclick="submitUpgradeRequest()" style="background-color:#4caf50; color:white; padding:8px 12px; border:none; border-radius:4px; margin-top:8px;">
-        Enviar Solicitud ✅
-    </button>
-    <br>
-    <button onclick="closeUpgradeModal()" style="background-color:#ccc; color:#333; border:none; border-radius:4px; padding:8px 12px; margin-top:10px;">
-        Cancelar
-    </button>
-</div>
-
-
-        <label for="new-plan">Selecciona un nuevo plan:</label>
-        <select id="new-plan"></select>
-        <button onclick="upgradePlan()" class="orange-button">Mejorar Plan</button>
+        <button onclick="upgradePlan()" class="orange-button" style="margin-top: 10px;">
+            Actualizar Plan 🚀
+        </button>
     </div>
+
+    <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+        <button onclick="openAddVehiclesModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+            Añade más vehículos: Mejora a Plan Plus 🚗✨
+        </button>
+    </div>
+</div>
+
+        </div>
+        
+            
+      <!-- 🚗 Centralized Vehicle Management Section -->
+<div class="card">
+  <h3><i class="fas fa-car"></i> Mis Vehículos Registrados</h3>
+  <div id="vehiclesList">
+    <p>Cargando vehículos...</p>
+  </div>
+</div>
+    
+ <div>   
+  <div id="addVehicleForm" style="margin-top: 20px;">
+  <h3><i class="fas fa-car"></i> Mis Vehículos Registrados</h3>
+      <h4>Añadir Nuevo Vehículo</h4>
+    <label for="newBrand">Marca:</label>
+    <input type="text" id="newBrand" placeholder="Ej. Toyota">
+
+    <label for="newModel">Modelo:</label>
+    <input type="text" id="newModel" placeholder="Ej. Corolla">
+
+    <label for="newPlate">Placa:</label>
+    <input type="text" id="newPlate" placeholder="Ej. P123456">
+
+    <label for="newYear">Año:</label>
+    <input type="number" id="newYear" placeholder="Ej. 2020">
+
+    <button onclick="addNewVehicle()" class="orange-button">Añadir Vehículo 🚗</button>
+  </div>
+
+  <p style="margin-top: 10px; font-size: 13px; color: #777;">
+    * Solo podrás modificar los vehículos después de finalizar tu periodo de suscripción actual.
+  </p>
 </div>
 
            
