@@ -1219,6 +1219,18 @@ function updateVehicleFields(planType) {
 }
         console.log("Before the error point");
 
+                
+const termsCheckbox = document.getElementById("terms");
+
+termsCheckbox.addEventListener("invalid", function(event) {
+  event.target.setCustomValidity("Por favor, acepta los Términos y Condiciones para continuar.");
+});
+
+termsCheckbox.addEventListener("change", function(event) {
+  event.target.setCustomValidity("");
+});
+
+                
             </script>
 </body>
 </html>
