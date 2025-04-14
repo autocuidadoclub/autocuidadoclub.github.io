@@ -67,6 +67,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameInput = document.getElementById("referralName");
     const emailInput = document.getElementById("referralEmail");
     const phoneInput = document.getElementById("referralPhone");
+    // ✅ Prefill +503 if empty
+if (phoneInput.value.trim() === "") {
+    phoneInput.value = "+503";
+    phoneInput.setSelectionRange(phoneInput.value.length, phoneInput.value.length); // Move cursor to end
+    validatePhoneNumber(); // Trigger feedback immediately
+}
+
     const submitButton = referralForm.querySelector("button[type='submit']");
 
 
