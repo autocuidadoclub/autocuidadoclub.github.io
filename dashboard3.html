@@ -1166,15 +1166,28 @@ document.addEventListener("DOMContentLoaded", () => {
             const month = redeemForm.redeemMonth.value.trim();
 
             try {
+                redeemButton.disabled = true; // Disable to prevent double submission
                 await db.collection("users").doc(user.uid).update({
-                    rewardsRedeemed: true,
-                    redeemRequest: {
-                        name,
-                        email,
-                        phone,
-                        month,
-                        timestamp: firebase.firestore.Timestamp.now()
-                    }
+                rewardsRedeemed: true,
+                monthsPaid: 0, // ✅ Reset loyalty card
+                redeemRequest: {
+                    name,
+                    email,
+                    phone,
+                    month,
+                    timestamp: firebase.firestore.Timestamp.now()
+                }
+            });
+            
+            // ✅ Actions after Firestore update
+            console.log("✅ Loyalty card reset to zero after redemption.");
+            alert("Premios enviados, espera confirmación de nuestro equipo.");
+            document.getElementById("redeemRewardsModal").style.display = "none";
+            
+            // ✅ Refresh dashboard to update loyalty card
+            loadUserProfile(user.uid);
+
+
                 });
 
                 // Optional: send notification to admin
