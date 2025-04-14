@@ -312,8 +312,8 @@ function listenForReferralUpdates(userId, userEmail) {
             }
 
             if (!lastReferralStates[referralId].registered && referral.registered) {
-                showDashboardNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
-             
+                showReferralCelebration();
+            
                 notifyReferralRegistered(userEmail, referral.email, referral.name, referral.phone);
 
             }
@@ -1629,7 +1629,32 @@ async function submitAdditionalVehicles() {
         alert("Ocurrió un error al guardar tus vehículos. Intenta nuevamente.");
     }
 }
-        
+
+        function showReferralCelebration() {
+  const popup = document.getElementById('referralSuccessPopup');
+  if (!popup) return;
+  popup.style.display = 'block';
+
+  // Optional: confetti animation
+  if (typeof confetti === 'function') {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
+
+  // Auto close after 8 sec
+  setTimeout(() => {
+    popup.style.display = 'none';
+  }, 8000);
+}
+
+function closeReferralPopup() {
+  const popup = document.getElementById('referralSuccessPopup');
+  if (popup) popup.style.display = 'none';
+}
+
         
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
@@ -2577,6 +2602,55 @@ document.body.appendChild(popup);
 ">
   <span id="notificationMessage">Notificación aquí</span>
 </div>
+
+    <!-- 🎉 Referral Celebration Popup -->
+<div id="referralSuccessPopup" style="
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #ffffff;
+  border: 3px solid #4CAF50;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  z-index: 99999;
+  width: 340px;
+  max-width: 90%;
+  text-align: center;
+  animation: slideInPopup 0.8s ease;
+  font-family: 'Arial', sans-serif;
+">
+  <div style="font-size: 50px; color: #4CAF50;">🎉</div>
+  <h3 style="margin-top: 10px; font-size: 18px; color: #003366;">¡Recompensa de Referido!</h3>
+  <p style="color: #333;">Tu referido se ha registrado exitosamente en AutoCuidado Club.</p>
+  <button onclick="closeReferralPopup()" style="
+    margin-top: 12px;
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+  ">Ver mis recompensas 🎁</button>
+</div>
+
+<style>
+@keyframes slideInPopup {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+</style>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
 
 </body>
