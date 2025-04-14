@@ -1150,46 +1150,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (redeemForm && redeemButton) {
         redeemForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+            event.preventDefault();
+            redeemButton.disabled = true; // ✅ Disable button to prevent double submission
 
-    redeemButton.disabled = true; // Prevent double clicks
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert("Debes estar autenticado para redimir tus premios.");
+                redeemButton.disabled = false;
+                return;
+            }
 
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Debes estar autenticado para redimir tus premios.");
-        redeemButton.disabled = false;
-        return;
-    }
+            const name = redeemForm.redeemName.value.trim();
+            const email = redeemForm.redeemEmail.value.trim();
+            const phone = redeemForm.redeemPhone.value.trim();
+            const month = redeemForm.redeemMonth.value.trim();
 
-    const name = redeemForm.redeemName.value.trim();
-    const email = redeemForm.redeemEmail.value.trim();
-    const phone = redeemForm.redeemPhone.value.trim();
-    const month = redeemForm.redeemMonth.value.trim();
+            try {
+                await db.collection("users").doc(user.uid).update({
+                    rewardsRedeemed: true,
+                    monthsPaid: 0, // ✅ Reset loyalty card to zero
+                    redeemRequest: {
+                        name,
+                        email,
+                        phone,
+                        month,
+                        timestamp: firebase.firestore.Timestamp.now()
+                    }
+                });
 
-    try {
-        await db.collection("users").doc(user.uid).update({
-            rewardsRedeemed: true,
-            monthsPaid: 0,
-            redeemRequest: {
-                name,
-                email,
-                phone,
-                month,
-                timestamp: firebase.firestore.Timestamp.now()
+                // ✅ Optional: Send notification to staff
+                sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
+                    Cliente: ${name}<br>
+                    Email: ${email}<br>
+                    WhatsApp: ${phone}<br>
+                    Mes seleccionado: ${month}
+                `);
+
+                console.log("✅ Loyalty card reset to zero after redemption.");
+
+                alert("Premios enviados, espera confirmación de nuestro equipo.");
+                document.getElementById("redeemRewardsModal").style.display = "none";
+
+                // ✅ Refresh dashboard to update loyalty card
+                loadUserProfile(user.uid);
+
+            } catch (error) {
+                console.error("Error al enviar la solicitud de premios:", error);
+                alert("❌ Ocurrió un error al enviar tu solicitud. Intenta nuevamente.");
+                redeemButton.disabled = false;
             }
         });
-
-        console.log("✅ Loyalty card reset to zero after redemption.");
-        alert("Premios enviados, espera confirmación de nuestro equipo.");
-        document.getElementById("redeemRewardsModal").style.display = "none";
-        loadUserProfile(user.uid);
-
-    } catch (error) {
-        console.error("❌ Error al enviar premios:", error);
-        alert("Error al enviar tu solicitud. Intenta nuevamente.");
-        redeemButton.disabled = false;
     }
 });
+
 
 
                 // Optional: send notification to admin
