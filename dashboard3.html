@@ -1152,7 +1152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         redeemForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    redeemButton.disabled = true;
+    redeemButton.disabled = true; // Prevent double clicks
 
     const user = firebase.auth().currentUser;
     if (!user) {
@@ -1190,6 +1190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         redeemButton.disabled = false;
     }
 });
+
 
                 // Optional: send notification to admin
                 sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
