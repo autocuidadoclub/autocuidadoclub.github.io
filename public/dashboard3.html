@@ -431,12 +431,32 @@ async function validateReferralEmailGlobal(referralEmail) {
         
 // ✅ Notificación Interna del Dashboard
 function showDashboardNotification(message) {
-    const popup = document.getElementById("notificationPopup");
-    const messageEl = document.getElementById("notificationMessage");
-    if (!popup || !messageEl) return;
-    messageEl.textContent = message;
-    popup.style.display = "block";
-    setTimeout(() => popup.style.display = "none", 4000);
+  const existing = document.getElementById("notificationPopup");
+  if (existing) existing.remove(); // remove old one if present
+
+  const popup = document.createElement("div");
+  popup.id = "notificationPopup";
+  popup.innerHTML = `
+    <div style="
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #003366;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 9999;
+      max-width: 300px;
+      font-size: 14px;
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span>${message}</span>
+        <span style="cursor:pointer; font-weight:bold; margin-left: 10px;" onclick="document.getElementById('notificationPopup').remove()">✖</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(popup);
 }
 
 function sendEmail(destinationEmail, subject, acmessage) {
