@@ -51,6 +51,19 @@ table td, table th {
     📥 Exportar Todos los Referidos a Excel
 </button>
 
+
+  <button onclick="exportAllUsersToExcel()" style="
+  margin-top: 20px;
+  background-color: #00695c;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+">
+📊 Exportar Todos los Usuarios a Excel
+</button>
+
   
   <section id="restricted-content" style="display: none;">
     <h2>Panel de Gestión para el Staff</h2>
@@ -388,7 +401,54 @@ async function exportAllReferralsToExcel() {
     }
 }
 
+async function exportAllUsersToExcel() {
+  try {
+    const usersSnapshot = await db.collection("users").get();
 
+    if (usersSnapshot.empty) {
+      alert("No hay usuarios registrados.");
+      return;
+    }
+
+    const allUsers = [];
+
+    for (const doc of usersSnapshot.docs) {
+      const user = doc.data();
+
+      const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "";
+      const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "";
+      const referralCount = (user.referrals && Array.isArray(user.referrals)) ? user.referrals.length : 0;
+
+      allUsers.push({
+        "Nombre": user.name || "",
+        "Email": user.email || "",
+        "Teléfono": user.phone || "",
+        "Plan": user.planType || "",
+        "Estado de Pago": user.paymentStatus || "",
+        "Meses Pagados": user.monthsPaid ?? 0,
+        "Departamento": user.department || "",
+        "Municipio": user.municipality || "",
+        "Fecha de Registro": registrationDate,
+        "Fecha de Pago": paymentDate,
+        "Cantidad de Referidos": referralCount
+      });
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(allUsers);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Usuarios");
+
+    const fileName = `Usuarios_AutoCuidado_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+
+    alert("✅ Exportación de usuarios completada.");
+  } catch (error) {
+    console.error("❌ Error exportando usuarios:", error);
+    alert("Error al exportar los usuarios.");
+  }
+}
+
+    
     function getPaymentHistoryByEmail() {
   const email = document.getElementById("searchEmail").value.trim();
   if (!email) return alert("Escribe el correo del cliente.");
