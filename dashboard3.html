@@ -835,6 +835,7 @@ const registrationDate = userData.registrationDate?.toDate?.() || null;
 updateLoyaltyCard(userData);
     showFreeRescheduleOffer(userData);
 checkFirstTimePaymentOffer(userData); // ✅ add this here
+showSmartFollowupMessage(userData); // ✅ Add this here
 }
 
   // ✅ Function to close the popup
@@ -1630,7 +1631,72 @@ async function submitAdditionalVehicles() {
     }
 }
         
-        
+function showSmartFollowupMessage(userData) {
+  if (!userData || userData.paymentStatus !== "Pending" || !userData.registrationDate) return;
+
+  const now = new Date();
+  const regDate = userData.registrationDate.toDate ? userData.registrationDate.toDate() : new Date(userData.registrationDate.seconds * 1000);
+  const hoursPassed = (now - regDate) / (1000 * 60 * 60);
+
+  let message = "";
+  let tag = "";
+
+  if (hoursPassed >= 2 && hoursPassed < 24) {
+    message = "👋 ¿Te llegó la información? Queremos saber si esta solución se ajusta a lo que necesitas.";
+    tag = "silent_2h";
+  } else if (hoursPassed >= 24 && hoursPassed < 48) {
+    message = "📩 ¿Tienes dudas sobre cómo te ayudamos a lograr una rutina sin estrés con tu vehículo?";
+    tag = "silent_24h";
+  } else if (hoursPassed >= 48) {
+    message = "⌛ Sabemos que tu agenda es ocupada. Si necesitas apoyo para el pago o tienes preguntas, estamos aquí.";
+    tag = "silent_48h";
+  }
+
+  if (message) {
+    showDashboardNotification(message);
+
+    if (typeof _pe !== "undefined") {
+      _pe.tagPushSubscriber(tag);
+      console.log(`📬 PushEngage tag applied: ${tag}`);
+    }
+
+    showFollowUpCard();
+  }
+}
+
+function showFollowUpCard() {
+  const existing = document.getElementById("followUpCard");
+  if (existing) return;
+
+  const paymentCard = document.querySelector(".countdown-container");
+  if (!paymentCard) return;
+
+  const followUp = document.createElement("div");
+  followUp.id = "followUpCard";
+  followUp.style.cssText = `
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+  `;
+
+  followUp.innerHTML = `
+    <h4 style="margin-top:0;">¿Aún tienes dudas antes de pagar?</h4>
+    <ul style="padding-left: 20px; margin-top: 10px; margin-bottom: 15px;">
+      <li>✅ ¿Ya revisaste todos los beneficios?</li>
+      <li>💬 ¿Quieres agendar una llamada rápida con nuestro staff?</li>
+      <li>🎁 Tu bono especial de bienvenida sigue activo.</li>
+    </ul>
+    <button onclick="window.open('contacto.html', '_blank');" class="orange-button">
+      Hablar con un asesor ahora
+    </button>
+  `;
+
+  paymentCard.parentNode.insertBefore(followUp, paymentCard.nextSibling);
+}
+
+
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   
