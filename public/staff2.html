@@ -52,16 +52,16 @@ table td, table th {
 </button>
 
 
-  <button onclick="exportAllUsersToExcel()" style="
+button onclick="exportAllUsersToExcel()" style="
   margin-top: 20px;
-  background-color: #00695c;
+  background-color: #336699;
   color: white;
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 ">
-📊 Exportar Todos los Usuarios a Excel
+📥 Exportar Todos los Usuarios a Excel
 </button>
 
   
@@ -401,52 +401,93 @@ async function exportAllReferralsToExcel() {
     }
 }
 
+<script>
 async function exportAllUsersToExcel() {
   try {
-    const usersSnapshot = await db.collection("users").get();
-
-    if (usersSnapshot.empty) {
-      alert("No hay usuarios registrados.");
+    const snapshot = await db.collection("users").get();
+    if (snapshot.empty) {
+      alert("No hay usuarios para exportar.");
       return;
     }
 
-    const allUsers = [];
+    const data = [];
 
-    for (const doc of usersSnapshot.docs) {
+    snapshot.forEach(doc => {
       const user = doc.data();
+      const userId = doc.id;
 
-      const registrationDate = user.registrationDate?.toDate().toLocaleDateString("es-ES") || "";
-      const paymentDate = user.paymentDate?.toDate().toLocaleDateString("es-ES") || "";
-      const referralCount = (user.referrals && Array.isArray(user.referrals)) ? user.referrals.length : 0;
-
-      allUsers.push({
+      const commonFields = {
+        "UID": userId,
         "Nombre": user.name || "",
         "Email": user.email || "",
         "Teléfono": user.phone || "",
-        "Plan": user.planType || "",
-        "Estado de Pago": user.paymentStatus || "",
-        "Meses Pagados": user.monthsPaid ?? 0,
         "Departamento": user.department || "",
         "Municipio": user.municipality || "",
-        "Fecha de Registro": registrationDate,
-        "Fecha de Pago": paymentDate,
-        "Cantidad de Referidos": referralCount
-      });
-    }
+        "Plan": user.planType || "",
+        "Estado de Suscripción": user.subscriptionStatus || "",
+        "Estado de Pago": user.paymentStatus || "",
+        "Fecha de Registro": user.registrationDate?.toDate().toLocaleDateString("es-ES") || "",
+        "Fecha de Pago": user.paymentDate?.toDate().toLocaleDateString("es-ES") || "",
+        "Próximo Pago": user.nextPaymentDate?.toDate().toLocaleDateString("es-ES") || "",
+        "Meses Pagados": user.monthsPaid || 0,
+        "Premios Redimidos": user.rewardsRedeemed ? "✅ Sí" : "❌ No",
+        "Premio Enviado": user.rewardsUnlockedEmailSent ? "✅ Sí" : "❌ No",
+        "Ciclo de Lealtad": user.loyaltyCycle || 0,
+        "Intentos No Redimir": user.loyaltyNoClickCount || 0,
+        "Nota de Staff": user.staffLastChangeNote || "",
+        "Horario Actual": user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "",
+        "Horario Seleccionado": user.selectedSchedule || ""
+      };
 
-    const worksheet = XLSX.utils.json_to_sheet(allUsers);
+      const paymentHistory = user.paymentHistory || [];
+      const redeem = user.redeemRequest || {};
+
+      // Si no hay vehículos, igual lo agregamos como una fila
+      if (!user.vehicles || user.vehicles.length === 0) {
+        data.push({
+          ...commonFields,
+          "Marca Vehículo": "",
+          "Modelo": "",
+          "Año": "",
+          "Placa": "",
+          "Premio Redimido - Nombre": redeem.name || "",
+          "Premio Redimido - Teléfono": redeem.phone || "",
+          "Premio Redimido - Mes": redeem.month || "",
+          "Premio Redimido - Fecha": redeem.timestamp?.toDate().toLocaleString("es-ES") || "",
+          "Historial de Pagos": paymentHistory.length
+        });
+      } else {
+        user.vehicles.forEach(vehicle => {
+          data.push({
+            ...commonFields,
+            "Marca Vehículo": vehicle.brand || "",
+            "Modelo": vehicle.model || "",
+            "Año": vehicle.year || "",
+            "Placa": vehicle.plate || "",
+            "Premio Redimido - Nombre": redeem.name || "",
+            "Premio Redimido - Teléfono": redeem.phone || "",
+            "Premio Redimido - Mes": redeem.month || "",
+            "Premio Redimido - Fecha": redeem.timestamp?.toDate().toLocaleString("es-ES") || "",
+            "Historial de Pagos": paymentHistory.length
+          });
+        });
+      }
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Usuarios");
 
-    const fileName = `Usuarios_AutoCuidado_${new Date().toISOString().slice(0, 10)}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
+    const exportFileName = `Usuarios_Completos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(workbook, exportFileName);
 
-    alert("✅ Exportación de usuarios completada.");
+    alert("✅ Exportación completada con éxito.");
   } catch (error) {
-    console.error("❌ Error exportando usuarios:", error);
-    alert("Error al exportar los usuarios.");
+    console.error("❌ Error al exportar usuarios:", error);
+    alert("Error al exportar usuarios. Revisa la consola.");
   }
 }
+</script>
 
     
     function getPaymentHistoryByEmail() {
