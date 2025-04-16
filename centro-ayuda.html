@@ -260,40 +260,71 @@
     });
   </script>
 
-  <div id="install-banner">
-    ¿Quieres instalar AutoCuidado Club en tu pantalla de inicio?
-    <button id="install-btn">Instalar</button>
-  </div>
-
-  <script>
-    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-    const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
-
-    if (isIos && !isInStandaloneMode) {
-      document.getElementById('install-banner').style.display = 'block';
-    }
-
-    document.getElementById('install-btn').addEventListener('click', () => {
-      alert('Para instalar, presiona el botón de compartir y elige "Agregar a pantalla de inicio".');
-    });
-  </script>
-
-  <div id="installBanner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 12px; font-size: 14px; z-index: 999;">
-  ¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular. 
-  <button onclick="dismissInstallBanner()" style="margin-left: 10px; background: white; color: #ff9800; border: none; padding: 6px 10px; border-radius: 5px;">Cerrar</button>
+<!-- iOS Install Banner -->
+<div id="install-banner-ios" style="display: none; background: #007bff; color: white; padding: 10px; text-align: center; font-size: 14px;">
+  ¿Quieres instalar AutoCuidado Club en tu pantalla de inicio?
+  <button id="install-btn-ios" style="margin-left: 10px; background: white; color: #007bff; border: none; padding: 6px 10px; border-radius: 5px;">¿Cómo instalar?</button>
 </div>
 
-<script>
-  function dismissInstallBanner() {
-    document.getElementById('installBanner').style.display = 'none';
-  }
-</script>
+<!-- General Bottom Banner -->
+<div id="install-banner-general" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 12px; font-size: 14px; z-index: 999;">
+  ¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular. 
+  <button onclick="document.getElementById('install-banner-general').style.display = 'none';" style="margin-left: 10px; background: white; color: #ff9800; border: none; padding: 6px 10px; border-radius: 5px;">Cerrar</button>
+</div>
 
-  <div class="mobile-nav">
+<!-- Mobile Navigation -->
+<div class="mobile-nav">
   <a href="#inicio">Inicio</a>
   <a href="#planes">Suscribirme</a>
   <a href="#contacto">Contacto</a>
 </div>
 
+<!-- Final CTA Block -->
+<div style="text-align: center; padding: 30px 20px; background: #f1f1f1; margin-top: 40px;">
+  <h3 style="margin-bottom: 10px;">¿Quieres acceder más rápido?</h3>
+  <p style="margin-bottom: 20px;">Instala <strong>AutoCuidado Club</strong> como aplicación y disfruta la experiencia completa.</p>
+  <button onclick="alert('Desde tu navegador, presiona el botón de compartir y selecciona “Agregar a pantalla de inicio”')" style="background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px;">¿Cómo instalar?</button>
+</div>
+
+<!-- Script -->
+<script>
+  const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+  if (isIos && !isInStandaloneMode) {
+    document.getElementById('install-banner-ios').style.display = 'block';
+  }
+
+  document.getElementById('install-btn-ios').addEventListener('click', () => {
+    alert('Desde tu navegador, presiona el botón de compartir y selecciona “Agregar a pantalla de inicio”');
+  });
+</script>
+
+<!-- Mobile Nav CSS -->
+<style>
+  @media only screen and (max-width: 768px) {
+    .mobile-nav {
+      position: fixed;
+      bottom: 60px;
+      width: 100%;
+      background: #fff;
+      border-top: 1px solid #ccc;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    .mobile-nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      font-size: 14px;
+    }
+  }
+</style>
+
+  
+  
 </body>
 </html>
