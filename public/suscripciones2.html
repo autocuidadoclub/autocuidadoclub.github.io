@@ -1045,12 +1045,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const vehicles = [];
         document.querySelectorAll(".vehicle-entry").forEach(entry => {
             vehicles.push({
-                plate: entry.querySelector(".plate").value,
-                model: entry.querySelector(".model").value,
-                brand: entry.querySelector(".brand").value,
-                year: entry.querySelector(".year").value
+                plate: entry.querySelector(".plate").value || "",
+                model: entry.querySelector(".model").value || "",
+                brand: entry.querySelector(".brand").value || "",
+                year: entry.querySelector(".year").value || "",
+                inspectionDates: []  // ✅ Inicializa campo vacío
             });
         });
+
 
         if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
             alert("❌ Todos los campos son obligatorios.");
