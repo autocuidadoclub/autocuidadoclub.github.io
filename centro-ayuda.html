@@ -278,5 +278,17 @@
     });
   </script>
 
+  <div id="installBanner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 12px; font-size: 14px; z-index: 999;">
+  ¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular. 
+  <button onclick="dismissInstallBanner()" style="margin-left: 10px; background: white; color: #ff9800; border: none; padding: 6px 10px; border-radius: 5px;">Cerrar</button>
+</div>
+
+<script>
+  function dismissInstallBanner() {
+    document.getElementById('installBanner').style.display = 'none';
+  }
+</script>
+
+  
 </body>
 </html>
