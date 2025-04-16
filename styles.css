@@ -94,12 +94,26 @@ button {
 
 /* Responsive Navbar */
 @media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+     .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 1000;
+  }
 
-    .nav-links {
+  .mobile-nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 14px;
+  }
+    
+       .nav-links {
         flex-direction: column;
         gap: 10px;
     }
