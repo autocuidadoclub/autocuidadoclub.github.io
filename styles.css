@@ -1895,3 +1895,14 @@ html, body {
   width: 100vw;        /* force full‑viewport width */
   max-width: 100%;
 }
+
+section, .pricing-table, .info-block {
+  padding: 24px 16px;
+  margin-bottom: 20px;
+}
+
+h2, h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-size: 20px;
+}
