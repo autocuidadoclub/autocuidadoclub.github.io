@@ -64,7 +64,12 @@ table td, table th {
 📥 Exportar Todos los Usuarios a Excel
 </button>
 
-  
+<div id="vehicleInspectionSection" style="margin-top: 20px;">
+  <h4>📅 Inspecciones por Vehículo</h4>
+  <div id="vehicleInspectionList"></div>
+</div>
+
+ 
   <section id="restricted-content" style="display: none;">
     <h2>Panel de Gestión para el Staff</h2>
 
@@ -813,6 +818,8 @@ function selectScheduleBox(cell) {
       document.getElementById("currentDepartment").innerText = user.department || "-";
       document.getElementById("currentSchedule").innerText = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
       document.getElementById("staffControlForm").style.display = "block";
+      renderVehicleInspections(user.vehicles || [], selectedStaffUserId);
+
      
       if (user.staffLastChangeNote) {
   const note = document.createElement("p");
@@ -932,6 +939,73 @@ function showCustomAlert(message, type = "success") {
   }, 3000);
 }
 
+function renderVehicleInspections(vehicles, userId) {
+  const container = document.getElementById("vehicleInspectionList");
+  container.innerHTML = "";
+
+  if (!vehicles || vehicles.length === 0) {
+    container.innerHTML = "<p>🚘 No hay vehículos registrados.</p>";
+    return;
+  }
+
+  vehicles.forEach((vehicle, index) => {
+    const vehicleBox = document.createElement("div");
+    vehicleBox.style.border = "1px solid #ccc";
+    vehicleBox.style.padding = "10px";
+    vehicleBox.style.marginBottom = "15px";
+    vehicleBox.innerHTML = `
+      <strong>Vehículo ${index + 1}:</strong> ${vehicle.brand} ${vehicle.model} (${vehicle.plate})<br>
+      <label>📅 Nueva Fecha de Inspección:</label>
+      <input type="date" id="newInspectionDate${index}" />
+      <input type="text" id="inspectionNote${index}" placeholder="Nota (opcional)" />
+      <button onclick="saveInspectionDate('${userId}', ${index})">Agregar</button>
+      <div><strong>Historial:</strong><br>${
+        vehicle.inspectionDates && vehicle.inspectionDates.length > 0
+          ? vehicle.inspectionDates.map(entry => `✔️ ${entry.date} (${entry.note || "Sin nota"})`).join("<br>")
+          : "Sin inspecciones registradas."
+      }</div>
+    `;
+    container.appendChild(vehicleBox);
+  });
+}
+
+function saveInspectionDate(userId, vehicleIndex) {
+  const dateInput = document.getElementById(`newInspectionDate${vehicleIndex}`).value;
+  const noteInput = document.getElementById(`inspectionNote${vehicleIndex}`).value;
+
+  if (!dateInput) {
+    alert("Por favor selecciona una fecha.");
+    return;
+  }
+
+  const userRef = db.collection("users").doc(userId);
+
+  userRef.get().then(doc => {
+    if (!doc.exists) return alert("Usuario no encontrado.");
+
+    const data = doc.data();
+    const vehicles = data.vehicles || [];
+
+    if (!vehicles[vehicleIndex]) return alert("Vehículo no válido.");
+
+    if (!vehicles[vehicleIndex].inspectionDates) {
+      vehicles[vehicleIndex].inspectionDates = [];
+    }
+
+    vehicles[vehicleIndex].inspectionDates.push({
+      date: dateInput,
+      note: noteInput || ""
+    });
+
+    userRef.update({ vehicles }).then(() => {
+      alert("✅ Inspección agregada.");
+      loadStaffUser(); // Refresh
+    }).catch(err => {
+      console.error("❌ Error al guardar inspección:", err);
+      alert("Error al guardar inspección.");
+    });
+  });
+}
 
     
   </script>
