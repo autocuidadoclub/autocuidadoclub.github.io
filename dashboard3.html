@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1970,6 +1969,33 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
 .subscription-blurred #subscription-upgrade-card > h3:hover {
   color: #ff6600;
   cursor: pointer;
+}
+
+      @media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card, .referral-submission-section, .referral-progress-section, .loyalty-card, .rewards {
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    width: 100% !important;
+  }
+
+  .floating-contact-button {
+    bottom: 15px;
+    right: 15px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .cta-button {
+    width: 100%;
+  }
+
+  .schedule-table {
+    font-size: 12px;
+  }
 }
 
 
