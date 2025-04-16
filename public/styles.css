@@ -1883,3 +1883,15 @@ body {
   font-weight: bold;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* prevent horizontal overflow */
+}
+
+.main‑wrapper, .dashboard‑container, .dashboard‑grid {
+  box‑sizing: border‑box;
+  width: 100vw;        /* force full‑viewport width */
+  max-width: 100%;
+}
