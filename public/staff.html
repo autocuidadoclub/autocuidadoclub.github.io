@@ -9,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
 </head>
 
   <style>
@@ -38,6 +39,32 @@ table td, table th {
     <h1>Gestión de Clientes</h1>
   </header>
 
+  <button onclick="exportAllReferralsToExcel()" style="
+    margin-top: 20px;
+    background-color: #003366;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+">
+    📥 Exportar Todos los Referidos a Excel
+</button>
+
+
+<button onclick="exportAllUsersToExcel()" style="
+  margin-top: 20px;
+  background-color: #336699;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+">
+📥 Exportar Todos los Usuarios a Excel
+</button>
+
+  
   <section id="restricted-content" style="display: none;">
     <h2>Panel de Gestión para el Staff</h2>
 
@@ -114,6 +141,8 @@ table td, table th {
     <p>Departamento actual: <span id="currentDepartment">-</span></p>
     <p>Horario actual: <span id="currentSchedule">-</span></p>
 
+    <h4>Deseas confimar pago?<h4>
+    <p><button onclick="confirmPayment(selectedStaffUserId)">Confirmar Pago</button><br></p>
     <h4>Seleccione Nuevo Horario:</h4>
     <table class="schedule-table">
             <thead>
@@ -315,8 +344,158 @@ function updatePaymentTable(user, userId) {
     </tr>`;
 }
 
+    function formatDate(timestamp) {
+  if (!timestamp || !timestamp.toDate) return "";
+  const date = timestamp.toDate();
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+function formatDateTime(timestamp) {
+  if (!timestamp || !timestamp.toDate) return "";
+  const date = timestamp.toDate();
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+async function exportAllReferralsToExcel() {
+    try {
+        const currentUser = firebase.auth().currentUser;
+        if (!currentUser) {
+            alert("Debes iniciar sesión para exportar referidos.");
+            return;
+        }
+
+        const referralsSnapshot = await db.collectionGroup("referrals").get();
+
+        if (referralsSnapshot.empty) {
+            alert("No hay referidos para exportar.");
+            return;
+        }
+
+        const data = [];
+
+        for (const doc of referralsSnapshot.docs) {
+            const referral = doc.data();
+
+            // Get parent document (referrer user)
+            const pathParts = doc.ref.path.split('/');
+            const userId = pathParts[1];
+
+            const userDoc = await db.collection("users").doc(userId).get();
+            const userData = userDoc.exists ? userDoc.data() : {};
+
+            data.push({
+                "Referrer Nombre": userData.name || "Desconocido",
+                "Referrer Email": userData.email || "Desconocido",
+                "Referrer Teléfono": userData.phone || "Desconocido",
+                "Nombre del Referido": referral.name || "",
+                "Correo del Referido": referral.email || "",
+                "WhatsApp del Referido": referral.phone || "",
+                "Estado 1: Info Enviada": referral.timestamp ? "✅" : "⏳",
+                "Estado 2: Registrado": referral.registered ? "✅" : "⏳",
+                "Estado 3: Pago Completado": referral.paid ? "✅" : "⏳",
+                "Fecha de Registro": referral.timestamp?.toDate().toLocaleString("es-ES") || "",
+            });
+        }
+
+        // Generate Excel
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Todos Referidos");
+
+        const exportFileName = `Todos_Referidos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        XLSX.writeFile(workbook, exportFileName);
+
+        alert("✅ Exportación global completada. Revisa tu archivo Excel.");
+
+    } catch (error) {
+        console.error("❌ Error al exportar referidos globales:", error);
+        alert("Error al exportar los referidos. Intenta nuevamente.");
+    }
+}
 
 
+async function exportAllUsersToExcel() {
+  try {
+    const snapshot = await db.collection("users").get();
+    const data = [];
+
+    for (const doc of snapshot.docs) {
+      const user = doc.data();
+
+      const row = {
+        UID: doc.id,
+        Nombre: user.name || "",
+        Email: user.email || "",
+        Teléfono: user.phone || "",
+        Departamento: user.department || "",
+        Municipio: user.municipality || "",
+        Plan: user.planType || "",
+        EstadoPago: user.paymentStatus || "",
+        MesesPagados: user.monthsPaid ?? 0,
+        EstadoSuscripción: user.subscriptionStatus || "",
+        FechaRegistro: formatDate(user.registrationDate),
+        FechaPago: formatDate(user.paymentDate),
+        PróximoPago: formatDate(user.nextPaymentDate),
+        ÚltimoCambioMunicipio: formatDate(user.lastMunicipalityChange),
+        ÚltimoCambioHorario: formatDate(user.lastReschedule),
+        ÚltimoCambioPlan: formatDate(user.lastPlanUpgradeDate),
+        ÚltimoResetLealtad: formatDate(user.lastLoyaltyReset),
+        "Premios Redimidos": user.rewardsRedeemed ? "✅ Sí" : "⏳ No",
+      };
+
+      // Agregar info del horario seleccionado
+      if (user.schedule) {
+        row.HorarioActual = `${user.schedule.day} - ${user.schedule.time}`;
+      } else {
+        row.HorarioActual = "No asignado";
+      }
+
+      // Agregar resumen vehículos
+      if (user.vehicles && Array.isArray(user.vehicles)) {
+        row.Vehículos = user.vehicles.map(v => `${v.plate} (${v.brand} ${v.model})`).join(" | ");
+      }
+
+      // Agregar resumen historial de pagos
+      if (user.paymentHistory && Array.isArray(user.paymentHistory)) {
+        row.HistorialPagos = user.paymentHistory.map(p =>
+          `${formatDate(p.date)} - $${p.amount} - ${p.method}`
+        ).join(" | ");
+      }
+
+      // Agregar info de redención (si existe)
+      if (user.redeemRequest) {
+        row.Redención_Nombre = user.redeemRequest.name || "";
+        row.Redención_Email = user.redeemRequest.email || "";
+        row.Redención_Teléfono = user.redeemRequest.phone || "";
+        row.Redención_Mes = user.redeemRequest.month || "";
+        row.Redención_Fecha = formatDateTime(user.redeemRequest.timestamp);
+      }
+
+      data.push(row);
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
+
+    const fileName = `Clientes_AutoCuidado_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+
+    alert("✅ Exportación completada.");
+  } catch (error) {
+    console.error("❌ Error exportando usuarios:", error);
+    alert("Error al exportar usuarios.");
+  }
+}
+    
     function getPaymentHistoryByEmail() {
   const email = document.getElementById("searchEmail").value.trim();
   if (!email) return alert("Escribe el correo del cliente.");
