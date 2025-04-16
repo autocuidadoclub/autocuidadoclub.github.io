@@ -1466,18 +1466,37 @@ button:hover, .orange-button:hover, .register-button:hover, .floating-contact-bu
 }
 
 /* ====== INSTALL BANNER FOR iOS ====== */
+/* Install Banner - AutoCuidado Club */
 #install-banner {
-    display: none;
-    background-color: var(--blue-darker);
-    color: var(--white);
-    text-align: center;
-    padding: 10px;
-    font-size: 0.95em;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: 999;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #ff6600;
+  color: white;
+  padding: 18px 10px;
+  font-size: 18px;
+  text-align: center;
+  box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  display: none;
 }
+
+#install-banner strong {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#close-banner {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
 
 #install-banner button {
     background: var(--white);
