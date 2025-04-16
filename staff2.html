@@ -448,7 +448,7 @@ async function exportAllUsersToExcel() {
         ÚltimoCambioHorario: formatDate(user.lastReschedule),
         ÚltimoCambioPlan: formatDate(user.lastPlanUpgradeDate),
         ÚltimoResetLealtad: formatDate(user.lastLoyaltyReset),
-        ¿Premios Redimidos?: user.rewardsRedeemed ? "✅ Sí" : "⏳ No",
+        "Premios Redimidos": user.rewardsRedeemed ? "✅ Sí" : "⏳ No",
       };
 
       // Agregar info del horario seleccionado
