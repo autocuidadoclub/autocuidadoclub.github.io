@@ -80,12 +80,14 @@
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
-        vehicles.push({
-            plate: entry.querySelector(".plate").value || "",
-            model: entry.querySelector(".model").value || "",
-            brand: entry.querySelector(".brand").value || "",
-            year: entry.querySelector(".year").value || ""
+       vehicles.push({
+    plate: entry.querySelector(".plate").value,
+    model: entry.querySelector(".model").value,
+    brand: entry.querySelector(".brand").value,
+    year: entry.querySelector(".year").value,
+    inspectionDates: [] // 🔧 Automatically include empty array
         });
+
     });
 
     if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
