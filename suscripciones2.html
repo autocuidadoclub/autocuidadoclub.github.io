@@ -251,16 +251,16 @@ if (registerButton) {
         vehicleEntry.innerHTML = `
             <h4>Vehículo ${i + 1}</h4>
             <label>Placa:</label>
-            <input type="text" class="plate" placeholder="Ej: P123-456" title="Ej: P123-456">
+            <input type="text" class="plate" placeholder="Ej: P123-456" title="Ej: P123-456" autocomplete="off" required>
 
             <label>Modelo:</label>
-            <input type="text" class="model" placeholder="Ej: Corolla" title="Ej: Corolla">
+            <input type="text" class="model" placeholder="Ej: Corolla" title="Ej: Corolla" autocomplete="off" required>
 
             <label>Marca:</label>
-            <input type="text" class="brand" placeholder="Ej: Toyota" title="Ej: Toyota">
+            <input type="text" class="brand" placeholder="Ej: Toyota" title="Ej: Toyota" autocomplete="off" required>
 
             <label>Año:</label>
-            <input type="number" class="year" placeholder="Ej: 2020" title="Ej: 2020">
+            <input type="number" class="year" placeholder="Ej: 2020" title="Ej: 2020" autocomplete="off" required>
         `;
         vehicleContainer.appendChild(vehicleEntry);
     }
