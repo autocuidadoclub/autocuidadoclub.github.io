@@ -77,3 +77,34 @@ exports.sendReferralEmail = functions.https.onRequest(async (req, res) => {
 });
 
 // ✅ Add more functions for registration and payment notifications here.
+exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
+  try {
+    const { token_usuario, token_comercio, estado, correo_cliente } = req.body;
+
+    if (!token_usuario || !token_comercio || !correo_cliente || estado !== "EX") {
+      return res.status(400).send("Datos incompletos o transacción fallida.");
+    }
+
+    // Buscar el usuario por email
+    const usersRef = admin.firestore().collection("users");
+    const snapshot = await usersRef.where("email", "==", correo_cliente).limit(1).get();
+
+    if (snapshot.empty) {
+      return res.status(404).send("Usuario no encontrado en Firestore.");
+    }
+
+    const userRef = snapshot.docs[0].ref;
+
+    // Guardar tokens en subcolección "pagadito"
+    await userRef.collection("pagadito").doc("tokens").set({
+      token_usuario,
+      token_comercio,
+      creado: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return res.status(200).send("Tokens guardados exitosamente.");
+  } catch (error) {
+    console.error("❌ Error al guardar tokens:", error);
+    return res.status(500).send("Error del servidor.");
+  }
+});
