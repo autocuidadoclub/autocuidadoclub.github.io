@@ -239,6 +239,29 @@ if (registerButton) {
 
 };
 
+function isMobileDevice() {
+  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+planButtons.forEach(button => {
+    button.addEventListener("click", function () {
+        selectedPlanType = this.getAttribute("data-plan");
+        updateVehicleFields(selectedPlanType);
+        registrationContainer.style.display = "block";
+
+        if (isMobileDevice()) {
+            // Delay para móviles reales
+            setTimeout(() => {
+                registrationContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 300);
+        } else {
+            // Inmediato para desktop
+            registrationContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+    });
+});
 
            function updateVehicleFields(planType) {
     const vehicleContainer = document.getElementById("vehicle-container");
