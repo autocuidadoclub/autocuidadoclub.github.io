@@ -1715,6 +1715,20 @@ function showFollowUpCard() {
   paymentCard.parentNode.insertBefore(followUp, paymentCard.nextSibling);
 }
 
+  function checkOrientation() {
+    const banner = document.getElementById("rotateBanner");
+    const isPortrait = window.innerHeight > window.innerWidth;
+    if (isPortrait) {
+      banner.style.display = "block";
+    } else {
+      banner.style.display = "none";
+    }
+  }
+
+  window.addEventListener("load", checkOrientation);
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("orientationchange", checkOrientation);
+
 
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
@@ -2193,7 +2207,13 @@ html, body {
 
     </style>
 </head>
-<body>
+
+    <body>
+
+        <div id="rotateBanner" style="display: none; background-color: #ff9800; color: white; text-align: center; padding: 10px; font-weight: bold;">
+  📱 Para una mejor experiencia, gira tu teléfono a modo horizontal.
+</div>
+
     <!-- Navigation -->
     <nav class="navbar">
         <ul class="nav-links">
@@ -2383,8 +2403,9 @@ html, body {
   </div>
 </div>
     
- <div>   
+<div class="dashboard-section">
   <div id="addVehicleForm" style="margin-top: 20px;">
+
   <h3><i class="fas fa-car"></i> Mis Vehículos Registrados</h3>
       <h4>Añadir Nuevo Vehículo</h4>
     <label for="newBrand">Marca:</label>
@@ -2466,7 +2487,8 @@ html, body {
 </button>
     </div>
 
-<section class="referral-progress-section">
+<div class="dashboard-section">
+        <section class="referral-progress-section">
   <h2>Mi Progreso de Referidos</h2>
   <p>Comparte los datos de tus referidos directamente desde tu panel, y sigue su progreso hasta obtener tu recompensa 🎁</p>
 <section class="referral-submission-section">
@@ -2486,7 +2508,8 @@ html, body {
     <button type="submit">Enviar Referido 🎉</button>
   </form>
 </section>
-    
+</div>
+        
   <div id="referralList">
     <p>Cargando tus referidos...</p>
   </div>
@@ -2494,6 +2517,7 @@ html, body {
 
     
     <!-- Loyalty Rewards Section -->
+        <div class="dashboard-section">
         <div class="card">
             <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
             <div class="loyalty-card">
@@ -2522,7 +2546,8 @@ html, body {
             </div>
 
            <!-- Rewards -->
-<div class="rewards">
+<div class="dashboard-section">
+  <div class="rewards">
     <h3><i class="fas fa-gift"></i> Premios Disponibles 
         <span class="reward-status locked" style="margin-left:10px;"><i class="fas fa-lock"></i> Bloqueado</span>
          <!-- 🎁 Redeem Rewards Button -->
@@ -2568,7 +2593,8 @@ html, body {
     
         </div>
     </div>
-   
+    </div>
+    </div>   
 
 <!-- 🎁 Redeem Rewards Modal Form -->
 <div id="redeemConfirmationPopup" style="
@@ -2593,7 +2619,8 @@ html, body {
 </div>
 
     <!-- 🎁 Redeem Rewards Modal Form -->
-<div id="redeemRewardsModal" style="
+<div class="dashboard-section">
+    <div id="redeemRewardsModal" style="
     display: none;
     position: fixed;
     top: 50%;
@@ -2626,7 +2653,7 @@ html, body {
         <button type="button" onclick="document.getElementById('redeemRewardsModal').style.display='none';" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px; margin-top: 10px;">Cancelar</button>
     </form>
 </div>
-
+</div>
 
 <script>
 // 🎉 Open Redeem Modal
