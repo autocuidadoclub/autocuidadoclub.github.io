@@ -8,22 +8,29 @@
 <body>
   <h2>Simulación de pago en AutoCuidado Club</h2>
 <form method="POST" action="https://www.pagadito.com/comercios/button.php" target="_blank">
-  <!-- Credenciales de producción -->
+  <!-- Tus credenciales -->
   <input type="hidden" name="uid" value="98f7beafd87befc5110980de6a9c733d">
   <input type="hidden" name="wsk" value="132e7730671be4be41ac34c5e277dd88">
+  <input type="hidden" name="env" value="sandbox"><!-- Quitar si es producción -->
 
-  <!-- Detalles del producto real -->
-  <input type="hidden" name="nombre_item_1" value="Suscripción AutoCuidado Club">
-  <input type="hidden" name="descripcion_item_1" value="Prueba real de suscripción AutoCuidado">
+  <!-- Info de prueba -->
+  <input type="hidden" name="nombre_item_1" value="Prueba AutoCuidado">
+  <input type="hidden" name="descripcion_item_1" value="Pago de prueba para obtener token de Pagadito">
   <input type="hidden" name="precio_item_1" value="1.00">
   <input type="hidden" name="cantidad_item_1" value="1">
 
-  <!-- URLs de redirección -->
+  <!-- Redirecciones -->
   <input type="hidden" name="url_respuesta" value="https://autocuidadoclub.com/gracias.html">
-  <input type="hidden" name="url_confirmacion" value="https://autocuidadoclub.com/confirmacion">
 
-  <button type="submit">Pagar $1 con Pagadito</button>
+  <!-- EN EL SIGUIENTE PASO configuramos esta URL para que reciba el token -->
+  <input type="hidden" name="url_confirmacion" value="https://us-central1-TU_PROYECTO.cloudfunctions.net/guardarTokenPagadito">
+
+  <!-- Email del cliente (para mapear usuario en Firestore) -->
+  <input type="hidden" name="correo_cliente" value="cliente@autocuidadoclub.com">
+
+  <button type="submit">Probar Pago $1 - Pagadito Express</button>
 </form>
+
 
 
 </body>
