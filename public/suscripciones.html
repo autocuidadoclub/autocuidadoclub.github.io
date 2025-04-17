@@ -79,14 +79,12 @@
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
-       vehicles.push({
-    plate: entry.querySelector(".plate").value,
-    model: entry.querySelector(".model").value,
-    brand: entry.querySelector(".brand").value,
-    year: entry.querySelector(".year").value,
-    inspectionDates: [] // 🔧 Automatically include empty array
+        vehicles.push({
+            plate: entry.querySelector(".plate").value || "",
+            model: entry.querySelector(".model").value || "",
+            brand: entry.querySelector(".brand").value || "",
+            year: entry.querySelector(".year").value || ""
         });
-
     });
 
     if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
@@ -132,28 +130,6 @@
 
             // ✅ Save user profile
             return db.collection("users").doc(userId).set(userData).then(() => {
-                // ✅ Send email notification to info@autocuidadoclub.com
-fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-    method: "POST",
-    headers: { 
-        'Content-Type': 'application/json' 
-    },
-    body: JSON.stringify({
-        name: name,
-        email: email,
-        phone: phone,
-        subject: "new register in the platafform",
-        message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
-    })
-})
-.then(response => {
-    if (response.ok) {
-        console.log("✅ Email enviado a info@autocuidadoclub.com");
-    } else {
-        console.warn("⚠️ No se pudo enviar el email.");
-    }
-})
-.catch(error => console.error("❌ Error al enviar email:", error));
               
                           });
         })
@@ -987,7 +963,7 @@ body, html {
   <div class="loader"></div>
 </div>
     
- 
+
             <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
@@ -1036,14 +1012,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const vehicles = [];
         document.querySelectorAll(".vehicle-entry").forEach(entry => {
             vehicles.push({
-                plate: entry.querySelector(".plate").value || "",
-                model: entry.querySelector(".model").value || "",
-                brand: entry.querySelector(".brand").value || "",
-                year: entry.querySelector(".year").value || "",
-                inspectionDates: []  // ✅ Inicializa campo vacío
+                plate: entry.querySelector(".plate").value,
+                model: entry.querySelector(".model").value,
+                brand: entry.querySelector(".brand").value,
+                year: entry.querySelector(".year").value
             });
         });
-
 
         if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
             alert("❌ Todos los campos son obligatorios.");
@@ -1176,27 +1150,6 @@ setTimeout(() => {
     console.error("❌ Error en el registro:", error.message);
     alert("❌ Error en el registro: " + error.message);
 });
-
-                function sendEmail(destinationEmail, subject, acmessage) {
-    const styledMessage = `
-        ${acmessage}
-        <br><br>
-        Síguenos en nuestras redes sociales:<br>
-        📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
-        📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
-        💬 WhatsApp: https://wa.me/50376064756
-    `;
-
-    return fetch("https://formsubmit.co/ajax/" + destinationEmail, {
-        method: 'POST',
-        body: new URLSearchParams({
-            email: destinationEmail,
-            subject,
-            message: styledMessage
-        })
-    });
-}
-
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
 // ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
