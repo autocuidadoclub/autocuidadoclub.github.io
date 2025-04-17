@@ -1014,119 +1014,103 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ✅ Modify registerUser function to use selectedPlanType
-   window.registerUser = async function(event) {
-    event.preventDefault();
+    window.registerUser = function(event) {
+        event.preventDefault();
 
-    if (!selectedPlanType) {
-        alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
-        return;
-    }
+        if (!selectedPlanType) {
+            alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
+            return;
+        }
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const department = document.getElementById("department").value;
-    const municipality = document.getElementById("municipality").value;
-    const selectedDay = document.getElementById("selectedDay").value;
-    const selectedTime = document.getElementById("selectedTime").value;
-    const referralCode = document.getElementById("referralCode").value.trim();
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
 
-    const vehicles = [];
-    document.querySelectorAll(".vehicle-entry").forEach(entry => {
-        vehicles.push({
-            plate: entry.querySelector(".plate").value || "",
-            model: entry.querySelector(".model").value || "",
-            brand: entry.querySelector(".brand").value || "",
-            year: entry.querySelector(".year").value || "",
-            inspectionDates: []
+        const selectedDay = document.getElementById("selectedDay").value;
+        const selectedTime = document.getElementById("selectedTime").value;
+         const referralCode = document.getElementById("referralCode").value.trim();
+
+        const vehicles = [];
+        document.querySelectorAll(".vehicle-entry").forEach(entry => {
+            vehicles.push({
+                plate: entry.querySelector(".plate").value || "",
+                model: entry.querySelector(".model").value || "",
+                brand: entry.querySelector(".brand").value || "",
+                year: entry.querySelector(".year").value || "",
+                inspectionDates: []  // ✅ Inicializa campo vacío
+            });
         });
-    });
 
-    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-        alert("❌ Todos los campos son obligatorios.");
-        return;
-    }
 
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+            alert("❌ Todos los campos son obligatorios.");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
         const userId = userCredential.user.uid;
         const paymentDate = new Date();
         const nextPaymentDate = new Date();
         nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-        const messaging = firebase.messaging();
-        const token = await messaging.getToken({
-            vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-        });
+    const messaging = firebase.messaging();
+          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
+  .then((token) => {
+    console.log("✅ pushToken obtenido:", token);
+   return db.collection("users").doc(userId).set({
+  uid: userId,
+  name,
+  email,
+  phone,
+  planType: selectedPlanType,
+  department,
+  municipality,
+  registrationDate: firebase.firestore.Timestamp.now(),
+  lastUpgradeDate: firebase.firestore.Timestamp.now(),
+  schedule: {
+    day: selectedDay,
+    time: selectedTime
+  },
+  paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+  nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+  paymentStatus: "Pending",
+  subscriptionStatus: "active",
+  monthsPaid: 0,
+  vehicles,
+  freeRescheduleClaimed: false,
+  referredBy: referredByEmail,
 
-        console.log("✅ pushToken obtenido:", token);
+  // 🧩 Loyalty Program Fields
+  loyaltyCycle: 0,
+  lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+  paymentHistory: []
+});
 
-        await db.collection("users").doc(userId).set({
-            uid: userId,
-            name,
-            email,
-            phone,
-            planType: selectedPlanType,
-            department,
-            municipality,
-            registrationDate: firebase.firestore.Timestamp.now(),
-            lastUpgradeDate: firebase.firestore.Timestamp.now(),
-            schedule: {
-                day: selectedDay,
-                time: selectedTime
-            },
-            paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-            nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-            paymentStatus: "Pending",
-            subscriptionStatus: "active",
-            monthsPaid: 0,
-            vehicles,
-            freeRescheduleClaimed: false,
-            referredBy: referralCode,
-            loyaltyCycle: 0,
-            lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-            paymentHistory: []
-        });
-
-        // ✅ Referral logic
-        if (referralCode && referralCode !== userId) {
-            await db.collection("referrals").doc(referralCode).set({
-                completed: firebase.firestore.FieldValue.increment(1),
-                bonuses: firebase.firestore.FieldValue.increment(1)
-            }, { merge: true });
-        }
-
-        // ✅ Send notification email to admin
-        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: name,
-                email: email,
-                phone: phone,
-                subject: "new register in the platafform",
-                message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
-            })
-        });
-
-        // ✅ PushEngage Tag
+       if (referralCode && referralCode !== userId) {
+        await db.collection("referrals").doc(referralCode).set({
+          completed: firebase.firestore.FieldValue.increment(1),
+          bonuses: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true });
         if (typeof _pe !== "undefined") {
-            _pe.tagPushSubscriber('not_paid_yet');
         }
+      }
 
-        // ✅ Success overlay
-        document.getElementById("successOverlay").style.display = "flex";
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 2500);
+      if (typeof _pe !== "undefined") {
+        _pe.tagPushSubscriber('not_paid_yet');
+      }
+
+      document.getElementById("successOverlay").style.display = "flex";
+      setTimeout(() => { window.location.href = "login.html"; }, 2500);
 
     } catch (error) {
-        console.error("❌ Error en el registro:", error.message);
-        alert("❌ Error en el registro: " + error.message);
+      console.error("❌ Error:", error);
+      alert("Error: " + error.message);
     }
-};
-
+  });
 
 
         function getNextMonthDate() {
