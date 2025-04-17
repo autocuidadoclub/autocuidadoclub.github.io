@@ -1178,6 +1178,27 @@ setTimeout(() => {
     alert("❌ Error en el registro: " + error.message);
 });
 
+                function sendEmail(destinationEmail, subject, acmessage) {
+    const styledMessage = `
+        ${acmessage}
+        <br><br>
+        Síguenos en nuestras redes sociales:<br>
+        📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+        📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+        💬 WhatsApp: https://wa.me/50376064756
+    `;
+
+    return fetch("https://formsubmit.co/ajax/" + destinationEmail, {
+        method: 'POST',
+        body: new URLSearchParams({
+            email: destinationEmail,
+            subject,
+            message: styledMessage
+        })
+    });
+}
+
+
 // ✅ Function to Update Vehicle Fields Based on Plan Type
 // ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
 function updateVehicleFields(planType) {
