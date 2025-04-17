@@ -1281,6 +1281,39 @@ termsCheckbox.addEventListener("change", function(event) {
                 
             </script>
 
+    
+<!-- Install Banner Adaptativo -->
+<div id="smart-install-banner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 14px; font-size: 16px; z-index: 999;">
+  <span>¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</span>
+  <button id="how-to-install-btn" style="margin-left: 10px; background: white; color: #ff9800; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold;">¿Cómo instalar?</button>
+  <button onclick="document.getElementById('smart-install-banner').style.display = 'none';" style="margin-left: 8px; background: transparent; color: white; border: 1px solid white; padding: 8px 12px; border-radius: 5px;">Cerrar</button>
+</div>
+
+<script>
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+
+  const installBtn = document.getElementById('how-to-install-btn');
+  const installBanner = document.getElementById('smart-install-banner');
+
+  // Solo mostrar si no es app instalada
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+  if (isStandalone) {
+    installBanner.style.display = 'none';
+  }
+
+  installBtn.addEventListener('click', () => {
+    if (isIos) {
+      alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+    } else if (isAndroid) {
+      alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
+    } else {
+      alert("Instalación no disponible en este dispositivo.");
+    }
+  });
+</script>
+
 <div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
   <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
     <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
