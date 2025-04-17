@@ -1,0 +1,29 @@
+<!-- test-pagadito.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pago de prueba AutoCuidado Club</title>
+</head>
+<body>
+  <h2>Simulación de pago en AutoCuidado Club</h2>
+  <form method="POST" action="https://www.pagadito.com/comercios/button.php">
+    <!-- Credenciales del comercio -->
+    <input type="hidden" name="uid" value="98f7beafd87befc5110980de6a9c733d">
+    <input type="hidden" name="wsk" value="132e7730671be4be41ac34c5e277dd88">
+    <input type="hidden" name="env" value="sandbox">
+
+    <!-- Producto de prueba -->
+    <input type="hidden" name="nombre_item_1" value="Suscripción Prueba AutoCuidado">
+    <input type="hidden" name="descripcion_item_1" value="Plan Básico Prueba (3 meses)">
+    <input type="hidden" name="precio_item_1" value="1.00">
+    <input type="hidden" name="cantidad_item_1" value="1">
+
+    <!-- Redirección -->
+    <input type="hidden" name="url_respuesta" value="https://autocuidadoclub.com/gracias.html">
+    <input type="hidden" name="url_confirmacion" value="https://autocuidadoclub.com/confirmacion">
+
+    <button type="submit">Pagar con Pagadito</button>
+  </form>
+</body>
+</html>
