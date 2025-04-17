@@ -1735,7 +1735,29 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Make sure all containers respect padding/margins */
+/* Set consistent max width and center content */
+.container,
+.standard-block,
+.dashboard-section,
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+/* Make sure sections align full width on mobile */
+@media (max-width: 768px) {
+  .container,
+  .standard-block,
+  .dashboard-section,
+  .dashboard-content {
+    padding: 0 10px;
+  }
+}
+
+      /* Make sure all containers respect padding/margins */
 .table-container {
   overflow-x: auto;
   width: 100%;
