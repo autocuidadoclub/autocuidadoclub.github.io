@@ -240,30 +240,33 @@ if (registerButton) {
 };
 
 
-            function updateVehicleFields(planType) {
-                const vehicleContainer = document.getElementById("vehicle-container");
-                vehicleContainer.innerHTML = "";
+           function updateVehicleFields(planType) {
+    const vehicleContainer = document.getElementById("vehicle-container");
+    vehicleContainer.innerHTML = "";
 
-                const maxVehicles = planType.includes("plus") ? 3 : 1;
-                for (let i = 0; i < maxVehicles; i++) {
-                    const vehicleEntry = document.createElement("div");
-                    vehicleEntry.classList.add("vehicle-entry");
-                    vehicleEntry.innerHTML = `
-                        <h4>Vehículo ${i + 1}</h4>
-                        <label>Placa:</label>
-                        <input type="text" class="plate" required>
-                        <label>Modelo:</label>
-                        <input type="text" class="model" required>
-                        <label>Marca:</label>
-                        <input type="text" class="brand" required>
-                        <label>Año:</label>
-                        <input type="number" class="year" required>
-                      `;
-                    vehicleContainer.appendChild(vehicleEntry);
-                }
+    const maxVehicles = planType.includes("plus") ? 3 : 1;
+    for (let i = 0; i < maxVehicles; i++) {
+        const vehicleEntry = document.createElement("div");
+        vehicleEntry.classList.add("vehicle-entry");
+        vehicleEntry.innerHTML = `
+            <h4>Vehículo ${i + 1}</h4>
+            <label>Placa:</label>
+            <input type="text" class="plate" placeholder="Ej: P123-456" title="Ej: P123-456">
 
-                console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
-            }
+            <label>Modelo:</label>
+            <input type="text" class="model" placeholder="Ej: Corolla" title="Ej: Corolla">
+
+            <label>Marca:</label>
+            <input type="text" class="brand" placeholder="Ej: Toyota" title="Ej: Toyota">
+
+            <label>Año:</label>
+            <input type="number" class="year" placeholder="Ej: 2020" title="Ej: 2020">
+        `;
+        vehicleContainer.appendChild(vehicleEntry);
+    }
+
+    console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
+}
         });
     </script>
 
