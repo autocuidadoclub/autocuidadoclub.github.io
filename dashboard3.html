@@ -1748,15 +1748,13 @@ html, body {
 }
 
 /* Make sure sections align full width on mobile */
-@media (max-width: 768px) {
-  .container,
-  .standard-block,
-  .dashboard-section,
-  .dashboard-content {
-    padding: 0 10px;
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    display: flex;
+    flex-direction: column;
   }
-}
-
+    
       /* Make sure all containers respect padding/margins */
 .table-container {
   overflow-x: auto;
@@ -1773,9 +1771,13 @@ html, body {
 
 .card {
   box-sizing: border-box;
-  padding-left: 15px;
-  padding-right: 15px;
+  width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+ min-height: 100px; /* or whatever minimum works */
+     border: 1px dashed red;
 }
+
 
         /* Styles for Loyalty Card */
         .loyalty-card {
