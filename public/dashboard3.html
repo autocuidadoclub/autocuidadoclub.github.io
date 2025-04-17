@@ -1723,6 +1723,31 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
 
     
   <style>
+      /* Prevent body overflow */
+body {
+  overflow-x: hidden;
+}
+
+/* Make sure all containers respect padding/margins */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 10px;
+}
+
+/* Optional: Set max width for the table if needed */
+.schedule-table {
+  min-width: 700px;
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+.card {
+  box-sizing: border-box;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
         /* Styles for Loyalty Card */
         .loyalty-card {
             text-align: center;
@@ -1998,6 +2023,144 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   }
 }
 
+      
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.schedule-table {
+  min-width: 700px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.schedule-table th,
+.schedule-table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.schedule-table th {
+  background-color: #003366;
+  color: white;
+}
+
+.schedule-table td:hover {
+  cursor: pointer;
+  background-color: #ffe0b2;
+}
+
+      
+.referral-submission-section {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-submission-section label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.referral-submission-section input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.referral-submission-section button {
+  background-color: #003366;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.referral-submission-section button:hover {
+  background-color: #ff6600;
+}
+
+    .subscription-blurred .subscription-blur-target {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.subscription-blurred h3 {
+  filter: none;
+  pointer-events: auto;
+}
+
+.subscription-blurred #subscription-locked-popup {
+  display: block;
+}
+
+    .subscription-blur-target {
+  transition: filter 0.3s ease;
+}
+
+ @keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -60%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}   
+
+    .referral-progress-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+}
+
+.referral-step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.referral-step span {
+  margin-left: 10px;
+}
+
+.referral-step .completed {
+  color: green;
+  font-weight: bold;
+}
+
+.referral-step .pending {
+  color: orange;
+}
+
+    #notificationPopup {
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
     </style>
 </head>
@@ -2215,37 +2378,7 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
   </p>
 </div>
 
-
-        <style>
-.table-container {
-  overflow-x: auto;
-  width: 100%;
-}
-
-.schedule-table {
-  min-width: 700px;
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.schedule-table th,
-.schedule-table td {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  text-align: center;
-}
-
-.schedule-table th {
-  background-color: #003366;
-  color: white;
-}
-
-.schedule-table td:hover {
-  cursor: pointer;
-  background-color: #ffe0b2;
-}
-            </style>
-        
+               
     <!-- Reschedule Section -->
     <div class="card reschedule-section">
         <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
@@ -2324,127 +2457,11 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
     <button type="submit">Enviar Referido 🎉</button>
   </form>
 </section>
-
-<style>
-.referral-submission-section {
-  margin-top: 40px;
-  padding: 20px;
-  background-color: #e3f2fd;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
-}
-
-.referral-submission-section label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.referral-submission-section input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.referral-submission-section button {
-  background-color: #003366;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.referral-submission-section button:hover {
-  background-color: #ff6600;
-}
-
-    .subscription-blurred .subscription-blur-target {
-  filter: blur(4px);
-  pointer-events: none;
-}
-
-.subscription-blurred h3 {
-  filter: none;
-  pointer-events: auto;
-}
-
-.subscription-blurred #subscription-locked-popup {
-  display: block;
-}
-
-    .subscription-blur-target {
-  transition: filter 0.3s ease;
-}
-
- @keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, -60%); }
-    to { opacity: 1; transform: translate(-50%, -50%); }
-}   
-
-</style>
-
     
   <div id="referralList">
     <p>Cargando tus referidos...</p>
   </div>
 </section>
-
-<style>
-.referral-progress-section {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
-}
-
-.referral-item {
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: white;
-}
-
-.referral-step {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.referral-step span {
-  margin-left: 10px;
-}
-
-.referral-step .completed {
-  color: green;
-  font-weight: bold;
-}
-
-.referral-step .pending {
-  color: orange;
-}
-
-    #notificationPopup {
-  animation: slideIn 0.5s ease;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-</style>
 
     
     <!-- Loyalty Rewards Section -->
@@ -2688,18 +2705,19 @@ document.body.appendChild(popup);
   </p>
 </div>
    
-     <footer>
-        <p>&copy; 2024 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="nosotros.html">Quiénes Somos</a></li>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-             <li><a href="tac.html">Términos y Condiciones</a></li>
-        </ul>
-   
- <div class="social-container" style="text-align: center; margin-top: 20px;">
+<footer>
+    <p>&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
+    <ul>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+         <li><a href="tac.html">Términos y Condiciones</a></li>
+         <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
+    </ul>
+
+<div class="social-container" style="text-align: center; margin-top: 20px;">
     <p><strong>Síguenos en nuestras redes sociales</strong></p>
     <div class="social-buttons">
         <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
@@ -2715,10 +2733,13 @@ document.body.appendChild(popup);
 </div>
 
 <!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
+        crossorigin="anonymous"></script>
 
-        
-    </footer>
+
+</footer>
+
 
             <!-- 🔔 Notification Pop-up -->
 <div id="notificationPopup" style="
