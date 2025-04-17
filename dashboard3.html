@@ -1724,7 +1724,14 @@ document.addEventListener("DOMContentLoaded", populatePopupDepartments);
     
   <style>
       /* Prevent body overflow */
-body {
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+      body {
   overflow-x: hidden;
 }
 
@@ -2734,8 +2741,11 @@ document.body.appendChild(popup);
 
 <!-- Include Font Awesome for icons -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
-        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
-        crossorigin="anonymous"></script>
+  integrity="sha512-C8dG4Oz9e2SNDY3hNXYMxdC8r44T+Qhpt8wBtaT0LgD0fXzRGv9gJ9mH6YmtFwUrLjPgD3STdJ9IjG2I+Bc2Fg=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer">
+</script>
+
 
 
 </footer>
