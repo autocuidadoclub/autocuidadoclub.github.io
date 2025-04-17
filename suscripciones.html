@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -79,12 +80,14 @@
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
-        vehicles.push({
-            plate: entry.querySelector(".plate").value || "",
-            model: entry.querySelector(".model").value || "",
-            brand: entry.querySelector(".brand").value || "",
-            year: entry.querySelector(".year").value || ""
+       vehicles.push({
+    plate: entry.querySelector(".plate").value,
+    model: entry.querySelector(".model").value,
+    brand: entry.querySelector(".brand").value,
+    year: entry.querySelector(".year").value,
+    inspectionDates: [] // 🔧 Automatically include empty array
         });
+
     });
 
     if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
@@ -130,6 +133,28 @@
 
             // ✅ Save user profile
             return db.collection("users").doc(userId).set(userData).then(() => {
+                // ✅ Send email notification to info@autocuidadoclub.com
+fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+    method: "POST",
+    headers: { 
+        'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify({
+        name: name,
+        email: email,
+        phone: phone,
+        subject: "new register in the platafform",
+        message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
+    })
+})
+.then(response => {
+    if (response.ok) {
+        console.log("✅ Email enviado a info@autocuidadoclub.com");
+    } else {
+        console.warn("⚠️ No se pudo enviar el email.");
+    }
+})
+.catch(error => console.error("❌ Error al enviar email:", error));
               
                           });
         })
@@ -963,7 +988,7 @@ body, html {
   <div class="loader"></div>
 </div>
     
-
+ 
             <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
@@ -992,9 +1017,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ Modify registerUser function to use selectedPlanType
     window.registerUser = function(event) {
         event.preventDefault();
+         const loader = document.getElementById("loader");
+    loader.style.display = "flex"; // ⏳ Show loader
 
         if (!selectedPlanType) {
             alert("❌ Error: Debes seleccionar un plan antes de registrarte.");
+          loader.style.display = "none";
             return;
         }
 
@@ -1012,12 +1040,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const vehicles = [];
         document.querySelectorAll(".vehicle-entry").forEach(entry => {
             vehicles.push({
-                plate: entry.querySelector(".plate").value,
-                model: entry.querySelector(".model").value,
-                brand: entry.querySelector(".brand").value,
-                year: entry.querySelector(".year").value
+                plate: entry.querySelector(".plate").value || "",
+                model: entry.querySelector(".model").value || "",
+                brand: entry.querySelector(".brand").value || "",
+                year: entry.querySelector(".year").value || "",
+                inspectionDates: []  // ✅ Inicializa campo vacío
             });
         });
+
 
         if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
             alert("❌ Todos los campos son obligatorios.");
@@ -1073,16 +1103,32 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
+        // 📨 Send email to admin
+        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                phone: phone,
+                subject: "new register in the platafform",
+                message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
+            })
+        });
+
+
       if (typeof _pe !== "undefined") {
         _pe.tagPushSubscriber('not_paid_yet');
       }
 
+         loader.style.display = "none"; // ✅ Hide loader after all is done
       document.getElementById("successOverlay").style.display = "flex";
       setTimeout(() => { window.location.href = "login.html"; }, 2500);
 
     } catch (error) {
       console.error("❌ Error:", error);
       alert("Error: " + error.message);
+          loader.style.display = "none"; // ⛔ Hide loader on error
     }
   });
 
@@ -1150,6 +1196,27 @@ setTimeout(() => {
     console.error("❌ Error en el registro:", error.message);
     alert("❌ Error en el registro: " + error.message);
 });
+
+                function sendEmail(destinationEmail, subject, acmessage) {
+    const styledMessage = `
+        ${acmessage}
+        <br><br>
+        Síguenos en nuestras redes sociales:<br>
+        📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+        📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+        💬 WhatsApp: https://wa.me/50376064756
+    `;
+
+    return fetch("https://formsubmit.co/ajax/" + destinationEmail, {
+        method: 'POST',
+        body: new URLSearchParams({
+            email: destinationEmail,
+            subject,
+            message: styledMessage
+        })
+    });
+}
+
 
 // ✅ Function to Update Vehicle Fields Based on Plan Type
 // ✅ Updated Function to Always Create 3 Vehicle Fields & Hide Extra for Basic
@@ -1249,6 +1316,12 @@ termsCheckbox.addEventListener("change", function(event) {
         integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
         crossorigin="anonymous"></script>
         </footer>
+
+<!-- Fullscreen Loader -->
+<div id="loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <img src="loading.gif" alt="Cargando..." style="width: 80px; border-radius: 8px;">
+</div>
+
     
 </body>
 </html>
