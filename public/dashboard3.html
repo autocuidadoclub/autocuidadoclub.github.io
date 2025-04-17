@@ -1715,6 +1715,20 @@ function showFollowUpCard() {
   paymentCard.parentNode.insertBefore(followUp, paymentCard.nextSibling);
 }
 
+  function checkOrientation() {
+    const banner = document.getElementById("rotateBanner");
+    const isPortrait = window.innerHeight > window.innerWidth;
+    if (isPortrait) {
+      banner.style.display = "block";
+    } else {
+      banner.style.display = "none";
+    }
+  }
+
+  window.addEventListener("load", checkOrientation);
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("orientationchange", checkOrientation);
+
 
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
@@ -2193,7 +2207,13 @@ html, body {
 
     </style>
 </head>
-<body>
+
+    <body>
+
+        <div id="rotateBanner" style="display: none; background-color: #ff9800; color: white; text-align: center; padding: 10px; font-weight: bold;">
+  📱 Para una mejor experiencia, gira tu teléfono a modo horizontal.
+</div>
+
     <!-- Navigation -->
     <nav class="navbar">
         <ul class="nav-links">
