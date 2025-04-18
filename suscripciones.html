@@ -50,15 +50,24 @@
             const registrationContainer = document.getElementById("registration-container");
             const planButtons = document.querySelectorAll(".plan-button");
 
-            planButtons.forEach(button => {
-                button.addEventListener("click", function () {
-                    selectedPlanType = this.getAttribute("data-plan");
-                    updateVehicleFields(selectedPlanType);
-                    registrationContainer.style.display = "block";
-                    registrationContainer.scrollIntoView({ behavior: "smooth" });
-                    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-                });
+           planButtons.forEach(button => {
+    button.addEventListener("click", function () {
+        selectedPlanType = this.getAttribute("data-plan");
+        updateVehicleFields(selectedPlanType);
+        registrationContainer.style.display = "block";
+
+        // Delay inteligente para asegurar render correcto
+        setTimeout(() => {
+            registrationContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
             });
+        }, isMobileDevice() ? 400 : 100);
+
+        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+    });
+});
+
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
@@ -241,6 +250,27 @@ if (registerButton) {
 
 };
 
+function isMobileDevice() {
+  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+planButtons.forEach(button => {
+    button.addEventListener("click", function () {
+        selectedPlanType = this.getAttribute("data-plan");
+        updateVehicleFields(selectedPlanType);
+        registrationContainer.style.display = "block";
+
+        // Delay inteligente para asegurar render correcto
+        setTimeout(() => {
+            registrationContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, isMobileDevice() ? 400 : 100);
+
+        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+    });
+});
 
            function updateVehicleFields(planType) {
     const vehicleContainer = document.getElementById("vehicle-container");
@@ -1020,15 +1050,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ Attach event listeners to all plan buttons
     planButtons.forEach(button => {
-        button.addEventListener("click", function () {
-            selectedPlanType = this.getAttribute("data-plan"); // ✅ Store selected plan
+    button.addEventListener("click", function () {
+        selectedPlanType = this.getAttribute("data-plan");
+        updateVehicleFields(selectedPlanType);
+        registrationContainer.style.display = "block";
 
-            registrationContainer.style.display = "block"; // ✅ Show form
-            registrationContainer.scrollIntoView({ behavior: "smooth" }); // ✅ Smooth scroll
+        // Delay inteligente para asegurar render correcto
+        setTimeout(() => {
+            registrationContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, isMobileDevice() ? 400 : 100);
 
-            console.log(`✅ Plan seleccionado: ${selectedPlanType}, formulario mostrado.`);
-        });
+        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
     });
+});
+
 
     // ✅ Modify registerUser function to use selectedPlanType
     window.registerUser = function(event) {
