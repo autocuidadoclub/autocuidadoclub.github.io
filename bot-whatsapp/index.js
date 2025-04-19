@@ -74,6 +74,3 @@ Escribí "hola" para ver las opciones disponibles.`;
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Bot WhatsApp activo en puerto ${PORT}`));
-
-Update bot logic to include menu options
-
