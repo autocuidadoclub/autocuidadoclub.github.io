@@ -7,6 +7,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/whatsapp', (req, res) => {
+  console.log('✅ Incoming message from Twilio:', req.body);
   const twiml = new MessagingResponse();
   const msg = req.body.Body ? req.body.Body.trim().toLowerCase() : '';
 
