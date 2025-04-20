@@ -63,7 +63,7 @@ Escribí "hola" para ver las opciones disponibles.`;
   res.end(twiml.toString());
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`🚀 Bot WhatsApp activo en puerto ${PORT}`);
 });
