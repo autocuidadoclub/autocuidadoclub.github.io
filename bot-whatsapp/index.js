@@ -4,7 +4,13 @@ const bodyParser = require('body-parser');
 const { MessagingResponse } = require('twilio').twiml;
 
 const app = express();
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.get('/', (req, res) => {
+  res.send('✅ Bot activo y escuchando');
+});
+
 
 app.post('/whatsapp', (req, res) => {
   console.log('✅ Incoming message from Twilio:', req.body);
