@@ -20,6 +20,7 @@ app.post('/whatsapp', (req, res) => {
     case 'hola':
     case 'hi':
     case 'hello':
+    case 'volver':
       response = `🚗 ¡Hola y bienvenido a AutoCuidado Club!
 
 Elegí una opción para continuar:
@@ -39,13 +40,17 @@ Elegí una opción para continuar:
 
 Cuidamos tu vehículo sin talleres ni filas. Hecha con orgullo en El Salvador 🇸🇻
 
-👉 Conocenos mejor aquí: https://autocuidadoclub.com/nosotros.html`;
+👉 Conocenos mejor aquí: https://autocuidadoclub.com/nosotros.html
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case '2':
       response = `🏠 Volvé a la página principal del sitio y descubrí cómo trabajamos:
 
-👉 https://autocuidadoclub.com`;
+👉 https://autocuidadoclub.com
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case '3':
@@ -56,70 +61,89 @@ b) Nuestro Programa de Lealtad
 c) Conocé nuestro proceso  
 d) Nuestras ofertas
 
-📌 Escribí: a, b, c o d para seguir.`;
+📌 Escribí: a, b, c o d  
+✏️ O escribí *volver* para regresar al menú.`;
       break;
 
     case 'a':
       response = `🔍 Revisamos frenos, niveles, batería, aceite, filtros, y más.
 
-👉 Detalles: https://autocuidadoclub.com/servicios.html#checklist`;
+👉 Detalles: https://autocuidadoclub.com/servicios.html#checklist
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case 'b':
       response = `🏅 Ganá premios por cuidar tu carro mensualmente.
 
-👉 Detalles: https://autocuidadoclub.com/servicios.html#lealtad`;
+👉 Detalles: https://autocuidadoclub.com/servicios.html#lealtad
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case 'c':
       response = `⚙️ Llegamos a tu casa/oficina. Revisamos. Cuidamos. ¡Sin filas!
 
-👉 Conocé cómo lo hacemos: https://autocuidadoclub.com/servicios.html#proceso`;
+👉 Conocé cómo lo hacemos: https://autocuidadoclub.com/servicios.html#proceso
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case 'd':
       response = `💸 Revisá nuestras promociones y premios disponibles.
 
-👉 https://autocuidadoclub.com/servicios.html#ofertas`;
+👉 https://autocuidadoclub.com/servicios.html#ofertas
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case '4':
       response = `📅 Elegí el plan ideal para vos y empezá a recibir mantenimiento personalizado.
 
-👉 https://autocuidadoclub.com/suscripciones2.html`;
+👉 https://autocuidadoclub.com/suscripciones2.html
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case '5':
       response = `💬 ¿Necesitás ayuda?
 
-👉 Escribinos directamente: https://wa.me/50377777777`;
+👉 Escribinos directamente: https://wa.me/50377777777
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case '6':
       response = `🔐 Accedé a tu dashboard para ver agenda, lealtad y referidos.
 
-👉 https://autocuidadoclub.com/dashboard3.html`;
+👉 https://autocuidadoclub.com/dashboard3.html
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case '7':
       response = `❓¿Tenés dudas sobre el servicio, pagos o tu plan?
 
-👉 Resolvelo aquí: https://autocuidadoclub.com/centro-ayuda.html`;
+👉 Resolvelo aquí: https://autocuidadoclub.com/centro-ayuda.html
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     case '8':
       response = `📲 ¡Accedé más rápido desde tu pantalla de inicio!
 
-👉 https://autocuidadoclub.com (en tu navegador móvil seleccioná "Agregar a inicio")`;
+👉 https://autocuidadoclub.com (en tu navegador móvil seleccioná "Agregar a inicio")
+
+✏️ Escribí *volver* para regresar al menú.`;
       break;
 
     default:
       response = `🤖 Lo siento, no entendí ese mensaje.
 
-Escribí "hola" para ver las opciones disponibles.`;
+Escribí *hola* o *volver* para ver las opciones disponibles.`;
   }
 
-  // Branding y cierre
+  // Branding y redes
   response += `
 
 ✨ Esta app es más que tecnología. Es una forma distinta de cuidar lo que importa.
