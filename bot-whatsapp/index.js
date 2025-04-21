@@ -100,7 +100,7 @@ d) Nuestras ofertas
     case '4':
       response = `📅 Elegí el plan ideal para vos y empezá a recibir mantenimiento personalizado.
 
-👉 https://autocuidadoclub.com/suscripciones2.html
+👉 https://autocuidadoclub.com/suscripciones.html
 
 ✏️ Escribí *volver* para regresar al menú.`;
       break;
@@ -116,7 +116,7 @@ d) Nuestras ofertas
     case '6':
       response = `🔐 Accedé a tu dashboard para ver agenda, lealtad y referidos.
 
-👉 https://autocuidadoclub.com/dashboard3.html
+👉 https://autocuidadoclub.com/dashboard2.html
 
 ✏️ Escribí *volver* para regresar al menú.`;
       break;
