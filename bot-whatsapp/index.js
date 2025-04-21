@@ -151,6 +151,7 @@ AutoCuidado Club — Hecha con visión. Hecha con orgullo en El Salvador 🇸�
 
 📱 Seguinos:
 👉 Facebook: https://facebook.com/autocuidadoclub
+👉 X: https://x.com/AutoCuidadoClub
 👉 Instagram: https://instagram.com/autocuidadoclub`;
 
   twiml.message(response);
