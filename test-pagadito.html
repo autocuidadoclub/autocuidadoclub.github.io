@@ -10,16 +10,14 @@
 
   <script>
     function makePayment() {
-      // Redirect to Pagadito with required GET parameters
-      const uid = "390659198d13c8e00fd980af3aaacd80"; // Your UID
-      const wsk = "ab5b9914c40921750f9e68f80d94b485"; // Your WSK
+      const uid = "390659198d13c8e00fd980af3aaacd80"; // Tu UID
+      const wsk = "ab5b9914c40921750f9e68f80d94b485"; // Tu WSK
       const amount = 1.00;
       const description = encodeURIComponent("Pago de prueba AutoCuidado Club");
       const returnURL = encodeURIComponent("https://autocuidadoclub.com/success.html");
       const cancelURL = encodeURIComponent("https://autocuidadoclub.com/cancel.html");
 
-      // Create the full payment link
-      const url = `https://sandbox.pagadito.com/comercios/js/Integracion.php?UID=${uid}&WSK=${wsk}&amount=${amount}&description=${description}&url_redirect=${returnURL}&url_cancel=${cancelURL}`;
+      const url = `https://sandbox.pagadito.com/index.php?mod=usuarios&hac=cnfc&UID=${uid}&WSK=${wsk}&amount=${amount}&description=${description}&url_redirect=${returnURL}&url_cancel=${cancelURL}`;
 
       window.location.href = url;
     }
