@@ -1,59 +1,28 @@
-<!-- test-pagadito.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Pago de prueba AutoCuidado Club</title>
+  <title>Pagadito Test Payment</title>
 </head>
 <body>
-  <div id="fb-root"></div>
-<script async defer crossorigin="anonymous" 
-src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
+  <h2>Pago de prueba Pagadito</h2>
+  <button onclick="makePayment()">Realizar pago de $1</button>
 
+  <script>
+    function makePayment() {
+      // Redirect to Pagadito with required GET parameters
+      const uid = "390659198d13c8e00fd980af3aaacd80"; // Your UID
+      const wsk = "ab5b9914c40921750f9e68f80d94b485"; // Your WSK
+      const amount = 1.00;
+      const description = encodeURIComponent("Pago de prueba AutoCuidado Club");
+      const returnURL = encodeURIComponent("https://autocuidadoclub.com/success.html");
+      const cancelURL = encodeURIComponent("https://autocuidadoclub.com/cancel.html");
 
-  <div class="fb-page" 
-     data-href="https://www.facebook.com/profile.php?id=61575027617474"
-     data-tabs="timeline"
-     data-width="340"
-     data-height=""
-     data-small-header="true"
-     data-adapt-container-width="true"
-     data-hide-cover="false"
-     data-show-facepile="true">
-  <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" 
-              class="fb-xfbml-parse-ignore">
-    <a href="https://www.facebook.com/profile.php?id=61575027617474">
-      Autocuidado Club
-    </a>
-  </blockquote>
-</div>
+      // Create the full payment link
+      const url = `https://sandbox.pagadito.com/comercios/js/Integracion.php?UID=${uid}&WSK=${wsk}&amount=${amount}&description=${description}&url_redirect=${returnURL}&url_cancel=${cancelURL}`;
 
-  <h2>Simulación de pago en AutoCuidado Club</h2>
-<form method="POST" action="https://www.pagadito.com/comercios/button.php" target="_blank">
-  <!-- Tus credenciales -->
-  <input type="hidden" name="uid" value="98f7beafd87befc5110980de6a9c733d">
-  <input type="hidden" name="wsk" value="132e7730671be4be41ac34c5e277dd88">
-  <input type="hidden" name="env" value="sandbox"><!-- Quitar si es producción -->
-
-  <!-- Info de prueba -->
-  <input type="hidden" name="nombre_item_1" value="Prueba AutoCuidado">
-  <input type="hidden" name="descripcion_item_1" value="Pago de prueba para obtener token de Pagadito">
-  <input type="hidden" name="precio_item_1" value="1.00">
-  <input type="hidden" name="cantidad_item_1" value="1">
-
-  <!-- Redirecciones -->
-  <input type="hidden" name="url_respuesta" value="https://autocuidadoclub.com/gracias.html">
-
-  <!-- EN EL SIGUIENTE PASO configuramos esta URL para que reciba el token -->
-  <input type="hidden" name="url_confirmacion" value="https://us-central1-TU_PROYECTO.cloudfunctions.net/guardarTokenPagadito">
-
-  <!-- Email del cliente (para mapear usuario en Firestore) -->
-  <input type="hidden" name="correo_cliente" value="cliente@autocuidadoclub.com">
-
-  <button type="submit">Probar Pago $1 - Pagadito Express</button>
-</form>
-
-
-
+      window.location.href = url;
+    }
+  </script>
 </body>
 </html>
