@@ -303,7 +303,17 @@ planButtons.forEach(button => {
     </script>
 
     <style>
-       body, html {
+      .disclaimer-box {
+  font-size: 4rem; /* puedes subir a 1.3rem o 1.4rem si quieres aún más grande */
+  line-height: 1.6;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #ff9800;
+  margin-top: 20px;
+  border-radius: 6px;
+}
+
+        body, html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -514,6 +524,10 @@ body, html {
 </head>
 
 <body>
+     <div id="fb-root"></div>
+<script async defer crossorigin="anonymous" 
+src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
+    
     <nav class="navbar">
         <ul class="nav-links">
             <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
@@ -1354,7 +1368,28 @@ termsCheckbox.addEventListener("change", function(event) {
   });
 </script>
 
-<div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+
+    <div style="display: flex; justify-content: center; margin: 20px 0;"> 
+    <div class="fb-page" 
+     data-href="https://www.facebook.com/profile.php?id=61575027617474"
+     data-tabs="timeline"
+     data-width="640"
+     data-height=""
+     data-small-header="true"
+     data-adapt-container-width="true"
+     data-hide-cover="false"
+     data-show-facepile="true">
+  <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" 
+              class="fb-xfbml-parse-ignore">
+    <a href="https://www.facebook.com/profile.php?id=61575027617474">
+      Autocuidado Club
+    </a>
+  </blockquote>
+</div>
+    </div>
+
+    
+    <div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
   <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
     <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
     <div style="text-align: left; max-width: 300px;">
@@ -1382,28 +1417,8 @@ termsCheckbox.addEventListener("change", function(event) {
             <li><a href="login.html">Ingresa a tu cuenta</a></li>
              <li><a href="tac.html">Términos y Condiciones</a></li>
         </ul>
-
-          <div class="social-container" style="text-align: center; margin-top: 20px;">
-    <p><strong>Síguenos en nuestras redes sociales</strong></p>
-    <div class="social-buttons">
-        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-            <i class="fab fa-instagram fa-3x"></i>
-        </a>
-        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
-            <i class="fab fa-facebook-f fa-3x"></i>
-        </a>
-        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-            <i class="fab fa-twitter fa-3x"></i>
-        </a>
-    </div>
-</div>
-
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
-        integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMVYLZtdWZRoCbqUq8t8ANNC7b+tdsYjsdA4i2F"
-        crossorigin="anonymous"></script>
-        </footer>
-
+    </footer>
+         
 <!-- Fullscreen Loader -->
 <div id="loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
     <img src="loading.gif" alt="Cargando..." style="width: 80px; border-radius: 8px;">
