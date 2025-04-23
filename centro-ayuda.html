@@ -340,7 +340,9 @@
 </div>
 
   </footer>
-<!-- 📢 Feedback Button + Modal with Voice Input -->
+
+
+   <!-- Feedback Button + Modal -->
 <button id="feedbackBtn" onclick="openFeedbackModal()" style="position:fixed; bottom:20px; right:20px; background:#ff9800; color:white; border:none; border-radius:50px; padding:10px 20px; box-shadow:0 4px 8px rgba(0,0,0,0.2); z-index:999;">
   📝 Opinión
 </button>
@@ -348,18 +350,27 @@
 <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
   <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
     <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
-    <textarea id="feedbackText" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;"></textarea>
-    <div style="display:flex; justify-content:space-between;">
-      <button onclick="startVoiceInput()">🎤 Hablar</button>
-      <button onclick="submitFeedback()">Enviar</button>
-    </div>
+    <form id="voiceFeedbackForm">
+      <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+      <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+      <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+      <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between;">
+        <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
+        <button type="submit">Enviar</button>
+      </div>
+    </form>
     <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
+    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+      <img src="loading.gif" alt="Cargando..." style="width:40px;">
+    </div>
   </div>
 </div>
 
 <script>
-  let recognition;
   const feedbackText = document.getElementById('feedbackText');
+  const feedbackForm = document.getElementById('voiceFeedbackForm');
+  const feedbackLoader = document.getElementById('feedbackLoader');
 
   function openFeedbackModal() {
     document.getElementById('feedbackModal').style.display = 'flex';
@@ -368,7 +379,8 @@
 
   function closeFeedbackModal() {
     document.getElementById('feedbackModal').style.display = 'none';
-    feedbackText.value = '';
+    feedbackForm.reset();
+    feedbackLoader.style.display = 'none';
   }
 
   function startVoiceInput() {
@@ -377,17 +389,11 @@
       return;
     }
 
-    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'es-ES';
-    recognition.interimResults = false;
 
-    // Show feedback while listening
-    feedbackText.placeholder = "🎙️ Escuchando... hablá ahora.";
+    feedbackText.placeholder = "🎙️ Escuchando...";
     feedbackText.style.border = "2px solid orange";
-
-    recognition.onstart = () => {
-      console.log("Reconocimiento iniciado");
-    };
 
     recognition.onresult = (event) => {
       const result = event.results[0][0].transcript;
@@ -401,9 +407,9 @@
       feedbackText.style.border = "1px solid #ccc";
 
       if (event.error === 'no-speech') {
-        alert("No se detectó voz. Asegúrate de hablar claramente o revisá tu micrófono.");
+        alert("No se detectó voz. Intentá nuevamente.");
       } else {
-        alert("Error de reconocimiento de voz: " + event.error);
+        alert("Error de voz: " + event.error);
       }
     };
 
@@ -415,21 +421,32 @@
     recognition.start();
   }
 
-  function submitFeedback() {
-    const msg = feedbackText.value.trim();
-    if (!msg) {
-      alert("Por favor, deja tu opinión antes de enviar.");
-      return;
-    }
+  feedbackForm.onsubmit = function(event) {
+    event.preventDefault();
+    feedbackLoader.style.display = 'block';
 
-    const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdXnyXcfApBCLUTHSOe0rs12T_N-HG3LXBBuD61vIsihaj-aQ/viewform?usp=pp_url&entry.1851768973=";
-    const fullURL = formURL + encodeURIComponent(msg);
-
-    window.open(fullURL, '_blank');
-    closeFeedbackModal();
-    alert("¡Gracias por tu opinión!");
-  }
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+      method: "POST",
+      body: new FormData(feedbackForm)
+    })
+    .then(response => response.json())
+    .then(data => {
+      feedbackLoader.style.display = 'none';
+      if (data.success === "true") {
+        alert("¡Gracias por tu opinión!");
+        closeFeedbackModal();
+      } else {
+        alert("Error al enviar. Intenta de nuevo.");
+      }
+    })
+    .catch(error => {
+      feedbackLoader.style.display = 'none';
+      console.error("Error:", error);
+      alert("Hubo un problema al enviar el mensaje.");
+    });
+  };
 </script>
+
 
 
    
