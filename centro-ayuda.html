@@ -358,29 +358,65 @@
 </div>
 
 <script>
+  let recognition;
+  const feedbackText = document.getElementById('feedbackText');
+
   function openFeedbackModal() {
     document.getElementById('feedbackModal').style.display = 'flex';
+    feedbackText.focus();
   }
 
   function closeFeedbackModal() {
     document.getElementById('feedbackModal').style.display = 'none';
+    feedbackText.value = '';
   }
 
   function startVoiceInput() {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'es-ES';
+    recognition.interimResults = false;
+
+    // Show feedback while listening
+    feedbackText.placeholder = "🎙️ Escuchando... hablá ahora.";
+    feedbackText.style.border = "2px solid orange";
+
+    recognition.onstart = () => {
+      console.log("Reconocimiento iniciado");
+    };
+
     recognition.onresult = (event) => {
       const result = event.results[0][0].transcript;
-      document.getElementById('feedbackText').value += ' ' + result;
+      feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
     };
+
     recognition.onerror = (event) => {
-      alert("Error de voz: " + event.error);
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+
+      if (event.error === 'no-speech') {
+        alert("No se detectó voz. Asegúrate de hablar claramente o revisá tu micrófono.");
+      } else {
+        alert("Error de reconocimiento de voz: " + event.error);
+      }
     };
+
+    recognition.onend = () => {
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+    };
+
     recognition.start();
   }
 
   function submitFeedback() {
-    const msg = document.getElementById('feedbackText').value.trim();
+    const msg = feedbackText.value.trim();
     if (!msg) {
       alert("Por favor, deja tu opinión antes de enviar.");
       return;
@@ -394,6 +430,7 @@
     alert("¡Gracias por tu opinión!");
   }
 </script>
+
 
    
 </body>
