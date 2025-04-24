@@ -303,12 +303,6 @@
     });
   </script>
 
-<!-- Install Banner Adaptativo -->
-<div id="smart-install-banner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 14px; font-size: 16px; z-index: 999;">
-  <span>¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</span>
-  <button id="how-to-install-btn" style="margin-left: 10px; background: white; color: #ff9800; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold;">¿Cómo instalar?</button>
-  <button onclick="document.getElementById('smart-install-banner').style.display = 'none';" style="margin-left: 8px; background: transparent; color: white; border: 1px solid white; padding: 8px 12px; border-radius: 5px;">Cerrar</button>
-</div>
 
 <script>
   const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
@@ -383,10 +377,26 @@
 
 
 
-   <div class="mobile-button-bar">
-  <a onclick="openFeedbackModal()" class="floating-contact-button">📝 Opinión</a>
-  <a href="contacto.html" target="_blank" class="floating-contact-button">📞 Contactar Staff</a>
+  <div id="smart-install-banner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 10px 0 15px; font-size: 16px; z-index: 999;">
+  <div style="margin-bottom: 8px;">¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</div>
+  
+  <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+    <button onclick="openFeedbackModal()" style="background: white; color: #ff6600; border: none; padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 14px;">
+      📝 Opinión
+    </button>
+    <a href="https://wa.me/+50376064062" target="_blank" style="background: white; color: #ff6600; text-decoration: none; padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 14px;">
+      📞 Contactar Staff
+    </a>
+    <button id="how-to-install-btn" style="background: white; color: #ff6600; border: none; padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 14px;">
+      ¿Cómo instalar?
+    </button>
+    <button onclick="document.getElementById('smart-install-banner').style.display = 'none';" style="background: transparent; color: white; border: 1px solid white; padding: 8px 12px; border-radius: 50px; font-weight: bold;">
+      Cerrar
+    </button>
+
+  </div>
 </div>
+
 
 
 <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
