@@ -7,14 +7,140 @@
   <h2>😕 El pago fue cancelado</h2>
   <p>Inténtalo de nuevo cuando estés listo.</p>
 
-  <script>
-    function openFeedbackModal() {
-  document.getElementById('feedbackModal').style.display = 'flex';
-  document.getElementById('feedbackText').focus();
+   
+  <style>
+  #cta-install-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #ff9800;
+  color: white;
+  text-align: center;
+  padding: 10px 12px 15px;
+  font-size: 15px;
+  z-index: 9999;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
 }
+
+.cta-message {
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cta-buttons button,
+.cta-buttons a {
+  background: white;
+  color: #ff6600;
+  border: none;
+  border-radius: 40px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.cta-buttons button:hover,
+.cta-buttons a:hover {
+  background: #003893;
+  color: white;
+}
+
+.cta-buttons .close-btn {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+}
+
+     /* Loader Styling */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loader img {
+            width: 80px;
+            border-radius: 8px;
+        }
+</style>
+
+  
+<!-- ✅ Fixed Bottom Bar with Functional Buttons -->
+<div id="cta-install-bar">
+  <div class="cta-message">¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</div>
+
+  <div class="cta-buttons">
+   <a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
+  📝 Opinión
+</a>
+
+    <a href="contacto.html">📞 Contactar</a>
+    <button id="how-to-install-btn">🧭 Instalar</button>
+    <button onclick="document.getElementById('cta-install-bar').style.display = 'none';" class="close-btn">❌ Cerrar</button>
+  </div>
+</div>
+
+<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+    <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
+    <form id="voiceFeedbackForm">
+      <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+      <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+      <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+      <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between;">
+        <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
+        <button type="submit">Enviar</button>
+      </div>
+    </form>
+    <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
+    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+      <img src="loading.gif" alt="Cargando..." style="width:400px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+  const installBtn = document.getElementById('how-to-install-btn');
+
+  installBtn.addEventListener('click', () => {
+    if (isIos) {
+      alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+    } else if (isAndroid) {
+      alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
+    } else {
+      alert("Instalación no disponible en este dispositivo.");
+    }
+  });
+
   const feedbackText = document.getElementById('feedbackText');
   const feedbackForm = document.getElementById('voiceFeedbackForm');
   const feedbackLoader = document.getElementById('feedbackLoader');
+
+  function openFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'flex';
+    feedbackText.focus();
+  }
 
   function closeFeedbackModal() {
     document.getElementById('feedbackModal').style.display = 'none';
@@ -71,12 +197,11 @@
     .then(response => response.json())
     .then(data => {
       feedbackLoader.style.display = 'none';
-      if (data.success) {
+      if (data.success === "true") {
         alert("¡Gracias por tu opinión!");
         closeFeedbackModal();
       } else {
-        alert("No se pudo enviar tu mensaje. Intenta de nuevo.");
-        console.log("FormSubmit response:", data);
+        alert("Error al enviar. Intenta de nuevo.");
       }
     })
     .catch(error => {
@@ -87,114 +212,8 @@
   };
 </script>
 
-  
-  <style>
-  #cta-install-bar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #ff9800;
-  color: white;
-  text-align: center;
-  padding: 10px 12px 15px;
-  font-size: 15px;
-  z-index: 9999;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-}
-
-.cta-message {
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.cta-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.cta-buttons button,
-.cta-buttons a {
-  background: white;
-  color: #ff6600;
-  border: none;
-  border-radius: 40px;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: bold;
-  text-decoration: none;
-  flex: 1;
-  min-width: 100px;
-  text-align: center;
-  transition: background 0.2s ease;
-}
-
-.cta-buttons button:hover,
-.cta-buttons a:hover {
-  background: #003893;
-  color: white;
-}
-
-.cta-buttons .close-btn {
-  background: transparent;
-  border: 1px solid white;
-  color: white;
-}
-
-</style>
-
-  <script>
-  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-  const installBtn = document.getElementById('how-to-install-btn');
-
-  installBtn.addEventListener('click', () => {
-    if (isIos) {
-      alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-    } else if (isAndroid) {
-      alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
-    } else {
-      alert("Instalación no disponible en este dispositivo.");
-    }
-  });
-</script>
 
   
-<!-- ✅ Fixed Bottom Bar with Functional Buttons -->
-<div id="cta-install-bar">
-  <div class="cta-message">¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</div>
-
-  <div class="cta-buttons">
-   <a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
-  📝 Opinión
-</a>
-
-    <a href="contacto.html">📞 Contactar</a>
-    <button id="how-to-install-btn">🧭 Instalar</button>
-    <button onclick="document.getElementById('cta-install-bar').style.display = 'none';" class="close-btn">❌ Cerrar</button>
-  </div>
-</div>
-
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-    <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
-    <form id="voiceFeedbackForm">
-      <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-      <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-      <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-      <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between;">
-        <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
-        <button type="submit">Enviar</button>
-      </div>
-    </form>
-    <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
-    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-      <img src="loading.gif" alt="Cargando..." style="width:400px;">
-    </div>
-  </div>
-</div>
-
+  
 </body>
 </html>
