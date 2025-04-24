@@ -6,7 +6,15 @@
 <body>
   <h2>😕 El pago fue cancelado</h2>
   <p>Inténtalo de nuevo cuando estés listo.</p>
-<style>
+
+  <script>
+    function openFeedbackModal() {
+  document.getElementById('feedbackModal').style.display = 'flex';
+  document.getElementById('feedbackText').focus();
+}
+  </script>
+  
+  <style>
   #cta-install-bar {
   position: fixed;
   bottom: 0;
