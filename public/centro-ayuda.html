@@ -127,9 +127,7 @@
       <a href="#faq">FAQs</a>
     </nav>
 
-    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-  <i class="fas fa-headset"></i> Contactar Staff
-</button>
+   
 
     
     <div class="search-bar">
@@ -342,11 +340,11 @@
   </footer>
 
 
-   <!-- Feedback Button + Modal -->
-<a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
-  📝 Opinión
-</a>
 
+   <div class="mobile-button-bar">
+  <a onclick="openFeedbackModal()" class="floating-contact-button">📝 Opinión</a>
+  <a href="contacto.html" target="_blank" class="floating-contact-button">📞 Contactar Staff</a>
+</div>
 
 
 <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
