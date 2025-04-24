@@ -9,28 +9,7 @@
 
    
   <style>
-  /* Global Styles for the bottom bar (desktop hidden by default) */
-  #cta-install-bar {
-    display: none;
-  }
-
-  /* Only show and style on mobile */
-  @media (max-width: 600px) {
-    #cta-install-bar {
-      display: block;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #ff9800;
-      color: white;
-      text-align: center;
-      padding: 12px 10px;
-      font-size: 14px;
-      z-index: 9999;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    }
-
-    .cta-message {
+      .cta-message {
       font-size: 13px;
       margin-bottom: 10px;
     }
@@ -219,7 +198,15 @@
       alert("Hubo un problema al enviar el mensaje.");
     });
   };
+
+    // Show bar only on real mobile (touch + screen narrow)
+  const isMobile = window.matchMedia("(max-width: 600px)").matches && ('ontouchstart' in window);
+
+  if (isMobile) {
+    document.getElementById('cta-install-bar').style.display = 'block';
+  }
 </script>
+
 
 
   
