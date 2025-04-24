@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -84,48 +85,6 @@
       color: white;
       margin-top: 30px;
     }
-
-  /* Floating contact button */
-.floating-contact-button {
-  background-color: #ff6600;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 40px;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: bold;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.3s ease;
-  display: inline-block;
-}
-
-/* Responsive container for buttons */
-.mobile-button-bar {
-  display: none;
-}
-
-@media (max-width: 600px) {
-  .mobile-button-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #fff;
-    padding: 10px 0;
-    display: flex;
-    justify-content: space-around;
-    z-index: 1000;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  .mobile-button-bar .floating-contact-button {
-    font-size: 14px;
-    flex: 1;
-    text-align: center;
-    margin: 0 5px;
-    padding: 10px 0;
-  }
-}
   </style>
 </head>
 <body>
@@ -169,7 +128,9 @@
       <a href="#faq">FAQs</a>
     </nav>
 
-   
+    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+  <i class="fas fa-headset"></i> Contactar Staff
+</button>
 
     
     <div class="search-bar">
@@ -303,6 +264,12 @@
     });
   </script>
 
+<!-- Install Banner Adaptativo -->
+<div id="smart-install-banner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 14px; font-size: 16px; z-index: 999;">
+  <span>¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</span>
+  <button id="how-to-install-btn" style="margin-left: 10px; background: white; color: #ff9800; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold;">¿Cómo instalar?</button>
+  <button onclick="document.getElementById('smart-install-banner').style.display = 'none';" style="margin-left: 8px; background: transparent; color: white; border: 1px solid white; padding: 8px 12px; border-radius: 5px;">Cerrar</button>
+</div>
 
 <script>
   const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
@@ -376,26 +343,10 @@
   </footer>
 
 
-
-  <div id="smart-install-banner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 10px 0 15px; font-size: 16px; z-index: 999;">
-  <div style="margin-bottom: 8px;">¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</div>
-  
-  <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-    <button onclick="openFeedbackModal()" style="background: white; color: #ff6600; border: none; padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 14px;">
-      📝 Opinión
-    </button>
-    <a href="https://wa.me/+50376064062" target="_blank" style="background: white; color: #ff6600; text-decoration: none; padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 14px;">
-      📞 Contactar Staff
-    </a>
-    <button id="how-to-install-btn" style="background: white; color: #ff6600; border: none; padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 14px;">
-      ¿Cómo instalar?
-    </button>
-    <button onclick="document.getElementById('smart-install-banner').style.display = 'none';" style="background: transparent; color: white; border: 1px solid white; padding: 8px 12px; border-radius: 50px; font-weight: bold;">
-      Cerrar
-    </button>
-
-  </div>
-</div>
+   <!-- Feedback Button + Modal -->
+<a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
+  📝 Opinión
+</a>
 
 
 
