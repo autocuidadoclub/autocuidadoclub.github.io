@@ -12,7 +12,81 @@
   document.getElementById('feedbackModal').style.display = 'flex';
   document.getElementById('feedbackText').focus();
 }
-  </script>
+  const feedbackText = document.getElementById('feedbackText');
+  const feedbackForm = document.getElementById('voiceFeedbackForm');
+  const feedbackLoader = document.getElementById('feedbackLoader');
+
+  function closeFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'none';
+    feedbackForm.reset();
+    feedbackLoader.style.display = 'none';
+  }
+
+  function startVoiceInput() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'es-ES';
+
+    feedbackText.placeholder = "🎙️ Escuchando...";
+    feedbackText.style.border = "2px solid orange";
+
+    recognition.onresult = (event) => {
+      const result = event.results[0][0].transcript;
+      feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+    };
+
+    recognition.onerror = (event) => {
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+
+      if (event.error === 'no-speech') {
+        alert("No se detectó voz. Intentá nuevamente.");
+      } else {
+        alert("Error de voz: " + event.error);
+      }
+    };
+
+    recognition.onend = () => {
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+    };
+
+    recognition.start();
+  }
+
+  feedbackForm.onsubmit = function(event) {
+    event.preventDefault();
+    feedbackLoader.style.display = 'block';
+
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+      method: "POST",
+      body: new FormData(feedbackForm)
+    })
+    .then(response => response.json())
+    .then(data => {
+      feedbackLoader.style.display = 'none';
+      if (data.success) {
+        alert("¡Gracias por tu opinión!");
+        closeFeedbackModal();
+      } else {
+        alert("No se pudo enviar tu mensaje. Intenta de nuevo.");
+        console.log("FormSubmit response:", data);
+      }
+    })
+    .catch(error => {
+      feedbackLoader.style.display = 'none';
+      console.error("Error:", error);
+      alert("Hubo un problema al enviar el mensaje.");
+    });
+  };
+</script>
+
   
   <style>
   #cta-install-bar {
