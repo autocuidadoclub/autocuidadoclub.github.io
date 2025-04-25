@@ -67,9 +67,7 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
 
 </section>
 
-    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-    <i class="fas fa-headset"></i> Contactar Staff
-</button>
+    
 <!-- About Logo Section -->
 <section class="logo-section">
     <section class="section-container">
@@ -188,112 +186,124 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
 
 </footer>
 
- <!-- Feedback Button + Modal -->
-<a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
-  📝 Opinión
-</a>
-
-
-
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-    <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
-    <form id="voiceFeedbackForm">
-      <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-      <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-      <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-      <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between;">
-        <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
-        <button type="submit">Enviar</button>
-      </div>
-    </form>
-    <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
-    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-      <img src="loading.gif" alt="Cargando..." style="width:400px;">
+    <!-- CTA Footer -->
+  <div id="cta-install-bar">
+    <div class="cta-message">
+  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+</div>
+<div class="cta-buttons">
+      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
+      <a href="contacto.html">💬 Contácta con nuestro staff</a>
+      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
+      <button onclick="document.getElementById('cta-install-bar').style.display='none'" class="close-btn">❌ Cerrar</button>
     </div>
   </div>
-</div>
 
-<script>
-  const feedbackText = document.getElementById('feedbackText');
-  const feedbackForm = document.getElementById('voiceFeedbackForm');
-  const feedbackLoader = document.getElementById('feedbackLoader');
+  <!-- Feedback Modal -->
+  <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+      <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
+      <form id="voiceFeedbackForm">
+        <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+        <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+        <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+        <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between;">
+          <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
+          <button type="submit">Enviar</button>
+        </div>
+      </form>
+      <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
+      <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+        <img src="loading.gif" alt="Cargando..." style="width:80px;">
+      </div>
+    </div>
+  </div>
 
-  function openFeedbackModal() {
-    document.getElementById('feedbackModal').style.display = 'flex';
-    feedbackText.focus();
-  }
+  <script>
+    const installBtn = document.getElementById('how-to-install-btn');
+    installBtn.addEventListener('click', () => {
+      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+      if (isIos) {
+        alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+      } else if (isAndroid) {
+        alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
+      } else {
+        alert("Instalación no disponible en este dispositivo.");
+      }
+    });
 
-  function closeFeedbackModal() {
-    document.getElementById('feedbackModal').style.display = 'none';
-    feedbackForm.reset();
-    feedbackLoader.style.display = 'none';
-  }
-
-  function startVoiceInput() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert("Tu navegador no soporta reconocimiento de voz.");
-      return;
+    function openFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'flex';
+      document.getElementById('feedbackText').focus();
     }
 
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'es-ES';
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'none';
+      document.getElementById('voiceFeedbackForm').reset();
+      document.getElementById('feedbackLoader').style.display = 'none';
+    }
 
-    feedbackText.placeholder = "🎙️ Escuchando...";
-    feedbackText.style.border = "2px solid orange";
+    function startVoiceInput() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz.");
+        return;
+      }
 
-    recognition.onresult = (event) => {
-      const result = event.results[0][0].transcript;
-      feedbackText.value += (feedbackText.value ? ' ' : '') + result;
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-    };
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'es-ES';
 
-    recognition.onerror = (event) => {
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
+      const feedbackText = document.getElementById('feedbackText');
+      feedbackText.placeholder = "🎙️ Escuchando...";
+      feedbackText.style.border = "2px solid orange";
 
-      if (event.error === 'no-speech') {
-        alert("No se detectó voz. Intentá nuevamente.");
-      } else {
+      recognition.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.onerror = (event) => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
         alert("Error de voz: " + event.error);
-      }
+      };
+
+      recognition.onend = () => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.start();
+    }
+
+    document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
+      e.preventDefault();
+      document.getElementById('feedbackLoader').style.display = 'block';
+
+      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        body: new FormData(this)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        if (data.success) {
+          alert("¡Gracias por tu opinión!");
+          closeFeedbackModal();
+        } else {
+          alert("Error al enviar. Intenta de nuevo.");
+        }
+      })
+      .catch(() => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        alert("Hubo un problema al enviar el mensaje.");
+      });
     };
+  </script>
 
-    recognition.onend = () => {
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-    };
-
-    recognition.start();
-  }
-
-  feedbackForm.onsubmit = function(event) {
-    event.preventDefault();
-    feedbackLoader.style.display = 'block';
-
-    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-      method: "POST",
-      body: new FormData(feedbackForm)
-    })
-    .then(response => response.json())
-    .then(data => {
-      feedbackLoader.style.display = 'none';
-      if (data.success === "true") {
-        alert("¡Gracias por tu opinión!");
-        closeFeedbackModal();
-      } else {
-        alert("Error al enviar. Intenta de nuevo.");
-      }
-    })
-    .catch(error => {
-      feedbackLoader.style.display = 'none';
-      console.error("Error:", error);
-      alert("Hubo un problema al enviar el mensaje.");
-    });
-  };
-</script>
 
     
 </body>
