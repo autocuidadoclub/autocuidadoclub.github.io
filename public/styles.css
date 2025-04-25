@@ -1990,7 +1990,6 @@ h2, h3 {
   right: 20px;
   background: #ff9800;
   color: white;
-  text-align: center;
   padding: 14px 18px;
   font-size: 14px;
   z-index: 9999;
@@ -1999,13 +1998,17 @@ h2, h3 {
   width: 280px;
   max-width: 90%;
 
-  /* 🔥 FIX CENTERING ISSUES */
+  /* 💥 Important fix to remove centering from any inherited flex or grid */
   margin: 0 !important;
   left: auto !important;
   transform: none !important;
-  display: block;
-}
+  display: block !important;
+  text-align: left !important;
 
+  /* 💣 Remove any unintended flex container behavior */
+  align-self: auto !important;
+  justify-self: auto !important;
+}
 
 .cta-message {
   font-size: 13px;
