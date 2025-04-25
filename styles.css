@@ -1982,19 +1982,23 @@ h2, h3 {
 /* ====== GLOBAL CTA INSTALL MENU ====== */
 #cta-install-bar {
   position: fixed;
-  bottom: 100px; /* Ajustado para no chocar con el botón de Contactar Staff */
+  bottom: 80px; /* Justo arriba del botón de contacto */
   right: 20px;
   background: #ff9800;
   color: white;
   text-align: center;
-  padding: 14px 18px;
+  padding: 16px 20px;
   font-size: 14px;
   z-index: 9999;
-  box-shadow: 0 0 10px rgba(0,0,0,0.25);
+  box-shadow: 0 0 12px rgba(0,0,0,0.3);
   border-radius: 16px;
-  width: 280px;
+  width: 300px;
   max-width: 90%;
+  transform: none !important;
+  left: auto !important;
+  margin: 0 !important;
 }
+
 
 .cta-message {
   font-size: 13px;
