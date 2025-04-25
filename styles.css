@@ -1981,9 +1981,12 @@ h2, h3 {
 
 /* ====== GLOBAL CTA INSTALL MENU ====== */
 #cta-install-bar {
-  position: fixed;
-  bottom: 80px; /* Justo arriba del botón de contacto */
-  right: 20px;
+  position: fixed !important;
+  bottom: 90px !important; /* Justo encima del botón Contactar Staff */
+  right: 20px !important;
+  left: auto !important;
+  margin: 0 !important;
+  transform: none !important;
   background: #ff9800;
   color: white;
   text-align: center;
@@ -1994,10 +1997,8 @@ h2, h3 {
   border-radius: 16px;
   width: 300px;
   max-width: 90%;
-  transform: none !important;
-  left: auto !important;
-  margin: 0 !important;
 }
+
 
 
 .cta-message {
