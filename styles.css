@@ -1985,24 +1985,26 @@ h2, h3 {
 
 /* ====== GLOBAL CTA INSTALL MENU ====== */
 #cta-install-bar {
-  position: fixed !important;
-  bottom: 90px !important; /* Justo encima del botón Contactar Staff */
-  right: 20px !important;
-  left: auto !important;
-  margin: 0 !important;
-  transform: none !important;
+  position: fixed;
+  bottom: 100px; /* Just above Contactar Staff */
+  right: 20px;
   background: #ff9800;
   color: white;
   text-align: center;
-  padding: 16px 20px;
+  padding: 14px 18px;
   font-size: 14px;
   z-index: 9999;
-  box-shadow: 0 0 12px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0,0,0,0.25);
   border-radius: 16px;
-  width: 300px;
+  width: 280px;
   max-width: 90%;
-}
 
+  /* 🔥 FIX CENTERING ISSUES */
+  margin: 0 !important;
+  left: auto !important;
+  transform: none !important;
+  display: block;
+}
 
 
 .cta-message {
