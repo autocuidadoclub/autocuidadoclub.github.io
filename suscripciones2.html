@@ -1349,6 +1349,15 @@ window.addEventListener('load', function() {
   document.body.appendChild(fbScript);
 });
 
+                window.addEventListener('load', function() {
+  const ctaBar = document.getElementById('cta-install-bar');
+  if (ctaBar) {
+    ctaBar.style.display = 'block';
+    ctaBar.style.opacity = '1';
+    ctaBar.style.transform = 'translateY(0)';
+  }
+});
+
 
             </script>
 
