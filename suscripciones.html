@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1338,7 +1339,27 @@ termsCheckbox.addEventListener("invalid", function(event) {
 termsCheckbox.addEventListener("change", function(event) {
   event.target.setCustomValidity("");
 });
+
                 
+window.addEventListener('load', function() {
+  var fbScript = document.createElement('script');
+  fbScript.async = true;
+  fbScript.defer = true;
+  fbScript.crossOrigin = 'anonymous';
+  fbScript.src = "https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0";
+  document.body.appendChild(fbScript);
+});
+
+                window.addEventListener('load', function() {
+  const ctaBar = document.getElementById('cta-install-bar');
+  if (ctaBar) {
+    ctaBar.style.display = 'block';
+    ctaBar.style.opacity = '1';
+    ctaBar.style.transform = 'translateY(0)';
+  }
+});
+
+
             </script>
 
     
@@ -1353,7 +1374,7 @@ termsCheckbox.addEventListener("change", function(event) {
        data-adapt-container-width="false"
        data-hide-cover="false"
        data-show-facepile="true"
-       style="max-width: 900px; width: 100%;">
+       style="max-width: 1000px; width: 100%;">
     <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" class="fb-xfbml-parse-ignore">
       <a href="https://www.facebook.com/profile.php?id=61575027617474">Autocuidado Club</a>
     </blockquote>
