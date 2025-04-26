@@ -294,7 +294,7 @@
 
   </footer>
 
-<!-- CTA Footer -->
+   <!-- CTA Footer -->
   <div id="cta-install-bar">
     <div class="cta-message">
   ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
@@ -303,7 +303,8 @@
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
       <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-      <button onclick="document.getElementById('cta-install-bar').style.display='none'" class="close-btn">❌ Cerrar</button>
+    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+
     </div>
   </div>
 
@@ -327,6 +328,34 @@
       </div>
     </div>
   </div>
+
+<!-- Botón para volver a mostrar el menú -->
+<button id="reopen-cta-btn" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 9999;
+  opacity: 0;
+  max-width: 180px;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+">
+📲 Abrir menú
+</button>
+
+
+
 
   <script>
     const installBtn = document.getElementById('how-to-install-btn');
@@ -410,7 +439,39 @@
         alert("Hubo un problema al enviar el mensaje.");
       });
     };
+
+      function closeCtaInstallBar() {
+    const ctaBar = document.getElementById('cta-install-bar');
+    const reopenBtn = document.getElementById('reopen-cta-btn');
+
+    // Animación suave antes de ocultarlo
+    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    ctaBar.style.opacity = '0';
+    ctaBar.style.transform = 'translateY(20px)';
+
+    setTimeout(() => {
+      ctaBar.style.display = 'none';
+
+      // Mostrar botón flotante después de 5 segundos
+      setTimeout(() => {
+        reopenBtn.style.display = 'block';
+        setTimeout(() => {
+          reopenBtn.style.opacity = '1';
+        }, 10);
+      }, 5000);
+    }, 300); // esperar a que termine la transición
+  }
+
+      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
   </script>
-  
 </body>
 </html>
