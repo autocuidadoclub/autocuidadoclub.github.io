@@ -472,6 +472,17 @@
   reopenBtn.style.display = 'none';
 });
 
+      document.querySelectorAll('.faq h3').forEach(item => {
+    item.addEventListener('click', () => {
+      const p = item.nextElementSibling;
+      const isVisible = p.style.display === 'block';
+      // Ocultar todos los <p> antes de abrir el nuevo
+      document.querySelectorAll('.faq p').forEach(p => p.style.display = 'none');
+      // Alternar visibilidad
+      p.style.display = isVisible ? 'none' : 'block';
+    });
+  });
+    
   </script>
 </body>
 </html>
