@@ -206,7 +206,8 @@
     </div>
   </div>
 
- <button id="reopen-cta-btn" style="
+ <!-- Botón para volver a mostrar el menú -->
+<button id="reopen-cta-btn" style="
   display: none;
   position: fixed;
   bottom: 100px;
@@ -214,18 +215,19 @@
   background-color: #ff9800;
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 20px;
   font-weight: bold;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   z-index: 9999;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
 ">
 📲 Abrir menú
 </button>
+
 
 
 
@@ -333,6 +335,16 @@
       }, 5000);
     }, 300); // esperar a que termine la transición
   }
+
+      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
 
   </script>
 
