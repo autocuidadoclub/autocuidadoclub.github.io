@@ -206,27 +206,27 @@
     </div>
   </div>
 
-  <!-- Botón para volver a mostrar el menú -->
-<button id="reopen-cta-btn" style="
+ <button id="reopen-cta-btn" style="
   display: none;
   position: fixed;
-  bottom: 100px; /* Igual que el CTA */
+  bottom: 100px;
   right: 20px;
-  background-color: #003893;
+  background-color: #ff9800;
   color: white;
   border: none;
-  padding: 10px 14px;
-  border-radius: 30px;
+  padding: 8px 14px;
+  border-radius: 20px;
   font-weight: bold;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   z-index: 9999;
   opacity: 0;
   transition: opacity 0.4s ease;
 ">
 📲 Abrir menú
 </button>
+
 
 
   <script>
@@ -312,28 +312,27 @@
       });
     };
 
-      
       function closeCtaInstallBar() {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
+    const ctaBar = document.getElementById('cta-install-bar');
+    const reopenBtn = document.getElementById('reopen-cta-btn');
 
-  ctaBar.style.display = 'none';
+    // Animación suave antes de ocultarlo
+    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    ctaBar.style.opacity = '0';
+    ctaBar.style.transform = 'translateY(20px)';
 
-  // Esperar 5 segundos antes de mostrar el botón flotante
-  setTimeout(() => {
-    reopenBtn.style.display = 'block';
-    reopenBtn.style.opacity = '1';
-  }, 5000);
-}
+    setTimeout(() => {
+      ctaBar.style.display = 'none';
 
-document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
-
-  ctaBar.style.display = 'block';
-  reopenBtn.style.display = 'none';
-});
-
+      // Mostrar botón flotante después de 5 segundos
+      setTimeout(() => {
+        reopenBtn.style.display = 'block';
+        setTimeout(() => {
+          reopenBtn.style.opacity = '1';
+        }, 10);
+      }, 5000);
+    }, 300); // esperar a que termine la transición
+  }
 
   </script>
 
