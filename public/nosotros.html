@@ -195,7 +195,7 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
       <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-      <button onclick="document.getElementById('cta-install-bar').style.display='none'" class="close-btn">❌ Cerrar</button>
+      <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
     </div>
   </div>
 
@@ -302,6 +302,18 @@ if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad
         alert("Hubo un problema al enviar el mensaje.");
       });
     };
+
+      function closeCtaInstallBar() {
+  const ctaBar = document.getElementById('cta-install-bar');
+  if (ctaBar) {
+    ctaBar.style.opacity = '0';
+    ctaBar.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      ctaBar.style.display = 'none';
+    }, 300);
+  }
+}
+
   </script>
 
 
