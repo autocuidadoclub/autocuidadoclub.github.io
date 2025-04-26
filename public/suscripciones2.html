@@ -1338,7 +1338,18 @@ termsCheckbox.addEventListener("invalid", function(event) {
 termsCheckbox.addEventListener("change", function(event) {
   event.target.setCustomValidity("");
 });
+
                 
+window.addEventListener('load', function() {
+  var fbScript = document.createElement('script');
+  fbScript.async = true;
+  fbScript.defer = true;
+  fbScript.crossOrigin = 'anonymous';
+  fbScript.src = "https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0";
+  document.body.appendChild(fbScript);
+});
+
+
             </script>
 
     
