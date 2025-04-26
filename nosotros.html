@@ -206,27 +206,28 @@
     </div>
   </div>
 
-   <!-- Botón para volver a mostrar el CTA -->
+  <!-- Botón para volver a mostrar el menú -->
 <button id="reopen-cta-btn" style="
   display: none;
   position: fixed;
-  bottom: 20px;
+  bottom: 100px; /* Igual que el CTA */
   right: 20px;
-  z-index: 9999;
   background-color: #003893;
   color: white;
   border: none;
   padding: 10px 14px;
   border-radius: 30px;
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 9999;
   opacity: 0;
   transition: opacity 0.4s ease;
 ">
-  📲 Abrir menú
+📲 Abrir menú
 </button>
+
 
   <script>
     const installBtn = document.getElementById('how-to-install-btn');
@@ -311,17 +312,7 @@
       });
     };
 
-      function closeCtaInstallBar() {
-  const ctaBar = document.getElementById('cta-install-bar');
-  if (ctaBar) {
-    ctaBar.style.opacity = '0';
-    ctaBar.style.transform = 'translateY(20px)';
-    setTimeout(() => {
-      ctaBar.style.display = 'none';
-    }, 300);
-  }
-}
-
+      
       function closeCtaInstallBar() {
   const ctaBar = document.getElementById('cta-install-bar');
   const reopenBtn = document.getElementById('reopen-cta-btn');
