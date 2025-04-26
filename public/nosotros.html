@@ -180,7 +180,8 @@
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
       <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-      <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+
     </div>
   </div>
 
@@ -204,6 +205,28 @@
       </div>
     </div>
   </div>
+
+   <!-- Botón para volver a mostrar el CTA -->
+<button id="reopen-cta-btn" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  background-color: #003893;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 30px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+">
+  📲 Abrir menú
+</button>
 
   <script>
     const installBtn = document.getElementById('how-to-install-btn');
@@ -298,6 +321,28 @@
     }, 300);
   }
 }
+
+      function closeCtaInstallBar() {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'none';
+
+  // Esperar 5 segundos antes de mostrar el botón flotante
+  setTimeout(() => {
+    reopenBtn.style.display = 'block';
+    reopenBtn.style.opacity = '1';
+  }, 5000);
+}
+
+document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  reopenBtn.style.display = 'none';
+});
+
 
   </script>
 
