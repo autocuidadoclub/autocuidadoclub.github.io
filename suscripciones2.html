@@ -409,26 +409,7 @@ body, html {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .floating-contact-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #ff6600;
-            color: white;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s, transform 0.2s;
-        }
-        .floating-contact-button:hover {
-            background-color: #cc5500;
-            transform: scale(1.05);
-        }
-
+      
         .graphic-container {
   text-align: center;
   margin: 20px 0;
@@ -543,10 +524,7 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
         </div>
     </nav>
 
-    <button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
-        <i class="fas fa-headset"></i> Contactar Staff
-    </button>
-    
+   
     <header>
         <div class="header-container">
             <div class="header-text">
@@ -1336,38 +1314,6 @@ termsCheckbox.addEventListener("change", function(event) {
             </script>
 
     
-<!-- Install Banner Adaptativo -->
-<div id="smart-install-banner" style="position: fixed; bottom: 0; width: 100%; background: #ff9800; color: white; text-align: center; padding: 14px; font-size: 16px; z-index: 999;">
-  <span>¿Quieres acceder más rápido? <strong>Instala AutoCuidado Club</strong> en tu celular.</span>
-  <button id="how-to-install-btn" style="margin-left: 10px; background: white; color: #ff9800; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold;">¿Cómo instalar?</button>
-  <button onclick="document.getElementById('smart-install-banner').style.display = 'none';" style="margin-left: 8px; background: transparent; color: white; border: 1px solid white; padding: 8px 12px; border-radius: 5px;">Cerrar</button>
-</div>
-
-<script>
-  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-
-  const installBtn = document.getElementById('how-to-install-btn');
-  const installBanner = document.getElementById('smart-install-banner');
-
-  // Solo mostrar si no es app instalada
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-  if (isStandalone) {
-    installBanner.style.display = 'none';
-  }
-
-  installBtn.addEventListener('click', () => {
-    if (isIos) {
-      alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-    } else if (isAndroid) {
-      alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
-    } else {
-      alert("Instalación no disponible en este dispositivo.");
-    }
-  });
-</script>
-
 
     <div style="display: flex; justify-content: center; margin: 20px 0;"> 
     <div class="fb-page" 
