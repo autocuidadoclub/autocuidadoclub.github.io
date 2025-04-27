@@ -452,14 +452,7 @@
   <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
     <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
       <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
-         <button onclick="closeFeedbackModal()" style="
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #ff0000;
-    font-weight: bold;">❌</button>
-      <form id="voiceFeedbackForm">
+          <form id="voiceFeedbackForm">
         <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
         <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
         <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
@@ -471,6 +464,13 @@
       </form>
       <img src="loading.gif" alt="Cargando..." style="width:80px;">
       </div>
+       <button onclick="closeFeedbackModal()" style="
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ff0000;
+    font-weight: bold;">❌</button>
     </div>
   </div>
 
