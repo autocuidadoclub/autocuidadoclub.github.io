@@ -14,51 +14,66 @@
   <link rel="manifest" href="/site.webmanifest">
 
   <style>
-    /* Compactar las tarjetas */
-    .card {
-      padding: 15px 20px;
-      margin: 10px auto;
-      max-width: 900px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
+/* General background */
+body {
+  background-color: #f8f9fa; /* Light soft gray background */
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    /* Compactar títulos dentro de las tarjetas */
-    .card h2, .card h3 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-size: 20px;
-      color: #003366;
-    }
+/* Compact cards */
+.card {
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 800px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease-in-out;
+}
 
-    /* Compactar párrafos dentro de las tarjetas */
-    .card p {
-      margin: 0 0 8px 0;
-      font-size: 16px;
-      line-height: 1.4;
-    }
+/* Card hover effect for better UX */
+.card:hover {
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
 
-    /* Compactar listas */
-    .card ul {
-      margin: 8px 0 8px 20px;
-      padding: 0;
-      list-style: disc inside;
-    }
+/* Compact internal elements */
+.card h2, .card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 22px;
+  color: #003366;
+}
 
-    /* Compactar ítems de lista */
-    .card ul li {
-      margin-bottom: 6px;
-    }
+.card p, .card ul, .card li {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+}
 
-    /* Extra compactación para primeras y últimas líneas */
-    .card h2:first-child,
-    .card p:last-child {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  </style>
+/* Compact lists */
+.card ul {
+  margin: 8px 0 8px 20px;
+  padding: 0;
+  list-style: disc inside;
+}
+
+.card ul li {
+  margin-bottom: 6px;
+}
+
+/* Button styling */
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+</style>
+
 </head>
 
 <body>
