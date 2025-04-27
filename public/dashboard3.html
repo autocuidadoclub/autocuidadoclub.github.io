@@ -2243,11 +2243,11 @@ html, body {
 
     
     <!-- Header -->
-   <header style="background: linear-gradient(to bottom, #002F6C, #003366); padding: 60px 20px; text-align: center;">
-  <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">Bienvenido a AutoCuidado Club</h1>
-  <p style="color: white; font-size: 1.2em;">Tu tiempo es oro, nuestro cuidado es total.</p>
-</header>
-
+    <header>
+    <div class="header-container">
+        <h2 id="user-info">Cargando usuario...</h2>
+          </div>
+        </header>
     
         <button class="orange-button" onclick="logoutUser()" style="margin-left: 10px;">Cerrar Sesión</button>
 
@@ -2856,15 +2856,12 @@ document.body.appendChild(popup);
   <span id="notificationMessage">Notificación aquí</span>
 </div>
 
-   <!-- CTA Footer -->
+            <!-- CTA Footer -->
   <div id="cta-install-bar">
     <div class="cta-message">
   ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
 </div>
-
-      <!-- CTA Footer -->
-<div id="cta-install-bar" style="display:none;">
-
+<div class="cta-buttons">
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
       <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
@@ -2874,40 +2871,25 @@ document.body.appendChild(popup);
   </div>
 
   <!-- Feedback Modal -->
-<!-- Feedback Modal -->
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-  
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
-    <button onclick="closeFeedbackModal()" style="
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #ff0000;
-      font-weight: bold;
-    ">❌</button>
-  </div>
-
-  <form id="voiceFeedbackForm">
-    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-    <div style="display:flex; justify-content:space-between;">
-      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
-      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
+  <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+      <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
+      <form id="voiceFeedbackForm">
+        <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+        <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+        <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+        <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between;">
+          <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
+          <button type="submit">Enviar</button>
+        </div>
+      </form>
+      <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
+      <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+        <img src="loading.gif" alt="Cargando..." style="width:80px;">
+      </div>
     </div>
-  </form>
-
-  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-    <img src="loading.gif" alt="Cargando..." style="width:80px;">
   </div>
-
-  </div>
-</div>
-
 
 <!-- Botón para volver a mostrar el menú -->
 <button id="reopen-cta-btn" style="
@@ -2996,17 +2978,7 @@ document.body.appendChild(popup);
       recognition.start();
     }
 
-   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
-
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
-
-      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
+    document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
       e.preventDefault();
       document.getElementById('feedbackLoader').style.display = 'block';
 
@@ -3063,6 +3035,7 @@ document.body.appendChild(popup);
 });
 
   </script>
+
 
 </body>
 </html>
