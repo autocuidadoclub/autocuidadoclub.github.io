@@ -502,7 +502,20 @@
   reopenBtn.style.display = 'none';
 });
 
-  </script>
+  
+  // Hacer clic en cualquier <h3> dentro de .faq para abrir/cerrar su contenido
+  document.querySelectorAll('.faq h3').forEach(h3 => {
+    h3.addEventListener('click', () => {
+      const p = h3.nextElementSibling;
+      if (p.style.display === 'block') {
+        p.style.display = 'none';
+      } else {
+        p.style.display = 'block';
+      }
+    });
+  });
+</script>
+
     
 </body>
 </html>
