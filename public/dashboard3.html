@@ -539,15 +539,13 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
 }
 
      
-// Founder Phase Countdown Logic
-const founderStartDate = new Date('2025-04-27T00:00:00'); // May 1, 2025
+// Founder Phase Settings
+const founderStartDate = new Date('2025-05-01T00:00:00'); // May 1, 2025
 const founderDurationDays = 90; // Founder Phase lasts 90 days
 const founderEndDate = new Date(founderStartDate.getTime() + founderDurationDays * 24 * 60 * 60 * 1000);
-const today = new Date();
 const msInDay = 24 * 60 * 60 * 1000;
-const daysElapsed = Math.floor((today - founderStartDate) / msInDay);
 
-// Messages Timeline
+// Message Timeline
 const messages = [
   "¡Bienvenido a la Fase Fundador! Asegura el mejor precio para siempre.",
   "¡Ya pasó 1 semana! No dejes pasar esta oportunidad única.",
@@ -565,25 +563,46 @@ const messages = [
   "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas."
 ];
 
-// Determine which message to show
-let messageIndex = Math.floor(daysElapsed / 7);
-if (messageIndex < 0) messageIndex = 0;
-if (messageIndex >= messages.length) messageIndex = messages.length - 1;
-
-// Update founder phase message
-const founderMessage = document.getElementById('founderPhaseMessage');
-if (founderMessage) {
-  founderMessage.textContent = messages[messageIndex];
+// Initialize on page load
+function startFounderPhaseCountdown() {
+  updateFounderMessage(); 
+  updateCountdown(); 
 }
 
-// Update the Countdown every second
+// Update the message based on weeks elapsed
+function updateFounderMessage() {
+  const today = new Date();
+  const daysElapsed = Math.floor((today - founderStartDate) / msInDay);
+
+  let messageIndex = Math.floor(daysElapsed / 7);
+  if (messageIndex < 0) messageIndex = 0;
+  if (messageIndex >= messages.length) messageIndex = messages.length - 1;
+
+  const founderMessage = document.getElementById('founderPhaseMessage');
+  if (founderMessage) {
+    founderMessage.textContent = messages[messageIndex];
+  }
+}
+
+// Update the 7-day countdown
 function updateCountdown() {
   const now = new Date();
-  const distance = founderEndDate - now;
 
-  if (distance <= 0) {
+  if (now >= founderEndDate) {
     document.getElementById("countdown").innerHTML = "Fase Fundador Cerrada ⏳";
     clearInterval(countdownInterval);
+    return;
+  }
+
+  // Calculate which 7-day cycle we are currently in
+  const daysElapsed = Math.floor((now - founderStartDate) / msInDay);
+  const currentCycleStart = new Date(founderStartDate.getTime() + Math.floor(daysElapsed / 7) * 7 * msInDay);
+  const currentCycleEnd = new Date(currentCycleStart.getTime() + 7 * msInDay);
+
+  const distance = currentCycleEnd - now;
+
+  if (distance <= 0) {
+    document.getElementById("countdown").innerHTML = "Nuevo ciclo iniciando...";
     return;
   }
 
@@ -592,14 +611,16 @@ function updateCountdown() {
   const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-  document.getElementById("countdown").innerHTML = `
-    ${days}d ${hours}h ${minutes}m ${seconds}s
-  `;
+  document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
-const countdownInterval = setInterval(updateCountdown, 1000);
-updateCountdown(); // Run immediately when page loads
-     
+// Update both countdown and message every 1 second
+const countdownInterval = setInterval(() => {
+  updateFounderMessage();
+  updateCountdown();
+}, 1000);
+
+startFounderPhaseCountdown(); // Run once on load     
 
 async function upgradePlan() {
     const selectedPlan = document.getElementById("new-plan").value;
