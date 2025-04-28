@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -539,36 +540,88 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
 }
 
      
-  // Try to get the saved end time from localStorage
-  var savedEndTime = localStorage.getItem("countdownEndTime");
+// Founder Phase Settings
+const founderStartDate = new Date('2025-05-01T00:00:00'); // May 1, 2025
+const founderDurationDays = 90; // Founder Phase lasts 90 days
+const founderEndDate = new Date(founderStartDate.getTime() + founderDurationDays * 24 * 60 * 60 * 1000);
+const msInDay = 24 * 60 * 60 * 1000;
 
-  // If no saved end time exists, set a new one (48 hours from now)
-  if (!savedEndTime) {
-    savedEndTime = new Date().getTime() + 48 * 60 * 60 * 1000; // 48 hours from now
-    localStorage.setItem("countdownEndTime", savedEndTime); // Save it in localStorage
+// Message Timeline
+const messages = [
+  "¡Bienvenido a la Fase Fundador! Asegura el mejor precio para siempre.",
+  "¡Ya pasó 1 semana! No dejes pasar esta oportunidad única.",
+  "2 semanas menos, y los precios cambiarán para siempre. ¡Actúa hoy!",
+  "🚨 ¡El acceso exclusivo ya está en cuenta regresiva! ¡Activa tu membresía antes de que cierre!",
+  "¡1 mes transcurrido! Cada día cuenta. Aprovecha antes que otros.",
+  "🎯 ¡Cada día cuenta! No dejes pasar la oportunidad de ser Fundador.",
+  "¡Quedan menos de 2 meses! Reserva tu lugar como Fundador.",
+  "¡Cada semana más cerca del cierre! Activa ahora tu beneficio exclusivo.",
+  "Tiempo limitado: Asegura beneficios de Fundador antes que termine.",
+  "🔥 ¡Últimas 4 semanas! Última llamada para obtener el mejor precio.",
+  "⏳ ¡Últimas 3 semanas! Se acerca el final de la Fase Fundador.",
+  "¡Últimas 2 semanas! ¿Qué estás esperando? Tu beneficio especial está por terminar.",
+  "¡Última semana! Esta es tu última oportunidad para ser Fundador. ¡Actúa YA!",
+  "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas."
+];
+
+// Initialize on page load
+function startFounderPhaseCountdown() {
+  updateFounderMessage(); 
+  updateCountdown(); 
+}
+
+// Update the message based on weeks elapsed
+function updateFounderMessage() {
+  const today = new Date();
+  const daysElapsed = Math.floor((today - founderStartDate) / msInDay);
+
+  let messageIndex = Math.floor(daysElapsed / 7);
+  if (messageIndex < 0) messageIndex = 0;
+  if (messageIndex >= messages.length) messageIndex = messages.length - 1;
+
+  const founderMessage = document.getElementById('founderPhaseMessage');
+  if (founderMessage) {
+    founderMessage.textContent = messages[messageIndex];
+  }
+}
+
+// Update the 7-day countdown
+function updateCountdown() {
+  const now = new Date();
+
+  if (now >= founderEndDate) {
+    document.getElementById("countdown").innerHTML = "Fase Fundador Cerrada ⏳";
+    clearInterval(countdownInterval);
+    return;
   }
 
-  // Update the countdown every 1 second
-  var x = setInterval(function() {
-    var now = new Date().getTime();
-    var distance = savedEndTime - now;
+  // Calculate which 7-day cycle we are currently in
+  const daysElapsed = Math.floor((now - founderStartDate) / msInDay);
+  const currentCycleStart = new Date(founderStartDate.getTime() + Math.floor(daysElapsed / 7) * 7 * msInDay);
+  const currentCycleEnd = new Date(currentCycleStart.getTime() + 7 * msInDay);
 
-    // Time calculations for hours, minutes, and seconds
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  const distance = currentCycleEnd - now;
 
-    // Display the countdown
-    document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
+  if (distance <= 0) {
+    document.getElementById("countdown").innerHTML = "Nuevo ciclo iniciando...";
+    return;
+  }
 
-    // If the countdown finishes, clear the interval and show EXPIRED
-    if (distance < 0) {
-      clearInterval(x);
-      document.getElementById("countdown").innerHTML = "EXPIRED";
-      document.getElementById("upgrade-now").disabled = true;
-    }
-  }, 1000);
-     
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+// Update both countdown and message every 1 second
+const countdownInterval = setInterval(() => {
+  updateFounderMessage();
+  updateCountdown();
+}, 1000);
+
+startFounderPhaseCountdown(); // Run once on load     
 
 async function upgradePlan() {
     const selectedPlan = document.getElementById("new-plan").value;
@@ -831,13 +884,9 @@ const registrationDate = userData.registrationDate?.toDate?.() || null;
     <div id="promo-popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
                 background:#fffbe6; padding:20px; border-radius:15px; border:2px solid #ff9800;
                 z-index:9999; box-shadow:0px 4px 12px rgba(0,0,0,0.15); text-align:center; max-width:90%;">
-      <h3>🎁 ¡Activa tu plan ahora!</h3>
-      <p>Recibe una oferta especial por ser nuevo cliente: <strong>Tu primer mes por solo $5</strong></p>
-      <button onclick="window.location.href='pago.html'" style="background:#ff6600; color:white;
-              border:none; padding:10px 20px; border-radius:8px; font-size:16px; margin-top:10px;">
-        Activar Plan Ahora
-      </button>
-      <br>
+      <h3>🚀 ¡Fase de Fundadores!</h3>
+      <p style="margin-top:10px;">Activa tu plan ahora y asegura tu precio exclusivo antes que termine esta etapa especial.</p>
+          <br>
       <button onclick="closePromoPopup()" style="margin-top:10px; background:#cccccc; color:#333; padding:8px 16px; border:none; border-radius:5px;">Cerrar</button>
     </div>
   `;
@@ -1305,19 +1354,23 @@ function loadPaymentHistory() {
   _pe.tagPushSubscriber('inactive_2months');
 }
 
-     function showFirstTimePaymentOffer() {
+     function showFirstTimePaymentOffer(userData) {
   const offerBox = document.createElement("div");
+  const planType = userData.planType || "basic3m"; // fallback if missing
+  const payPalURL = getPaypalLink(planType) || "pago.html"; // fallback if missing link
+
   offerBox.innerHTML = `
-    <div style="background:#fff4e5; border:2px solid #ffa500; padding:20px; margin:20px 0; border-radius:10px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:1000; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" id="first-payment-offer">
-      <span onclick="document.getElementById('first-payment-offer').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
-      <h3>🎉 ¡Activa tu plan ahora!</h3>
-      <p>Recibe un beneficio especial: tu primer mes por solo <strong>$5</strong>. 🚗✨</p>
-      <button style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" onclick="redirectToPayment()">Activar Plan Ahora</button>
+    <div style="background:#fff3e0; border:2px solid #ff9800; padding:20px; margin:20px 0; border-radius:12px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:10000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-width:90%; text-align:center;">
+      <span onclick="document.getElementById('founderOfferBox').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
+      <h2>🚀 ¡Fase de Fundadores!</h2>
+      <p style="margin-top:10px;">Activa tu plan ahora y asegura tu precio exclusivo antes que termine esta etapa especial.</p>
+      <button onclick="window.location.href='${payPalURL}'" style="background:#ff6600; color:white; padding:10px 20px; border:none; border-radius:8px; margin-top:15px; font-size:16px;">Activar Plan</button>
     </div>
   `;
+  offerBox.id = "founderOfferBox";
   document.body.appendChild(offerBox);
 }
-
+        
 function redirectToPayment() {
   // Redirect to your payment page or PayPal link
   window.location.href = "https://www.paypal.com/pay/basic1m"; // Example link
@@ -2306,6 +2359,9 @@ html, body {
             <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
 
+            <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
+  Cargando mensaje especial...
+</div>
             <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
                 ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
             </div>
@@ -2317,12 +2373,10 @@ html, body {
             
             <!-- Countdown Timer Section -->
 <div class="countdown-container">
-  <h2>Hurry up! Limited-time offer</h2>
-  <p>Complete your payment to enjoy a <strong>45% discount</strong>!</p>
+  <h2>🚀 ¡Tiempo restante de la Fase Fundador!</h2>
+  <p>Completa tu pago, <strong>antes que esta fase termine</strong></p>
   <div id="countdown"></div>
-  <p><strong>$35 Savings</strong> if you pay now.</p>
-  <button id="upgrade-now" class="cta-button">Upgrade Now</button>
-</div>
+  </div>
 
         </div>
 
