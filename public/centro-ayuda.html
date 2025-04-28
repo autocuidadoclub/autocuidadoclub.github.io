@@ -499,6 +499,26 @@
   reopenBtn.style.display = 'none';
 });
 
+    
+  document.addEventListener('DOMContentLoaded', function () {
+    const questions = document.querySelectorAll('.faq h3');
+
+    questions.forEach(question => {
+      question.addEventListener('click', function () {
+        const answer = this.nextElementSibling;
+
+        if (answer.style.display === 'block') {
+          answer.style.display = 'none';
+        } else {
+          // Opcional: cerrar otros abiertos antes
+          document.querySelectorAll('.faq p').forEach(p => p.style.display = 'none');
+
+          answer.style.display = 'block';
+        }
+      });
+    });
+  });
+
   </script>
 
     
