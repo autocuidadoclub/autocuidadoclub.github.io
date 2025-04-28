@@ -539,35 +539,66 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
 }
 
      
-  // Try to get the saved end time from localStorage
-  var savedEndTime = localStorage.getItem("countdownEndTime");
+// Founder Phase Countdown Logic
+const founderStartDate = new Date('2025-05-01T00:00:00'); // May 1, 2025
+const founderDurationDays = 90; // Founder Phase lasts 90 days
+const founderEndDate = new Date(founderStartDate.getTime() + founderDurationDays * 24 * 60 * 60 * 1000);
+const today = new Date();
+const msInDay = 24 * 60 * 60 * 1000;
+const daysElapsed = Math.floor((today - founderStartDate) / msInDay);
 
-  // If no saved end time exists, set a new one (48 hours from now)
-  if (!savedEndTime) {
-    savedEndTime = new Date().getTime() + 48 * 60 * 60 * 1000; // 48 hours from now
-    localStorage.setItem("countdownEndTime", savedEndTime); // Save it in localStorage
+// Messages Timeline
+const messages = [
+  "¡Bienvenido a la Fase Fundador! Asegura el mejor precio para siempre.",
+  "¡Ya pasó 1 semana! No dejes pasar esta oportunidad única.",
+  "2 semanas menos, y los precios cambiarán para siempre. ¡Actúa hoy!",
+  "🚨 ¡El acceso exclusivo ya está en cuenta regresiva! ¡Activa tu membresía antes de que cierre!",
+  "¡1 mes transcurrido! Cada día cuenta. Aprovecha antes que otros.",
+  "🎯 ¡Cada día cuenta! No dejes pasar la oportunidad de ser Fundador.",
+  "¡Quedan menos de 2 meses! Reserva tu lugar como Fundador.",
+  "¡Cada semana más cerca del cierre! Activa ahora tu beneficio exclusivo.",
+  "Tiempo limitado: Asegura beneficios de Fundador antes que termine.",
+  "🔥 ¡Últimas 4 semanas! Última llamada para obtener el mejor precio.",
+  "⏳ ¡Últimas 3 semanas! Se acerca el final de la Fase Fundador.",
+  "¡Últimas 2 semanas! ¿Qué estás esperando? Tu beneficio especial está por terminar.",
+  "¡Última semana! Esta es tu última oportunidad para ser Fundador. ¡Actúa YA!",
+  "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas."
+];
+
+// Determine which message to show
+let messageIndex = Math.floor(daysElapsed / 7);
+if (messageIndex < 0) messageIndex = 0;
+if (messageIndex >= messages.length) messageIndex = messages.length - 1;
+
+// Update founder phase message
+const founderMessage = document.getElementById('founderPhaseMessage');
+if (founderMessage) {
+  founderMessage.textContent = messages[messageIndex];
+}
+
+// Update the Countdown every second
+function updateCountdown() {
+  const now = new Date();
+  const distance = founderEndDate - now;
+
+  if (distance <= 0) {
+    document.getElementById("countdown").innerHTML = "Fase Fundador Cerrada ⏳";
+    clearInterval(countdownInterval);
+    return;
   }
 
-  // Update the countdown every 1 second
-  var x = setInterval(function() {
-    var now = new Date().getTime();
-    var distance = savedEndTime - now;
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    // Time calculations for hours, minutes, and seconds
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  document.getElementById("countdown").innerHTML = `
+    ${days}d ${hours}h ${minutes}m ${seconds}s
+  `;
+}
 
-    // Display the countdown
-    document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
-
-    // If the countdown finishes, clear the interval and show EXPIRED
-    if (distance < 0) {
-      clearInterval(x);
-      document.getElementById("countdown").innerHTML = "EXPIRED";
-      document.getElementById("upgrade-now").disabled = true;
-    }
-  }, 1000);
+const countdownInterval = setInterval(updateCountdown, 1000);
+updateCountdown(); // Run immediately when page loads
      
 
 async function upgradePlan() {
@@ -2317,10 +2348,10 @@ html, body {
             
             <!-- Countdown Timer Section -->
 <div class="countdown-container">
-  <h2>Hurry up! Limited-time offer</h2>
-  <p>Complete your payment to enjoy a <strong>45% discount</strong>!</p>
+  <h2>🚀 ¡Tiempo restante de la Fase Fundador!</h2>
+  <p>Completa tu pago, <strong>antes que esta fase termine</strong></p>
   <div id="countdown"></div>
-  <p><strong>$35 Savings</strong> if you pay now.</p>
+  <p><strong>Descuento de fundador</strong> Si lo adquieres ahora.</p>
  </div>
 
         </div>
