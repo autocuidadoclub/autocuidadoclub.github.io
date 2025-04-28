@@ -71,11 +71,15 @@
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
-           function registerUser(event) {
+          function registerUser(event) {
     event.preventDefault();
+
+    const loader = document.getElementById("loader");
+    loader.style.display = "flex"; // ⏳ Show loading
 
     if (!selectedPlanType) {
         alert("❌ Debes seleccionar un plan antes de registrarte.");
+        loader.style.display = "none";
         return;
     }
 
@@ -87,21 +91,22 @@
     const municipality = document.getElementById("municipality").value;
     const selectedDay = document.getElementById("selectedDay").value;
     const selectedTime = document.getElementById("selectedTime").value;
+    const referredBy = document.getElementById("referredBy") ? document.getElementById("referredBy").value.trim() : "";
 
     const vehicles = [];
     document.querySelectorAll(".vehicle-entry").forEach(entry => {
-       vehicles.push({
-    plate: entry.querySelector(".plate").value,
-    model: entry.querySelector(".model").value,
-    brand: entry.querySelector(".brand").value,
-    year: entry.querySelector(".year").value,
-    inspectionDates: [] // 🔧 Automatically include empty array
+        vehicles.push({
+            plate: entry.querySelector(".plate").value || "",
+            model: entry.querySelector(".model").value || "",
+            brand: entry.querySelector(".brand").value || "",
+            year: entry.querySelector(".year").value || "",
+            inspectionDates: []  // 🛡️ Empty array for future inspections
         });
-
     });
 
     if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
         alert("❌ Todos los campos son obligatorios.");
+        loader.style.display = "none";
         return;
     }
 
@@ -112,7 +117,6 @@
             const nextPaymentDate = new Date();
             nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-            // ✅ Prepare user data
             const userData = {
                 uid: userId,
                 name,
@@ -134,69 +138,43 @@
                 monthsPaid: 0,
                 vehicles,
                 freeRescheduleClaimed: false,
-                  
-               loyaltyCycle: 0,
-               lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-               paymentHistory: []
 
-                          };
+                loyaltyCycle: 0,
+                lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+                paymentHistory: [],
 
-            // ✅ Save user profile
-            return db.collection("users").doc(userId).set(userData).then(() => {
-                // ✅ Send email notification to info@autocuidadoclub.com
-fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-    method: "POST",
-    headers: { 
-        'Content-Type': 'application/json' 
-    },
-    body: JSON.stringify({
-        name: name,
-        email: email,
-        phone: phone,
-        subject: "new register in the platafform",
-        message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
-    })
-})
-.then(response => {
-    if (response.ok) {
-        console.log("✅ Email enviado a info@autocuidadoclub.com");
-    } else {
-        console.warn("⚠️ No se pudo enviar el email.");
-    }
-})
-.catch(error => console.error("❌ Error al enviar email:", error));
-              
-                          });
+                // 🧩 New fields for Referrals & Stripe integration
+                founderPhase: true,
+                referralsCompleted: 0,
+                plusReferralsCompleted: 0,
+                referralBonusAvailable: false,
+                nextCyclePrice: 0,
+                stripeCustomerId: "",
+                referredBy: referredBy
+            };
+
+            return db.collection("users").doc(userId).set(userData);
         })
         .then(() => {
-            // ✅ Show success overlay
-            const overlay = document.createElement("div");
-            overlay.style.position = "fixed";
-            overlay.style.top = "0";
-            overlay.style.left = "0";
-            overlay.style.width = "100%";
-            overlay.style.height = "100%";
-            overlay.style.backgroundColor = "rgba(0, 51, 102, 0.9)";
-            overlay.style.display = "flex";
-            overlay.style.flexDirection = "column";
-            overlay.style.justifyContent = "center";
-            overlay.style.alignItems = "center";
-            overlay.style.zIndex = "9999";
-            overlay.innerHTML = `
-                <h2 style="color: white; font-size: 2em; margin-bottom: 20px;">✅ Registro Exitoso</h2>
-                <p style="color: white; font-size: 1.2em; margin-bottom: 20px;">Redirigiendo a tu cuenta...</p>
-                <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #ff6600; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-            `;
-            document.body.appendChild(overlay);
+            return fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    subject: "new register in the platafform",
+                    message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
+                })
+            });
+        })
+        .then(() => {
+            loader.style.display = "none";
 
-            const style = document.createElement("style");
-            style.innerHTML = `
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `;
-            document.head.appendChild(style);
+            const successOverlay = document.getElementById("successOverlay");
+            if (successOverlay) {
+                successOverlay.style.display = "flex";
+            }
 
             setTimeout(() => {
                 window.location.href = "login.html";
@@ -205,6 +183,7 @@ fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         .catch((error) => {
             console.error("❌ Error en el registro:", error.message);
             alert("❌ Error en el registro: " + error.message);
+            loader.style.display = "none";
         });
 }
 
