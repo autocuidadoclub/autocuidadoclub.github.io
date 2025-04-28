@@ -1305,19 +1305,23 @@ function loadPaymentHistory() {
   _pe.tagPushSubscriber('inactive_2months');
 }
 
-     function showFirstTimePaymentOffer() {
+     function showFirstTimePaymentOffer(userData) {
   const offerBox = document.createElement("div");
+  const planType = userData.planType || "basic3m"; // fallback if missing
+  const payPalURL = getPaypalLink(planType) || "pago.html"; // fallback if missing link
+
   offerBox.innerHTML = `
-    <div style="background:#fff4e5; border:2px solid #ffa500; padding:20px; margin:20px 0; border-radius:10px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:1000; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" id="first-payment-offer">
-      <span onclick="document.getElementById('first-payment-offer').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
-      <h3>🎉 ¡Activa tu plan ahora!</h3>
-      <p>Recibe un beneficio especial: tu primer mes por solo <strong>$5</strong>. 🚗✨</p>
-      <button style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" onclick="redirectToPayment()">Activar Plan Ahora</button>
+    <div style="background:#fff3e0; border:2px solid #ff9800; padding:20px; margin:20px 0; border-radius:12px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:10000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-width:90%; text-align:center;">
+      <span onclick="document.getElementById('founderOfferBox').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
+      <h2>🚀 ¡Fase de Fundadores!</h2>
+      <p style="margin-top:10px;">Activa tu plan ahora y asegura tu precio exclusivo antes que termine esta etapa especial.</p>
+      <button onclick="window.location.href='${payPalURL}'" style="background:#ff6600; color:white; padding:10px 20px; border:none; border-radius:8px; margin-top:15px; font-size:16px;">Activar Plan</button>
     </div>
   `;
+  offerBox.id = "founderOfferBox";
   document.body.appendChild(offerBox);
 }
-
+        
 function redirectToPayment() {
   // Redirect to your payment page or PayPal link
   window.location.href = "https://www.paypal.com/pay/basic1m"; // Example link
