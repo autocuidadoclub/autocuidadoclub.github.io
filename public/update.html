@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Actualizar Usuarios</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="/env.js"></script> <!-- Your Firebase config -->
+</head>
+<body>
+  <h1>Actualizar Usuarios Existentes</h1>
+  <button onclick="updateExistingUsers()">Actualizar Ahora</button>
+
+  <script>
+    const db = firebase.firestore();
+
+    async function updateExistingUsers() {
+      const usersRef = db.collection("users");
+      const querySnapshot = await usersRef.get();
+
+      for (const userDoc of querySnapshot.docs) {
+        const userData = userDoc.data();
+        const updates = {};
+
+        if (!userData.department) updates.department = "Morazán";
+        if (!userData.freeRescheduleClaimed) updates.freeRescheduleClaimed = false;
+        if (!userData.lastLoyaltyReset) updates.lastLoyaltyReset = firebase.firestore.Timestamp.now();
+        if (!userData.lastUpgradeDate) updates.lastUpgradeDate = firebase.firestore.Timestamp.now();
+        if (!userData.loyaltyCycle && userData.loyaltyCycle !== 0) updates.loyaltyCycle = 0;
+        if (!userData.monthsPaid && userData.monthsPaid !== 0) updates.monthsPaid = 0;
+        if (!userData.nextCyclePrice && userData.nextCyclePrice !== 0) updates.nextCyclePrice = 0;
+        if (!userData.paymentHistory) updates.paymentHistory = [];
+        if (!userData.stripeCustomerId) updates.stripeCustomerId = "";
+        if (!userData.founderPhase) updates.founderPhase = true;
+        if (!userData.referralBonusAvailable) updates.referralBonusAvailable = false;
+        if (!userData.referralsCompleted && userData.referralsCompleted !== 0) updates.referralsCompleted = 0;
+        if (!userData.plusReferralsCompleted && userData.plusReferralsCompleted !== 0) updates.plusReferralsCompleted = 0;
+        if (!userData.referredBy) updates.referredBy = "";
+
+        if (!userData.vehicles) {
+          updates.vehicles = [{
+            brand: "",
+            model: "",
+            plate: "",
+            year: "",
+            inspectionDates: []
+          }];
+        }
+
+        if (!userData.schedule) {
+          updates.schedule = {
+            day: "",
+            time: ""
+          };
+        }
+
+        if (Object.keys(updates).length > 0) {
+          await userDoc.ref.update(updates);
+          console.log(`Updated user: ${userDoc.id}`);
+        }
+      }
+
+      alert("✅ Todos los usuarios actualizados.");
+    }
+  </script>
+</body>
+</html>
