@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>Actualizar Usuarios</title>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <script src="/env.js"></script> <!-- Your Firebase config -->
+  <script src="/env.js"></script> <!-- your env.js must define firebaseConfig -->
+
 </head>
 <body>
   <h1>Actualizar Usuarios Existentes</h1>
   <button onclick="updateExistingUsers()">Actualizar Ahora</button>
 
   <script>
-   firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-    
+    // Initialize Firebase only once
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // Define the function after Firebase is initialized
     async function updateExistingUsers() {
       const usersRef = db.collection("users");
       const querySnapshot = await usersRef.get();
@@ -60,11 +62,11 @@ const db = firebase.firestore();
 
         if (Object.keys(updates).length > 0) {
           await userDoc.ref.update(updates);
-          console.log(`Updated user: ${userDoc.id}`);
+          console.log(`✅ Updated user: ${userDoc.id}`, updates);
         }
       }
 
-      alert("✅ Todos los usuarios actualizados.");
+      alert("✅ Todos los usuarios actualizados exitosamente.");
     }
   </script>
 </body>
