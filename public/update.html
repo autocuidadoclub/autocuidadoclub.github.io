@@ -12,6 +12,10 @@
   <button onclick="updateExistingUsers()">Actualizar Ahora</button>
 
   <script>
+   firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+    
     const db = firebase.firestore();
 
     async function updateExistingUsers() {
