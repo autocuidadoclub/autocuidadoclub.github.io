@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procesando tu pago...</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="env.js?v=1.0"></script>
+</head>
+<body>
+  <h2 style="text-align: center;">Redirigiéndote a Stripe...</h2>
+  <div style="text-align: center;"><img src="loading.gif" alt="Cargando..." style="width:80px"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: window._env_.FIREBASE_API_KEY,
+      authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+      projectId: window._env_.FIREBASE_PROJECT_ID,
+      storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+      appId: window._env_.FIREBASE_APP_ID,
+      measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const uid = urlParams.get("uid");
+
+    const links = {
+      basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
+      basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
+      basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
+      plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
+      plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
+      plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
+    };
+
+    if (uid) {
+      db.collection("users").doc(uid).get().then(doc => {
+        if (!doc.exists) throw new Error("Usuario no encontrado");
+        const data = doc.data();
+        const plan = data.planType;
+        if (!links[plan]) throw new Error("Plan no válido");
+        window.location.href = links[plan];
+      }).catch(err => {
+        console.error("❌ Error redirigiendo al link de Stripe:", err);
+        alert("Error al procesar el pago. Intenta de nuevo más tarde.");
+      });
+    } else {
+      alert("❌ UID no encontrado en la URL");
+    }
+  </script>
+</body>
+</html>
