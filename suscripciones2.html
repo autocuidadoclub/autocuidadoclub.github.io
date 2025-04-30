@@ -1216,9 +1216,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
          loader.style.display = "none"; // ✅ Hide loader after all is done
       document.getElementById("successOverlay").style.display = "flex";
-    setTimeout(() => {
-    window.location.href = `checkout.html?uid=${firebase.auth().currentUser.uid}`;
+setTimeout(() => {
+    window.location.href = `checkout.html?uid=${userId}`;
 }, 2500);
+
 }
         catch (error) {
       console.error("❌ Error:", error);
