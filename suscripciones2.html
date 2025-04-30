@@ -1187,9 +1187,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
          loader.style.display = "none"; // ✅ Hide loader after all is done
       document.getElementById("successOverlay").style.display = "flex";
-      setTimeout(() => { window.location.href = "login.html"; }, 2500);
-
-    } catch (error) {
+    setTimeout(() => {
+    window.location.href = `checkout.html?uid=${firebase.auth().currentUser.uid}`;
+}, 2500);
+}
+        catch (error) {
       console.error("❌ Error:", error);
       alert("Error: " + error.message);
           loader.style.display = "none"; // ⛔ Hide loader on error
