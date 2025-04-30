@@ -72,149 +72,123 @@
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
          function registerUser(event) {
-    event.preventDefault();
-    const loader = document.getElementById("loader");
-    loader.style.display = "flex";
+  event.preventDefault();
+  const loader = document.getElementById("loader");
+  loader.style.display = "flex";
 
-    if (!selectedPlanType) {
-        alert("❌ Debes seleccionar un plan antes de registrarte.");
-        loader.style.display = "none";
-        return;
-    }
+  if (!selectedPlanType) {
+    alert("❌ Debes seleccionar un plan antes de registrarte.");
+    loader.style.display = "none";
+    return;
+  }
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const department = document.getElementById("department").value;
-    const municipality = document.getElementById("municipality").value;
-    const selectedDay = document.getElementById("selectedDay").value;
-    const selectedTime = document.getElementById("selectedTime").value;
-    const referredBy = document.getElementById("referredBy") ? document.getElementById("referredBy").value.trim() : "";
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const department = document.getElementById("department").value;
+  const municipality = document.getElementById("municipality").value;
+  const selectedDay = document.getElementById("selectedDay").value;
+  const selectedTime = document.getElementById("selectedTime").value;
+  const referredBy = document.getElementById("referredBy") ? document.getElementById("referredBy").value.trim() : "";
 
-    const vehicles = [];
-    document.querySelectorAll(".vehicle-entry").forEach(entry => {
-        vehicles.push({
-            plate: entry.querySelector(".plate").value || "",
-            model: entry.querySelector(".model").value || "",
-            brand: entry.querySelector(".brand").value || "",
-            year: entry.querySelector(".year").value || "",
-            inspectionDates: []
-        });
+  const vehicles = [];
+  document.querySelectorAll(".vehicle-entry").forEach(entry => {
+    vehicles.push({
+      plate: entry.querySelector(".plate").value || "",
+      model: entry.querySelector(".model").value || "",
+      brand: entry.querySelector(".brand").value || "",
+      year: entry.querySelector(".year").value || "",
+      inspectionDates: []
     });
+  });
 
-    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-        alert("❌ Todos los campos son obligatorios.");
-        loader.style.display = "none";
-        return;
-    }
+  if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+    alert("❌ Todos los campos son obligatorios.");
+    loader.style.display = "none";
+    return;
+  }
 
-    // ✅ Define checkoutLink BEFORE using it
-    let checkoutLink = "";
-    switch (selectedPlanType) {
-        case "basic3m":
-            checkoutLink = "https://stripe.com/link-for-basic3m";
-            break;
-        case "basic6m":
-            checkoutLink = "https://stripe.com/link-for-basic6m";
-            break;
-        case "basic12m":
-            checkoutLink = "https://stripe.com/link-for-basic12m";
-            break;
-        case "plus3m":
-            checkoutLink = "https://stripe.com/link-for-plus3m";
-            break;
-        case "plus6m":
-            checkoutLink = "https://stripe.com/link-for-plus6m";
-            break;
-        case "plus12m":
-            checkoutLink = "https://stripe.com/link-for-plus12m";
-            break;
-        default:
-            checkoutLink = "";
-    }
+  const stripeLinks = {
+    basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
+    basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
+    basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
+    plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
+    plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
+    plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
+  };
+  const checkoutLink = stripeLinks[selectedPlanType] || "";
 
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            const paymentDate = new Date();
-            const nextPaymentDate = new Date();
-            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      const userId = userCredential.user.uid;
+      const paymentDate = new Date();
+      const nextPaymentDate = new Date();
+      nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-            const userData = {
-                uid: userId,
-                name,
-                email,
-                phone,
-                planType: selectedPlanType,
-                department,
-                municipality,
-                registrationDate: firebase.firestore.Timestamp.now(),
-                lastUpgradeDate: firebase.firestore.Timestamp.now(),
-                schedule: {
-                    day: selectedDay,
-                    time: selectedTime
-                },
-                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-                paymentStatus: "Pending",
-                subscriptionStatus: "active",
-                monthsPaid: 0,
-                vehicles,
-                freeRescheduleClaimed: false,
-                loyaltyCycle: 0,
-                lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-                paymentHistory: [],
-                founderPhase: true,
-                referralsCompleted: 0,
-                plusReferralsCompleted: 0,
-                referralBonusAvailable: false,
-                nextCyclePrice: 0,
-                stripeCustomerId: "",
-                referredBy: referredBy,
-                checkoutLink: checkoutLink // ✅ This is now defined above
-            };
+      const userData = {
+        uid: userId,
+        name,
+        email,
+        phone,
+        planType: selectedPlanType,
+        department,
+        municipality,
+        registrationDate: firebase.firestore.Timestamp.now(),
+        lastUpgradeDate: firebase.firestore.Timestamp.now(),
+        schedule: {
+          day: selectedDay,
+          time: selectedTime
+        },
+        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+        paymentStatus: "Pending",
+        subscriptionStatus: "active",
+        monthsPaid: 0,
+        vehicles,
+        freeRescheduleClaimed: false,
+        loyaltyCycle: 0,
+        lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+        paymentHistory: [],
+        founderPhase: true,
+        referralsCompleted: 0,
+        plusReferralsCompleted: 0,
+        referralBonusAvailable: false,
+        nextCyclePrice: 0,
+        stripeCustomerId: "",
+        referredBy,
+        checkoutLink
+      };
 
-            return db.collection("users").doc(userId).set(userData);
+      return db.collection("users").doc(userId).set(userData).then(() => userId);
+    })
+    .then(userId => {
+      return fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          subject: "new register in the platafform",
+          message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
         })
-        .then(() => {
-            return fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    subject: "new register in the platafform",
-                    message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
-                })
-            });
-        })
-        .then(() => {
-            loader.style.display = "none";
-
-            const successOverlay = document.getElementById("successOverlay");
-            if (successOverlay) {
-                successOverlay.style.display = "flex";
-            }
-
-            setTimeout(() => {
-              auth.onAuthStateChanged((user) => {
-    if (user) {
-        window.location.href = `checkout.html?uid=${user.uid}`;
-    } else {
-        alert("❌ Error: usuario no autenticado.");
-    }
-});
-
-            }, 2500);
-        })
-        .catch((error) => {
-            console.error("❌ Error en el registro:", error.message);
-            alert("❌ Error en el registro: " + error.message);
-            loader.style.display = "none";
-        });
+      }).then(() => userId);
+    })
+    .then(userId => {
+      loader.style.display = "none";
+      document.getElementById("successOverlay").style.display = "flex";
+      setTimeout(() => {
+        window.location.href = `checkout.html?uid=${userId}`;
+      }, 2000);
+    })
+    .catch(error => {
+      console.error("❌ Error en el registro:", error.message);
+      alert("❌ Error en el registro: " + error.message);
+      loader.style.display = "none";
+    });
 }
+
 
 
             
