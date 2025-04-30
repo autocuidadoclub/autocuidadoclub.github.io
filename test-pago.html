@@ -9,10 +9,16 @@
   <script src="env.js?v=1.0"></script>
 </head>
 <body>
-  <h2>Creando cuenta de prueba y redirigiendo...</h2>
+  <h2>Probar Flujo de Pago</h2>
+  <p>Haz clic en un plan para simular el flujo completo:</p>
+  <button onclick="testPayment('basic3m')">Basic 3 Meses</button>
+  <button onclick="testPayment('basic6m')">Basic 6 Meses</button>
+  <button onclick="testPayment('basic12m')">Basic 12 Meses</button>
+  <button onclick="testPayment('plus3m')">Plus 3 Meses</button>
+  <button onclick="testPayment('plus6m')">Plus 6 Meses</button>
+  <button onclick="testPayment('plus12m')">Plus 12 Meses</button>
 
   <script>
-    // ✅ Inicializar Firebase
     const firebaseConfig = {
       apiKey: window._env_.FIREBASE_API_KEY,
       authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
@@ -29,11 +35,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ✅ Datos de prueba
-    const testEmail = `test${Date.now()}@autocuidadoclub.com`;
-    const testPassword = "test1234";
-    const selectedPlan = "basic3m"; // Cambia si querés probar otro
-
     const stripeLinks = {
       basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
       basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
@@ -43,28 +44,12 @@
       plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
     };
 
-    // ✅ Crear usuario de prueba y redirigir
-    auth.createUserWithEmailAndPassword(testEmail, testPassword)
-      .then(userCred => {
-        const uid = userCred.user.uid;
+    function testPayment(plan) {
+      const testEmail = `test${Date.now()}@autocuidadoclub.com`;
+      const testPassword = "test1234";
 
-        return db.collection("users").doc(uid).set({
-          uid,
-          email: testEmail,
-          planType: selectedPlan,
-          registrationDate: firebase.firestore.Timestamp.now(),
-          paymentStatus: "Pending",
-          checkoutLink: stripeLinks[selectedPlan]
-        }).then(() => {
-          setTimeout(() => {
-            window.location.href = `checkout.html?uid=${uid}`;
-          }, 1000); // ⏳ Asegura propagación
-        });
-      })
-      .catch(error => {
-        alert("❌ Error: " + error.message);
-        console.error(error);
-      });
-  </script>
-</body>
-</html>
+      auth.createUserWithEmailAndPassword(testEmail, testPassword)
+        .then(userCred => {
+          const uid = userCred.user.uid;
+
+          return
