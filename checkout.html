@@ -29,32 +29,24 @@
   const urlParams = new URLSearchParams(window.location.search);
   const uid = urlParams.get("uid");
 
-  const links = {
-    basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
-    basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
-    basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
-    plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
-    plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
-    plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
-  };
-
   if (uid) {
     db.collection("users").doc(uid).get().then(doc => {
       if (!doc.exists) throw new Error("Usuario no encontrado");
       const data = doc.data();
 
-      // 🔒 If user already paid, redirect to dashboard
+      // 🔒 If already paid, go to dashboard
       if (data.paymentStatus === "Completed") {
         alert("✅ Ya has completado tu pago.");
         window.location.href = "dashboard.html";
         return;
       }
 
-      const plan = data.planType;
-      if (!links[plan]) throw new Error("Plan no válido");
+      const checkoutLink = data.checkoutLink;
+      if (!checkoutLink) throw new Error("No se encontró el enlace de Stripe.");
 
-      // ✅ Redirect to Stripe checkout link
-      window.location.href = links[plan];
+      setTimeout(() => {
+        window.location.href = checkoutLink;
+      }, 1500);
     }).catch(err => {
       console.error("❌ Error redirigiendo al link de Stripe:", err);
       alert("Error al procesar el pago. Intenta de nuevo más tarde.");
