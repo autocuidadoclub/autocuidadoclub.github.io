@@ -178,9 +178,26 @@
     .then(userId => {
       loader.style.display = "none";
       document.getElementById("successOverlay").style.display = "flex";
-      setTimeout(() => {
-        window.location.href = `checkout.html?uid=${userId}`;
-      }, 2000);
+      // Get checkout link from Firestore or predefined
+const stripeLinks = {
+  basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
+  basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
+  basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
+  plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
+  plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
+  plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
+};
+
+const checkoutLink = stripeLinks[selectedPlanType] || "";
+
+// 🆕 Open Stripe checkout in a new tab
+if (checkoutLink) {
+  window.open(checkoutLink, "_blank");
+}
+
+// ✅ Redirect current page to login.html
+window.location.href = "login.html";
+
     })
     .catch(error => {
       console.error("❌ Error en el registro:", error.message);
