@@ -71,11 +71,10 @@
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
-          function registerUser(event) {
+         function registerUser(event) {
     event.preventDefault();
-
     const loader = document.getElementById("loader");
-    loader.style.display = "flex"; // ⏳ Show loading
+    loader.style.display = "flex";
 
     if (!selectedPlanType) {
         alert("❌ Debes seleccionar un plan antes de registrarte.");
@@ -100,7 +99,7 @@
             model: entry.querySelector(".model").value || "",
             brand: entry.querySelector(".brand").value || "",
             year: entry.querySelector(".year").value || "",
-            inspectionDates: []  // 🛡️ Empty array for future inspections
+            inspectionDates: []
         });
     });
 
@@ -108,6 +107,31 @@
         alert("❌ Todos los campos son obligatorios.");
         loader.style.display = "none";
         return;
+    }
+
+    // ✅ Define checkoutLink BEFORE using it
+    let checkoutLink = "";
+    switch (selectedPlanType) {
+        case "basic3m":
+            checkoutLink = "https://stripe.com/link-for-basic3m";
+            break;
+        case "basic6m":
+            checkoutLink = "https://stripe.com/link-for-basic6m";
+            break;
+        case "basic12m":
+            checkoutLink = "https://stripe.com/link-for-basic12m";
+            break;
+        case "plus3m":
+            checkoutLink = "https://stripe.com/link-for-plus3m";
+            break;
+        case "plus6m":
+            checkoutLink = "https://stripe.com/link-for-plus6m";
+            break;
+        case "plus12m":
+            checkoutLink = "https://stripe.com/link-for-plus12m";
+            break;
+        default:
+            checkoutLink = "";
     }
 
     auth.createUserWithEmailAndPassword(email, password)
@@ -138,19 +162,17 @@
                 monthsPaid: 0,
                 vehicles,
                 freeRescheduleClaimed: false,
-
                 loyaltyCycle: 0,
                 lastLoyaltyReset: firebase.firestore.Timestamp.now(),
                 paymentHistory: [],
-
-                // 🧩 New fields for Referrals & Stripe integration
                 founderPhase: true,
                 referralsCompleted: 0,
                 plusReferralsCompleted: 0,
                 referralBonusAvailable: false,
                 nextCyclePrice: 0,
                 stripeCustomerId: "",
-                referredBy: referredBy
+                referredBy: referredBy,
+                checkoutLink: checkoutLink // ✅ This is now defined above
             };
 
             return db.collection("users").doc(userId).set(userData);
@@ -177,7 +199,7 @@
             }
 
             setTimeout(() => {
-                window.location.href = "login.html";
+                window.location.href = "checkout.html"; // Or pass UID or token if needed
             }, 2500);
         })
         .catch((error) => {
