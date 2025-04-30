@@ -34,7 +34,7 @@
       if (!doc.exists) throw new Error("Usuario no encontrado");
       const data = doc.data();
 
-      // 🔒 If already paid, go to dashboard
+      // Verificar si el usuario ya ha pagado
       if (data.paymentStatus === "Completed") {
         alert("✅ Ya has completado tu pago.");
         window.location.href = "dashboard.html";
@@ -42,7 +42,9 @@
       }
 
       const checkoutLink = data.checkoutLink;
-      if (!checkoutLink) throw new Error("No se encontró el enlace de Stripe.");
+      if (!checkoutLink || typeof checkoutLink !== "string") throw new Error("No se encontró el enlace de Stripe.");
+
+      console.log("🔗 Redirigiendo a:", checkoutLink);
 
       setTimeout(() => {
         window.location.href = checkoutLink;
