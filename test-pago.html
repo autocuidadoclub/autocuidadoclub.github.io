@@ -2,103 +2,59 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Test de Pago</title>
+  <title>🧪 Test de Pago</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
   <script src="env.js?v=1.0"></script>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-    button {
-      padding: 12px 20px;
-      margin: 10px;
-      font-size: 16px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0055aa;
-    }
-    #loader {
-      display: none;
-      margin-top: 30px;
-    }
-  </style>
+  <style>/* … your existing styles … */</style>
 </head>
 <body>
-
   <h2>🧪 Probar flujo de pago con cuenta temporal</h2>
-
-  <p>Selecciona un plan para simular el flujo completo (registro + redirección a Stripe):</p>
-
+  <p>Selecciona un plan:</p>
   <button onclick="testPayment('basic3m')">Basic 3M</button>
-  <button onclick="testPayment('basic6m')">Basic 6M</button>
-  <button onclick="testPayment('basic12m')">Basic 12M</button>
-  <button onclick="testPayment('plus3m')">Plus 3M</button>
-  <button onclick="testPayment('plus6m')">Plus 6M</button>
-  <button onclick="testPayment('plus12m')">Plus 12M</button>
-
-  <div id="loader">
-    <p>⏳ Creando cuenta y redirigiendo a Stripe...</p>
-    <img src="loading.gif" alt="Cargando..." width="80">
+  <!-- … other buttons … -->
+  <div id="loader" style="display:none;">
+    ⏳ Creando cuenta y redirigiendo…
   </div>
 
   <script>
-    const firebaseConfig = {
-      apiKey: window._env_.FIREBASE_API_KEY,
-      authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-      projectId: window._env_.FIREBASE_PROJECT_ID,
-      storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-      appId: window._env_.FIREBASE_APP_ID,
-      measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-    };
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    // 1) init Firebase + functions
+    const cfg = { apiKey: window._env_.FIREBASE_API_KEY, authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+                  projectId: window._env_.FIREBASE_PROJECT_ID };
+    if (!firebase.apps.length) firebase.initializeApp(cfg);
+    const auth      = firebase.auth();
+    const db        = firebase.firestore();
+    const functions = firebase.app().functions("us-central1");
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const stripeLinks = {
-      basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
-      basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
-      basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
-      plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
-      plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
-      plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
-    };
-
-    function testPayment(plan) {
+    async function testPayment(plan) {
       document.getElementById("loader").style.display = "block";
 
-      const testEmail = `test${Date.now()}@autocuidadoclub.com`;
-      const testPassword = "test1234";
+      // 2) create a temp user
+      const email    = `test${Date.now()}@autocuidadoclub.com`;
+      const password = "test1234";
+      const userCred = await auth.createUserWithEmailAndPassword(email, password);
 
-      auth.createUserWithEmailAndPassword(testEmail, testPassword)
-        .then(userCred => {
-          const uid = userCred.user.uid;
-          return db.collection("users").doc(uid).set({
-            uid,
-            email: testEmail,
-            planType: plan,
-            registrationDate: firebase.firestore.Timestamp.now(),
-            paymentStatus: "Pending",
-            checkoutLink: stripeLinks[plan]
-          }).then(() => {
-            setTimeout(() => {
-              window.location.href = `checkout.html?uid=${uid}`;
-            }, 1000);
-          });
-        })
-        .catch(error => {
-          alert("❌ Error: " + error.message);
-          console.error(error);
-          document.getElementById("loader").style.display = "none";
-        });
+      // 3) write minimal user doc
+      await db.collection("users").doc(userCred.user.uid).set({
+        uid: userCred.user.uid,
+        email,
+        planType: plan,
+        paymentStatus: "Pending",
+        registrationDate: firebase.firestore.Timestamp.now()
+      });
+
+      // 4) call your createCheckoutSession function
+      const callable = functions.httpsCallable("createCheckoutSession");
+      const origin   = window.location.origin;
+      const resp     = await callable({ plan, origin });
+      // resp.data.url is the Stripe Checkout link
+
+      // 5) redirect in a new tab
+      window.open(resp.data.url, "_blank");
+      auth.signOut();  // so your main tab can stay unauthenticated
+      document.getElementById("loader").innerText = "✅ Sesión creada, revisa la nueva pestaña.";
     }
   </script>
 </body>
