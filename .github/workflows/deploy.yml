@@ -1,63 +1,84 @@
 # .github/workflows/deploy.yml
-name: 🚀 Deploy AutoCuidado Club
+name: 🚀 Deploy AutoCuidado Club to Firebase Hosting & GitHub Pages
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy_hosting:
-    name: Deploy Firebase Hosting
+  deploy_firebase:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Generate env.js
         run: |
+          echo "🔍 Generating env.js..."
           mkdir -p public
           cat <<EOF > public/env.js
           window._env_ = {
-            FIREBASE_API_KEY:      "${{ secrets.FIREBASE_API_KEY }}",
-            FIREBASE_AUTH_DOMAIN:  "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-            FIREBASE_PROJECT_ID:   "${{ secrets.FIREBASE_PROJECT_ID }}",
-            FIREBASE_STORAGE_BUCKET:"${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-            FIREBASE_MESSAGING_SENDER_ID:"${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
-            FIREBASE_APP_ID:       "${{ secrets.FIREBASE_APP_ID }}",
-            FIREBASE_MEASUREMENT_ID:"${{ secrets.FIREBASE_MEASUREMENT_ID }}"
+            FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}",
+            FIREBASE_AUTH_DOMAIN: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+            FIREBASE_PROJECT_ID: "${{ secrets.FIREBASE_PROJECT_ID }}",
+            FIREBASE_STORAGE_BUCKET: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+            FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
+            FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}",
+            FIREBASE_MEASUREMENT_ID: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
           };
           EOF
+          echo "✅ env.js generated successfully."
 
-      - name: Decode Service Account
-        run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d > $HOME/service-account.json
+      - name: Verify env.js exists
+        run: cat public/env.js || echo "❌ env.js is missing!"
 
-      - name: Authenticate gcloud
+      - name: Decode Firebase Service Account JSON
         run: |
-          curl -sSL https://sdk.cloud.google.com | bash > /dev/null
-          source $HOME/google-cloud-sdk/path.bash.inc
+          echo "🔍 Decoding Firebase Service Account JSON..."
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
+          if [ ! -s "$HOME/service-account.json" ]; then
+            echo "❌ Error: service-account.json is empty or missing!"
+            exit 1
+          fi
+          echo "✅ Firebase Service Account decoded."
+
+      - name: Authenticate with Google Cloud
+        run: |
+          echo "🔍 Authenticating with Google Cloud..."
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           gcloud auth activate-service-account --key-file=$HOME/service-account.json
           gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
+          gcloud auth list
+          echo "✅ Google Cloud authentication successful."
 
       - name: Install Firebase CLI
-        run: curl -sL https://firebase.tools | bash
+        run: |
+          echo "🔍 Installing Firebase CLI..."
+          curl -sL https://firebase.tools | bash
+          firebase --version
+          echo "✅ Firebase CLI installed."
 
       - name: Deploy to Firebase Hosting
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-account.json
-        run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          echo "🚀 Deploying to Firebase Hosting..."
+          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
+          echo "✅ Firebase Hosting deployed successfully."
 
   deploy_github_pages:
-    name: Deploy to GitHub Pages
-    needs: deploy_hosting
     runs-on: ubuntu-latest
+    needs: deploy_firebase
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Copy Hosting output to public/
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up GitHub Pages
         run: |
           mkdir -p public
-          cp -r public/* public/  # if your hosting build is in public/
-      - name: Push to gh-pages
+          cp index.html public/index.html
+
+      - name: Deploy GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
@@ -65,26 +86,41 @@ jobs:
 
   deploy_functions:
     name: Deploy Firebase Functions
-    needs: deploy_hosting
     runs-on: ubuntu-latest
+    needs: deploy_firebase
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Decode Service Account
+      - name: Decode Firebase Service Account JSON
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d > $HOME/service-account.json
+          echo "🔍 Decoding Firebase Service Account JSON..."
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
+          if [ ! -s "$HOME/service-account.json" ]; then
+            echo "❌ Error: service-account.json is empty or missing!"
+            exit 1
+          fi
+          echo "✅ Firebase Service Account decoded."
 
-      - name: Authenticate gcloud
+      - name: Authenticate with Google Cloud
         run: |
-          curl -sSL https://sdk.cloud.google.com | bash > /dev/null
-          source $HOME/google-cloud-sdk/path.bash.inc
+          echo "🔍 Authenticating with Google Cloud..."
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           gcloud auth activate-service-account --key-file=$HOME/service-account.json
           gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
+          gcloud auth list
+          echo "✅ Google Cloud authentication successful."
 
       - name: Install Firebase CLI
-        run: curl -sL https://firebase.tools | bash
+        run: |
+          echo "🔍 Installing Firebase CLI..."
+          curl -sL https://firebase.tools | bash
+          firebase --version
+          echo "✅ Firebase CLI installed."
 
-      - name: Deploy Cloud Functions
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-account.json
-        run: firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Deploy to Firebase Functions
+        run: |
+          echo "🚀 Deploying to Firebase Functions..."
+          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only functions --project=${{ secrets.FIREBASE_PROJECT_ID }}
+          echo "✅ Firebase Functions deployed successfully."
