@@ -1,6 +1,53 @@
+name: Deploy AutoCuidado Club
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:  # ← ESTA LÍNEA FALTABA
+
+  deploy_firebase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate env.js
+        run: |
+          echo "🔍 Generating env.js..."
+          cat <<EOF > public/env.js
+          window._env_ = {
+            FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}",
+            FIREBASE_AUTH_DOMAIN: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+            FIREBASE_PROJECT_ID: "${{ secrets.FIREBASE_PROJECT_ID }}",
+            FIREBASE_STORAGE_BUCKET: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+            FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
+            FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}",
+            FIREBASE_MEASUREMENT_ID: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
+          };
+          EOF
+
+      - name: Decode Firebase Service Account JSON
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
+
+      - name: Authenticate with Google Cloud
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
+          gcloud auth activate-service-account --key-file=$HOME/service-account.json
+          gcloud config set project ${{ secrets.FIREBASE_PROJECT_ID }}
+
+      - name: Install Firebase CLI
+        run: curl -sL https://firebase.tools | bash
+
+      - name: Deploy to Firebase Hosting
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
+          firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
+
   deploy_github_pages:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -16,7 +63,7 @@
           branch: gh-pages
           folder: public
 
-  deploy_functions:  # ← ❗ ESTA LÍNEA ESTABA MAL INDENTADA
+  deploy_functions:
     runs-on: ubuntu-latest
     needs: deploy_firebase
     steps:
