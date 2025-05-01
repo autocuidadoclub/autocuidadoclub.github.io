@@ -108,3 +108,54 @@ exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
     return res.status(500).send("Error del servidor.");
   }
 });
+
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const Stripe = require("stripe");
+
+admin.initializeApp();
+const db = admin.firestore();
+
+// Load Stripe secret and webhook secret from environment
+const stripe = Stripe(functions.config().stripe.secret);
+const endpointSecret = functions.config().stripe.webhook;
+
+exports.stripeWebhook = functions.https.onRequest((req, res) => {
+  const sig = req.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+  } catch (err) {
+    console.error("❌ Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  const session = event.data.object;
+
+  if (event.type === "checkout.session.completed") {
+    const uid = session.metadata.uid;
+
+    return db.collection("users").doc(uid).update({
+      paymentStatus: "Completed",
+      paymentDate: admin.firestore.Timestamp.now(),
+      nextPaymentDate: admin.firestore.Timestamp.fromDate(
+        new Date(new Date().setMonth(new Date().getMonth() + 1))
+      ),
+      paymentHistory: admin.firestore.FieldValue.arrayUnion({
+        date: admin.firestore.Timestamp.now(),
+        amount: session.amount_total / 100,
+        method: "Stripe",
+        status: "Completed",
+      }),
+    }).then(() => {
+      console.log(`✅ Payment recorded for user: ${uid}`);
+      return res.status(200).send("Success");
+    }).catch((err) => {
+      console.error("❌ Firestore update failed:", err);
+      return res.status(500).send("Firestore update error");
+    });
+  }
+
+  return res.status(200).send("Unhandled event type");
+});
