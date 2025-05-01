@@ -90,3 +90,26 @@ jobs:
         with:
           branch: gh-pages
           folder: public
+
+  deploy_functions:
+    name: Deploy Firebase Functions
+    runs-on: ubuntu-latest
+    needs: deploy_firebase   # ← ensures your hosting/env steps ran first
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Decode Service Account
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" \
+            | base64 --decode > $HOME/service-account.json
+          echo $HOME/service-account.json
+
+      - name: Install Firebase CLI
+        run: curl -sL https://firebase.tools | bash
+
+      - name: Authenticate to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }} \
+            --token "${{ secrets.FIREBASE_TOKEN }}"
