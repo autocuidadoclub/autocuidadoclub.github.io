@@ -63,9 +63,10 @@ jobs:  # ← ESTA LÍNEA FALTABA
           branch: gh-pages
           folder: public
 
-  deploy_functions:
+    deploy_functions:
     runs-on: ubuntu-latest
     needs: deploy_firebase
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -80,14 +81,14 @@ jobs:  # ← ESTA LÍNEA FALTABA
         run: |
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
           firebase functions:config:set \
-            "stripe.secret=${{ secrets.STRIPE_SECRET_KEY }}" \
-            "stripe.webhook=${{ secrets.STRIPE_WEBHOOK_SECRET }}" \
-            "zoho.client_id=${{ secrets.ZOHO_CLIENT_ID }}" \
-            "zoho.client_secret=${{ secrets.ZOHO_CLIENT_SECRET }}" \
-            "zoho.refresh_token=${{ secrets.ZOHO_REFRESH_TOKEN }}" \
-            "zoho.api_domain=${{ secrets.ZOHO_API_DOMAIN }}" \
-            "zoho.user_id=${{ secrets.ZOHO_USER_ID }}" \
-            "app.url=https://autocuidadoclub.com" \
+            stripe.secret="${{ secrets.STRIPE_SECRET_KEY }}" \
+            stripe.webhook="${{ secrets.STRIPE_WEBHOOK_SECRET }}" \
+            zoho.client_id="${{ secrets.ZOHO_CLIENT_ID }}" \
+            zoho.client_secret="${{ secrets.ZOHO_CLIENT_SECRET }}" \
+            zoho.refresh_token="${{ secrets.ZOHO_REFRESH_TOKEN }}" \
+            zoho.api_domain="${{ secrets.ZOHO_API_DOMAIN }}" \
+            zoho.user_id="${{ secrets.ZOHO_USER_ID }}" \
+            app.url="https://autocuidadoclub.com" \
             --project="${{ secrets.FIREBASE_PROJECT_ID }}"
 
       - name: Deploy Firebase Functions
