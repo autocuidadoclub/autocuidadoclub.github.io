@@ -30,8 +30,7 @@ jobs:
 
       - name: Decode Firebase Service Account JSON
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
-
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > $HOME/service-account.json
       - name: Authenticate with Google Cloud
         run: |
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account.json
