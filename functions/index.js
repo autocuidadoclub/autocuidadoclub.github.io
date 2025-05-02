@@ -146,7 +146,8 @@ exports.createCheckoutSession = functions.https.onCall(async (data, context) => 
 
 // ─── 4️⃣ Webhook: Handle completed checkouts ──────────────────────────────────
 
-exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+exports.stripeWebhook = functions.https.onRequest({ rawBody: true }, async (req, res) => {
+
   const sig = req.headers['stripe-signature'];
   let event;
 
@@ -187,6 +188,8 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 
   // 2️⃣ Monthly subscription payment success
   if (event.type === 'invoice.payment_succeeded') {
+    console.log('📥 invoice.payment_succeeded received!');
+    console.log('🧾 Invoice data:', JSON.stringify(event.data.object, null, 2));
     const invoice = event.data.object;
     const customerEmail = invoice.customer_email || invoice.customer;
     const amountPaid = invoice.amount_paid / 100;
@@ -199,29 +202,36 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       timestamp: Date.now(),
     });
 
-    await sendZohoMail(
-      'info@autocuidadoclub.com',
-      `💳 Pago recibido de ${customerEmail}`,
-      `Plan: ${planId}, Monto: $${amountPaid.toFixed(2)}`
-    );
+    try {
+  await sendZohoMail(
+    'info@autocuidadoclub.com',
+    `💳 Pago recibido de ${customerEmail}`,
+    `Plan: ${planId}, Monto: $${amountPaid.toFixed(2)}`
+  );
+  console.log('✅ Zoho mail sent successfully');
+} catch (err) {
+  console.error('❌ Error sending Zoho mail:', err.response?.data || err.message);
+}
 
-    console.log(`✅ invoice.payment_succeeded email sent for ${customerEmail}`);
-  }
 
   // 3️⃣ Subscription payment failed
   if (event.type === 'invoice.payment_failed') {
+    console.log('📥 invoice.payment_failed received!');
     const invoice = event.data.object;
     const customerEmail = invoice.customer_email || invoice.customer;
     const amountDue = invoice.amount_due / 100;
 
-    await sendZohoMail(
-      'info@autocuidadoclub.com',
-      `⚠️ Falló el pago de ${customerEmail}`,
-      `Monto pendiente: $${amountDue.toFixed(2)} – por favor contactar.`
-    );
+    try {
+  await sendZohoMail(
+    'info@autocuidadoclub.com',
+    `⚠️ Falló el pago de ${customerEmail}`,
+    `Monto pendiente: $${amountDue.toFixed(2)} – por favor contactar.`
+  );
+  console.log('⚠️ Zoho failed payment email sent');
+} catch (err) {
+  console.error('❌ Error sending failed payment email:', err.response?.data || err.message);
+}
 
-    console.log(`❌ invoice.payment_failed email sent for ${customerEmail}`);
-  }
 
   // ✅ Always ACK
   res.json({ received: true });
