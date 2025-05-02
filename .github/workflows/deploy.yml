@@ -33,7 +33,14 @@ jobs:
 
       - name: Decode Firebase Service Account JSON
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | jq . > $HOME/service-account.json
+          echo "🔍 Decoding Firebase Service Account JSON..."
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
+          if [ ! -s "$HOME/service-account.json" ]; then
+            echo "❌ Error: service-account.json is empty or missing!"
+            exit 1
+          fi
+          echo "✅ Firebase Service Account decoded."
+
 
       - name: Authenticate with Google Cloud
         run: |
@@ -80,7 +87,14 @@ jobs:
 
       - name: Decode Firebase Service Account
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | jq . > $HOME/service-account.json
+          echo "🔍 Decoding Firebase Service Account JSON..."
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > $HOME/service-account.json
+          if [ ! -s "$HOME/service-account.json" ]; then
+            echo "❌ Error: service-account.json is empty or missing!"
+            exit 1
+          fi
+          echo "✅ Firebase Service Account decoded."
+
 
       - name: Install Firebase CLI
         run: curl -sL https://firebase.tools | bash
