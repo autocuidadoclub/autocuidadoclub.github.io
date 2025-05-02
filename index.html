@@ -29,46 +29,7 @@
 </head>
 
 <body>
-    <button id="install-button" style="display:none;">Instala nuestra AutoCuidado Club APP</button>
-
-    <div id="ios-message" style="display:none; text-align:center; padding:10px; background:#f1f1f1;">
-        📱 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca <strong>Compartir</strong> y selecciona <strong>'Agregar a pantalla de inicio'</strong>.
-    </div>
-
-    <script>
-    let deferredPrompt;
-
-    // Android
-    window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-         });
-
-    document.getElementById("install-button").addEventListener("click", () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === "accepted") {
-                    console.log("Usuario aceptó la instalación PWA");
-                } else {
-                    console.log("Usuario canceló la instalación PWA");
-                }
-                deferredPrompt = null;
-            });
-        }
-    });
-
-    // iOS
-    window.addEventListener("load", () => {
-        const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-        const isInStandalone = ("standalone" in navigator) && navigator.standalone;
-        if (isIos && !isInStandalone) {
-            document.getElementById("ios-message").style.display = "block";
-        }
-    });
-    </script>
-
-    
+        
     <style>
         .floating-contact-button {
     position: fixed;
