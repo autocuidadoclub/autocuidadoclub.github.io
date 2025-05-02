@@ -71,141 +71,121 @@
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
-         function registerUser(event) {
-  event.preventDefault();
-  const loader = document.getElementById("loader");
-  loader.style.display = "flex";
+          function registerUser(event) {
+    event.preventDefault();
 
-  if (!selectedPlanType) {
-    alert("❌ Debes seleccionar un plan antes de registrarte.");
-    loader.style.display = "none";
-    return;
-  }
+    const loader = document.getElementById("loader");
+    loader.style.display = "flex"; // ⏳ Show loading
 
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const department = document.getElementById("department").value;
-  const municipality = document.getElementById("municipality").value;
-  const selectedDay = document.getElementById("selectedDay").value;
-  const selectedTime = document.getElementById("selectedTime").value;
-  const referredBy = document.getElementById("referredBy") ? document.getElementById("referredBy").value.trim() : "";
+    if (!selectedPlanType) {
+        alert("❌ Debes seleccionar un plan antes de registrarte.");
+        loader.style.display = "none";
+        return;
+    }
 
-  const vehicles = [];
-  document.querySelectorAll(".vehicle-entry").forEach(entry => {
-    vehicles.push({
-      plate: entry.querySelector(".plate").value || "",
-      model: entry.querySelector(".model").value || "",
-      brand: entry.querySelector(".brand").value || "",
-      year: entry.querySelector(".year").value || "",
-      inspectionDates: []
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const department = document.getElementById("department").value;
+    const municipality = document.getElementById("municipality").value;
+    const selectedDay = document.getElementById("selectedDay").value;
+    const selectedTime = document.getElementById("selectedTime").value;
+    const referredBy = document.getElementById("referredBy") ? document.getElementById("referredBy").value.trim() : "";
+
+    const vehicles = [];
+    document.querySelectorAll(".vehicle-entry").forEach(entry => {
+        vehicles.push({
+            plate: entry.querySelector(".plate").value || "",
+            model: entry.querySelector(".model").value || "",
+            brand: entry.querySelector(".brand").value || "",
+            year: entry.querySelector(".year").value || "",
+            inspectionDates: []  // 🛡️ Empty array for future inspections
+        });
     });
-  });
 
-  if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-    alert("❌ Todos los campos son obligatorios.");
-    loader.style.display = "none";
-    return;
-  }
+    if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+        alert("❌ Todos los campos son obligatorios.");
+        loader.style.display = "none";
+        return;
+    }
 
-  const stripeLinks = {
-    basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
-    basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
-    basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
-    plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
-    plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
-    plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
-  };
-  const checkoutLink = stripeLinks[selectedPlanType] || "";
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const userId = userCredential.user.uid;
+            const paymentDate = new Date();
+            const nextPaymentDate = new Date();
+            nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(userCredential => {
-      const userId = userCredential.user.uid;
-      const paymentDate = new Date();
-      const nextPaymentDate = new Date();
-      nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+            const userData = {
+                uid: userId,
+                name,
+                email,
+                phone,
+                planType: selectedPlanType,
+                department,
+                municipality,
+                registrationDate: firebase.firestore.Timestamp.now(),
+                lastUpgradeDate: firebase.firestore.Timestamp.now(),
+                schedule: {
+                    day: selectedDay,
+                    time: selectedTime
+                },
+                paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+                nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+                paymentStatus: "Pending",
+                subscriptionStatus: "active",
+                monthsPaid: 0,
+                vehicles,
+                freeRescheduleClaimed: false,
 
-      const userData = {
-        uid: userId,
-        name,
-        email,
-        phone,
-        planType: selectedPlanType,
-        department,
-        municipality,
-        registrationDate: firebase.firestore.Timestamp.now(),
-        lastUpgradeDate: firebase.firestore.Timestamp.now(),
-        schedule: {
-          day: selectedDay,
-          time: selectedTime
-        },
-        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-        paymentStatus: "Pending",
-        subscriptionStatus: "active",
-        monthsPaid: 0,
-        vehicles,
-        freeRescheduleClaimed: false,
-        loyaltyCycle: 0,
-        lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-        paymentHistory: [],
-        founderPhase: true,
-        referralsCompleted: 0,
-        plusReferralsCompleted: 0,
-        referralBonusAvailable: false,
-        nextCyclePrice: 0,
-        stripeCustomerId: "",
-        referredBy,
-        checkoutLink
-      };
+                loyaltyCycle: 0,
+                lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+                paymentHistory: [],
 
-      return db.collection("users").doc(userId).set(userData).then(() => userId);
-    })
-    .then(userId => {
-      return fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          subject: "new register in the platafform",
-          message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
+                // 🧩 New fields for Referrals & Stripe integration
+                founderPhase: true,
+                referralsCompleted: 0,
+                plusReferralsCompleted: 0,
+                referralBonusAvailable: false,
+                nextCyclePrice: 0,
+                stripeCustomerId: "",
+                referredBy: referredBy
+            };
+
+            return db.collection("users").doc(userId).set(userData);
         })
-      }).then(() => userId);
-    })
-    .then(userId => {
-      loader.style.display = "none";
-      document.getElementById("successOverlay").style.display = "flex";
-      // Get checkout link from Firestore or predefined
-const stripeLinks = {
-  basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
-  basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
-  basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
-  plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
-  plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
-  plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
-};
+        .then(() => {
+            return fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    subject: "new register in the platafform",
+                    message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
+                })
+            });
+        })
+        .then(() => {
+            loader.style.display = "none";
 
-const checkoutLink = stripeLinks[selectedPlanType] || "";
+            const successOverlay = document.getElementById("successOverlay");
+            if (successOverlay) {
+                successOverlay.style.display = "flex";
+            }
 
-// 🆕 Open Stripe checkout in a new tab
-if (checkoutLink) {
-  window.open(checkoutLink, "_blank");
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2500);
+        })
+        .catch((error) => {
+            console.error("❌ Error en el registro:", error.message);
+            alert("❌ Error en el registro: " + error.message);
+            loader.style.display = "none";
+        });
 }
-
-// ✅ Redirect current page to login.html
-window.location.href = "login.html";
-
-    })
-    .catch(error => {
-      console.error("❌ Error en el registro:", error.message);
-      alert("❌ Error en el registro: " + error.message);
-      loader.style.display = "none";
-    });
-}
-
 
 
             
@@ -788,7 +768,7 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
         <h3>💎 Plan 12 Meses PLUS</h3>
         <ul>
             <li>💰 <strong>Ahorra $180/año</strong></li>
-            <li>✅ <strong>5.5 meses gratis</strong></li>
+            <li>✅ <strong>Obtienes un monto de ahorro equivalente a 5.5 meses gratis</strong></li>
             <li>✔ Servicio para <strong>3 vehículos</strong></li>
             <li>🎁 Recompensas al mes 8</li>
         </ul>
@@ -799,7 +779,7 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
         <h3>💰 Plan 12 Meses BASIC</h3>
         <ul>
             <li>💰 <strong>Ahorra $60/año</strong></li>
-            <li>✅ <strong>1.8 meses gratis</strong></li>
+            <li>✅ <strong>Obtienes un monto de ahorro equivalente a 1.8 meses gratis</strong></li>
             <li>✔ Servicio para <strong>1 vehículo</strong></li>
             <li>🎁 Recompensas al mes 8</li>
         </ul>
@@ -1207,12 +1187,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
          loader.style.display = "none"; // ✅ Hide loader after all is done
       document.getElementById("successOverlay").style.display = "flex";
-setTimeout(() => {
-    window.location.href = `checkout.html?uid=${userId}`;
-}, 2500);
+      setTimeout(() => { window.location.href = "login.html"; }, 2500);
 
-}
-        catch (error) {
+    } catch (error) {
       console.error("❌ Error:", error);
       alert("Error: " + error.message);
           loader.style.display = "none"; // ⛔ Hide loader on error
