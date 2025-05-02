@@ -148,7 +148,7 @@ exports.createCheckoutSession = functions.https.onCall(async (data, context) => 
 
 exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   const sig = req.headers['stripe-signature'];
-  let   event;
+  let event;
 
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, STRIPE_WEBHOOK);
@@ -157,9 +157,11 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  // 1️⃣ First-time payment after checkout
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const uid     = session.metadata.uid;
+
     console.log(`🔔 Checkout complete for user ${uid}`);
 
     try {
@@ -183,6 +185,44 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     }
   }
 
-  // always ACK
+  // 2️⃣ Monthly subscription payment success
+  if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+    const customerEmail = invoice.customer_email || invoice.customer;
+    const amountPaid = invoice.amount_paid / 100;
+    const planId = invoice.lines.data[0].plan.id;
+
+    await db.collection('payments').add({
+      email: customerEmail,
+      planId,
+      amount: amountPaid,
+      timestamp: Date.now(),
+    });
+
+    await sendZohoMail(
+      'info@autocuidadoclub.com',
+      `💳 Pago recibido de ${customerEmail}`,
+      `Plan: ${planId}, Monto: $${amountPaid.toFixed(2)}`
+    );
+
+    console.log(`✅ invoice.payment_succeeded email sent for ${customerEmail}`);
+  }
+
+  // 3️⃣ Subscription payment failed
+  if (event.type === 'invoice.payment_failed') {
+    const invoice = event.data.object;
+    const customerEmail = invoice.customer_email || invoice.customer;
+    const amountDue = invoice.amount_due / 100;
+
+    await sendZohoMail(
+      'info@autocuidadoclub.com',
+      `⚠️ Falló el pago de ${customerEmail}`,
+      `Monto pendiente: $${amountDue.toFixed(2)} – por favor contactar.`
+    );
+
+    console.log(`❌ invoice.payment_failed email sent for ${customerEmail}`);
+  }
+
+  // ✅ Always ACK
   res.json({ received: true });
 });
