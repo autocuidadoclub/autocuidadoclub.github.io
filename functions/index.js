@@ -10,12 +10,13 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // — Zoho config from `functions.config().zoho`
-const ZOHO_CLIENT_ID     = process.env.ZOHO_CLIENT_ID;
-const ZOHO_CLIENT_SECRET = process.env.ZOHO_CLIENT_SECRET;
-const ZOHO_REFRESH_TOKEN = process.env.ZOHO_REFRESH_TOKEN;
-const ZOHO_API_DOMAIN    = process.env.ZOHO_API_DOMAIN;
-const ZOHO_USER_ID       = process.env.ZOHO_USER_ID;
-
+const {
+  client_id:     ZOHO_CLIENT_ID,
+  client_secret: ZOHO_CLIENT_SECRET,
+  refresh_token: ZOHO_REFRESH_TOKEN,
+  api_domain:    ZOHO_API_DOMAIN,
+  user_id:       ZOHO_USER_ID
+} = functions.config().zoho;
 
 // — Stripe config from `functions.config().stripe`
 const STRIPE_SECRET    = functions.config().stripe.secret;
@@ -230,7 +231,6 @@ exports.stripeWebhook = functions.https.onRequest({ rawBody: true }, async (req,
 } catch (err) {
   console.error('❌ Error sending failed payment email:', err.response?.data || err.message);
 }
-    }
 
 
   // ✅ Always ACK
