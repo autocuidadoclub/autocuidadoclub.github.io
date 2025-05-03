@@ -230,6 +230,7 @@ exports.stripeWebhook = functions.https.onRequest({ rawBody: true }, async (req,
 } catch (err) {
   console.error('❌ Error sending failed payment email:', err.response?.data || err.message);
 }
+    }
 
 
   // ✅ Always ACK
