@@ -28,6 +28,10 @@ jobs:
             FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
             FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}",
             FIREBASE_MEASUREMENT_ID: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
+            ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+            ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+            ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+            ZOHO_API_DOMAIN: ${{ secrets.ZOHO_API_DOMAIN }}
           };
           EOF
           echo "✅ env.js generated successfully."
@@ -90,3 +94,16 @@ jobs:
         with:
           branch: gh-pages
           folder: public
+
+    # ✅ Deploy Firebase Functions
+      - name: Deploy Firebase Functions
+        run: |
+          echo "🚀 Deploying Firebase Functions..."
+          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" \
+          ZOHO_CLIENT_ID="${{ secrets.ZOHO_CLIENT_ID }}" \
+          ZOHO_CLIENT_SECRET="${{ secrets.ZOHO_CLIENT_SECRET }}" \
+          ZOHO_REFRESH_TOKEN="${{ secrets.ZOHO_REFRESH_TOKEN }}" \
+          ZOHO_API_DOMAIN="${{ secrets.ZOHO_API_DOMAIN }}" \
+          firebase deploy --only functions --project=${{ secrets.FIREBASE_PROJECT_ID }}
+          echo "✅ Firebase Functions deployed successfully."
+
