@@ -47,9 +47,14 @@ app.post("/webhook", async (req, res) => {
 
     res.sendStatus(200);
   } catch (error) {
-    console.error("❌ Error handling webhook:", error.message);
-    res.status(500).send("Error");
-  }
+  console.error("❌ Error handling webhook:", {
+    message: error.message,
+    response: error.response?.data,
+    status: error.response?.status,
+  });
+  res.status(500).send("Error");
+}
+
 });
 
 app.listen(PORT, () => {
