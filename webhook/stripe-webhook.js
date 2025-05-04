@@ -57,9 +57,7 @@ app.post("/webhook", async (req, res) => {
 
 });
 
-app.get("/", (req, res) => {
-  res.send("✅ Webhook is running!");
-});
+app.get("/", (req, res) => res.send("✅ Webhook is running!"));
 
 app.listen(PORT, () => {
   console.log(`🚀 Webhook server running on port ${PORT}`);
