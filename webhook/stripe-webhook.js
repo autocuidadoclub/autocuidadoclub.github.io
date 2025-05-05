@@ -27,13 +27,24 @@ app.post("/webhook", async (req, res) => {
   Estado: "Pagado con éxito"
 });
  
-      await axios.post("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-  _subject: "✅ Pago exitoso en Stripe",
-  Nombre: session.customer_details?.name || "Sin nombre",
-  Email: session.customer_details?.email || "Sin correo",
-  Plan: session.metadata?.plan || "No definido",
-  Estado: "Pagado con éxito",
-});
+    const qs = require("qs");
+
+await axios.post(
+  "https://formsubmit.co/info@autocuidadoclub.com",
+  qs.stringify({
+    _subject: "✅ Pago exitoso en Stripe",
+    Nombre: session.customer_details?.name || "Sin nombre",
+    Email: session.customer_details?.email || "Sin correo",
+    Plan: session.metadata?.plan || "No definido",
+    Estado: "Pagado con éxito",
+  }),
+  {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  }
+);
+
 
     }
 
