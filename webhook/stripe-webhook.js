@@ -2,6 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const qs = require("qs");
 
 app.use(express.json());
 
@@ -27,8 +28,7 @@ app.post("/webhook", async (req, res) => {
   Estado: "Pagado con éxito"
 });
  
-    const qs = require("qs");
-
+ 
 await axios.post(
   "https://formsubmit.co/info@autocuidadoclub.com",
   qs.stringify({
@@ -57,11 +57,20 @@ await axios.post(
         email: session.customer_email || "Sin correo",
       });
 
-      await axios.post("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        _subject: "❌ Pago fallido o cancelado en Stripe",
-        Email: session.customer_email || "Sin correo",
-        Estado: "El cliente no completó el pago",
-      });
+      await axios.post(
+  "https://formsubmit.co/info@autocuidadoclub.com",
+  qs.stringify({
+    _subject: "❌ Pago fallido o cancelado en Stripe",
+    Email: session.customer_email || "Sin correo",
+    Estado: "El cliente no completó el pago",
+  }),
+  {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  }
+);
+
     }
 
     res.sendStatus(200);
