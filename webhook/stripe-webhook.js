@@ -1,53 +1,73 @@
 const express = require("express");
 const axios = require("axios");
-const FormData = require("form-data"); // ✅ Required for multipart/form-data
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const ZOHO_TOKEN = process.env.ZOHO_ACCESS_TOKEN;
+const ZOHO_ACCOUNT_ID = process.env.ZOHO_ACCOUNT_ID;
 
 app.use(express.json());
 
 app.post("/webhook", async (req, res) => {
   const event = req.body;
-
-  console.log("📩 Received Stripe webhook:", event.type);
+  console.log("📩 Stripe event:", event.type);
 
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
 
-      console.log("✅ Checkout completed:", {
-        name: session.customer_details?.name,
-        email: session.customer_details?.email,
-        plan: session.metadata?.plan,
-      });
+      const nombre = session.customer_details?.name || "Sin nombre";
+      const email = session.customer_details?.email || "Sin correo";
+      const plan = session.metadata?.plan || "No definido";
 
-      const form = new FormData();
-      form.append("_subject", "✅ Pago exitoso en Stripe");
-      form.append("Nombre", session.customer_details?.name || "Sin nombre");
-      form.append("Email", session.customer_details?.email || "Sin correo");
-      form.append("Plan", session.metadata?.plan || "No definido");
-      form.append("Estado", "Pagado con éxito");
+      const content = `
+✅ Pago exitoso en Stripe
 
-      await axios.post("https://formsubmit.co/info@autocuidadoclub.com", form, {
-        headers: form.getHeaders(),
-      });
-    }
+🧑 Nombre: ${nombre}
+📧 Email del cliente: ${email}
+📦 Plan: ${plan}
+✅ Estado: Pagado con éxito
+`;
 
-    if (
-      event.type === "checkout.session.expired" ||
-      event.type === "payment_intent.payment_failed"
-    ) {
-      const session = event.data.object;
+      const messageData = {
+        fromAddress: "info@autocuidadoclub.com",
+        subject: "✅ Confirmación de pago - AutoCuidado Club",
+        content: content,
+      };
 
-      const form = new FormData();
-      form.append("_subject", "❌ Pago fallido o cancelado en Stripe");
-      form.append("Email", session.customer_email || "Sin correo");
-      form.append("Estado", "El cliente no completó el pago");
+      // 📤 Send to staff
+      await axios.post(
+        `https://mail.zoho.com/api/accounts/${ZOHO_ACCOUNT_ID}/messages`,
+        {
+          ...messageData,
+          toAddress: "info@autocuidadoclub.com",
+        },
+        {
+          headers: {
+            Authorization: `Zoho-oauthtoken ${ZOHO_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      await axios.post("https://formsubmit.co/info@autocuidadoclub.com", form, {
-        headers: form.getHeaders(),
-      });
+      // 📤 Send to client
+      if (email !== "Sin correo") {
+        await axios.post(
+          `https://mail.zoho.com/api/accounts/${ZOHO_ACCOUNT_ID}/messages`,
+          {
+            ...messageData,
+            toAddress: email,
+          },
+          {
+            headers: {
+              Authorization: `Zoho-oauthtoken ${ZOHO_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+
+      console.log("✅ Emails sent to staff and customer.");
     }
 
     res.sendStatus(200);
