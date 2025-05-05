@@ -31,7 +31,7 @@ app.post("/webhook", async (req, res) => {
   _subject: "✅ Pago exitoso en Stripe",
   Nombre: session.customer_details?.name || "Sin nombre",
   Email: session.customer_details?.email || "Sin correo",
-  Plan: "Plan Plus de 12 meses (3 Vehículos)",  // hardcoded plan name
+  Plan: session.metadata?.plan || "No definido",
   Estado: "Pagado con éxito",
 });
 
