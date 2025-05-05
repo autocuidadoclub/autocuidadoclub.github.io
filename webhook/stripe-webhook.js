@@ -20,13 +20,21 @@ app.post("/webhook", async (req, res) => {
         plan: session.metadata?.plan,
       });
 
+     console.log("📤 Sending to FormSubmit with:", {
+  Nombre: session.customer_details?.name,
+  Email: session.customer_details?.email,
+  Plan: session.metadata?.plan,
+  Estado: "Pagado con éxito"
+});
+ 
       await axios.post("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        _subject: "✅ Pago exitoso en Stripe",
-        Nombre: session.customer_details?.name || "Sin nombre",
-        Email: session.customer_details?.email || "Sin correo",
-        Plan: session.metadata?.plan || "No definido",
-        Estado: "Pagado con éxito",
-      });
+  _subject: "✅ Pago exitoso en Stripe",
+  Nombre: session.customer_details?.name || "Sin nombre",
+  Email: session.customer_details?.email || "Sin correo",
+  Plan: "Plan Plus de 12 meses (3 Vehículos)",  // hardcoded plan name
+  Estado: "Pagado con éxito",
+});
+
     }
 
     if (
