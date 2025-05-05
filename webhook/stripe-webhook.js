@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
-const FormData = require("form-data"); // ✅ Use this
+const FormData = require("form-data"); // ✅ Required for multipart/form-data
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
