@@ -3096,7 +3096,29 @@ document.body.appendChild(popup);
   reopenBtn.style.display = 'none';
 });
 
+    
+  function checkOrientation() {
+    const isMobile = window.innerWidth < 768;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const banner = document.getElementById('rotate-device-banner');
+
+    if (isMobile && isPortrait) {
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('load', checkOrientation);
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
+
+
   </script>
+
+        <div id="rotate-device-banner" style="display:none;">
+  <p>📱 Para ver mejor el contenido, gira tu dispositivo a modo horizontal.</p>
+</div>
 
 
 </body>
