@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles.css">
 
     <!-- Force Load env.js to Prevent Caching Issues -->
-    <script src="env.js?v=1.0"></script>
+    <script src="env.js?v=2.0"></script>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -528,7 +528,71 @@ body, html {
   padding-right: 8px;
 }
 
+         /* Style the disclaimer box */
+.disclaimer-box {
+    background-color: #f8f8f8; /* Light gray background */
+    border: 1px solid #ddd;   /* Gray border */
+    padding: 20px;             /* Add padding around the text */
+    border-radius: 8px;       /* Rounded corners */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    font-size: 14px;           /* Set a smaller font size */
+    margin-top: 20px;          /* Add some space from the top */
+}
+
+/* Style the "Nota" text to make it stand out */
+.disclaimer-box strong {
+    color: #003366; /* Dark blue color for emphasis */
+}
+
+        /* Flexbox layout for the image container */
+.image-container {
+  display: flex;
+  justify-content: space-between; /* Space between the images */
+  gap: 20px; /* Add space between the images */
+  margin-top: 20px;
+}
+
+/* Align images in the center vertically */
+.graphic-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically centers the content */
+  width: 48%; /* Ensures the images are placed side by side */
+  text-align: center;
+}
+
+.plan-graphic {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+    .promo-banner {
+  display: flex;
+  justify-content: center;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  max-width: 100%;
+}
+
+.promo-banner img {
+  width: 100%;
+  max-width: 100px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+.promo-popup img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+}
+
         </style>
+    
 </head>
 
 <body>
@@ -560,59 +624,13 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
 </header>
 
 
-<!-- Disclaimer Box -->
-<style>
-    /* Style the disclaimer box */
-.disclaimer-box {
-    background-color: #f8f8f8; /* Light gray background */
-    border: 1px solid #ddd;   /* Gray border */
-    padding: 20px;             /* Add padding around the text */
-    border-radius: 8px;       /* Rounded corners */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
-    font-size: 14px;           /* Set a smaller font size */
-    margin-top: 20px;          /* Add some space from the top */
-}
 
-/* Style the "Nota" text to make it stand out */
-.disclaimer-box strong {
-    color: #003366; /* Dark blue color for emphasis */
-}
-</style>
-    
     <div class="disclaimer-box">
   <p>
     <strong>Nota:</strong> Los servicios de AutoCuidado Club están diseñados exclusivamente para motores de gasolina. Esto está alineado con nuestro compromiso de ofrecer movilidad con una huella de carbono más baja. Según la Agencia Europea de Medio Ambiente (EEA), los motores diésel son responsables de hasta 20 veces más contaminación que los de gasolina.
   </p>
 </div>
 
-
-<style>
-   /* Flexbox layout for the image container */
-.image-container {
-  display: flex;
-  justify-content: space-between; /* Space between the images */
-  gap: 20px; /* Add space between the images */
-  margin-top: 20px;
-}
-
-/* Align images in the center vertically */
-.graphic-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Vertically centers the content */
-  width: 48%; /* Ensures the images are placed side by side */
-  text-align: center;
-}
-
-.plan-graphic {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-</style>
-        
     <!-- Subscription Plans -->
     <section>
 
@@ -1430,20 +1448,21 @@ window.addEventListener('load', function() {
 </div>
 
  
-      <!-- CTA Footer -->
-<div id="cta-install-bar" style="display:none;">
-     <div class="cta-message">
-  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
-</div>
-
-
-      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
-      <a href="contacto.html">💬 Contácta con nuestro staff</a>
-      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
-
-    </div>
+     <div id="cta-install-bar" style="display:none;">
+ 
+         <div id="promoPopup" class="promo-popup">
+  <img src="promo-banner.png" alt="Promo AutoCuidado Club">
   </div>
+         <div class="cta-message">
+    <p>¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong></p>
+
+    <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
+    <a href="contacto.html">💬 Contácta con nuestro staff</a>
+    <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
+
+    <button onclick="closeCtaInstallBar()" class="close-btn">❌Cerrar</button>
+  </div>
+</div>
 
   <!-- Feedback Modal -->
 <!-- Feedback Modal -->
@@ -1479,7 +1498,6 @@ window.addEventListener('load', function() {
 
   </div>
 </div>
-
 
 <!-- Botón para volver a mostrar el menú -->
 <button id="reopen-cta-btn" style="
@@ -1634,8 +1652,33 @@ window.addEventListener('load', function() {
   reopenBtn.style.display = 'none';
 });
 
-  </script>
+        function closePromo() {
+    document.getElementById("promoPopup").style.display = "none";
+  }
 
+  // Opcional: mostrar automáticamente después de unos segundos
+  window.onload = function() {
+    setTimeout(() => {
+      document.getElementById("promoPopup").style.display = "block";
+    }, 1500);
+  };
+
+      function closePromo() {
+    document.getElementById("promoPopup").style.display = "none";
+  }
+
+  window.onload = function () {
+    setTimeout(() => {
+      document.getElementById("promoPopup").style.display = "block";
+    }, 1500);
+
+    // Oculta automáticamente a los 10 segundos
+    setTimeout(() => {
+      closePromo();
+    }, 11000);
+  };
+
+  </script>
 
     
 </body>
