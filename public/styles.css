@@ -1994,11 +1994,16 @@ h2, h3 {
   color: white;
   padding: 14px 18px;
   font-size: 14px;
-  z-index: 9999;
+  z-index: 9500;
   box-shadow: 0 0 10px rgba(0,0,0,0.25);
   border-radius: 16px;
   width: 280px;
   max-width: 90%;
+
+    #reopen-cta-btn {
+  z-index: 9600;
+}
+
 
   /* 💥 Important fix to remove centering from any inherited flex or grid */
   margin: 0 !important;
