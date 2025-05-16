@@ -528,55 +528,6 @@ body, html {
   padding-right: 8px;
 }
 
-
-.promo-popup {
-  position: fixed;
-  bottom: 20px;
-  left: 20px; /* 🔁 antes estaba en right: 20px */
-  max-width: 300px;
-  width: 90%;
-  background: #fff;
-  border: 2px solid #ff6600;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.25);
-  z-index: 9000;
-  animation: fadeIn 0.5s ease;
-}
-
-
-.promo-popup img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px 10px 0 0;
-}
-
-.close-btn {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  background: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-    z-index: 10; /* ✅ Lowered from 9999 */
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-        .cta-message {
-  position: relative; /* 🔧 This is essential */
-  padding: 1rem;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  max-width: 1000px;
-  margin: auto;
-}
-
-        
         </style>
 </head>
 
@@ -1683,27 +1634,7 @@ window.addEventListener('load', function() {
   reopenBtn.style.display = 'none';
 });
 
-       function closePromo() {
-    document.getElementById("promoPopup").style.display = "none";
-  }
-
-  window.onload = function () {
-    setTimeout(() => {
-      document.getElementById("promoPopup").style.display = "block";
-    }, 1500);
-
-    // Oculta automáticamente a los 10 segundos
-    setTimeout(() => {
-      closePromo();
-    }, 11000);
-  };
-
   </script>
-
-<div id="promoPopup" class="promo-popup">
-  <img src="promo-banner.png" alt="Promo AutoCuidado Club">
-  <button class="close-btn" onclick="closePromo()">✖</button>
-</div>
 
 
     
