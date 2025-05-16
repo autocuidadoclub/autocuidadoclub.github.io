@@ -830,10 +830,11 @@ input:focus, select:focus {
 
 /* Responsive Dashboard */
 @media (max-width: 768px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* ✅ Stack vertically on small screens */
+  }
 }
+
 
 /* ====== CONTACT STAFF SECTION ====== */
 .contact-staff-section {
@@ -1917,11 +1918,12 @@ html, body {
     scroll-padding-top: 140px;
   }
 
-.main‑wrapper, .dashboard‑container, .dashboard‑grid {
-  box‑sizing: border‑box;
-  width: 100vw;        /* force full‑viewport width */
+.main-wrapper, .dashboard-container, .dashboard-grid {
+  box-sizing: border-box;
+  width: 100vw;
   max-width: 100%;
 }
+
 
 section, .pricing-table, .info-block {
   padding: 24px 16px;
