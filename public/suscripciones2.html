@@ -584,6 +584,40 @@ body, html {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.promo-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  max-width: 300px;
+  width: 90%;
+  background: #fff;
+  border: 2px solid #ff6600;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
+  z-index: 9999;
+  animation: fadeIn 0.5s ease;
+}
+
+.promo-popup img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+}
+
+.close-btn {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
         
         </style>
@@ -624,11 +658,6 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
   <p>
     <strong>Nota:</strong> Los servicios de AutoCuidado Club están diseñados exclusivamente para motores de gasolina. Esto está alineado con nuestro compromiso de ofrecer movilidad con una huella de carbono más baja. Según la Agencia Europea de Medio Ambiente (EEA), los motores diésel son responsables de hasta 20 veces más contaminación que los de gasolina.
   </p>
-</div>
-
-
-    <div class="promo-banner" style="text-align:center; margin: 20px 0;">
-  <img src="promo-banner.png" alt="Promoción por tiempo limitado" style="max-width:100%; height:auto;">
 </div>
 
     <!-- Subscription Plans -->
@@ -1653,8 +1682,23 @@ window.addEventListener('load', function() {
   reopenBtn.style.display = 'none';
 });
 
+        function closePromo() {
+    document.getElementById("promoPopup").style.display = "none";
+  }
+
+  // Opcional: mostrar automáticamente después de unos segundos
+  window.onload = function() {
+    setTimeout(() => {
+      document.getElementById("promoPopup").style.display = "block";
+    }, 1500);
+  };
+
   </script>
 
+<div id="promoPopup" class="promo-popup">
+  <img src="banner-promo.png" alt="Promo AutoCuidado Club">
+  <button class="close-btn" onclick="closePromo()">✖</button>
+</div>
 
     
 </body>
