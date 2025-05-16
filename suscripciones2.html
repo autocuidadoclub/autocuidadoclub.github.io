@@ -613,6 +613,7 @@ body, html {
   border: none;
   font-size: 18px;
   cursor: pointer;
+    z-index: 10; /* ✅ Lowered from 9999 */
 }
 
 @keyframes fadeIn {
@@ -620,7 +621,16 @@ body, html {
   to { opacity: 1; transform: translateY(0); }
 }
 
-        
+        .cta-message {
+  position: relative; /* 🔧 This is essential */
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  max-width: 1000px;
+  margin: auto;
+}
+
         </style>
     
 </head>
@@ -1490,6 +1500,7 @@ window.addEventListener('load', function() {
       <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
     <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
 
+    
     </div>
   </div>
 
