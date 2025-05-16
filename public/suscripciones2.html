@@ -587,7 +587,7 @@ body, html {
 .promo-popup {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px; /* 🔁 antes estaba en right: 20px */
   max-width: 300px;
   width: 90%;
   background: #fff;
@@ -597,6 +597,7 @@ body, html {
   z-index: 9999;
   animation: fadeIn 0.5s ease;
 }
+
 
 .promo-popup img {
   width: 100%;
@@ -1691,6 +1692,21 @@ window.addEventListener('load', function() {
     setTimeout(() => {
       document.getElementById("promoPopup").style.display = "block";
     }, 1500);
+  };
+
+      function closePromo() {
+    document.getElementById("promoPopup").style.display = "none";
+  }
+
+  window.onload = function () {
+    setTimeout(() => {
+      document.getElementById("promoPopup").style.display = "block";
+    }, 1500);
+
+    // Oculta automáticamente a los 10 segundos
+    setTimeout(() => {
+      closePromo();
+    }, 11000);
   };
 
   </script>
