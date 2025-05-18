@@ -1305,49 +1305,83 @@ function loadPaymentHistory() {
 }
 
     function showFreeRescheduleOffer(userData) {
-        console.log("Verificando oferta gratuita de reprogramación...");
+  console.log("Verificando oferta gratuita de reprogramación...");
   const now = new Date();
   const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
   const monthsUnpaid = lastPaymentDate
     ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
-    : 3; // default to 3 if missing
+    : 3;
 
   if (
     userData.monthsPaid === 0 &&
     monthsUnpaid >= 2 &&
-    userData.freeRescheduleClaimed === false
+    userData.freeRescheduleClaimed === false &&
+    !document.getElementById("freeRescheduleBox")
   ) {
     console.log("✅ Condiciones cumplidas, mostrando oferta...");
+
     const offerBox = document.createElement("div");
+    offerBox.id = "freeRescheduleBox";
     offerBox.innerHTML = `
       <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
         <h3>🎁 ¡Te regalamos una cita!</h3>
         <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
-        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" #claimFreeReschedule {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
->Agendar ahora</button>
+        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
+          Agendar ahora
+        </button>
       </div>
     `;
     document.body.prepend(offerBox);
 
-    document.getElementById("claimFreeReschedule").addEventListener("click", () => {
-      // Redirect to booking page or open modal
-      window.location.href = "agenda.html?gratis=true";
+    document.getElementById("claimFreeReschedule").addEventListener("click", async () => {
+      try {
+        // ✅ Mark as claimed in Firestore
+        await db.collection("users").doc(userData.uid).update({
+          freeRescheduleClaimed: true
+        });
 
-      // Optionally mark it as claimed (or after they book)
-      db.collection("users").doc(userData.uid).update({
-        freeRescheduleClaimed: true
-      });
+        // ✅ Create a FormSubmit request (invisible)
+        const form = document.createElement("form");
+        form.style.display = "none";
+        form.action = "https://formsubmit.co/info@autocuidadoclub.com";
+        form.method = "POST";
+
+        // Add hidden fields
+        const fields = {
+          _subject: "🎁 Cliente reclamó cita gratis",
+          _cc: "info@autocuidadoclub.com",
+          message: `
+Cliente: ${userData.name || "N/A"}
+Correo: ${userData.email}
+Departamento: ${userData.department || "N/A"}
+Municipio: ${userData.municipality || "N/A"}
+Último pago: ${lastPaymentDate?.toLocaleDateString("es-ES") || "Desconocido"}
+UID: ${userData.uid}
+✅ El cliente accedió a la inspección gratuita desde el dashboard.
+          `
+        };
+
+        for (const name in fields) {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = name;
+          input.value = fields[name];
+          form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+
+        // ✅ Redirect to booking page
+        window.location.href = "https://www.autocuidadoclub.com/agenda.html?gratis=true";
+      } catch (error) {
+        console.error("❌ Error al registrar cita gratis:", error);
+        alert("Hubo un problema al reclamar tu cita. Intenta nuevamente.");
+      }
     });
   }
 }
+
 
      if (typeof _pe !== "undefined") {
   _pe.tagPushSubscriber('inactive_2months');
