@@ -135,76 +135,27 @@
             document.getElementById('forgot-password-section').style.display = sectionToShow === 'forgot-password' ? 'block' : 'none';
         };
     });
-
-        <script>
-  // 🔔 Push Notifications
-  const notificationBtn = document.getElementById('enable-notifications-btn');
-  notificationBtn.addEventListener('click', () => {
-    if (typeof PushEngage === 'undefined') {
-      alert("❌ PushEngage no está disponible aún. Intenta más tarde.");
-      return;
-    }
-
-    PushEngage.push(function () {
-      PushEngage.subscribe({
-        onSuccess: () => {
-          alert("✅ Notificaciones activadas correctamente");
-        },
-        onFailure: (err) => {
-          alert("❌ Error al activar notificaciones");
-          console.warn("PushEngage error:", err);
-        }
-      });
-    });
-  });
-
-  // 📲 PWA Install
-  let deferredPrompt;
-  const installBtn = document.getElementById('install-pwa-btn');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
-  });
-
-  installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        console.log("✅ Usuario aceptó instalar la app.");
-      } else {
-        console.log("❌ Usuario rechazó la instalación.");
-      }
-      deferredPrompt = null;
-      installBtn.style.display = 'none';
-    }
-  });
-
-(function(w, d) {
-  w.PushEngage = w.PushEngage || [];
-  w._peq = w._peq || [];
-
-  PushEngage.push(['init', {
-    appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7',
-    autoPrompt: false,
-    enableSubscription: false
-  }]);
-
-  var e = d.createElement('script');
-  e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
-  e.async = true;
-  e.type = 'text/javascript';
-  d.head.appendChild(e);
-})(window, document);
-</script>
-
-    
+    </script>
 </head>
 <body>
 
-       <!-- Navigation -->
+    <!-- Install Banner for iPhone -->
+    <div id="install-banner" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center; font-size: 14px; position: fixed; top: 0; width: 100%; z-index: 1000;">
+        📲 Para instalar AutoCuidado Club en iPhone: Abre Safari, toca Compartir y selecciona 'Agregar a pantalla de inicio'.
+        <button onclick="dismissBanner()" style="background: white; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;">X</button>
+    </div>
+    
+    <script>
+    function dismissBanner() {
+        document.getElementById("install-banner").style.display = "none";
+    }
+
+    if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+        document.getElementById("install-banner").style.display = "block";
+    }
+    </script>
+
+    <!-- Navigation -->
     <nav class="navbar">
         <ul class="nav-links">
             <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
@@ -322,9 +273,7 @@
 
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
-    <button id="enable-notifications-btn">🔔 Activá notificaciones</button>
-<button id="install-pwa-btn" style="display: none;">📲 Instalá AutoCuidado Club</button>
-
+      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
     <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
 
     </div>
@@ -395,7 +344,18 @@
 
 
   <script>
-   
+    const installBtn = document.getElementById('how-to-install-btn');
+    installBtn.addEventListener('click', () => {
+      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+      if (isIos) {
+        alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+      } else if (isAndroid) {
+        alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
+      } else {
+        alert("Instalación no disponible en este dispositivo.");
+      }
+    });
 
     function openFeedbackModal() {
       document.getElementById('feedbackModal').style.display = 'flex';
