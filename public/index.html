@@ -14,27 +14,22 @@
     <link rel="manifest" href="/site.webmanifest">
 
     <!-- Push Notification Script -->
-  <script>
-  (function(w, d) {
-    w.PushEngage = w.PushEngage || [];
-    w._peq = w._peq || [];
+    <script>
+    (function(w, d) {
+        w.PushEngage = w.PushEngage || [];
+        w._peq = w._peq || [];
+        PushEngage.push(['init', {
+            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'  // Replace with your PushEngage appId
+        }]);
 
-    // Only initialize, DO NOT auto-subscribe or redirect
-    PushEngage.push(['init', {
-      appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7',
-      autoPrompt: false, // ⛔ Prevent automatic popups
-      enableSubscription: false // ⛔ Prevent automatic redirects
-    }]);
-
-    // Load SDK
-    var e = d.createElement('script');
-    e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
-    e.async = true;
-    e.type = 'text/javascript';
-    d.head.appendChild(e);
-  })(window, document);
-</script>
-
+        var e = d.createElement('script');
+        e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
+        e.async = true;
+        e.type = 'text/javascript';
+        d.head.appendChild(e);
+    })(window, document);
+    </script>
+    
        
 </head>
 
@@ -429,9 +424,7 @@
 
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
-      <button id="enable-notifications-btn">🔔 Activá notificaciones</button>
-<button id="install-pwa-btn" style="display: none;">📲 Instalá AutoCuidado Club</button>
-
+      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
     <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
 
     </div>
@@ -502,6 +495,18 @@
 
 
   <script>
+    const installBtn = document.getElementById('how-to-install-btn');
+    installBtn.addEventListener('click', () => {
+      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+      if (isIos) {
+        alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+      } else if (isAndroid) {
+        alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
+      } else {
+        alert("Instalación no disponible en este dispositivo.");
+      }
+    });
 
     function openFeedbackModal() {
       document.getElementById('feedbackModal').style.display = 'flex';
@@ -641,46 +646,6 @@ document.querySelectorAll('.tab-button').forEach(button => {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tab1').style.display = 'block';
 });
-
-      
-  // 🔔 Push Notification Setup
-  const notificationBtn = document.getElementById('enable-notifications-btn');
-  notificationBtn.addEventListener('click', () => {
-    PushEngage.push(function () {
-      PushEngage.subscribe({
-        onSuccess: () => {
-          console.log("✅ Notificaciones activadas");
-          window.location.href = "https://autocuidadoclub.com/dashboard.html";
-        },
-        onFailure: (err) => {
-          console.warn("❌ Falló la suscripción:", err);
-          window.location.href = "https://autocuidadoclub.com/dashboard.html";
-        }
-      });
-    });
-  });
-
-  // 📲 PWA Install Setup
-  let deferredPrompt;
-  const installBtn = document.getElementById('install-pwa-btn');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
-  });
-
-  installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log("PWA Install outcome:", outcome);
-      deferredPrompt = null;
-      installBtn.style.display = 'none';
-    }
-  });
-</script>
-
 </script>
 
 
