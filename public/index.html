@@ -502,24 +502,6 @@
 
 
   <script>
- 
-  const installBtn = document.getElementById('how-to-install-btn');
-  installBtn.addEventListener('click', () => {
-    PushEngage.push(function () {
-      PushEngage.subscribe({
-        onSuccess: function () {
-          console.log("✅ Notificaciones activadas");
-          window.location.href = "https://autocuidadoclub.com/dashboard.html"; // Replace if needed
-        },
-        onFailure: function (error) {
-          console.warn("❌ No se pudo activar:", error);
-          window.location.href = "https://autocuidadoclub.com/dashboard.html"; // Redirect anyway
-        }
-      });
-    });
-  });
-
-
 
     function openFeedbackModal() {
       document.getElementById('feedbackModal').style.display = 'flex';
