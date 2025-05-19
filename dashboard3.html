@@ -1306,7 +1306,7 @@ function loadPaymentHistory() {
 
         
 
-    function showFreeRescheduleOffer(userData) {
+  function showFreeRescheduleOffer(userData) {
   console.log("Verificando oferta gratuita de reprogramación...");
   const now = new Date();
   const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
@@ -1328,24 +1328,63 @@ function loadPaymentHistory() {
       <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
         <h3>🎁 ¡Te regalamos una cita!</h3>
         <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
-        <form id="claimFreeRescheduleForm" action="https://formsubmit.co/info@autocuidadoclub.com" method="POST">
+        <form id="claimFreeRescheduleForm">
           <input type="hidden" name="_subject" value="🎁 Cliente solicitó inspección gratis">
           <input type="hidden" name="Nombre" value="${userData.name || 'N/A'}">
           <input type="hidden" name="Correo" value="${userData.email}">
+          <input type="hidden" name="Teléfono" value="${userData.phone || 'N/A'}">
           <input type="hidden" name="Departamento" value="${userData.department || 'N/A'}">
           <input type="hidden" name="Municipio" value="${userData.municipality || 'N/A'}">
           <input type="hidden" name="Último pago" value="${lastPaymentDate?.toLocaleDateString("es-ES") || 'Desconocido'}">
           <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
           <input type="hidden" name="_captcha" value="false">
-          <button type="submit" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
-            Agendar ahora
-          </button>
+          <div id="freeRescheduleResponse">
+            <button type="submit" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
+              Agendar ahora
+            </button>
+          </div>
         </form>
       </div>
     `;
     document.body.prepend(offerBox);
+
+    // FormSubmit logic
+    document.getElementById("claimFreeRescheduleForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const responseContainer = document.getElementById("freeRescheduleResponse");
+      responseContainer.innerHTML = `
+        <img src="loading.gif" alt="Cargando..." style="width:50px; height:50px;">
+      `;
+
+      try {
+        const res = await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          responseContainer.innerHTML = `
+            <p style="margin-top: 10px; color: green;"><strong>✅ Gracias, hemos confirmado con nuestro staff tu solicitud.<br>Nos pondremos en contacto contigo en breve.</strong></p>
+          `;
+        } else {
+          throw new Error("Error al enviar");
+        }
+      } catch (err) {
+        console.error("❌ Fallo el envío:", err);
+        responseContainer.innerHTML = `
+          <p style="margin-top: 10px; color: red;"><strong>❌ Hubo un problema. Intenta nuevamente.</strong></p>
+        `;
+      }
+    });
   }
 }
+
 
      function showFirstTimePaymentOffer(userData) {
   const offerBox = document.createElement("div");
