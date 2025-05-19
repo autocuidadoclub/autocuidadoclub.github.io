@@ -1304,54 +1304,84 @@ function loadPaymentHistory() {
   });
 }
 
-    function showFreeRescheduleOffer(userData) {
-        console.log("Verificando oferta gratuita de reprogramación...");
+        
+
+function showFreeRescheduleOffer(userData) {
+  const uid = userData.uid;
   const now = new Date();
   const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
+
   const monthsUnpaid = lastPaymentDate
     ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
-    : 3; // default to 3 if missing
+    : 6;
 
-  if (
-    userData.monthsPaid === 0 &&
-    monthsUnpaid >= 2 &&
-    userData.freeRescheduleClaimed === false
-  ) {
-    console.log("✅ Condiciones cumplidas, mostrando oferta...");
-    const offerBox = document.createElement("div");
-    offerBox.innerHTML = `
-      <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
-        <h3>🎁 ¡Te regalamos una cita!</h3>
-        <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
-        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" #claimFreeReschedule {
-  animation: pulse 2s infinite;
-}
+  // Check if banner was already shown via Firestore
+  if (userData.freeInspectionBannerShown || monthsUnpaid < 1) return;
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
->Agendar ahora</button>
-      </div>
-    `;
-    document.body.prepend(offerBox);
+  const offerBox = document.createElement("div");
+  offerBox.id = "freeRescheduleBox";
+  offerBox.innerHTML = `
+    <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
+      <h3>🎁 ¡Te regalamos una cita!</h3>
+      <p>Han pasado más de ${monthsUnpaid} mes${monthsUnpaid > 1 ? "es" : ""} sin pago. Agenda gratis tu próxima inspección.</p>
+      <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
+        Agendar ahora
+      </button>
+    </div>
+  `;
+  document.body.prepend(offerBox);
 
-    document.getElementById("claimFreeReschedule").addEventListener("click", () => {
-      // Redirect to booking page or open modal
-      window.location.href = "agenda.html?gratis=true";
+  document.getElementById("claimFreeReschedule").addEventListener("click", async () => {
+    const loader = document.createElement("div");
+    loader.innerHTML = `<img src="loading.gif" alt="Cargando..." style="width:50px;">`;
+    offerBox.innerHTML = "";
+    offerBox.appendChild(loader);
 
-      // Optionally mark it as claimed (or after they book)
-      db.collection("users").doc(userData.uid).update({
-        freeRescheduleClaimed: true
+    const formData = new FormData();
+    formData.append("_subject", "🎁 Cliente solicitó inspección gratis");
+    formData.append("_cc", "info@autocuidadoclub.com");
+    formData.append("message", `
+      Cliente: ${userData.name || "N/A"}
+      Correo: ${userData.email || "N/A"}
+      Teléfono: ${userData.phone || "N/A"}
+      Departamento: ${userData.department || "N/A"}
+      Municipio: ${userData.municipality || "N/A"}
+      Fecha de último pago: ${lastPaymentDate?.toLocaleDateString("es-ES") || "Desconocida"}
+      Plan: ${userData.planType}
+    `);
+
+    try {
+      await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        body: formData
       });
-    });
-  }
+
+      // ✅ Mark banner as shown in Firestore
+      await db.collection("users").doc(uid).update({
+        freeInspectionBannerShown: true
+      });
+
+      offerBox.innerHTML = `<p style="color: green; font-weight: bold;">✅ Inspección extra gratis solicitada.</p>`;
+    } catch (error) {
+      offerBox.innerHTML = `<p style="color: red;">❌ Error al enviar la solicitud. Intenta de nuevo más tarde.</p>`;
+    }
+  });
 }
 
-     if (typeof _pe !== "undefined") {
-  _pe.tagPushSubscriber('inactive_2months');
+
+
+
+function showReminderBanner() {
+  const banner = document.createElement("div");
+  banner.style = "background:#e6f7e6; border-left:5px solid #28a745; padding:15px; margin:20px; border-radius:5px;";
+  banner.innerHTML = `
+    <strong>📌 Inspección gratis solicitada</strong><br>
+    Nuestro staff ya recibió tu solicitud. Te contactaremos pronto.
+  `;
+  document.querySelector("main")?.prepend(banner) || document.body.prepend(banner);
 }
+
+
 
      function showFirstTimePaymentOffer(userData) {
   const offerBox = document.createElement("div");
@@ -2890,13 +2920,13 @@ document.body.appendChild(popup);
   <span id="notificationMessage">Notificación aquí</span>
 </div>
 
-  
+
       <!-- CTA Footer -->
 <div id="cta-install-bar" style="display:none;">
-     <div class="cta-message">
+ <div class="cta-message">
   ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
 </div>
-
+    
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
       <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
