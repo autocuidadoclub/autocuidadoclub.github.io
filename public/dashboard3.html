@@ -1307,81 +1307,74 @@ function loadPaymentHistory() {
         
 
 function showFreeRescheduleOffer(userData) {
-  const now = new Date();
-  const lastSubmitted = localStorage.getItem("freeRescheduleSubmittedAt");
-  const daysSince = lastSubmitted ? (now - new Date(lastSubmitted)) / (1000 * 60 * 60 * 24) : Infinity;
+  console.log("📊 Evaluando recordatorio de inspección gratuita...");
 
+  const now = new Date();
   const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
+
   const monthsUnpaid = lastPaymentDate
-    ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
+    ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth()) + (now.getDate() < lastPaymentDate.getDate() ? -0.5 : 0)
     : 3;
 
-  const alreadyShown = document.getElementById("freeRescheduleBox");
+  const lastSubmitted15 = localStorage.getItem("freeRescheduleSubmittedAt15");
+  const lastSubmitted30 = localStorage.getItem("freeRescheduleSubmittedAt30");
+
+  const show15 = monthsUnpaid >= 0.5 && monthsUnpaid < 2 && (!lastSubmitted15 || (Date.now() - parseInt(lastSubmitted15)) > 15 * 24 * 60 * 60 * 1000);
+  const show30 = monthsUnpaid >= 2 && (!lastSubmitted30 || (Date.now() - parseInt(lastSubmitted30)) > 30 * 24 * 60 * 60 * 1000);
 
   if (
-    userData.monthsPaid === 0 &&
-    monthsUnpaid >= 2 &&
-    userData.freeRescheduleClaimed === false &&
-    daysSince >= 30 &&
-    !alreadyShown
+    (userData.monthsPaid === 0 || userData.monthsPaid === 1) &&
+    (show15 || show30) &&
+    !document.getElementById("freeRescheduleBox")
   ) {
-    const offerBox = document.createElement("div");
-    offerBox.id = "freeRescheduleBox";
-    offerBox.innerHTML = `
-      <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
-        <h3>🎁 ¡Te regalamos una cita!</h3>
-        <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
+    console.log("✅ Mostrando CTA de inspección gratuita");
+
+    const box = document.createElement("div");
+    box.id = "freeRescheduleBox";
+    box.innerHTML = `
+      <div style="background:#fff8e1; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
+        <h3>🎁 ¡Te regalamos una inspección!</h3>
+        <p>¿Pagás hoy? Te damos una inspección adicional totalmente gratis.</p>
         <form id="claimFreeRescheduleForm">
-          <input type="hidden" name="_subject" value="🎁 Cliente solicitó inspección gratis">
-          <input type="hidden" name="Nombre" value="${userData.name || 'N/A'}">
-          <input type="hidden" name="Correo" value="${userData.email}">
-          <input type="hidden" name="Teléfono" value="${userData.phone || 'N/A'}">
-          <input type="hidden" name="Departamento" value="${userData.department || 'N/A'}">
-          <input type="hidden" name="Municipio" value="${userData.municipality || 'N/A'}">
-          <input type="hidden" name="Último pago" value="${lastPaymentDate?.toLocaleDateString("es-ES") || 'Desconocido'}">
+          <input type="hidden" name="_subject" value="🎁 Solicitud de inspección gratis por inactividad">
           <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-          <input type="hidden" name="_captcha" value="false">
-          <div id="freeRescheduleResponse">
-            <button type="submit" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
-              Agendar ahora
-            </button>
-          </div>
+          <input type="hidden" name="name" value="${userData.name || 'N/A'}">
+          <input type="hidden" name="email" value="${userData.email}">
+          <input type="hidden" name="phone" value="${userData.phone || 'No registrado'}">
+          <input type="hidden" name="departamento" value="${userData.department || 'N/A'}">
+          <input type="hidden" name="municipio" value="${userData.municipality || 'N/A'}">
+          <input type="hidden" name="message" value="El cliente ${userData.name || 'N/A'} (${userData.email}) ha solicitado una inspección gratuita. Teléfono: ${userData.phone || 'N/A'}. Departamento: ${userData.department || 'N/A'}, Municipio: ${userData.municipality || 'N/A'}. Fecha de último pago: ${lastPaymentDate?.toLocaleDateString('es-ES') || 'Desconocida'}">
+          <button type="submit" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">Solicitar beneficio</button>
         </form>
+        <div id="freeRescheduleResponse" style="margin-top:10px;"></div>
       </div>
     `;
-    document.body.prepend(offerBox);
+    document.body.prepend(box);
 
-    document.getElementById("claimFreeRescheduleForm").addEventListener("submit", async (e) => {
+    document.getElementById("claimFreeRescheduleForm").addEventListener("submit", async function (e) {
       e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-      const responseContainer = document.getElementById("freeRescheduleResponse");
-
-      responseContainer.innerHTML = `
-        <img src="loading.gif" alt="Cargando..." style="width:50px; height:50px;">
-      `;
+      const responseBox = document.getElementById("freeRescheduleResponse");
+      responseBox.innerHTML = `<img src="loading.gif" style="width:40px;" alt="Cargando...">`;
 
       try {
-        const res = await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        const formData = new FormData(e.target);
+        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
           method: "POST",
           body: formData
         });
-        const result = await res.json();
 
-        if (result.success) {
-          localStorage.setItem("freeRescheduleSubmittedAt", new Date().toISOString());
-          offerBox.remove(); // 👈 Hide the box
-          showReminderBanner(); // 👈 Show subtle banner reminder
-        } else {
-          throw new Error("Error al enviar");
-        }
+        // Mark submission locally
+        if (show15) localStorage.setItem("freeRescheduleSubmittedAt15", Date.now().toString());
+        if (show30) localStorage.setItem("freeRescheduleSubmittedAt30", Date.now().toString());
+
+        responseBox.innerHTML = `<p style="color:green; font-weight:bold;">✅ Gracias, hemos confirmado con nuestro staff tu solicitud.<br>Nos pondremos en contacto contigo en breve.</p>`;
       } catch (err) {
-        console.error("❌ Fallo el envío:", err);
-        responseContainer.innerHTML = `<p style="color:red; margin-top: 10px;">❌ Hubo un problema. Intenta nuevamente.</p>`;
+        responseBox.innerHTML = `<p style="color:red; font-weight:bold;">❌ Error al enviar la solicitud. Intenta nuevamente.</p>`;
       }
     });
   }
 }
+
 
 function showReminderBanner() {
   const banner = document.createElement("div");
