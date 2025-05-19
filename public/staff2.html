@@ -599,6 +599,7 @@ async function confirmPayment(userId) {
       nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
       monthsPaid: newMonthsPaid >= 8 ? 0 : newMonthsPaid, // ✅ Reset monthsPaid at 8
       paymentHistory: firebase.firestore.FieldValue.arrayUnion(newPaymentEntry) // ✅ Keep adding to history
+      freeInspectionBannerShown: false
     };
 
     await userRef.update(updates);
