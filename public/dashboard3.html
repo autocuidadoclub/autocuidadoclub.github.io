@@ -1307,73 +1307,71 @@ function loadPaymentHistory() {
         
 
 function showFreeRescheduleOffer(userData) {
-  console.log("📊 Evaluando recordatorio de inspección gratuita...");
-
+  console.log("Verificando oferta gratuita de reprogramación...");
   const now = new Date();
   const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
-
   const monthsUnpaid = lastPaymentDate
-    ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth()) + (now.getDate() < lastPaymentDate.getDate() ? -0.5 : 0)
+    ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
     : 3;
-
-  const lastSubmitted15 = localStorage.getItem("freeRescheduleSubmittedAt15");
-  const lastSubmitted30 = localStorage.getItem("freeRescheduleSubmittedAt30");
-
-  const show15 = monthsUnpaid >= 0.5 && monthsUnpaid < 2 && (!lastSubmitted15 || (Date.now() - parseInt(lastSubmitted15)) > 15 * 24 * 60 * 60 * 1000);
-  const show30 = monthsUnpaid >= 2 && (!lastSubmitted30 || (Date.now() - parseInt(lastSubmitted30)) > 30 * 24 * 60 * 60 * 1000);
 
   if (
     (userData.monthsPaid === 0 || userData.monthsPaid === 1) &&
-    (show15 || show30) &&
+    monthsUnpaid >= 1 &&
     !document.getElementById("freeRescheduleBox")
   ) {
-    console.log("✅ Mostrando CTA de inspección gratuita");
+    console.log("✅ Condiciones cumplidas, mostrando oferta...");
 
-    const box = document.createElement("div");
-    box.id = "freeRescheduleBox";
-    box.innerHTML = `
-      <div style="background:#fff8e1; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
-        <h3>🎁 ¡Te regalamos una inspección!</h3>
-        <p>¿Pagás hoy? Te damos una inspección adicional totalmente gratis.</p>
-        <form id="claimFreeRescheduleForm">
-          <input type="hidden" name="_subject" value="🎁 Solicitud de inspección gratis por inactividad">
-          <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-          <input type="hidden" name="name" value="${userData.name || 'N/A'}">
-          <input type="hidden" name="email" value="${userData.email}">
-          <input type="hidden" name="phone" value="${userData.phone || 'No registrado'}">
-          <input type="hidden" name="departamento" value="${userData.department || 'N/A'}">
-          <input type="hidden" name="municipio" value="${userData.municipality || 'N/A'}">
-          <input type="hidden" name="message" value="El cliente ${userData.name || 'N/A'} (${userData.email}) ha solicitado una inspección gratuita. Teléfono: ${userData.phone || 'N/A'}. Departamento: ${userData.department || 'N/A'}, Municipio: ${userData.municipality || 'N/A'}. Fecha de último pago: ${lastPaymentDate?.toLocaleDateString('es-ES') || 'Desconocida'}">
-          <button type="submit" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">Solicitar beneficio</button>
-        </form>
-        <div id="freeRescheduleResponse" style="margin-top:10px;"></div>
+    const offerBox = document.createElement("div");
+    offerBox.id = "freeRescheduleBox";
+    offerBox.innerHTML = `
+      <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
+        <h3>🎁 ¡Te regalamos una cita!</h3>
+        <p>Han pasado más de ${monthsUnpaid} mes${monthsUnpaid > 1 ? 'es' : ''}. Agenda gratis tu próxima inspección.</p>
+        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
+          Agendar ahora
+        </button>
+        <div id="rescheduleStatus" style="margin-top:15px;"></div>
       </div>
     `;
-    document.body.prepend(box);
+    document.body.prepend(offerBox);
 
-    document.getElementById("claimFreeRescheduleForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const responseBox = document.getElementById("freeRescheduleResponse");
-      responseBox.innerHTML = `<img src="loading.gif" style="width:40px;" alt="Cargando...">`;
+    document.getElementById("claimFreeReschedule").addEventListener("click", async () => {
+      const statusDiv = document.getElementById("rescheduleStatus");
+      statusDiv.innerHTML = `<img src="loading.gif" alt="Cargando..." style="width:40px;">`;
+
+      const formData = new FormData();
+      formData.append("message", `🟢 Cliente solicitó una inspección gratuita:
+- Nombre: ${userData.name || "N/A"}
+- Correo: ${userData.email}
+- Teléfono: ${userData.phone || "No registrado"}
+- Departamento: ${userData.department || "N/A"}
+- Municipio: ${userData.municipality || "N/A"}
+- Último pago: ${lastPaymentDate?.toLocaleDateString("es-ES") || "Desconocido"}`);
 
       try {
-        const formData = new FormData(e.target);
-        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        const response = await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
           method: "POST",
           body: formData
         });
 
-        // Mark submission locally
-        if (show15) localStorage.setItem("freeRescheduleSubmittedAt15", Date.now().toString());
-        if (show30) localStorage.setItem("freeRescheduleSubmittedAt30", Date.now().toString());
-
-        responseBox.innerHTML = `<p style="color:green; font-weight:bold;">✅ Gracias, hemos confirmado con nuestro staff tu solicitud.<br>Nos pondremos en contacto contigo en breve.</p>`;
-      } catch (err) {
-        responseBox.innerHTML = `<p style="color:red; font-weight:bold;">❌ Error al enviar la solicitud. Intenta nuevamente.</p>`;
+        const result = await response.json();
+        if (result.success) {
+          offerBox.innerHTML = `
+            <div style="background:#eafaf1; border:2px solid #4CAF50; padding:20px; border-radius:10px;">
+              ✅ Inspección extra gratis solicitada.
+            </div>
+          `;
+        } else {
+          statusDiv.innerHTML = `<p style="color:red;">❌ Error al enviar. Intenta nuevamente.</p>`;
+        }
+      } catch (error) {
+        console.error("❌ Error al enviar solicitud:", error);
+        statusDiv.innerHTML = `<p style="color:red;">❌ Error de red. Intenta de nuevo más tarde.</p>`;
       }
     });
   }
 }
+
 
 
 function showReminderBanner() {
