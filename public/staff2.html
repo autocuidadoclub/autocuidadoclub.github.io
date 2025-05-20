@@ -296,7 +296,58 @@ async function exportAllReferralsToExcel() {
     }
 }
 
+async function searchClientByEmail() {
+  const email = document.getElementById("searchClientEmail").value.trim();
+  const box = document.getElementById("clientInfoBox");
 
+  if (!email) {
+    alert("Escribe un correo para buscar.");
+    return;
+  }
+
+  try {
+    const snapshot = await db.collection("users").where("email", "==", email).get();
+
+    if (snapshot.empty) {
+      alert("Cliente no encontrado.");
+      box.style.display = "none";
+      return;
+    }
+
+    const doc = snapshot.docs[0];
+    const user = doc.data();
+
+    // Fill info
+    document.getElementById("clientName").textContent = user.name || "-";
+    document.getElementById("clientEmail").textContent = user.email || "-";
+    document.getElementById("clientPhone").textContent = user.phone || "-";
+    document.getElementById("clientMunicipio").textContent = user.municipality || "-";
+    document.getElementById("clientSchedule").textContent = user.schedule ? `${user.schedule.day} - ${user.schedule.time}` : "-";
+
+    const vehicle = user.vehicles && user.vehicles.length > 0 ? `${user.vehicles[0].brand} ${user.vehicles[0].model} (${user.vehicles[0].plate})` : "Sin vehículo";
+    document.getElementById("clientVehicle").textContent = vehicle;
+
+    document.getElementById("clientPlan").textContent = user.planType || "-";
+
+    box.style.display = "block";
+  } catch (error) {
+    console.error("Error buscando cliente:", error);
+    alert("Error al buscar cliente.");
+    box.style.display = "none";
+  }
+}
+
+    function copyScheduleToClipboard() {
+  const name = document.getElementById("clientName").textContent;
+  const date = document.getElementById("clientSchedule").textContent;
+  const municipio = document.getElementById("clientMunicipio").textContent;
+  const text = `Inspección: ${name}\nHorario: ${date}\nLugar: ${municipio}`;
+  navigator.clipboard.writeText(text).then(() => {
+    alert("📋 Información copiada. Pegala en tu Google Calendar o WhatsApp.");
+  });
+}
+
+    
 async function exportAllUsersToExcel() {
   try {
     const snapshot = await db.collection("users").get();
@@ -879,6 +930,23 @@ function saveInspectionDate(userId, vehicleIndex) {
 
     
   </script>
+
+  <h3 class="section-title">🔍 Buscar Cliente</h3>
+<input id="searchClientEmail" placeholder="Correo del cliente..." />
+<button onclick="searchClientByEmail()">Buscar Cliente</button>
+
+<div id="clientInfoBox" style="margin-top: 20px; display: none;">
+  <h4>📋 Información del Cliente</h4>
+  <p><strong>Nombre:</strong> <span id="clientName">-</span></p>
+  <p><strong>Correo:</strong> <span id="clientEmail">-</span></p>
+  <p><strong>Teléfono:</strong> <span id="clientPhone">-</span></p>
+  <p><strong>Municipio:</strong> <span id="clientMunicipio">-</span></p>
+  <p><strong>Horario Seleccionado:</strong> <span id="clientSchedule">-</span></p>
+  <p><strong>Vehículo:</strong> <span id="clientVehicle">-</span></p>
+  <p><strong>Plan:</strong> <span id="clientPlan">-</span></p>
+  <button onclick="copyScheduleToClipboard()">📅 Copiar para Calendar</button>
+</div>
+
 
 
 <!-- Load flatpickr -->
