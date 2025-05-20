@@ -14,6 +14,8 @@
   
 </head>
 
+
+  
   <style>
    table tr {
   border-bottom: 1px solid #ddd;
@@ -41,207 +43,7 @@ table td, table th {
     <h1>Gestión de Clientes</h1>
   </header>
 
-  <button onclick="exportAllReferralsToExcel()" style="
-    margin-top: 20px;
-    background-color: #003366;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-">
-    📥 Exportar Todos los Referidos a Excel
-</button>
-
-
-<button onclick="exportAllUsersToExcel()" style="
-  margin-top: 20px;
-  background-color: #336699;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-">
-📥 Exportar Todos los Usuarios a Excel
-</button>
-
-
- <h2>Links importantes </h2>
-  https://forms.gle/15ECcbdkvrNVdzii6 (para inspecciones de mecanicos)
-
-  <section id="restricted-content" style="display: none;">
-    <h2>Panel de Gestión para el Staff</h2>
-    <h3 class="section-title">Buscar Usuarios por Fecha</h3>
-<div class="form-control">
-  <label for="startDate">Desde:</label>
-  <input type="date" id="startDate">
-</div>
-<div class="form-control">
-  <label for="endDate">Hasta:</label>
-  <input type="date" id="endDate">
-</div>
-<button onclick="findUsersByDate()">Buscar Usuarios</button>
-<button onclick="exportTableToExcel()">Exportar a Excel</button>
-
-<table id="usersFullTable">
-  <thead>
-  <tr>
-    <th>Usuario</th>
-    <th>Email</th>
-    <th>Teléfono</th>
-    <th>Municipio</th>
-    <th>Departamento</th>
-    <th>Fecha de Registro</th>
-    <th>Horario Seleccionado</th>
-    <th>Fecha de Pago</th>
-    <th>Estado del Pago</th>
-    <th>Acciones</th>
-  </tr>
-</thead>
-  <tbody id="paymentTable"></tbody>
-</table>
-
-
-    <div>
-      <h3 class="section-title">Verificar Reprogramaciones por Fecha</h3>
-      <div class="form-control">
-        <label for="rescheduleStartDate">Desde:</label>
-        <input type="date" id="rescheduleStartDate" />
-      </div>
-      <div class="form-control">
-        <label for="rescheduleEndDate">Hasta:</label>
-        <input type="date" id="rescheduleEndDate" />
-      </div>
-      <button onclick="findRescheduledUsers()">Buscar Reprogramaciones</button>
-      <button onclick="exportTableToExcel()">Exportar a Excel</button>
-
-      <table id="rescheduleFullTable">
-      <thead>
-  <tr>
-    <th>Usuario</th>
-    <th>Email</th>
-    <th>Teléfono</th>
-    <th>Horario Seleccionado</th>
-    <th>Departamento</th>
-    <th>Municipio</th>
-    <th>Tipo de Cambio</th>
-    <th>Fecha y Hora de Cambio</th>
-  </tr>
-</thead>
-        <tbody id="rescheduleTable"></tbody>
-      </table>
-    </div>
-  </section>
-
-<section id="staffControlSection" style="margin-top: 40px;">
-  <h3>🔧 Modificar Horario y Ubicación del Cliente</h3>
-  <input type="email" id="staffSearchEmail" placeholder="Correo del cliente..." />
-  <button onclick="loadStaffUser()">Buscar Cliente</button>
-
-  <div id="staffControlForm" style="display:none; margin-top: 20px;">
-    <h4>Cliente: <span id="staffClientName">-</span></h4>
-    <p>Municipio actual: <span id="currentMunicipality">-</span></p>
-    <p>Departamento actual: <span id="currentDepartment">-</span></p>
-    <p>Horario actual: <span id="currentSchedule">-</span></p>
-
-    <div id="vehicleInspectionSection" style="margin-top: 20px;">
-  <h4>📅 Inspecciones por Vehículo</h4>
-  <div id="vehicleInspectionList"></div>
-</div>
-
-    <h4>Deseas confimar pago?<h4>
-    <p><button onclick="confirmPayment(selectedStaffUserId)">Confirmar Pago</button><br></p>
-    <h4>Seleccione Nuevo Horario:</h4>
-    <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Horario</th>
-                    <th>Lunes</th>
-                    <th>Miércoles</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
-                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
-                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
-                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
-                    <td onclick="selectScheduleBox(this)">-</td>
-                </tr>
-            </tbody>
-        </table>
-
-     <h4>Seleccione una nueva ubicación</h4>
-   <label for="department">Departamento:</label>
-    <select id="department" onchange="updateMunicipalities()" required>
-        <option value="">Seleccione un departamento</option>
-    </select>
-    
-    <label for="municipality">Municipio:</label>
-    <select id="municipality" required>
-        <option value="">Seleccione un municipio</option>
-    </select>
-   
-    <br />
-    <button onclick="saveStaffClientChanges()">Guardar Cambios</button>
-  </div>
-</section>
-
-      
-
- <div id="customAlert" style="
-  display: none;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #4CAF50; /* default green */
-  color: white;
-  padding: 15px 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  z-index: 9999;
-  font-weight: bold;
-">
-  ✅ Mensaje de ejemplo.
-</div>
-
-     <div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
-  <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
-    <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
-    <div style="text-align: left; max-width: 300px;">
-      <p style="margin: 0; font-size: 18px; font-weight: bold;">
-        Esta app es más que tecnología.
-      </p>
-      <p style="margin: 5px 0 0; font-size: 16px;">
-        Es una forma distinta de cuidar lo que importa.
-      </p>
-    </div>
-  </div>
-  <p style="text-align: center; margin-top: 20px; font-size: 16px;">
-    <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
-  </p>
-</div>
+  
 
   <script src="env.js"></script>
   <script>
@@ -278,6 +80,52 @@ table td, table th {
         window.location.href = "login.html";
       }
     });
+
+    async function loadInspectionsByDate() {
+  const selectedDate = document.getElementById("calendarDate").value;
+  const table = document.getElementById("dayScheduleTable").querySelector("tbody");
+  table.innerHTML = "";
+
+  if (!selectedDate) return alert("Seleccioná una fecha");
+
+  const dateStart = new Date(selectedDate);
+  const dateEnd = new Date(selectedDate);
+  dateEnd.setDate(dateEnd.getDate() + 1);
+
+  try {
+    const snapshot = await db.collection("users")
+      .where("requestedDate", ">=", firebase.firestore.Timestamp.fromDate(dateStart))
+      .where("requestedDate", "<", firebase.firestore.Timestamp.fromDate(dateEnd))
+      .get();
+
+    if (snapshot.empty) {
+      alert("No hay inspecciones para este día.");
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      const user = doc.data();
+      const nameCode = (user.name || "USER").replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 5);
+      const todayCode = selectedDate.replace(/-/g, "");
+      const inviteCode = `INV-${todayCode}-${nameCode}`;
+
+      table.innerHTML += `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.schedule?.day || "-"} - ${user.schedule?.time || "-"}</td>
+          <td>${user.municipality || "-"}</td>
+          <td><strong>${inviteCode}</strong></td>
+        </tr>
+      `;
+    });
+
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    alert("Error al cargar las inspecciones.");
+  }
+}
+
     
 async function findUsersByDate() {
   const startDateInput = document.getElementById("startDate").value;
@@ -1033,112 +881,31 @@ function saveInspectionDate(userId, vehicleIndex) {
   </script>
 
 
+<!-- Load flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-       <!-- Feedback Button + Modal -->
-<a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
-  📝 Opinión
-</a>
+<h3 class="section-title">📅 Ver Solicitudes por Día</h3>
+<input id="calendarDate" placeholder="Seleccioná un día" />
+<button onclick="loadInspectionsByDate()">Buscar</button>
 
-
-
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-    <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
-    <form id="voiceFeedbackForm">
-      <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-      <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-      <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-      <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between;">
-        <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
-        <button type="submit">Enviar</button>
-      </div>
-    </form>
-    <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
-    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-      <img src="loading.gif" alt="Cargando..." style="width:400px;">
-    </div>
-  </div>
-</div>
+<table id="dayScheduleTable" style="margin-top: 20px;">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Email</th>
+      <th>Horario</th>
+      <th>Municipio</th>
+      <th>📎 Invite Code</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
 <script>
-  const feedbackText = document.getElementById('feedbackText');
-  const feedbackForm = document.getElementById('voiceFeedbackForm');
-  const feedbackLoader = document.getElementById('feedbackLoader');
-
-  function openFeedbackModal() {
-    document.getElementById('feedbackModal').style.display = 'flex';
-    feedbackText.focus();
-  }
-
-  function closeFeedbackModal() {
-    document.getElementById('feedbackModal').style.display = 'none';
-    feedbackForm.reset();
-    feedbackLoader.style.display = 'none';
-  }
-
-  function startVoiceInput() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert("Tu navegador no soporta reconocimiento de voz.");
-      return;
-    }
-
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'es-ES';
-
-    feedbackText.placeholder = "🎙️ Escuchando...";
-    feedbackText.style.border = "2px solid orange";
-
-    recognition.onresult = (event) => {
-      const result = event.results[0][0].transcript;
-      feedbackText.value += (feedbackText.value ? ' ' : '') + result;
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-    };
-
-    recognition.onerror = (event) => {
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-
-      if (event.error === 'no-speech') {
-        alert("No se detectó voz. Intentá nuevamente.");
-      } else {
-        alert("Error de voz: " + event.error);
-      }
-    };
-
-    recognition.onend = () => {
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-    };
-
-    recognition.start();
-  }
-
-  feedbackForm.onsubmit = function(event) {
-    event.preventDefault();
-    feedbackLoader.style.display = 'block';
-
-    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-      method: "POST",
-      body: new FormData(feedbackForm)
-    })
-    .then(response => response.json())
-    .then(data => {
-      feedbackLoader.style.display = 'none';
-      if (data.success === "true") {
-        alert("¡Gracias por tu opinión!");
-        closeFeedbackModal();
-      } else {
-        alert("Error al enviar. Intenta de nuevo.");
-      }
-    })
-    .catch(error => {
-      feedbackLoader.style.display = 'none';
-      console.error("Error:", error);
-      alert("Hubo un problema al enviar el mensaje.");
-    });
-  };
+flatpickr("#calendarDate", {
+  dateFormat: "Y-m-d",
+});
 </script>
 
 </body>
