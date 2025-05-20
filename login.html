@@ -329,18 +329,39 @@
 
 
   <script>
-    const installBtn = document.getElementById('how-to-install-btn');
-    installBtn.addEventListener('click', () => {
-      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-      if (isIos) {
-        alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-      } else if (isAndroid) {
-        alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
-      } else {
-        alert("Instalación no disponible en este dispositivo.");
-      }
-    });
+     let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Stop the browser from showing the default prompt
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Optional: you could show the button ONLY when install is available
+  document.getElementById('how-to-install-btn').style.display = 'inline-block';
+});
+
+document.getElementById('how-to-install-btn').addEventListener('click', async () => {
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+
+  if (deferredPrompt) {
+    // If install is supported, show browser-native prompt
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === 'accepted') {
+      console.log('✅ User accepted the install prompt');
+    } else {
+      console.log('❌ User dismissed the install prompt');
+    }
+    deferredPrompt = null;
+  } else if (isIos) {
+    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+  } else if (isAndroid) {
+    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
+  } else {
+    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
+  }
+});
 
     function openFeedbackModal() {
       document.getElementById('feedbackModal').style.display = 'flex';
