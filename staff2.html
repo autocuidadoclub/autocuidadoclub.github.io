@@ -928,7 +928,44 @@ function saveInspectionDate(userId, vehicleIndex) {
   });
 }
 
-    
+   function createGoogleCalendarEvent() {
+  const name = document.getElementById("clientName").textContent;
+  const email = document.getElementById("clientEmail").textContent;
+  const municipio = document.getElementById("clientMunicipio").textContent;
+  const schedule = document.getElementById("clientSchedule").textContent;
+
+  if (!schedule || schedule === "-") {
+    alert("Este cliente no tiene horario registrado.");
+    return;
+  }
+
+  const [dayName, timeRange] = schedule.split(" - ");
+  const [startTime, endTime] = timeRange.split(" - ");
+
+  // You must provide the exact inspection date (example: selectedDate from previous input)
+  const selectedDate = document.getElementById("calendarDate")?.value;
+  if (!selectedDate) {
+    alert("Seleccioná la fecha desde el calendario primero.");
+    return;
+  }
+
+  const start = `${selectedDate}T${startTime.replace(":", "")}00`;
+  const end = `${selectedDate}T${endTime.replace(":", "")}00`;
+
+  const title = `Inspección: ${name}`;
+  const details = `Cliente: ${name}\nCorreo: ${email}\nMunicipio: ${municipio}`;
+  const location = `${municipio} (AutoCuidado Club)`;
+
+  const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${formatToGCal(start)}/${formatToGCal(end)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}&sf=true&output=xml`;
+
+  window.open(calendarUrl, "_blank");
+}
+
+function formatToGCal(dateStr) {
+  // Convert "2025-05-20T100000" → "20250520T100000Z"
+  return dateStr.replace(/-/g, "").replace("T", "T") + "Z";
+}
+ 
   </script>
 
   <h3 class="section-title">🔍 Buscar Cliente</h3>
@@ -947,6 +984,7 @@ function saveInspectionDate(userId, vehicleIndex) {
   <button onclick="copyScheduleToClipboard()">📅 Copiar para Calendar</button>
 </div>
 
+<button onclick="createGoogleCalendarEvent()">📆 Agendar en Google Calendar</button>
 
 
 <!-- Load flatpickr -->
