@@ -159,3 +159,64 @@ exports.stripeWebhook = functions.https.onRequest((req, res) => {
 
   return res.status(200).send("Unhandled event type");
 });
+
+
+exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
+  try {
+    const transaction = req.body?.transaction;
+
+    if (!transaction || transaction.status !== "APPROVED") {
+      console.warn("Transacción inválida o no aprobada.");
+      return res.status(400).send("Invalid transaction");
+    }
+
+    const userEmail = transaction.customer_email;
+    if (!userEmail) {
+      return res.status(400).send("Missing customer email");
+    }
+
+    const usersRef = db.collection("users");
+    const snapshot = await usersRef.where("email", "==", userEmail).limit(1).get();
+
+    if (snapshot.empty) {
+      return res.status(404).send("User not found");
+    }
+
+    const userDoc = snapshot.docs[0];
+    const userRef = userDoc.ref;
+    const now = admin.firestore.Timestamp.now();
+    const nextCycle = admin.firestore.Timestamp.fromMillis(now.toMillis() + 30 * 24 * 60 * 60 * 1000);
+
+    const paymentId = transaction.id;
+    const currentHistory = userDoc.data().paymentHistory || [];
+    const alreadyExists = currentHistory.some(p => p.transactionId === paymentId);
+
+    if (alreadyExists) {
+      console.log("Pago ya registrado, ignorado:", paymentId);
+      return res.status(200).send("Duplicate transaction");
+    }
+
+    await userRef.update({
+      paymentStatus: "Paid",
+      subscriptionStatus: "active",
+      paymentDate: now,
+      nextPaymentDate: nextCycle,
+      monthsPaid: admin.firestore.FieldValue.increment(1),
+      checkoutLink: "",
+      paymentHistory: admin.firestore.FieldValue.arrayUnion({
+        date: now,
+        amount: transaction.amount_in_cents / 100,
+        transactionId: paymentId,
+        status: transaction.status,
+        source: "Wompi"
+      }),
+    });
+
+    console.log(`✅ Pago exitoso registrado para: ${userEmail}`);
+    return res.status(200).send("Payment processed");
+
+  } catch (error) {
+    console.error("❌ Error en webhook de Wompi:", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
