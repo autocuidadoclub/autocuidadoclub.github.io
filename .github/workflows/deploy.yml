@@ -83,7 +83,7 @@ jobs:
           echo "🚀 Deploying Firebase Functions..."
           cd functions
           npm install
-          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only functions:wompiWebhook --project=${{ secrets.FIREBASE_PROJECT_ID }} --json > deploy_output.json cat deploy_output.json
+          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only functions:wompiWebhook --project=${{ secrets.FIREBASE_PROJECT_ID }}
           echo "✅ Firebase Functions deployed successfully."
 
 
