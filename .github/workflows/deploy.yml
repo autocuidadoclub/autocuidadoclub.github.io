@@ -77,6 +77,16 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
           echo "✅ Firebase Hosting deployed successfully."
 
+      # ✅ Deploy Firebase Functions (including wompiWebhook)
+      - name: Deploy Firebase Functions
+        run: |
+          echo "🚀 Deploying Firebase Functions..."
+          cd functions
+          npm install
+          GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only functions:wompiWebhook --project=${{ secrets.FIREBASE_PROJECT_ID }}
+          echo "✅ Firebase Functions deployed successfully."
+
+
   # ✅ Deploy to GitHub Pages
   deploy_github_pages:
     runs-on: ubuntu-latest
