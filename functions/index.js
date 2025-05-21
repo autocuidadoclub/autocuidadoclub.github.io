@@ -109,12 +109,7 @@ exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
   }
 });
 
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const Stripe = require("stripe");
-const axios = require("axios");
 
-admin.initializeApp();
 const db = admin.firestore();
 
 const stripe = Stripe(functions.config().stripe.secret); // From GitHub secrets via `firebase functions:config:set`
