@@ -17,22 +17,20 @@ jobs:
 
       # ✅ Generate env.js from GitHub Secrets
       - name: Generate env.js
-        run: |
-          echo "🔍 Generating env.js..."
-          cat <<EOF > public/env.js
-window._env_ = {
-  FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}",
-  FIREBASE_AUTH_DOMAIN: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-  FIREBASE_PROJECT_ID: "${{ secrets.FIREBASE_PROJECT_ID }}",
-  FIREBASE_STORAGE_BUCKET: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-  FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
-  FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}",
-  FIREBASE_MEASUREMENT_ID: "${{ secrets.FIREBASE_MEASUREMENT_ID }}",
-  ZOHO_CLIENT_ID: "${{ secrets.ZOHO_CLIENT_ID }}",
-  ZOHO_CLIENT_SECRET: "${{ secrets.ZOHO_CLIENT_SECRET }}",
-  ZOHO_REFRESH_TOKEN: "${{ secrets.ZOHO_REFRESH_TOKEN }}"
-};
-EOF
+        run: >
+          echo "🔍 Generating env.js..." &&
+          echo "window._env_ = {" > public/env.js &&
+          echo "  FIREBASE_API_KEY: '${{ secrets.FIREBASE_API_KEY }}'," >> public/env.js &&
+          echo "  FIREBASE_AUTH_DOMAIN: '${{ secrets.FIREBASE_AUTH_DOMAIN }}'," >> public/env.js &&
+          echo "  FIREBASE_PROJECT_ID: '${{ secrets.FIREBASE_PROJECT_ID }}'," >> public/env.js &&
+          echo "  FIREBASE_STORAGE_BUCKET: '${{ secrets.FIREBASE_STORAGE_BUCKET }}'," >> public/env.js &&
+          echo "  FIREBASE_MESSAGING_SENDER_ID: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}'," >> public/env.js &&
+          echo "  FIREBASE_APP_ID: '${{ secrets.FIREBASE_APP_ID }}'," >> public/env.js &&
+          echo "  FIREBASE_MEASUREMENT_ID: '${{ secrets.FIREBASE_MEASUREMENT_ID }}'," >> public/env.js &&
+          echo "  ZOHO_CLIENT_ID: '${{ secrets.ZOHO_CLIENT_ID }}'," >> public/env.js &&
+          echo "  ZOHO_CLIENT_SECRET: '${{ secrets.ZOHO_CLIENT_SECRET }}'," >> public/env.js &&
+          echo "  ZOHO_REFRESH_TOKEN: '${{ secrets.ZOHO_REFRESH_TOKEN }}'" >> public/env.js &&
+          echo "};" >> public/env.js &&
           echo "✅ env.js generated successfully."
 
       # ✅ Verify env.js exists
@@ -60,45 +58,42 @@ EOF
           gcloud auth list
           echo "✅ Google Cloud authentication successful."
 
-      # ✅ Install Firebase CLI (Safe via npm)
+      # ✅ Install Firebase CLI
       - name: Install Firebase CLI via npm
         run: |
-          echo "🔍 Installing Firebase CLI via npm..."
+          echo "🔍 Installing Firebase CLI..."
           npm install -g firebase-tools
           firebase --version
-          echo "✅ Firebase CLI installed successfully."
+          echo "✅ Firebase CLI installed."
 
       # ✅ Deploy to Firebase Hosting
       - name: Deploy to Firebase Hosting
         run: |
           echo "🚀 Deploying to Firebase Hosting..."
           GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }}
-          echo "✅ Firebase Hosting deployed successfully."
+          echo "✅ Firebase Hosting deployed."
 
-      # ✅ Deploy Firebase Functions (e.g. wompiWebhook)
+      # ✅ Deploy Firebase Functions (e.g. webhook)
       - name: Deploy Firebase Functions
         run: |
           echo "🚀 Deploying Firebase Functions..."
           cd functions
           npm install
           GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json" firebase deploy --only functions --project=${{ secrets.FIREBASE_PROJECT_ID }}
-          echo "✅ Firebase Functions deployed successfully."
+          echo "✅ Firebase Functions deployed."
 
   deploy_github_pages:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # ✅ Ensure public/index.html exists
       - name: Prepare public folder
         run: |
           mkdir -p public
           cp index.html public/index.html
 
-      # ✅ Deploy to GitHub Pages
       - name: Deploy GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
