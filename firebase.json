@@ -16,7 +16,26 @@
       { "source": "/suscripciones", "destination": "/suscripciones.html" },
       { "source": "/contacto", "destination": "/contacto.html" },
       { "source": "/staff", "destination": "/staff.html" },
-      { "source": "**", "destination": "/index.html" }
+      {
+        "source": "/wompiWebhook",
+        "function": "wompiWebhook"
+      },
+      {
+        "source": "/stripeWebhook",
+        "function": "stripeWebhook"
+      },
+      {
+        "source": "/sendReferralEmail",
+        "function": "sendReferralEmail"
+      },
+      {
+        "source": "/guardarTokenPagadito",
+        "function": "guardarTokenPagadito"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }
