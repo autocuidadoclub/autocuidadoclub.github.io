@@ -6,7 +6,7 @@ const Stripe = require("stripe");
 admin.initializeApp();
 const db = admin.firestore();
 
-// 🔑 Environment variables from GitHub Secrets / Firebase config
+// 🔐 Entorno (Firebase config o GitHub Secrets)
 const {
   ZOHO_CLIENT_ID,
   ZOHO_CLIENT_SECRET,
@@ -18,7 +18,7 @@ const {
 const stripe = Stripe(functions.config().stripe.secret);
 const endpointSecret = functions.config().stripe.webhook;
 
-// 🌐 Zoho Mail: Get Access Token
+// 🌐 Obtener token de acceso Zoho
 async function getZohoAccessToken() {
   const response = await axios.post(`${ZOHO_API_DOMAIN}/oauth/v2/token`, null, {
     params: {
@@ -31,7 +31,7 @@ async function getZohoAccessToken() {
   return response.data.access_token;
 }
 
-// 📧 Zoho Mail: Send email
+// 📧 Enviar correo con Zoho
 async function sendZohoMail(toEmail, subject, bodyContent) {
   const accessToken = await getZohoAccessToken();
 
@@ -53,20 +53,14 @@ async function sendZohoMail(toEmail, subject, bodyContent) {
     }
   );
 
-  console.log("Email sent:", response.data);
+  console.log("📧 Email sent:", response.data);
   return response.data;
 }
 
-// 📩 Referral Email Function
+// 📩 Función de correo por referido
 exports.sendReferralEmail = functions.https.onRequest(async (req, res) => {
   try {
-    const {
-      referrerName,
-      referrerEmail,
-      referralName,
-      referralEmail,
-      referralPhone,
-    } = req.body;
+    const { referrerName, referrerEmail, referralName, referralEmail, referralPhone } = req.body;
 
     const subject = "🎉 ¡Nuevo referido agregado en AutoCuidado Club!";
     const body = `
@@ -81,10 +75,10 @@ exports.sendReferralEmail = functions.https.onRequest(async (req, res) => {
     `;
 
     await sendZohoMail(referrerEmail, subject, body);
-    res.status(200).send("Referral email sent successfully!");
+    res.status(200).send("Correo de referido enviado correctamente.");
   } catch (error) {
-    console.error("❌ Error sending referral email:", error);
-    res.status(500).send("Error sending email");
+    console.error("❌ Error enviando correo:", error);
+    res.status(500).send("Error al enviar correo.");
   }
 });
 
@@ -96,7 +90,7 @@ exports.stripeWebhook = functions.https.onRequest((req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("❌ Stripe Webhook signature failed:", err.message);
+    console.error("❌ Firma Stripe inválida:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -122,35 +116,32 @@ exports.stripeWebhook = functions.https.onRequest((req, res) => {
         }),
       })
       .then(() => {
-        console.log(`✅ Stripe payment recorded for user: ${uid}`);
+        console.log(`✅ Stripe: pago registrado para ${uid}`);
         return res.status(200).send("Success");
       })
       .catch((err) => {
-        console.error("❌ Firestore update failed:", err);
+        console.error("❌ Error al actualizar Firestore:", err);
         return res.status(500).send("Firestore update error");
       });
   }
 
-  res.status(200).send("Unhandled event type");
+  return res.status(200).send("Unhandled event type");
 });
 
-// 🧾 Wompi Webhook
+// 💰 Wompi Webhook
 exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
   try {
     const transaction = req.body?.transaction;
 
     if (!transaction || transaction.status !== "APPROVED") {
+      console.warn("Transacción inválida o no aprobada.");
       return res.status(400).send("Invalid transaction");
     }
 
     const userEmail = transaction.customer_email;
     if (!userEmail) return res.status(400).send("Missing customer email");
 
-    const snapshot = await db
-      .collection("users")
-      .where("email", "==", userEmail)
-      .limit(1)
-      .get();
+    const snapshot = await db.collection("users").where("email", "==", userEmail).limit(1).get();
 
     if (snapshot.empty) {
       return res.status(404).send("User not found");
@@ -158,18 +149,13 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
 
     const userRef = snapshot.docs[0].ref;
     const now = admin.firestore.Timestamp.now();
-    const nextCycle = admin.firestore.Timestamp.fromMillis(
-      now.toMillis() + 30 * 24 * 60 * 60 * 1000
-    );
-
+    const nextCycle = admin.firestore.Timestamp.fromMillis(now.toMillis() + 30 * 24 * 60 * 60 * 1000);
     const paymentId = transaction.id;
     const currentHistory = snapshot.docs[0].data().paymentHistory || [];
-    const alreadyExists = currentHistory.some(
-      (p) => p.transactionId === paymentId
-    );
+    const alreadyExists = currentHistory.some(p => p.transactionId === paymentId);
 
     if (alreadyExists) {
-      console.log("🔁 Duplicate Wompi payment:", paymentId);
+      console.log("🔁 Wompi: pago ya registrado", paymentId);
       return res.status(200).send("Duplicate transaction");
     }
 
@@ -189,15 +175,15 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
       }),
     });
 
-    console.log(`✅ Wompi payment processed for: ${userEmail}`);
+    console.log(`✅ Wompi: pago registrado para ${userEmail}`);
     res.status(200).send("Payment processed");
   } catch (error) {
-    console.error("❌ Error in Wompi webhook:", error);
+    console.error("❌ Error en webhook Wompi:", error);
     res.status(500).send("Internal Server Error");
   }
 });
 
-// 🔐 Pagadito token store
+// 🛡 Guardar token de Pagadito
 exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
   try {
     const { token_usuario, token_comercio, estado, correo_cliente } = req.body;
@@ -206,14 +192,10 @@ exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
       return res.status(400).send("Datos incompletos o transacción fallida.");
     }
 
-    const usersRef = db.collection("users");
-    const snapshot = await usersRef
-      .where("email", "==", correo_cliente)
-      .limit(1)
-      .get();
+    const snapshot = await db.collection("users").where("email", "==", correo_cliente).limit(1).get();
 
     if (snapshot.empty) {
-      return res.status(404).send("Usuario no encontrado en Firestore.");
+      return res.status(404).send("Usuario no encontrado.");
     }
 
     const userRef = snapshot.docs[0].ref;
@@ -226,7 +208,7 @@ exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
 
     return res.status(200).send("Tokens guardados exitosamente.");
   } catch (error) {
-    console.error("❌ Error al guardar tokens:", error);
+    console.error("❌ Error guardando tokens:", error);
     return res.status(500).send("Error del servidor.");
   }
 });
