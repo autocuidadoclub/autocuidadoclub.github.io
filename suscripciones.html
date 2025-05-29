@@ -110,12 +110,12 @@
   }
 
   const stripeLinks = {
-    basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
-    basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
-    basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
-    plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
-    plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
-    plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
+    basic3m: "https://u.wompi.sv/379910xeV",
+    basic6m: "https://u.wompi.sv/380639rcA",
+    basic12m: "https://u.wompi.sv/3806769qs",
+    plus3m: "https://u.wompi.sv/380690Gbx",
+    plus6m: "https://u.wompi.sv/380695_Np",
+    plus12m: "https://u.wompi.sv/380702xQa"
   };
   const checkoutLink = stripeLinks[selectedPlanType] || "";
 
@@ -155,7 +155,7 @@
         plusReferralsCompleted: 0,
         referralBonusAvailable: false,
         nextCyclePrice: 0,
-        stripeCustomerId: "",
+        CustomerId: "",
         referredBy,
         checkoutLink
       };
@@ -180,12 +180,12 @@
       document.getElementById("successOverlay").style.display = "flex";
       // Get checkout link from Firestore or predefined
 const stripeLinks = {
-  basic3m: "https://buy.stripe.com/test_bIYcNL4uW3PDexa8ww",
-  basic6m: "https://buy.stripe.com/test_bIYfZX8Lc2Lzdt6001",
-  basic12m: "https://buy.stripe.com/test_4gw7tr6D40DrfBe4gi",
-  plus3m: "https://buy.stripe.com/test_14k7tr2mObi5fBe8wz",
-  plus6m: "https://buy.stripe.com/test_7sIfZX2mO3PDbkYfZ2",
-  plus12m: "https://buy.stripe.com/test_4gw1537H83PDbkY3ch"
+   basic3m: "https://u.wompi.sv/379910xeV",
+    basic6m: "https://u.wompi.sv/380639rcA",
+    basic12m: "https://u.wompi.sv/3806769qs",
+    plus3m: "https://u.wompi.sv/380690Gbx",
+    plus6m: "https://u.wompi.sv/380695_Np",
+    plus12m: "https://u.wompi.sv/380702xQa"
 };
 
 const checkoutLink = stripeLinks[selectedPlanType] || "";
@@ -1528,7 +1528,7 @@ window.addEventListener('load', function() {
 
 
   <script>
- let deferredPrompt = null;
+    let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   // Stop the browser from showing the default prompt
