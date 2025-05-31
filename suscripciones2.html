@@ -109,14 +109,24 @@
     return;
   }
 
-  const stripeLinks = {
-    basic3m: "https://u.wompi.sv/379910xeV",
-    basic6m: "https://u.wompi.sv/380639rcA",
-    basic12m: "https://u.wompi.sv/3806769qs",
-    plus3m: "https://u.wompi.sv/380690Gbx",
-    plus6m: "https://u.wompi.sv/380695_Np",
-    plus12m: "https://u.wompi.sv/380753AKN"
-  };
+ const stripeLinksMonthly = {
+  basic3m: "https://u.wompi.sv/379910xeV",
+  basic6m: "https://u.wompi.sv/380639rcA",
+  basic12m: "https://u.wompi.sv/3806769qs",
+  plus3m: "https://u.wompi.sv/380690Gbx",
+  plus6m: "https://u.wompi.sv/380695_Np",
+  plus12m: "https://u.wompi.sv/380753AKN"
+};
+
+const stripeLinksFull = {
+  basic3m: "https://u.wompi.sv/370215SjH",
+  basic6m: "https://u.wompi.sv/387432nHU",
+  basic12m: "https://u.wompi.sv/387433i2m",
+  plus3m: "https://u.wompi.sv/387439i_2",
+  plus6m: "https://u.wompi.sv/387445Beb",
+  plus12m: "https://u.wompi.sv/387447ZDj"
+};
+
   const checkoutLink = stripeLinks[selectedPlanType] || "";
 
   auth.createUserWithEmailAndPassword(email, password)
@@ -179,13 +189,22 @@
       loader.style.display = "none";
       document.getElementById("successOverlay").style.display = "flex";
       // Get checkout link from Firestore or predefined
-const stripeLinks = {
-   basic3m: "https://u.wompi.sv/379910xeV",
-    basic6m: "https://u.wompi.sv/380639rcA",
-    basic12m: "https://u.wompi.sv/3806769qs",
-    plus3m: "https://u.wompi.sv/380690Gbx",
-    plus6m: "https://u.wompi.sv/380695_Np",
-    plus12m: "https://u.wompi.sv/380753AKN"
+const stripeLinksMonthly = {
+  basic3m: "https://u.wompi.sv/379910xeV",
+  basic6m: "https://u.wompi.sv/380639rcA",
+  basic12m: "https://u.wompi.sv/3806769qs",
+  plus3m: "https://u.wompi.sv/380690Gbx",
+  plus6m: "https://u.wompi.sv/380695_Np",
+  plus12m: "https://u.wompi.sv/380753AKN"
+};
+
+const stripeLinksFull = {
+  basic3m: "https://u.wompi.sv/370215SjH",
+  basic6m: "https://u.wompi.sv/387432nHU",
+  basic12m: "https://u.wompi.sv/387433i2m",
+  plus3m: "https://u.wompi.sv/387439i_2",
+  plus6m: "https://u.wompi.sv/387445Beb",
+  plus12m: "https://u.wompi.sv/387447ZDj"
 };
 
 const checkoutLink = stripeLinks[selectedPlanType] || "";
@@ -299,6 +318,16 @@ planButtons.forEach(button => {
     console.log(`✅ Vehículos preparados: Plan ${planType.includes("plus") ? "Plus (3)" : "Basic (1)"}`);
 }
         });
+
+        function goToFullPay(planKey) {
+  const fullLink = stripeLinksFull[planKey];
+  if (fullLink) {
+    window.open(fullLink, "_blank");
+  } else {
+    alert("Enlace de pago no disponible para este plan.");
+  }
+}
+
     </script>
 
     <style>
@@ -650,7 +679,15 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
                 <li>3 inspecciones preventivas (una cada mes).</li>
                 <li><strong>Beneficio:</strong> Ideal para probar el servicio sin compromiso a largo plazo.</li>
             </ul>
-            <button class="plan-button" data-plan="basic3m">¡Quiero este plan!</button>
+           <!-- Pago mensual -->
+            <button class="plan-button" data-plan="basic3m">¡Quiero este plan pagando mensual!</button>
+            
+            <!-- Pago total con descuento -->
+            <p style="color: green; font-weight: bold;">🎁 5% de descuento pagando todo el plan</p>
+            <button onclick="goToFullPay('basic3m')" style="background-color: #004d00; color: white; margin-top: 8px;">
+              ¡Quiero este plan en pago total!
+            </button>
+
             <p style="font-size:14px; margin-top:10px; color:#003366;">🚀 Asegurá tu tarifa especial de fundador para siempre. Solo por tiempo limitado.</p>
              <a href="tac.html" target="_blank">Ver términos y condiciones</a>
                 <a href="contacto.html" target="_blank">¿Dudas? Contáctanos</a>
