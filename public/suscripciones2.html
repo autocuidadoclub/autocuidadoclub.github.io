@@ -50,17 +50,7 @@
             const registrationContainer = document.getElementById("registration-container");
             const planButtons = document.querySelectorAll(".plan-button");
 
-            const stripeLinksFull = {
-  basic3m: "https://u.wompi.sv/370215SjH",
-  basic6m: "https://u.wompi.sv/387432nHU",
-  basic12m: "https://u.wompi.sv/387433i2m",
-  plus3m: "https://u.wompi.sv/387439i_2",
-  plus6m: "https://u.wompi.sv/387445Beb",
-  plus12m: "https://u.wompi.sv/387447ZDj"
-};
-
-
-          planButtons.forEach(button => {
+                    planButtons.forEach(button => {
   button.addEventListener("click", function () {
     selectedPlanType = this.getAttribute("data-plan");
     selectedPaymentType = this.getAttribute("data-paytype") || "monthly";
@@ -217,10 +207,23 @@ const stripeLinksFull = {
   plus12m: "https://u.wompi.sv/387447ZDj"
 };
 
+         let selectedPlanType = null;
+  let selectedPaymentType = "monthly";
+
+  function goToFullPay(planType) {
+    const fullLink = stripeLinksFull[planType];
+    if (fullLink) {
+      window.open(fullLink, '_blank');
+    } else {
+      alert("❌ Enlace no disponible para este plan.");
+    }
+  }
+        
 const checkoutLink = selectedPaymentType === "full"
   ? stripeLinksFull[selectedPlanType] || ""
   : stripeLinksMonthly[selectedPlanType] || "";
 
+         
         
 // 🆕 Open Stripe checkout in a new tab
 if (checkoutLink) {
@@ -329,14 +332,7 @@ planButtons.forEach(button => {
 }
         });
 
-        function goToFullPay(planKey) {
-  const fullLink = stripeLinksFull[planKey];
-  if (fullLink) {
-    window.open(fullLink, "_blank");
-  } else {
-    alert("Enlace de pago no disponible para este plan.");
-  }
-}
+      
 
     </script>
 
