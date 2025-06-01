@@ -210,15 +210,7 @@ const stripeLinksFull = {
          let selectedPlanType = null;
   let selectedPaymentType = "monthly";
 
-  function goToFullPay(planType) {
-    const fullLink = stripeLinksFull[planType];
-    if (fullLink) {
-      window.open(fullLink, '_blank');
-    } else {
-      alert("❌ Enlace no disponible para este plan.");
-    }
-  }
-        
+         
 const checkoutLink = selectedPaymentType === "full"
   ? stripeLinksFull[selectedPlanType] || ""
   : stripeLinksMonthly[selectedPlanType] || "";
@@ -284,24 +276,25 @@ if (registerButton) {
 
 };
 
-function isMobileDevice() {
-  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
 planButtons.forEach(button => {
   button.addEventListener("click", function () {
     selectedPlanType = this.getAttribute("data-plan");
     selectedPaymentType = this.getAttribute("data-paytype") || "monthly";
+
     updateVehicleFields(selectedPlanType);
     registrationContainer.style.display = "block";
 
     setTimeout(() => {
-      registrationContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      registrationContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
     }, isMobileDevice() ? 400 : 100);
 
     console.log(`✅ Plan: ${selectedPlanType}, Tipo de pago: ${selectedPaymentType}`);
   });
 });
+
 
            function updateVehicleFields(planType) {
     const vehicleContainer = document.getElementById("vehicle-container");
@@ -686,13 +679,12 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
                 <li><strong>Beneficio:</strong> Ideal para probar el servicio sin compromiso a largo plazo.</li>
             </ul>
            <!-- Pago mensual -->
-            <button class="plan-button" data-plan="basic3m">¡Quiero este plan pagando mensual!</button>
-            
-            <!-- Pago total con descuento -->
-            <p style="color: green; font-weight: bold;">🎁 5% de descuento pagando todo el plan</p>
-            <button onclick="goToFullPay('basic3m')" style="background-color: #004d00; color: white; margin-top: 8px;">
-              ¡Quiero este plan en pago total!
-            </button>
+           <button class="plan-button" data-plan="basic3m" data-paytype="monthly">¡Quiero este plan pagando mensual!</button>
+
+<p style="color: green; font-weight: bold;">🎁 5% de descuento pagando todo el plan</p>
+<button class="plan-button" data-plan="basic3m" data-paytype="full" style="background-color: #004d00; color: white;">
+  ¡Quiero este plan en pago total!
+</button>
 
             <p style="font-size:14px; margin-top:10px; color:#003366;">🚀 Asegurá tu tarifa especial de fundador para siempre. Solo por tiempo limitado.</p>
              <a href="tac.html" target="_blank">Ver términos y condiciones</a>
