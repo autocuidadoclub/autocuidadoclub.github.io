@@ -133,9 +133,10 @@ function registerUser(event) {
     return;
   }
 
-  const checkoutLink = selectedPaymentType === "full"
-    ? stripeLinksFull[selectedPlanType] || ""
-    : stripeLinksMonthly[selectedPlanType] || "";
+ const checkoutLink = selectedPayType === "monthly"
+  ? stripeLinksMonthly[selectedPlanType]
+  : stripeLinksFull[selectedPlanType];
+
 
   auth.createUserWithEmailAndPassword(email, password)
     .then(userCredential => {
