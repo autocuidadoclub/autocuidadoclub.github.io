@@ -188,10 +188,10 @@ const stripeLinksFull = {
       }).then(() => userId);
     })
     .then(userId => {
-      loader.style.display = "none";
-      document.getElementById("successOverlay").style.display = "flex";
+      loader.style.display = "none";document.getElementById("successOverlay").style.display = "flex";
       // Get checkout link from Firestore or predefined
-const stripeLinksMonthly = {
+
+        const stripeLinksMonthly = {
   basic3m: "https://u.wompi.sv/379910xeV",
   basic6m: "https://u.wompi.sv/380639rcA",
   basic12m: "https://u.wompi.sv/3806769qs",
@@ -209,31 +209,40 @@ const stripeLinksFull = {
   plus12m: "https://u.wompi.sv/387447ZDj"
 };
 
-         let selectedPlanType = null;
-  let selectedPaymentType = "monthly";
+let selectedPlanType = null;
+let selectedPaymentType = "monthly";
 
-         
-const checkoutLink = selectedPaymentType === "full"
-  ? stripeLinksFull[selectedPlanType] || ""
-  : stripeLinksMonthly[selectedPlanType] || "";
+const planButtons = document.querySelectorAll(".plan-button");
+const registrationContainer = document.getElementById("registration-container");
 
-         
-        
-// 🆕 Open Stripe checkout in a new tab
-if (checkoutLink) {
-  window.open(checkoutLink, "_blank");
+planButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    selectedPlanType = this.getAttribute("data-plan");
+    selectedPaymentType = this.getAttribute("data-paytype") || "monthly";
+    updateVehicleFields(selectedPlanType);
+
+    registrationContainer.style.display = "block";
+    setTimeout(() => {
+      registrationContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, isMobileDevice() ? 400 : 100);
+
+    console.log(`✅ Plan: ${selectedPlanType}, Tipo de pago: ${selectedPaymentType}`);
+  });
+});
+
+function openCheckoutLink() {
+  const checkoutLink = selectedPaymentType === "full"
+    ? stripeLinksFull[selectedPlanType] || ""
+    : stripeLinksMonthly[selectedPlanType] || "";
+
+  if (checkoutLink) {
+    window.open(checkoutLink, "_blank");
+    console.log("🔗 Enlace de pago abierto:", checkoutLink);
+  } else {
+    console.warn("⚠️ No se encontró enlace de pago para el plan:", selectedPlanType);
+  }
 }
 
-// ✅ Redirect current page to login.html
-window.location.href = "login.html";
-
-    })
-    .catch(error => {
-      console.error("❌ Error en el registro:", error.message);
-      alert("❌ Error en el registro: " + error.message);
-      loader.style.display = "none";
-    });
-}
 
 
 
@@ -577,12 +586,12 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
          loader.style.display = "none"; // ✅ Hide loader after all is done
-      document.getElementById("successOverlay").style.display = "flex";
+     document.getElementById("successOverlay").style.display = "flex";
+openCheckoutLink();
 setTimeout(() => {
-    window.location.href = `checkout.html?uid=${userId}`;
+  window.location.href = "login.html";
 }, 2500);
 
-}
         catch (error) {
       console.error("❌ Error:", error);
       alert("Error: " + error.message);
