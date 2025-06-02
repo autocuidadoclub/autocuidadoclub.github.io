@@ -1150,20 +1150,27 @@ function updateLoyaltyCard(userData) {
 
     // Step 3+: Based on unique months in paymentHistory
     const paymentHistory = userData.paymentHistory || [];
-    const uniqueMonths = new Set();
+    let totalMonths = 0;
 
-    paymentHistory.forEach(entry => {
+// Step 1: Detect from planType if it's a full upfront plan
+const fullPlanRegex = /(basic|plus)(\d{1,2})mfull/;
+const match = userData.planType?.match(fullPlanRegex);
+if (match) {
+    totalMonths = parseInt(match[2]); // e.g., 3, 6, or 12
+} else {
+    // Fallback to old logic if not a full upfront plan
+    const uniqueMonths = new Set();
+    (userData.paymentHistory || []).forEach(entry => {
         const date = entry.date?.toDate ? entry.date.toDate() : new Date(entry.date.seconds * 1000);
         const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
         uniqueMonths.add(monthYear);
     });
-
-    const uniqueMonthCount = uniqueMonths.size;
-
+    totalMonths = uniqueMonths.size;
+}
     const holeSteps = [2, 4, 6, 7, 8, 9]; // Corresponding unique month milestones
 
     holeSteps.forEach((step, index) => {
-        if (uniqueMonthCount >= step && progress < holes.length) {
+        if (totalMonths >= step && progress < holes.length) {
             holes[progress].classList.add('completed');
             progress++;
         }
