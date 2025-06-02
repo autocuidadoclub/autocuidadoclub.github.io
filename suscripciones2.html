@@ -77,18 +77,21 @@ const registrationContainer = document.getElementById("registration-container");
 planButtons.forEach(button => {
   button.addEventListener("click", function () {
     selectedPlanType = this.getAttribute("data-plan");
-    selectedPaymentType = this.getAttribute("data-paytype") || "monthly";
+    selectedPayType = this.getAttribute("data-paytype");
     updateVehicleFields(selectedPlanType);
     registrationContainer.style.display = "block";
+
     setTimeout(() => {
       registrationContainer.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
     }, isMobileDevice() ? 400 : 100);
-    console.log(`✅ Plan seleccionado: ${selectedPlanType}, Tipo de pago: ${selectedPaymentType}`);
+
+    console.log(`✅ Plan seleccionado: ${selectedPlanType}, tipo de pago: ${selectedPayType}`);
   });
 });
+
 
 document.getElementById("registerForm").addEventListener("submit", registerUser);
 
