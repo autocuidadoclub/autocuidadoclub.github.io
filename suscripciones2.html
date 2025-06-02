@@ -50,8 +50,8 @@
             const registrationContainer = document.getElementById("registration-container");
             const planButtons = document.querySelectorAll(".plan-button");
 
-          let selectedPlanType = null;
-let selectedPaymentType = "monthly";
+         let selectedPlanType = null;
+let selectedPayType = null;
 
 const stripeLinksMonthly = {
   basic3m: "https://u.wompi.sv/379910xeV",
@@ -71,9 +71,6 @@ const stripeLinksFull = {
   plus12m: "https://u.wompi.sv/387447ZDj"
 };
 
-const planButtons = document.querySelectorAll(".plan-button");
-const registrationContainer = document.getElementById("registration-container");
-
 planButtons.forEach(button => {
   button.addEventListener("click", function () {
     selectedPlanType = this.getAttribute("data-plan");
@@ -92,7 +89,6 @@ planButtons.forEach(button => {
   });
 });
 
-
 document.getElementById("registerForm").addEventListener("submit", registerUser);
 
 function registerUser(event) {
@@ -100,8 +96,8 @@ function registerUser(event) {
   const loader = document.getElementById("loader");
   loader.style.display = "flex";
 
-  if (!selectedPlanType) {
-    alert("❌ Debes seleccionar un plan antes de registrarte.");
+  if (!selectedPlanType || !selectedPayType) {
+    alert("❌ Debes seleccionar un plan y tipo de pago antes de registrarte.");
     loader.style.display = "none";
     return;
   }
@@ -133,16 +129,15 @@ function registerUser(event) {
     return;
   }
 
- const checkoutLink = selectedPayType === "monthly"
-  ? stripeLinksMonthly[selectedPlanType]
-  : stripeLinksFull[selectedPlanType];
-
+  const checkoutLink = selectedPayType === "monthly"
+    ? stripeLinksMonthly[selectedPlanType]
+    : stripeLinksFull[selectedPlanType];
 
   auth.createUserWithEmailAndPassword(email, password)
     .then(userCredential => {
       const userId = userCredential.user.uid;
       const paymentDate = new Date();
-      const nextPaymentDate = new Date(paymentDate);
+      const nextPaymentDate = new Date();
       nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
       const userData = {
@@ -155,7 +150,10 @@ function registerUser(event) {
         municipality,
         registrationDate: firebase.firestore.Timestamp.now(),
         lastUpgradeDate: firebase.firestore.Timestamp.now(),
-        schedule: { day: selectedDay, time: selectedTime },
+        schedule: {
+          day: selectedDay,
+          time: selectedTime
+        },
         paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
         nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
         paymentStatus: "Pending",
@@ -194,7 +192,11 @@ function registerUser(event) {
     .then(userId => {
       loader.style.display = "none";
       document.getElementById("successOverlay").style.display = "flex";
-      if (checkoutLink) window.open(checkoutLink, "_blank");
+
+      if (checkoutLink) {
+        window.open(checkoutLink, "_blank");
+      }
+
       window.location.href = "login.html";
     })
     .catch(error => {
