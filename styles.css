@@ -2074,3 +2074,10 @@ h2, h3 {
   z-index: 9999;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
+.button-spaced {
+    margin-top: 12px;
+}
+
+
+
