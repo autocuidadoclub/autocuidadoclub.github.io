@@ -1150,15 +1150,18 @@ function updateLoyaltyCard(userData) {
 
     // Step 3+: Based on unique months in paymentHistory
     const paymentHistory = userData.paymentHistory || [];
-    let totalMonths = 0;
+let totalMonths = 0;
+let fromFullPlan = false;
 
-// Step 1: Detect from planType if it's a full upfront plan
 const fullPlanRegex = /(basic|plus)(\d{1,2})mfull/;
 const match = userData.planType?.match(fullPlanRegex);
+
 if (match) {
-    totalMonths = parseInt(match[2]); // e.g., 3, 6, or 12
+    totalMonths = parseInt(match[2]);
+    fromFullPlan = true;
+} else if (userData.monthsPaid) {
+    totalMonths = userData.monthsPaid;
 } else {
-    // Fallback to old logic if not a full upfront plan
     const uniqueMonths = new Set();
     (userData.paymentHistory || []).forEach(entry => {
         const date = entry.date?.toDate ? entry.date.toDate() : new Date(entry.date.seconds * 1000);
@@ -1167,59 +1170,56 @@ if (match) {
     });
     totalMonths = uniqueMonths.size;
 }
-    const holeSteps = [2, 4, 6, 7, 8, 9]; // Corresponding unique month milestones
 
-    holeSteps.forEach((step, index) => {
-        if (totalMonths >= step && progress < holes.length) {
-            holes[progress].classList.add('completed');
-            progress++;
-        }
-    });
+    const holeSteps = [2, 4, 6, 7, 8, 9];
+holeSteps.forEach((step, index) => {
+    if (totalMonths >= step && progress < holes.length) {
+        holes[progress].classList.add('completed');
+        progress++;
+    }
+});
+
 
     // Update progress text
-    const progressDescription = document.querySelector('.description p strong');
-    if (progressDescription) {
-        progressDescription.textContent = `Progreso Actual: ${progress} de 8 pasos completados.`;
+if (totalMonths >= 8) {
+    if (rewardStatus) {
+        rewardStatus.textContent = "🎉 Desbloqueado";
+        rewardStatus.classList.remove('locked');
+        rewardStatus.classList.add('unlocked');
     }
 
-    const rewardStatus = document.querySelector('.reward-status');
-    const redeemButton = document.getElementById('redeemRewardsButton');
+    if (redeemButton && !userData.rewardsRedeemed) {
+        redeemButton.style.display = 'inline-block'; // Show redeem button
+    }
 
-    if (uniqueMonthCount >= 9) {
-        if (rewardStatus) {
-            rewardStatus.textContent = "🎉 Desbloqueado";
-            rewardStatus.classList.remove('locked');
-            rewardStatus.classList.add('unlocked');
-        }
+    // ✅ Send email ONCE to notify completion
+    if (!userData.rewardsUnlockedEmailSent) {
+        const remainingMonths = Math.max(totalMonths - 8, 0);
 
-        if (redeemButton && !userData.rewardsRedeemed) {
-            redeemButton.style.display = 'inline-block'; // Show redeem button
-        }
-
-        // ✅ Send email ONCE to notify completion
-        if (!userData.rewardsUnlockedEmailSent) {
-            db.collection("users").doc(userData.uid).update({
-                rewardsUnlockedEmailSent: true
-            }).then(() => {
-                sendEmail(userData.email, "🎉 ¡Premios desbloqueados!", `
-                    ¡Felicidades ${userData.name}!
-                    Has completado tu ciclo de lealtad y tus premios ahora están disponibles 🎁.
-                    Ingresa a tu dashboard y haz clic en "Redimir Premios" para solicitarlos.
-                `);
-            }).catch(console.error);
-        }
-    } else {
-        if (rewardStatus) {
-            rewardStatus.textContent = "🔒 Bloqueado";
-            rewardStatus.classList.remove('unlocked');
-            rewardStatus.classList.add('locked');
-        }
-        if (redeemButton) {
-            redeemButton.style.display = 'none'; // Hide if not eligible
-        }
+        db.collection("users").doc(userData.uid).update({
+            rewardsUnlockedEmailSent: true,
+            remainingPaidMonths: remainingMonths
+        }).then(() => {
+            sendEmail(userData.email, "🎉 ¡Premios desbloqueados!", `
+                ¡Felicidades ${userData.name}!
+                Has completado tu ciclo de lealtad y tus premios ahora están disponibles 🎁.
+                Ingresa a tu dashboard y haz clic en "Redimir Premios" para solicitarlos.
+            `);
+        }).catch(console.error);
+    }
+} else {
+    if (rewardStatus) {
+        rewardStatus.textContent = "🔒 Bloqueado";
+        rewardStatus.classList.remove('unlocked');
+        rewardStatus.classList.add('locked');
+    }
+    if (redeemButton) {
+        redeemButton.style.display = 'none'; // Hide if not eligible
     }
 }
 
+
+        
 // ✅ Redeem Prize Form Submission (Safe)
 document.addEventListener("DOMContentLoaded", () => {
     const redeemForm = document.getElementById("redeemRewardsForm");
