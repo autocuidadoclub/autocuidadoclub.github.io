@@ -46,6 +46,7 @@
             const db = firebase.firestore();
             const messaging = firebase.messaging();
             let selectedPlanType = null;
+            updatePlanSummary(selectedPlanType);
 
             const registrationContainer = document.getElementById("registration-container");
             const planButtons = document.querySelectorAll(".plan-button");
@@ -1627,52 +1628,43 @@ window.addEventListener('load', function() {
 });
 
                 
-  document.addEventListener("DOMContentLoaded", () => {
-    if (!window.selectedPlanType) return;
+<script>
+function updatePlanSummary(planType) {
+  const planData = {
+    basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
+    plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
+    basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
+    plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6, type: "Mensual" },
+    basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
+    plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
+    basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3, type: "Contado" },
+    plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3, type: "Contado" },
+    basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6, type: "Contado" },
+    plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6, type: "Contado" },
+    basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
+    plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" }
+  };
 
-    const planInfo = {
-      basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3,  type: "Mensual" },
-      plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3,  type: "Mensual" },
-      basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6,  type: "Mensual" },
-      plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6,  type: "Mensual" },
-      basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
-      plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
-      basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3,  type: "Contado" },
-      plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3,  type: "Contado" },
-      basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6,  type: "Contado" },
-      plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6,  type: "Contado" },
-      basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
-      plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" },
-    };
+  const plan = planData[planType];
+  if (!plan) return;
 
-    const selectedPlan = selectedPlanType;
-    const plan = planInfo[selectedPlan];
+  const monthly = plan.type === "Contado" ? (plan.price / plan.months) : plan.price;
+  const total = plan.type === "Contado" ? plan.price : plan.price * plan.months;
 
-    if (!plan) {
-      document.getElementById("plan-summary").innerHTML = "<p style='color:red;'>⚠️ Plan no reconocido.</p>";
-      return;
-    }
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const now = new Date();
+  const nextMonth = (now.getMonth() + 1) % 12;
+  const startMonth = monthNames[nextMonth];
 
-    const monthlyAmount = plan.type === "Contado"
-      ? plan.price / plan.months
-      : plan.price;
+  document.getElementById("summary-plan").textContent = plan.label;
+  document.getElementById("summary-type").textContent = plan.type;
+  document.getElementById("summary-monthly").textContent = monthly.toFixed(2);
+  document.getElementById("summary-total").textContent = total.toFixed(2);
+  document.getElementById("summary-start-month").textContent = startMonth;
+}
+</script>
 
-    const totalAmount = plan.type === "Contado"
-      ? plan.price
-      : plan.price * plan.months;
-
-    const startMonthDate = new Date();
-    startMonthDate.setMonth(startMonthDate.getMonth() + 1);
-
-    const startMonthName = startMonthDate.toLocaleDateString("es-SV", { month: 'long' });
-    const capitalizedMonth = startMonthName.charAt(0).toUpperCase() + startMonthName.slice(1);
-
-    document.getElementById("summary-plan").textContent = plan.label;
-    document.getElementById("summary-type").textContent = plan.type;
-    document.getElementById("summary-monthly").textContent = monthlyAmount.toFixed(2);
-    document.getElementById("summary-total").textContent = totalAmount.toFixed(2);
-    document.getElementById("summary-start-month").textContent = capitalizedMonth;
-  });
 
 
 
