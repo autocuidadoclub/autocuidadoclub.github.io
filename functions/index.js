@@ -129,6 +129,7 @@ exports.stripeWebhook = functions.https.onRequest((req, res) => {
 });
 
 // 💰 Wompi Webhook
+// 💰 Wompi Webhook
 exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
   try {
     const transaction = req.body?.transaction;
@@ -141,7 +142,8 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
     const userEmail = transaction.customer_email;
     if (!userEmail) return res.status(400).send("Missing customer email");
 
-    const snapshot = await db.collection("users").where("email", "==", userEmail).limit(1).get();
+    const snapshot = await db.collection("users")
+      .where("email", "==", userEmail).limit(1).get();
 
     if (snapshot.empty) {
       return res.status(404).send("User not found");
@@ -149,12 +151,12 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
 
     const userRef = snapshot.docs[0].ref;
     const now = admin.firestore.Timestamp.now();
-    const nextCycle = admin.firestore.Timestamp.fromMillis(now.toMillis() + 30 * 24 * 60 * 60 * 1000);
+    const nextCycle = admin.firestore.Timestamp
+      .fromMillis(now.toMillis() + 30 * 24 * 60 * 60 * 1000);
     const paymentId = transaction.id;
-    const currentHistory = snapshot.docs[0].data().paymentHistory || [];
-    const alreadyExists = currentHistory.some(p => p.transactionId === paymentId);
+    const history = snapshot.docs[0].data().paymentHistory || [];
 
-    if (alreadyExists) {
+    if (history.some(p => p.transactionId === paymentId)) {
       console.log("🔁 Wompi: pago ya registrado", paymentId);
       return res.status(200).send("Duplicate transaction");
     }
@@ -176,12 +178,32 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
     });
 
     console.log(`✅ Wompi: pago registrado para ${userEmail}`);
-    res.status(200).send("Payment processed");
+
+    // ✅ Send confirmation email
+    await sendZohoMail(
+      userEmail,
+      "🎉 ¡Gracias por tu pago en AutoCuidado Club!",
+      `
+      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+        <h2 style="color: #003893;">🚗 AutoCuidado Club</h2>
+        <p>¡Hola!</p>
+        <p>Tu pago ha sido recibido exitosamente. Gracias por confiar en nosotros.</p>
+        <p>Podes acceder a tu <a href="https://www.autocuidadoclub.com/dashboard2" style="color: #003893; text-decoration: none;">Dashboard de AutoCuidado Club</a> para ver tu información y beneficios.</p>
+        <p style="font-size: 0.9em; color: #555;">Si tenés dudas, escribinos a <a href="mailto:info@autocuidadoclub.com">info@autocuidadoclub.com</a>.<br>— El equipo de AutoCuidado Club</p>
+      </div>`
+    );
+    console.log("📧 Confirmación de pago enviada a", userEmail);
+
+    // ✅ Final send
+    return res.status(200).send("Payment processed");
+
   } catch (error) {
     console.error("❌ Error en webhook Wompi:", error);
-    res.status(500).send("Internal Server Error");
+    return res.status(500).send("Internal Server Error");
   }
 });
+
+
 
 // 🛡 Guardar token de Pagadito
 exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
