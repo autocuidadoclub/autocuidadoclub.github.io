@@ -165,8 +165,8 @@
         CustomerId: "",
         referredBy,
         checkoutLink,
-          customerAwareOfPaymentVerification: true,
-customerAwareTimestamp: Date
+          customerAwareOfPaymentVerification: false,
+customerAwareTimestamp: null,
 
       };
 
@@ -1419,8 +1419,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // 🧩 Loyalty Program Fields
   loyaltyCycle: 0,
   lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-    customerAwareOfPaymentVerification: true,
-customerAwareTimestamp: Date
+    customerAwareOfPaymentVerification: false,
+customerAwareTimestamp: null,
   paymentHistory: 
           
        });
