@@ -160,7 +160,7 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
     }
 
     await userRef.update({
-      paymentStatus: "Paid",
+      paymentStatus: "Confirmado",
       subscriptionStatus: "active",
       paymentDate: now,
       nextPaymentDate: nextCycle,
