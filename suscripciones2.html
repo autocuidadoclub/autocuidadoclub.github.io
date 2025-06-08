@@ -165,6 +165,9 @@
         CustomerId: "",
         referredBy,
         checkoutLink
+          customerAwareOfPaymentVerification: true
+customerAwareTimestamp: Date
+
       };
 
       return db.collection("users").doc(userId).set(userData).then(() => userId);
@@ -1417,7 +1420,7 @@ document.addEventListener("DOMContentLoaded", function () {
   loyaltyCycle: 0,
   lastLoyaltyReset: firebase.firestore.Timestamp.now(),
   paymentHistory: []
-});
+       });
 
        if (referralCode && referralCode !== userId) {
         await db.collection("referrals").doc(referralCode).set({
