@@ -42,9 +42,13 @@ jobs:
       - name: Set Firebase Functions Config (Zoho)
         run: |
           firebase functions:config:set \
+            zoho.client_id="${{ secrets.ZOHO_CLIENT_ID }}" \
+            zoho.client_secret="${{ secrets.ZOHO_CLIENT_SECRET }}" \
+            zoho.refresh_token="${{ secrets.ZOHO_REFRESH_TOKEN }}" \
             zoho.api_domain="https://www.zohoapis.com" \
-            --project=${{ secrets.FIREBASE_PROJECT_ID }} --token="${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
-
+            zoho.user_id="${{ secrets.ZOHO_USER_ID }}" \
+            --project=${{ secrets.FIREBASE_PROJECT_ID }} \
+            --token="${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
 
       - name: Deploy Firebase Functions
         env:
