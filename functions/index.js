@@ -21,20 +21,29 @@ const endpointSecret = functions.config().stripe.webhook;
 
 // 🌐 Obtener token de acceso Zoho
 async function getZohoAccessToken() {
-  if (!ZOHO_CLIENT_ID || !ZOHO_CLIENT_SECRET || !ZOHO_REFRESH_TOKEN || !ZOHO_API_DOMAIN) {
-  throw new Error("❌ Faltan variables de entorno de Zoho");
-}
+const qs = require("querystring");
 
-  const response = await axios.post(`${ZOHO_API_DOMAIN}/oauth/v2/token`, null, {
-    params: {
-      refresh_token: ZOHO_REFRESH_TOKEN,
-      client_id: ZOHO_CLIENT_ID,
-      client_secret: ZOHO_CLIENT_SECRET,
-      grant_type: "refresh_token",
-    },
+async function getZohoAccessToken() {
+  if (!ZOHO_CLIENT_ID || !ZOHO_CLIENT_SECRET || !ZOHO_REFRESH_TOKEN || !ZOHO_API_DOMAIN) {
+    throw new Error("❌ Faltan variables de entorno de Zoho");
+  }
+
+  const body = qs.stringify({
+    refresh_token: ZOHO_REFRESH_TOKEN,
+    client_id: ZOHO_CLIENT_ID,
+    client_secret: ZOHO_CLIENT_SECRET,
+    grant_type: "refresh_token"
   });
+
+  const response = await axios.post(`${ZOHO_API_DOMAIN}/oauth/v2/token`, body, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  });
+
   return response.data.access_token;
 }
+
 
 // 📧 Enviar correo con Zoho
 async function sendZohoMail(toEmail, subject, bodyContent) {
