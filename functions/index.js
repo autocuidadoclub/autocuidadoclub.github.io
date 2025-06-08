@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const axios = require("axios");
 const Stripe = require("stripe");
+const qs = require("querystring"); // ✅ Move to top level
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -15,14 +16,10 @@ const {
   user_id: ZOHO_USER_ID
 } = functions.config().zoho || {};
 
-
 const stripe = Stripe(functions.config().stripe.secret);
 const endpointSecret = functions.config().stripe.webhook;
 
-// 🌐 Obtener token de acceso Zoho
-async function getZohoAccessToken() {
-const qs = require("querystring");
-
+// ✅ CORRECTED: Zoho Access Token Function
 async function getZohoAccessToken() {
   if (!ZOHO_CLIENT_ID || !ZOHO_CLIENT_SECRET || !ZOHO_REFRESH_TOKEN || !ZOHO_API_DOMAIN) {
     throw new Error("❌ Faltan variables de entorno de Zoho");
@@ -43,6 +40,7 @@ async function getZohoAccessToken() {
 
   return response.data.access_token;
 }
+
 
 
 // 📧 Enviar correo con Zoho
