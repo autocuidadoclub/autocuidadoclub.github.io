@@ -72,6 +72,53 @@
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
+            function selectPlan(plan) {
+  selectedPlanType = plan;
+
+  // Highlight selected plan
+  document.querySelectorAll(".plan-card").forEach(card => {
+    card.classList.remove("selected");
+  });
+  document.getElementById(`plan-${plan}`).classList.add("selected");
+
+  // Show registration form
+  document.getElementById("registrationFormContainer").style.display = "block";
+
+  // Calculate price
+  let amount = 0;
+  let total = 0;
+  if (plan === "basic3m") {
+    amount = 5;
+    total = 15;
+  } else if (plan === "basic3mfull") {
+    amount = 15;
+    total = 15;
+  } else if (plan === "plus6m") {
+    amount = 7;
+    total = 42;
+  } else if (plan === "plus6mfull") {
+    amount = 42;
+    total = 42;
+  } else if (plan === "plus12m") {
+    amount = 7;
+    total = 84;
+  } else if (plan === "plus12mfull") {
+    amount = 84;
+    total = 84;
+  }
+
+  // Fill summary box
+  const now = new Date();
+  const nextMonth = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
+    new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  );
+
+  document.getElementById("summaryPlan").textContent = plan;
+  document.getElementById("summaryAmount").textContent = `$${amount.toFixed(2)}`;
+  document.getElementById("summaryTotal").textContent = `$${total.toFixed(2)}`;
+  document.getElementById("summaryStart").textContent = nextMonth;
+}
+
          function registerUser(event) {
   event.preventDefault();
   const loader = document.getElementById("loader");
