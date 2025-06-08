@@ -8,18 +8,23 @@ const db = admin.firestore();
 
 // 🔐 Entorno (Firebase config o GitHub Secrets)
 const {
-  ZOHO_CLIENT_ID,
-  ZOHO_CLIENT_SECRET,
-  ZOHO_REFRESH_TOKEN,
-  ZOHO_API_DOMAIN,
-  ZOHO_USER_ID,
-} = process.env;
+  client_id: ZOHO_CLIENT_ID,
+  client_secret: ZOHO_CLIENT_SECRET,
+  refresh_token: ZOHO_REFRESH_TOKEN,
+  api_domain: ZOHO_API_DOMAIN,
+  user_id: ZOHO_USER_ID
+} = functions.config().zoho || {};
+
 
 const stripe = Stripe(functions.config().stripe.secret);
 const endpointSecret = functions.config().stripe.webhook;
 
 // 🌐 Obtener token de acceso Zoho
 async function getZohoAccessToken() {
+  if (!ZOHO_CLIENT_ID || !ZOHO_CLIENT_SECRET || !ZOHO_REFRESH_TOKEN || !ZOHO_API_DOMAIN) {
+  throw new Error("❌ Faltan variables de entorno de Zoho");
+}
+
   const response = await axios.post(`${ZOHO_API_DOMAIN}/oauth/v2/token`, null, {
     params: {
       refresh_token: ZOHO_REFRESH_TOKEN,
@@ -34,7 +39,7 @@ async function getZohoAccessToken() {
 // 📧 Enviar correo con Zoho
 async function sendZohoMail(toEmail, subject, bodyContent) {
   const accessToken = await getZohoAccessToken();
-
+ 
   const payload = {
     fromAddress: "info@autocuidadoclub.com",
     toAddress: toEmail,
@@ -54,6 +59,8 @@ async function sendZohoMail(toEmail, subject, bodyContent) {
   );
 
   console.log("📧 Email sent:", response.data);
+  console.log("📧 Email payload:", payload);
+console.log("📧 Token:", accessToken);
   return response.data;
 }
 
