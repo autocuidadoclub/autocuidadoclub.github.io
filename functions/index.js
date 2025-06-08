@@ -83,10 +83,12 @@ exports.sendReferralEmail = functions.https.onRequest(async (req, res) => {
 
     await sendZohoMail(referrerEmail, subject, body);
     res.status(200).send("Correo de referido enviado correctamente.");
-  } catch((error) => {
-  console.error("❌ Error enviando correo:", error.toJSON?.() || error);
-  res.status(500).send("Error al enviar correo.");
+  } catch (error) {
+    console.error("❌ Error enviando correo:", error.toJSON?.() || error);
+    res.status(500).send("Error al enviar correo.");
+  }
 });
+
 
 
 // 💳 Stripe Webhook
