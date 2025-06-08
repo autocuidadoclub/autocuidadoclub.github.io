@@ -40,6 +40,12 @@ jobs:
           firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }} --token="${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
 
       - name: Deploy Firebase Functions
+        env:
+          ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+          ZOHO_API_DOMAIN: ${{ secrets.ZOHO_API_DOMAIN }}
+          ZOHO_USER_ID: ${{ secrets.ZOHO_USER_ID }}
         run: |
           cd functions
           npm install
