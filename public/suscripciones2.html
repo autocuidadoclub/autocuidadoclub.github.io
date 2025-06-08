@@ -1291,8 +1291,16 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
            He leído y acepto los <button type="button" onclick="window.open('tac.html', '_blank')">Términos y Condiciones</button>.
         </label>
     </div>
-            <p></p>
-            <p></p>
+
+            <div id="plan-summary" class="summary-box" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f8f8;">
+  <h3 style="margin-top: 0;">Resumen del Plan Seleccionado</h3>
+  <p><strong>Plan:</strong> <span id="summary-plan"></span></p>
+  <p><strong>Tipo de pago:</strong> <span id="summary-type"></span></p>
+  <p><strong>Pago mensual (estimado):</strong> $<span id="summary-monthly"></span></p>
+  <p><strong>Total del plan:</strong> $<span id="summary-total"></span></p>
+  <p><strong>Inicio de inspecciones:</strong> <span id="summary-start-month"></span></p>
+</div>
+
 
             
         <button type="submit">Registrarse</button>
@@ -1617,6 +1625,55 @@ window.addEventListener('load', function() {
     ctaBar.style.transform = 'translateY(0)';
   }
 });
+
+                
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!window.selectedPlanType) return;
+
+    const planInfo = {
+      basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3,  type: "Mensual" },
+      plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3,  type: "Mensual" },
+      basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6,  type: "Mensual" },
+      plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6,  type: "Mensual" },
+      basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
+      plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
+      basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3,  type: "Contado" },
+      plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3,  type: "Contado" },
+      basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6,  type: "Contado" },
+      plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6,  type: "Contado" },
+      basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
+      plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" },
+    };
+
+    const selectedPlan = selectedPlanType;
+    const plan = planInfo[selectedPlan];
+
+    if (!plan) {
+      document.getElementById("plan-summary").innerHTML = "<p style='color:red;'>⚠️ Plan no reconocido.</p>";
+      return;
+    }
+
+    const monthlyAmount = plan.type === "Contado"
+      ? plan.price / plan.months
+      : plan.price;
+
+    const totalAmount = plan.type === "Contado"
+      ? plan.price
+      : plan.price * plan.months;
+
+    const startMonthDate = new Date();
+    startMonthDate.setMonth(startMonthDate.getMonth() + 1);
+
+    const startMonthName = startMonthDate.toLocaleDateString("es-SV", { month: 'long' });
+    const capitalizedMonth = startMonthName.charAt(0).toUpperCase() + startMonthName.slice(1);
+
+    document.getElementById("summary-plan").textContent = plan.label;
+    document.getElementById("summary-type").textContent = plan.type;
+    document.getElementById("summary-monthly").textContent = monthlyAmount.toFixed(2);
+    document.getElementById("summary-total").textContent = totalAmount.toFixed(2);
+    document.getElementById("summary-start-month").textContent = capitalizedMonth;
+  });
+
 
 
             </script>
