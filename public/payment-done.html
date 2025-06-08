@@ -13,6 +13,68 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="manifest" href="/site.webmanifest" />
 
+  <!-- Firebase + env.js -->
+<script src="env.js?v=2.0"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded!");
+
+    if (typeof window._env_ === "undefined" || !window._env_.FIREBASE_API_KEY) {
+      console.error("❌ Error: Firebase env.js no cargado.");
+      alert("❌ Firebase no está inicializado. Revisa env.js.");
+      return;
+    }
+
+    const firebaseConfig = {
+      apiKey: window._env_.FIREBASE_API_KEY,
+      authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+      projectId: window._env_.FIREBASE_PROJECT_ID,
+      storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+      appId: window._env_.FIREBASE_APP_ID,
+      measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+      console.log("✅ Firebase inicializado correctamente");
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const btn = document.getElementById("goDashboardBtn");
+    const loader = document.getElementById("loader");
+
+    btn.addEventListener("click", async () => {
+      loader.style.display = "flex";
+
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          await db.collection("users").doc(user.uid).update({
+            customerAwareOfPaymentVerification: true,
+            customerAwareTimestamp: new Date()
+          });
+          console.log("✅ Cliente marcó pago como verificado");
+        } else {
+          console.warn("⚠️ No user logged in");
+        }
+      } catch (e) {
+        console.error("❌ Error actualizando Firestore:", e);
+      }
+
+      setTimeout(() => {
+        window.location.href = "dashboard2.html";
+      }, 2000);
+    });
+  });
+</script>
+
   <style>
     .contact-form-container {
       max-width: 500px;
