@@ -1419,7 +1419,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // 🧩 Loyalty Program Fields
   loyaltyCycle: 0,
   lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-  paymentHistory: []
+    customerAwareOfPaymentVerification: true,
+customerAwareTimestamp: Date
+  paymentHistory: 
+          
        });
 
        if (referralCode && referralCode !== userId) {
