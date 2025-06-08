@@ -165,9 +165,7 @@
         CustomerId: "",
         referredBy,
         checkoutLink
-          customerAwareOfPaymentVerification: true
-customerAwareTimestamp: Date
-             };
+      };
 
       return db.collection("users").doc(userId).set(userData).then(() => userId);
     })
@@ -1414,9 +1412,6 @@ document.addEventListener("DOMContentLoaded", function () {
   vehicles,
   freeRescheduleClaimed: false,
   referredBy: referredByEmail,
-       customerAwareOfPaymentVerification: true
-customerAwareTimestamp: Date
-
 
   // 🧩 Loyalty Program Fields
   loyaltyCycle: 0,
