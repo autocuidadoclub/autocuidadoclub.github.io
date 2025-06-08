@@ -39,6 +39,13 @@ jobs:
         run: |
           firebase deploy --only hosting --project=${{ secrets.FIREBASE_PROJECT_ID }} --token="${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
 
+      - name: Set Firebase Functions Config (Zoho)
+        run: |
+          firebase functions:config:set \
+            zoho.api_domain="https://www.zohoapis.com" \
+            --project=${{ secrets.FIREBASE_PROJECT_ID }} --token="${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
+
+
       - name: Deploy Firebase Functions
         env:
           ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
