@@ -115,7 +115,7 @@
     basic12m: "https://u.wompi.sv/4108889Ch",
     plus3m: "https://u.wompi.sv/410897aqI",
     plus6m: "https://u.wompi.sv/410910Fmh",
-    plus12m: "https://u.wompi.sv/410994_vJ",
+    plus12m: "https://u.wompi.sv/410918Xcy",
     basic3mfull: "https://u.wompi.sv/370215SjH",
     basic6mfull: "https://u.wompi.sv/387432nHU",
     basic12mfull: "https://u.wompi.sv/387433i2m",
@@ -134,43 +134,37 @@
       nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
       const userData = {
- uid: userId,
-  name,
-  email,
-  phone,
-  planType: selectedPlanType,
-  department,
-  municipality,
-  registrationDate: firebase.firestore.Timestamp.now(),
-  lastUpgradeDate: firebase.firestore.Timestamp.now(),
-  schedule: {
-    day: selectedDay,
-    time: selectedTime
-  },
-  paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-  nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-  paymentStatus: "Pending",
-  subscriptionStatus: "active",
-  monthsPaid: 0,
-  vehicles,
-  freeRescheduleClaimed: false,
-  loyaltyCycle: 0,
-  lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-  paymentHistory: [],
-  founderPhase: true,
-  referralsCompleted: 0,
-  plusReferralsCompleted: 0,
-  referralBonusAvailable: false,
-  nextCyclePrice: 0,
-  CustomerId: "",
-  referredBy,
-  checkoutLink,
-
-  // ✅ Acknowledgment fields initialized as false
-  customerAwareOfPaymentVerification: false,
-  customerAwareTimestamp: null
-};
-
+        uid: userId,
+        name,
+        email,
+        phone,
+        planType: selectedPlanType,
+        department,
+        municipality,
+        registrationDate: firebase.firestore.Timestamp.now(),
+        lastUpgradeDate: firebase.firestore.Timestamp.now(),
+        schedule: {
+          day: selectedDay,
+          time: selectedTime
+        },
+        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+        paymentStatus: "Pending",
+        subscriptionStatus: "active",
+        monthsPaid: 0,
+        vehicles,
+        freeRescheduleClaimed: false,
+        loyaltyCycle: 0,
+        lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+        paymentHistory: [],
+        founderPhase: true,
+        referralsCompleted: 0,
+        plusReferralsCompleted: 0,
+        referralBonusAvailable: false,
+        nextCyclePrice: 0,
+        CustomerId: "",
+        referredBy,
+        checkoutLink
       };
 
       return db.collection("users").doc(userId).set(userData).then(() => userId);
@@ -198,7 +192,7 @@ const stripeLinks = {
     basic12m: "https://u.wompi.sv/4108889Ch",
     plus3m: "https://u.wompi.sv/410897aqI",
     plus6m: "https://u.wompi.sv/410910Fmh",
-    plus12m: "https://u.wompi.sv/410994_vJ",
+    plus12m: "https://u.wompi.sv/410918Xcy",
     basic3mfull: "https://u.wompi.sv/370215SjH",
     basic6mfull: "https://u.wompi.sv/387432nHU",
     basic12mfull: "https://u.wompi.sv/387433i2m",
@@ -1385,88 +1379,86 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-auth.createUserWithEmailAndPassword(email, password)
-  .then((userCredential) => {
-    const userId = userCredential.user.uid;
-    const paymentDate = new Date();
-    const nextPaymentDate = new Date();
-    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+        auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const paymentDate = new Date();
+        const nextPaymentDate = new Date();
+        nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
     const messaging = firebase.messaging();
-    return messaging.getToken({
-      vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE"
-    }).then(async (token) => {
-      console.log("✅ pushToken obtenido:", token);
+          return messaging.getToken({ vapidKey: "BL9OlnifN3KktMZjAq933dl5SJqvple35ZmLZ-1vHXrZenzozjhHhVA-IhLoMX2Flh7NiNjPwjHQosSCDnLf5YE" })
+  .then((token) => {
+    console.log("✅ pushToken obtenido:", token);
+   return db.collection("users").doc(userId).set({
+  uid: userId,
+  name,
+  email,
+  phone,
+  planType: selectedPlanType,
+  department,
+  municipality,
+  registrationDate: firebase.firestore.Timestamp.now(),
+  lastUpgradeDate: firebase.firestore.Timestamp.now(),
+  schedule: {
+    day: selectedDay,
+    time: selectedTime
+  },
+  paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
+  nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
+  paymentStatus: "Pending",
+  subscriptionStatus: "active",
+  monthsPaid: 0,
+  vehicles,
+  freeRescheduleClaimed: false,
+  referredBy: referredByEmail,
 
-      const userId = userCredential.user.uid;
+  // 🧩 Loyalty Program Fields
+  loyaltyCycle: 0,
+  lastLoyaltyReset: firebase.firestore.Timestamp.now(),
+  paymentHistory: []
+});
 
-      await db.collection("users").doc(userId).set({
-        uid: userId,
-        name,
-        email,
-        phone,
-        planType: selectedPlanType,
-        department,
-        municipality,
-        registrationDate: firebase.firestore.Timestamp.now(),
-        lastUpgradeDate: firebase.firestore.Timestamp.now(),
-        schedule: {
-          day: selectedDay,
-          time: selectedTime
-        },
-        paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-        nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-        paymentStatus: "Pending",
-        subscriptionStatus: "active",
-        monthsPaid: 0,
-        vehicles,
-        freeRescheduleClaimed: false,
-        referredBy: referredByEmail,
-        pushToken: token,
-
-        // 🧩 Loyalty
-        loyaltyCycle: 0,
-        lastLoyaltyReset: firebase.firestore.Timestamp.now(),
-        paymentHistory: []
-      });
-
-      if (referralCode && referralCode !== userId) {
+       if (referralCode && referralCode !== userId) {
         await db.collection("referrals").doc(referralCode).set({
           completed: firebase.firestore.FieldValue.increment(1),
           bonuses: firebase.firestore.FieldValue.increment(1)
         }, { merge: true });
+        if (typeof _pe !== "undefined") {
+        }
       }
 
-      await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          subject: "new register in the platafform",
-          message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
-        })
-      });
+        // 📨 Send email to admin
+        await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                phone: phone,
+                subject: "new register in the platafform",
+                message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
+            })
+        });
+
 
       if (typeof _pe !== "undefined") {
         _pe.tagPushSubscriber('not_paid_yet');
       }
 
-      loader.style.display = "none";
+         loader.style.display = "none"; // ✅ Hide loader after all is done
       document.getElementById("successOverlay").style.display = "flex";
+setTimeout(() => {
+    window.location.href = `checkout.html?uid=${userId}`;
+}, 2500);
 
-      setTimeout(() => {
-        window.location.href = `checkout.html?uid=${userId}`;
-      }, 2500);
-    });
-  })
-  .catch((error) => {
-    console.error("❌ Error:", error);
-    alert("Error: " + error.message);
-    loader.style.display = "none";
+}
+        catch (error) {
+      console.error("❌ Error:", error);
+      alert("Error: " + error.message);
+          loader.style.display = "none"; // ⛔ Hide loader on error
+    }
   });
-
 
 
         function getNextMonthDate() {
