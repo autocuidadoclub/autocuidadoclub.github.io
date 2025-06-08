@@ -1,162 +1,154 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AutoCuidado Club - Tu servicio experto de mantenimiento personalizado para vehículos en El Salvador. Sin talleres. Sin filas. Sin excusas.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="AutoCuidado Club - Tu servicio experto de mantenimiento personalizado para vehículos en El Salvador. Sin talleres. Sin filas. Sin excusas.">
 
-    <title>AutoCuidado Club - Contacto</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <title>AutoCuidado Club - Confirmación de Pago</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="manifest" href="/site.webmanifest" />
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-
-    <style>
-        /* Contact Form Styling */
-        .contact-form-container {
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .contact-form-container h2 {
-            text-align: center;
-            color: #003366;
-        }
-
-        .contact-form-container label {
-            font-weight: bold;
-            color: #333;
-            margin-top: 10px;
-        }
-
-        .contact-form-container input[type="text"],
-        .contact-form-container input[type="email"],
-        .contact-form-container textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1em;
-        }
-
-        .contact-form-container button {
-            background-color: #003366;
-            color: #fff;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1em;
-        }
-
-        .contact-form-container button:hover {
-            background-color: #ff6600;
-        }
-
-        .contact-info {
-            font-size: 0.9em;
-            color: #666;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        /* Loader Styling */
-        #loader {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #loader img {
-            width: 80px;
-            border-radius: 8px;
-        }
-    </style>
+  <style>
+    .contact-form-container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .contact-form-container h2 {
+      text-align: center;
+      color: #003366;
+    }
+    .contact-form-container p {
+      margin-top: 15px;
+    }
+    .redirect-btn {
+      margin-top: 30px;
+      background-color: #003366;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .redirect-btn:hover {
+      background-color: #ff6600;
+    }
+    #loader {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #loader img {
+      width: 80px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
+  <script src="env.js"></script>
 
-    <!-- Load Environment Variables -->
-<script src="env.js"></script>
-    
-<!-- Navigation -->
-<nav class="navbar">
+  <nav class="navbar">
     <ul class="nav-links">
-        <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="suscripciones.html">Suscripciones</a></li>
-        <li><a href="login.html">Ingresa a tu cuenta</a></li>
-        <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
-
+      <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="servicios.html">Servicios</a></li>
+      <li><a href="suscripciones.html">Suscripciones</a></li>
+      <li><a href="login.html">Ingresa a tu cuenta</a></li>
+      <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
     </ul>
     <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+      <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo" />
     </div>
-</nav>
+  </nav>
 
-<!-- Header -->
-<header style="background: linear-gradient(to bottom, #002F6C, #003366); padding: 60px 20px; text-align: center;">
-  <div class="header-text">
-    <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">Bienvenido a AutoCuidado Club</h1>
-    <p style="color: white; font-size: 1.2em;">Tu tiempo es oro, nuestro cuidado es total.</p>
-  </div>
-</header>
+  <header style="background: linear-gradient(to bottom, #002F6C, #003366); padding: 60px 20px; text-align: center;">
+    <div class="header-text">
+      <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">Bienvenido a AutoCuidado Club</h1>
+      <p style="color: white; font-size: 1.2em;">Tu tiempo es oro, nuestro cuidado es total.</p>
+    </div>
+  </header>
 
   <main style="padding: 40px 20px; text-align: center;">
     <div class="contact-form-container">
-        <h2>✅ ¡Gracias por tu pago!</h2>
-        <p style="font-size: 1.1em; margin-top: 15px;">
-            En un lapso no máximo de <strong>48 horas</strong>, te estaremos confirmando con nuestro equipo para poder verificar los datos y asegurar la inspección de tu vehículo.
-        </p>
-        <p style="margin-top: 15px;">
-            Actualmente acabas de recibir un <strong>correo electrónico</strong> con la confirmación de esta operación.
-        </p>
-        <p style="margin-top: 30px; font-size: 0.95em; color: #666;">
-            Serás redirigido automáticamente al panel de control.
-        </p>
+      <h2>✅ ¡Gracias por tu pago!</h2>
+      <p style="font-size: 1.1em;">
+        En un lapso no máximo de <strong>48 horas</strong>, te estaremos confirmando con nuestro equipo para poder verificar los datos y asegurar la inspección de tu vehículo.
+      </p>
+      <p>
+        Actualmente acabas de recibir un <strong>correo electrónico</strong> con la confirmación de esta operación.
+      </p>
+      <p style="font-size: 0.95em; color: #666;">
+        Haz clic en el siguiente botón para continuar a tu panel de control.
+      </p>
+      <button class="redirect-btn" id="goDashboardBtn">Ir al Dashboard</button>
     </div>
-</main>
+  </main>
 
-<!-- Loader -->
-<div id="loader">
-    <img src="logo.jpg" alt="Cargando...">
-</div>
+  <div id="loader">
+    <img src="logo.jpg" alt="Cargando..." />
+  </div>
 
-<!-- Footer -->
-<footer style="text-align: center; padding: 20px; background-color: #f1f1f1; font-size: 0.9em; color: #555;">
+  <footer style="text-align: center; padding: 20px; background-color: #f1f1f1; font-size: 0.9em; color: #555;">
     <p>&copy; 2025 AutoCuidado Club. Todos los derechos reservados.</p>
-</footer>
+  </footer>
 
-<!-- Redirect Script -->
-<script>
-    // Show loader after 5s, redirect after 7s
-    setTimeout(() => {
-        document.getElementById('loader').style.display = 'flex';
-    }, 25000);
+  <!-- Firebase + Logic -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-    setTimeout(() => {
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const btn = document.getElementById("goDashboardBtn");
+    const loader = document.getElementById("loader");
+
+    btn.addEventListener("click", async () => {
+      loader.style.display = "flex";
+
+      try {
+        const user = auth.currentUser;
+
+        const ipRes = await fetch("https://api.ipify.org?format=json");
+        const ip = (await ipRes.json()).ip || "unknown";
+
+        if (user) {
+          await db.collection("users").doc(user.uid)
+            .collection("clickLogs")
+            .add({
+              type: "payment-confirmation-click",
+              source: "payment-done.html",
+              timestamp: new Date(),
+              ipAddress: ip
+            });
+        }
+      } catch (e) {
+        console.error("Error saving log:", e);
+      }
+
+      setTimeout(() => {
         window.location.href = "dashboard2.html";
-    }, 30000);
-</script>
-
+      }, 2000);
+    });
+  </script>
 </body>
 </html>
