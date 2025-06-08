@@ -128,21 +128,14 @@
       try {
         const user = auth.currentUser;
 
-        const ipRes = await fetch("https://api.ipify.org?format=json");
-        const ip = (await ipRes.json()).ip || "unknown";
-
         if (user) {
-          await db.collection("users").doc(user.uid)
-            .collection("clickLogs")
-            .add({
-              type: "payment-confirmation-click",
-              source: "payment-done.html",
-              timestamp: new Date(),
-              ipAddress: ip
-            });
+          await db.collection("users").doc(user.uid).update({
+            customerAwareOfPaymentVerification: true,
+            customerAwareTimestamp: new Date()
+          });
         }
       } catch (e) {
-        console.error("Error saving log:", e);
+        console.error("Error logging customer acknowledgment:", e);
       }
 
       setTimeout(() => {
