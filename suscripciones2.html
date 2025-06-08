@@ -51,23 +51,26 @@
             const registrationContainer = document.getElementById("registration-container");
             const planButtons = document.querySelectorAll(".plan-button");
 
-           planButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        selectedPlanType = this.getAttribute("data-plan");
-        updateVehicleFields(selectedPlanType);
-        registrationContainer.style.display = "block";
+          planButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    selectedPlanType = this.getAttribute("data-plan");
+    updateVehicleFields(selectedPlanType);
 
-        // Delay inteligente para asegurar render correcto
-        setTimeout(() => {
-            registrationContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }, isMobileDevice() ? 400 : 100);
+    updatePlanSummary(selectedPlanType); // ✅ This triggers the summary update
 
-        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-    });
+    registrationContainer.style.display = "block";
+
+    setTimeout(() => {
+      registrationContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, isMobileDevice() ? 400 : 100);
+
+    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+  });
 });
+
 
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
@@ -271,21 +274,23 @@ function isMobileDevice() {
 }
 
 planButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        selectedPlanType = this.getAttribute("data-plan");
-        updateVehicleFields(selectedPlanType);
-        registrationContainer.style.display = "block";
+  button.addEventListener("click", function () {
+    selectedPlanType = this.getAttribute("data-plan");
+    updateVehicleFields(selectedPlanType);
 
-        // Delay inteligente para asegurar render correcto
-        setTimeout(() => {
-            registrationContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }, isMobileDevice() ? 400 : 100);
+    updatePlanSummary(selectedPlanType); // ✅ This triggers the summary update
 
-        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-    });
+    registrationContainer.style.display = "block";
+
+    setTimeout(() => {
+      registrationContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, isMobileDevice() ? 400 : 100);
+
+    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+  });
 });
 
            function updateVehicleFields(planType) {
@@ -1333,8 +1338,12 @@ function updatePlanSummary(planType) {
     plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" }
   };
 
+ 
   const plan = planData[planType];
-  if (!plan) return;
+  if (!plan) {
+    console.error("❌ No se encontró el plan para:", planType);
+    return;
+  }
 
   const monthly = plan.type === "Contado" ? (plan.price / plan.months) : plan.price;
   const total = plan.type === "Contado" ? plan.price : plan.price * plan.months;
@@ -1344,6 +1353,8 @@ function updatePlanSummary(planType) {
   const now = new Date();
   const nextMonth = (now.getMonth() + 1) % 12;
   const startMonth = monthNames[nextMonth];
+
+  console.log("🧠 Actualizando resumen con:", { label: plan.label, type: plan.type, monthly, total, startMonth });
 
   document.getElementById("summary-plan").textContent = plan.label;
   document.getElementById("summary-type").textContent = plan.type;
@@ -1379,23 +1390,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const planButtons = document.querySelectorAll(".plan-button");
 
     // ✅ Attach event listeners to all plan buttons
-    planButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        selectedPlanType = this.getAttribute("data-plan");
-        updateVehicleFields(selectedPlanType);
-        registrationContainer.style.display = "block";
+   planButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    selectedPlanType = this.getAttribute("data-plan");
+    updateVehicleFields(selectedPlanType);
 
-        // Delay inteligente para asegurar render correcto
-        setTimeout(() => {
-            registrationContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }, isMobileDevice() ? 400 : 100);
+    updatePlanSummary(selectedPlanType); // ✅ This triggers the summary update
 
-        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-    });
+    registrationContainer.style.display = "block";
+
+    setTimeout(() => {
+      registrationContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, isMobileDevice() ? 400 : 100);
+
+    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+  });
 });
+
 
 
     // ✅ Modify registerUser function to use selectedPlanType
