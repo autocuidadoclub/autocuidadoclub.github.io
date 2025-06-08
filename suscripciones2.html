@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,7 +47,6 @@
             const db = firebase.firestore();
             const messaging = firebase.messaging();
             let selectedPlanType = null;
-            updatePlanSummary(selectedPlanType);
 
             const registrationContainer = document.getElementById("registration-container");
             const planButtons = document.querySelectorAll(".plan-button");
@@ -71,53 +71,6 @@
 
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
-
-            function selectPlan(plan) {
-  selectedPlanType = plan;
-
-  // Highlight selected plan
-  document.querySelectorAll(".plan-card").forEach(card => {
-    card.classList.remove("selected");
-  });
-  document.getElementById(`plan-${plan}`).classList.add("selected");
-
-  // Show registration form
-  document.getElementById("registrationFormContainer").style.display = "block";
-
-  // Calculate price
-  let amount = 0;
-  let total = 0;
-  if (plan === "basic3m") {
-    amount = 5;
-    total = 15;
-  } else if (plan === "basic3mfull") {
-    amount = 15;
-    total = 15;
-  } else if (plan === "plus6m") {
-    amount = 7;
-    total = 42;
-  } else if (plan === "plus6mfull") {
-    amount = 42;
-    total = 42;
-  } else if (plan === "plus12m") {
-    amount = 7;
-    total = 84;
-  } else if (plan === "plus12mfull") {
-    amount = 84;
-    total = 84;
-  }
-
-  // Fill summary box
-  const now = new Date();
-  const nextMonth = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
-    new Date(now.getFullYear(), now.getMonth() + 1, 1)
-  );
-
-  document.getElementById("summaryPlan").textContent = plan;
-  document.getElementById("summaryAmount").textContent = `$${amount.toFixed(2)}`;
-  document.getElementById("summaryTotal").textContent = `$${total.toFixed(2)}`;
-  document.getElementById("summaryStart").textContent = nextMonth;
-}
 
          function registerUser(event) {
   event.preventDefault();
@@ -1675,43 +1628,52 @@ window.addEventListener('load', function() {
 });
 
                 
-<script>
-function updatePlanSummary(planType) {
-  const planData = {
-    basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
-    plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
-    basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
-    plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6, type: "Mensual" },
-    basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
-    plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
-    basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3, type: "Contado" },
-    plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3, type: "Contado" },
-    basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6, type: "Contado" },
-    plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6, type: "Contado" },
-    basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
-    plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" }
-  };
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!window.selectedPlanType) return;
 
-  const plan = planData[planType];
-  if (!plan) return;
+    const planInfo = {
+      basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3,  type: "Mensual" },
+      plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3,  type: "Mensual" },
+      basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6,  type: "Mensual" },
+      plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6,  type: "Mensual" },
+      basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
+      plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
+      basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3,  type: "Contado" },
+      plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3,  type: "Contado" },
+      basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6,  type: "Contado" },
+      plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6,  type: "Contado" },
+      basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
+      plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" },
+    };
 
-  const monthly = plan.type === "Contado" ? (plan.price / plan.months) : plan.price;
-  const total = plan.type === "Contado" ? plan.price : plan.price * plan.months;
+    const selectedPlan = selectedPlanType;
+    const plan = planInfo[selectedPlan];
 
-  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-  const now = new Date();
-  const nextMonth = (now.getMonth() + 1) % 12;
-  const startMonth = monthNames[nextMonth];
+    if (!plan) {
+      document.getElementById("plan-summary").innerHTML = "<p style='color:red;'>⚠️ Plan no reconocido.</p>";
+      return;
+    }
 
-  document.getElementById("summary-plan").textContent = plan.label;
-  document.getElementById("summary-type").textContent = plan.type;
-  document.getElementById("summary-monthly").textContent = monthly.toFixed(2);
-  document.getElementById("summary-total").textContent = total.toFixed(2);
-  document.getElementById("summary-start-month").textContent = startMonth;
-}
-</script>
+    const monthlyAmount = plan.type === "Contado"
+      ? plan.price / plan.months
+      : plan.price;
 
+    const totalAmount = plan.type === "Contado"
+      ? plan.price
+      : plan.price * plan.months;
+
+    const startMonthDate = new Date();
+    startMonthDate.setMonth(startMonthDate.getMonth() + 1);
+
+    const startMonthName = startMonthDate.toLocaleDateString("es-SV", { month: 'long' });
+    const capitalizedMonth = startMonthName.charAt(0).toUpperCase() + startMonthName.slice(1);
+
+    document.getElementById("summary-plan").textContent = plan.label;
+    document.getElementById("summary-type").textContent = plan.type;
+    document.getElementById("summary-monthly").textContent = monthlyAmount.toFixed(2);
+    document.getElementById("summary-total").textContent = totalAmount.toFixed(2);
+    document.getElementById("summary-start-month").textContent = capitalizedMonth;
+  });
 
 
 
