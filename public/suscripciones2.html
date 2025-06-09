@@ -1301,10 +1301,10 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
            <div id="plan-summary" class="summary-box" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f8f8;">
   <h3 style="margin-top: 0;">Resumen del Plan Seleccionado</h3>
   <p><strong>Plan:</strong> <span id="summary-plan"></span></p>
-  <p><strong>Tipo de pago:</strong> <span id="summary-type"></span></p>
-  <p><strong><span id="summary-monthly-label">Pago mensual:</span></strong> <span id="summary-monthly"></span></p>
-  <p><strong>Total del plan:</strong> $<span id="summary-total"></span></p>
-  <p><strong>Inicio de inspecciones:</strong> <span id="summary-start-month"></span></p>
+<p><strong>Tipo de pago:</strong> <span id="summary-type"></span></p>
+<p><strong id="summary-monthly-label">Pago mensual:</strong> <span id="summary-monthly"></span></p>
+<p><strong>Total del plan:</strong> <span id="summary-total"></span></p>
+<p><strong>Inicio de inspecciones:</strong> <span id="summary-start-month"></span></p>
 </div>
 
             
@@ -1995,7 +1995,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   </script>
 
 
-    <script>
+<script>
 function updatePlanSummary(planType) {
   const planData = {
     basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
@@ -2016,7 +2016,8 @@ function updatePlanSummary(planType) {
   if (!plan) return;
 
   const isContado = plan.type === "Contado";
-  const total = plan.price.toFixed(2);
+  const monthly = isContado ? (plan.price / plan.months).toFixed(2) : plan.price.toFixed(2);
+  const total = isContado ? plan.price.toFixed(2) : (plan.price * plan.months).toFixed(2);
 
   const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -2024,25 +2025,21 @@ function updatePlanSummary(planType) {
   const nextMonth = (now.getMonth() + 1) % 12;
   const startMonth = monthNames[nextMonth];
 
-  // Set values
+  // Asignar valores
   document.getElementById("summary-plan").textContent = plan.label;
   document.getElementById("summary-type").textContent = plan.type;
   document.getElementById("summary-start-month").textContent = startMonth;
-  document.getElementById("summary-total").textContent = `$${total}`;
-
-  // Adjust label and value depending on payment type
-  const monthlyLabel = document.getElementById("summary-monthly-label");
-  const monthlyValue = document.getElementById("summary-monthly");
 
   if (isContado) {
-    monthlyLabel.textContent = "Un pago total:";
-    monthlyValue.textContent = `$${total}`;
+    document.getElementById("summary-monthly").parentElement.innerHTML = `<strong>Un pago total:</strong> $${total}`;
   } else {
-    monthlyLabel.textContent = "Pago mensual:";
-    monthlyValue.textContent = `$${plan.price.toFixed(2)}`;
+    document.getElementById("summary-monthly").textContent = `$${monthly}`;
   }
+
+  document.getElementById("summary-total").textContent = `$${total}`;
 }
 </script>
+
 
     
 </body>
