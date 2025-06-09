@@ -2011,25 +2011,27 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
     plus12mfull: { label: "Plus 12 meses", price: 669.49, months: 12, type: "Contado" }
   };
 
-  function updatePlanSummary(planType) {
-    const plan = planData[planType];
-    if (!plan) return;
+function updatePlanSummary(planType) {
+  const plan = planData[planType];
+  if (!plan) return;
 
-    const monthly = plan.type === "Contado" ? (plan.price / plan.months) : plan.price;
-    const total = plan.type === "Contado" ? plan.price : plan.price * plan.months;
+  const isFullPayment = plan.type === "Contado";
+  const monthly = isFullPayment ? plan.price : plan.price;
+  const total = plan.price;
 
-    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    const now = new Date();
-    const nextMonth = (now.getMonth() + 1) % 12;
-    const startMonth = monthNames[nextMonth];
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const now = new Date();
+  const nextMonth = (now.getMonth() + 1) % 12;
+  const startMonth = monthNames[nextMonth];
 
-    document.getElementById("summary-plan").textContent = plan.label;
-    document.getElementById("summary-type").textContent = plan.type;
-    document.getElementById("summary-monthly").textContent = monthly.toFixed(2);
-    document.getElementById("summary-total").textContent = total.toFixed(2);
-    document.getElementById("summary-start-month").textContent = startMonth;
-  }
+  document.getElementById("summary-plan").textContent = plan.label;
+  document.getElementById("summary-type").textContent = plan.type;
+  document.getElementById("summary-monthly").textContent = monthly.toFixed(2);
+  document.getElementById("summary-total").textContent = total.toFixed(2);
+  document.getElementById("summary-start-month").textContent = startMonth;
+}
+
 
   document.addEventListener("DOMContentLoaded", () => {
     const planButtons = document.querySelectorAll('input[name="planType"]');
