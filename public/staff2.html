@@ -1089,6 +1089,13 @@ function getNextMonthName() {
   return months[(new Date().getMonth() + 1) % 12];
 }
 
+    function copyEmail() {
+  const textarea = document.getElementById("emailTemplate");
+  textarea.select();
+  document.execCommand("copy");
+  alert("📋 Correo copiado al portapapeles");
+}
+
     
   </script>
 
