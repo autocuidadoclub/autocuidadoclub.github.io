@@ -51,23 +51,26 @@
             const registrationContainer = document.getElementById("registration-container");
             const planButtons = document.querySelectorAll(".plan-button");
 
-           planButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        selectedPlanType = this.getAttribute("data-plan");
-        updateVehicleFields(selectedPlanType);
-        registrationContainer.style.display = "block";
+          planButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    selectedPlanType = this.getAttribute("data-plan");
+    updateVehicleFields(selectedPlanType);
 
-        // Delay inteligente para asegurar render correcto
-        setTimeout(() => {
-            registrationContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }, isMobileDevice() ? 400 : 100);
+    updatePlanSummary(selectedPlanType); // ✅ This triggers the summary update
 
-        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-    });
+    registrationContainer.style.display = "block";
+
+    setTimeout(() => {
+      registrationContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, isMobileDevice() ? 400 : 100);
+
+    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+  });
 });
+
 
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
@@ -271,21 +274,23 @@ function isMobileDevice() {
 }
 
 planButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        selectedPlanType = this.getAttribute("data-plan");
-        updateVehicleFields(selectedPlanType);
-        registrationContainer.style.display = "block";
+  button.addEventListener("click", function () {
+    selectedPlanType = this.getAttribute("data-plan");
+    updateVehicleFields(selectedPlanType);
 
-        // Delay inteligente para asegurar render correcto
-        setTimeout(() => {
-            registrationContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }, isMobileDevice() ? 400 : 100);
+    updatePlanSummary(selectedPlanType); // ✅ This triggers the summary update
 
-        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-    });
+    registrationContainer.style.display = "block";
+
+    setTimeout(() => {
+      registrationContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, isMobileDevice() ? 400 : 100);
+
+    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+  });
 });
 
            function updateVehicleFields(planType) {
@@ -1293,15 +1298,14 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
         </label>
     </div>
 
-            <div id="plan-summary" class="summary-box" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f8f8;">
+           <div id="plan-summary" class="summary-box" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f8f8;">
   <h3 style="margin-top: 0;">Resumen del Plan Seleccionado</h3>
   <p><strong>Plan:</strong> <span id="summary-plan"></span></p>
-  <p><strong>Tipo de pago:</strong> <span id="summary-type"></span></p>
-  <p><strong>Pago mensual (estimado):</strong> $<span id="summary-monthly"></span></p>
-  <p><strong>Total del plan:</strong> $<span id="summary-total"></span></p>
-  <p><strong>Inicio de inspecciones:</strong> <span id="summary-start-month"></span></p>
+<p><strong>Tipo de pago:</strong> <span id="summary-type"></span></p>
+<p><strong id="summary-monthly-label">Pago mensual:</strong> <span id="summary-monthly"></span></p>
+<p><strong>Total del plan:</strong> <span id="summary-total"></span></p>
+<p><strong>Inicio de inspecciones:</strong> <span id="summary-start-month"></span></p>
 </div>
-
 
             
         <button type="submit">Registrarse</button>
@@ -1316,9 +1320,8 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
   <p>Redirigiendo a tu cuenta...</p>
   <div class="loader"></div>
 </div>
-    
- 
-            <script>
+
+    <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM fully loaded!");
 
@@ -1332,23 +1335,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const planButtons = document.querySelectorAll(".plan-button");
 
     // ✅ Attach event listeners to all plan buttons
-    planButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        selectedPlanType = this.getAttribute("data-plan");
-        updateVehicleFields(selectedPlanType);
-        registrationContainer.style.display = "block";
+   planButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    selectedPlanType = this.getAttribute("data-plan");
+    updateVehicleFields(selectedPlanType);
 
-        // Delay inteligente para asegurar render correcto
-        setTimeout(() => {
-            registrationContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }, isMobileDevice() ? 400 : 100);
+    updatePlanSummary(selectedPlanType); // ✅ This triggers the summary update
 
-        console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-    });
+    registrationContainer.style.display = "block";
+
+    setTimeout(() => {
+      registrationContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, isMobileDevice() ? 400 : 100);
+
+    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
+  });
 });
+
 
 
     // ✅ Modify registerUser function to use selectedPlanType
@@ -1987,6 +1993,53 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   };
 
   </script>
+
+
+<script>
+function updatePlanSummary(planType) {
+  const planData = {
+    basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
+    plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
+    basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
+    plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6, type: "Mensual" },
+    basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
+    plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
+    basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3, type: "Contado" },
+    plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3, type: "Contado" },
+    basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6, type: "Contado" },
+    plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6, type: "Contado" },
+    basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
+    plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" }
+  };
+
+  const plan = planData[planType];
+  if (!plan) return;
+
+  const isContado = plan.type === "Contado";
+  const monthly = isContado ? (plan.price / plan.months).toFixed(2) : plan.price.toFixed(2);
+  const total = isContado ? plan.price.toFixed(2) : (plan.price * plan.months).toFixed(2);
+
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const now = new Date();
+  const nextMonth = (now.getMonth() + 1) % 12;
+  const startMonth = monthNames[nextMonth];
+
+  // Asignar valores
+  document.getElementById("summary-plan").textContent = plan.label;
+  document.getElementById("summary-type").textContent = plan.type;
+  document.getElementById("summary-start-month").textContent = startMonth;
+
+  if (isContado) {
+    document.getElementById("summary-monthly").parentElement.innerHTML = `<strong>Un pago total:</strong> $${total}`;
+  } else {
+    document.getElementById("summary-monthly").textContent = `$${monthly}`;
+  }
+
+  document.getElementById("summary-total").textContent = `$${total}`;
+}
+</script>
+
 
     
 </body>
