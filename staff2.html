@@ -152,6 +152,7 @@ table td, table th {
 
     <h4>Deseas confimar pago?<h4>
     <p><button onclick="confirmPayment(selectedStaffUserId)">Confirmar Pago</button><br></p>
+      
     <h4>Seleccione Nuevo Horario:</h4>
     <table class="schedule-table">
             <thead>
@@ -1029,6 +1030,68 @@ function saveInspectionDate(userId, vehicleIndex) {
   });
 }
 
+    function showEmailTemplate(userData) {
+  const planData = {
+    basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
+    plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
+    basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
+    plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6, type: "Mensual" },
+    basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
+    plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
+    basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3, type: "Contado" },
+    plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3, type: "Contado" },
+    basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6, type: "Contado" },
+    plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6, type: "Contado" },
+    basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
+    plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" }
+  };
+
+  const plan = planData[userData.planType] || {};
+  const amount = plan.price?.toFixed(2) || "0.00";
+
+  const typeText = plan.type || "Desconocido";
+  const startMonth = getNextMonthName();
+
+  const msg = `
+Hola ${userData.name},
+
+✅ Te confirmamos que hemos recibido tu pago exitosamente en AutoCuidado Club.
+
+📅 A partir del mes de ${startMonth}, comenzarán tus inspecciones mensuales. Recibirás recordatorios con tiempo para coordinar las visitas.
+
+🛠️ Plan seleccionado: ${plan.label}
+💳 Tipo de pago: ${typeText}
+💰 Monto pagado: $${amount}
+📍 Municipio: ${userData.municipality}
+📞 Teléfono: ${userData.phone}
+
+Gracias por confiar en nosotros. ¡Nos vemos pronto!
+
+—
+AutoCuidado Club
+https://autocuidadoclub.com
+  `.trim();
+
+  document.getElementById("emailTemplate").value = msg;
+  document.getElementById("emailModal").style.display = "block";
+}
+
+function copyEmail() {
+  const textarea = document.getElementById("emailTemplate");
+  textarea.select();
+  document.execCommand("copy");
+  alert("📋 Copiado al portapapeles");
+}
+
+function closeEmailModal() {
+  document.getElementById("emailModal").style.display = "none";
+}
+
+function getNextMonthName() {
+  const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  return months[(new Date().getMonth() + 1) % 12];
+}
+
     
   </script>
 
@@ -1141,5 +1204,13 @@ function saveInspectionDate(userId, vehicleIndex) {
   };
 </script>
 
+      <div id="emailModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px #000; z-index:1000;">
+  <h3>📧 Email para el Cliente</h3>
+  <textarea id="emailTemplate" style="width:100%; height:200px;"></textarea>
+  <button onclick="copyEmail()">📋 Copiar correo</button>
+  <button onclick="closeEmailModal()">❌ Cerrar</button>
+</div>
+      
+      
 </body>
 </html>
