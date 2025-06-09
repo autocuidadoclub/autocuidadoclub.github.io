@@ -1302,7 +1302,7 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
   <h3 style="margin-top: 0;">Resumen del Plan Seleccionado</h3>
   <p><strong>Plan:</strong> <span id="summary-plan"></span></p>
   <p><strong>Tipo de pago:</strong> <span id="summary-type"></span></p>
-  <p><strong>Pago mensual:</strong> $<span id="summary-monthly"></span></p>
+  <p><strong><span id="summary-monthly-label">Pago mensual:</span></strong> <span id="summary-monthly"></span></p>
   <p><strong>Total del plan:</strong> $<span id="summary-total"></span></p>
   <p><strong>Inicio de inspecciones:</strong> <span id="summary-start-month"></span></p>
 </div>
@@ -1993,31 +1993,30 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   };
 
   </script>
-<script>
-  let selectedPlanType = "";
 
+
+    <script>
+function updatePlanSummary(planType) {
   const planData = {
-    basic3m: { label: "Básico 3 meses", price: 34.99, months: 3, type: "Mensual" },
-    plus3m: { label: "Plus 3 meses", price: 68.99, months: 3, type: "Mensual" },
-    basic6m: { label: "Básico 6 meses", price: 32.50, months: 6, type: "Mensual" },
-    plus6m: { label: "Plus 6 meses", price: 65.00, months: 6, type: "Mensual" },
-    basic12m: { label: "Básico 12 meses", price: 29.99, months: 12, type: "Mensual" },
-    plus12m: { label: "Plus 12 meses", price: 59.99, months: 12, type: "Mensual" },
-    basic3mfull: { label: "Básico 3 meses", price: 99.72, months: 3, type: "Contado" },
-    plus3mfull: { label: "Plus 3 meses", price: 196.62, months: 3, type: "Contado" },
-    basic6mfull: { label: "Básico 6 meses", price: 183.30, months: 6, type: "Contado" },
-    plus6mfull: { label: "Plus 6 meses", price: 366.60, months: 6, type: "Contado" },
-    basic12mfull: { label: "Básico 12 meses", price: 334.69, months: 12, type: "Contado" },
-    plus12mfull: { label: "Plus 12 meses", price: 669.49, months: 12, type: "Contado" }
+    basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
+    plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
+    basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
+    plus6m:        { label: "Plus 6 meses",        price: 65.00, months: 6, type: "Mensual" },
+    basic12m:      { label: "Básico 12 meses",     price: 29.99, months: 12, type: "Mensual" },
+    plus12m:       { label: "Plus 12 meses",       price: 59.99, months: 12, type: "Mensual" },
+    basic3mfull:   { label: "Básico 3 meses",      price: 99.72, months: 3, type: "Contado" },
+    plus3mfull:    { label: "Plus 3 meses",        price: 196.62, months: 3, type: "Contado" },
+    basic6mfull:   { label: "Básico 6 meses",      price: 183.30, months: 6, type: "Contado" },
+    plus6mfull:    { label: "Plus 6 meses",        price: 366.60, months: 6, type: "Contado" },
+    basic12mfull:  { label: "Básico 12 meses",     price: 334.69, months: 12, type: "Contado" },
+    plus12mfull:   { label: "Plus 12 meses",       price: 669.49, months: 12, type: "Contado" }
   };
 
-function updatePlanSummary(planType) {
   const plan = planData[planType];
   if (!plan) return;
 
-  const isFullPayment = plan.type === "Contado";
-  const monthly = isFullPayment ? plan.price : plan.price;
-  const total = plan.price;
+  const isContado = plan.type === "Contado";
+  const total = plan.price.toFixed(2);
 
   const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -2025,30 +2024,24 @@ function updatePlanSummary(planType) {
   const nextMonth = (now.getMonth() + 1) % 12;
   const startMonth = monthNames[nextMonth];
 
+  // Set values
   document.getElementById("summary-plan").textContent = plan.label;
   document.getElementById("summary-type").textContent = plan.type;
-  document.getElementById("summary-monthly").textContent = monthly.toFixed(2);
-  document.getElementById("summary-total").textContent = total.toFixed(2);
   document.getElementById("summary-start-month").textContent = startMonth;
+  document.getElementById("summary-total").textContent = `$${total}`;
+
+  // Adjust label and value depending on payment type
+  const monthlyLabel = document.getElementById("summary-monthly-label");
+  const monthlyValue = document.getElementById("summary-monthly");
+
+  if (isContado) {
+    monthlyLabel.textContent = "Un pago total:";
+    monthlyValue.textContent = `$${total}`;
+  } else {
+    monthlyLabel.textContent = "Pago mensual:";
+    monthlyValue.textContent = `$${plan.price.toFixed(2)}`;
+  }
 }
-
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const planButtons = document.querySelectorAll('input[name="planType"]');
-
-    planButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        selectedPlanType = button.value;
-        updatePlanSummary(selectedPlanType);
-        document.getElementById("registerForm").style.display = "block"; // Ensure it's visible
-      });
-
-      if (button.checked) {
-        selectedPlanType = button.value;
-        updatePlanSummary(selectedPlanType);
-      }
-    });
-  });
 </script>
 
     
