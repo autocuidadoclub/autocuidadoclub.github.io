@@ -937,12 +937,12 @@ function handlePaymentStatus(userData) {
 // PayPal Links
 function getPaypalLink(planType) {
     const payPalLinks = {
-        "basic3m": "https://www.paypal.com/pay/basic3m",
-        "basic6m": "https://www.paypal.com/pay/basic6m",
-        "basic12m": "https://www.paypal.com/pay/basic12m",
-        "plus3m": "https://www.paypal.com/pay/plus3m",
-        "plus6m": "https://www.paypal.com/pay/plus6m",
-        "plus12m": "https://www.paypal.com/pay/plus12m"
+        "basic3m": "https://u.wompi.sv/379910xeV",
+        "basic6m": "https://u.wompi.sv/380639rcA",
+        "basic12m": "https://u.wompi.sv/3806769qs",
+        "plus3m": "https://u.wompi.sv/380690Gbx",
+        "plus6m": "https://u.wompi.sv/380695_Np",
+        "plus12m": "https://u.wompi.sv/380702xQa"
     };
     return payPalLinks[planType] || null;
 }
@@ -1150,20 +1150,27 @@ function updateLoyaltyCard(userData) {
 
     // Step 3+: Based on unique months in paymentHistory
     const paymentHistory = userData.paymentHistory || [];
-    const uniqueMonths = new Set();
+    let totalMonths = 0;
 
-    paymentHistory.forEach(entry => {
+// Step 1: Detect from planType if it's a full upfront plan
+const fullPlanRegex = /(basic|plus)(\d{1,2})mfull/;
+const match = userData.planType?.match(fullPlanRegex);
+if (match) {
+    totalMonths = parseInt(match[2]); // e.g., 3, 6, or 12
+} else {
+    // Fallback to old logic if not a full upfront plan
+    const uniqueMonths = new Set();
+    (userData.paymentHistory || []).forEach(entry => {
         const date = entry.date?.toDate ? entry.date.toDate() : new Date(entry.date.seconds * 1000);
         const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
         uniqueMonths.add(monthYear);
     });
-
-    const uniqueMonthCount = uniqueMonths.size;
-
+    totalMonths = uniqueMonths.size;
+}
     const holeSteps = [2, 4, 6, 7, 8, 9]; // Corresponding unique month milestones
 
     holeSteps.forEach((step, index) => {
-        if (uniqueMonthCount >= step && progress < holes.length) {
+        if (totalMonths >= step && progress < holes.length) {
             holes[progress].classList.add('completed');
             progress++;
         }
@@ -2388,6 +2395,7 @@ html, body {
             <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
             <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+            <p><strong>Plan Elegido</strong> <span id="PlanType">Cargando...</span></p>
 
             <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
   Cargando mensaje especial...
@@ -3034,6 +3042,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
     alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
   }
 });
+
     function openFeedbackModal() {
       document.getElementById('feedbackModal').style.display = 'flex';
       document.getElementById('feedbackText').focus();
