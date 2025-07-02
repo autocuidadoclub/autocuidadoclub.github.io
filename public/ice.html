@@ -12,22 +12,17 @@
             background-color: #C5E4EB;
             color: #003344;
             padding: 20px;
+            text-align: center;
         }
         header {
             background-color: #003344;
             color: #fff;
             padding: 10px 20px;
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-        header img {
-            max-width: 180px;
-        }
-        h1 {
+        header h1 {
             color: #007799;
             margin: 0;
+            text-align: center;
         }
         .highlight {
             color: #FF6600;
@@ -35,20 +30,23 @@
         }
         .content-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: flex-start;
             margin-top: 30px;
             flex-wrap: wrap;
+            text-align: left;
         }
         .text-content {
-            max-width: 50%;
+            max-width: 500px;
+            margin-right: 20px;
         }
-        .product-box {
+        .product-box, .coverage-box, .city-box {
             background-color: #fff;
             border-radius: 12px;
             padding: 20px;
             margin: 20px 0;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
         }
         .btn {
             background-color: #FF6600;
@@ -67,7 +65,7 @@
             margin: 0 5px;
         }
         .logo-side {
-            max-width: 45%;
+            max-width: 300px;
         }
         .logo-side img {
             width: 100%;
@@ -103,6 +101,16 @@
             <p>$0.24 por libra - Bolsas de 50 lb o 100 lb</p>
         </div>
 
+        <div class="coverage-box">
+            <h2>Área de Cobertura</h2>
+            <p>San Vicente ✔️<br>San Miguel (Próximamente) 🕐<br>La Unión (Próximamente) 🕐</p>
+        </div>
+
+        <div class="city-box">
+            <h2>Ciudades con Servicio</h2>
+            <p>Apastepeque ✔️<br>San Vicente (Próximamente) 🕐</p>
+        </div>
+
         <div class="product-box">
             <h2>Pedidos y Pagos</h2>
             <p>Paga fácil y seguro con:</p>
@@ -112,19 +120,21 @@
                 <img src="/icons/mastercard.png" alt="Mastercard">
                 <img src="/icons/paypal.png" alt="PayPal">
             </div>
+            <p style="margin-top:10px; font-size: 0.95em;">También aceptamos <strong>Tasa Cero</strong> con tarjetas de crédito del Banco Agrícola para compras mayores a $50.00</p>
+            <p>¡Te lo llevamos a casa!</p>
             <a href="https://wa.me/50374696109" class="btn">Ordenar por WhatsApp</a>
+        </div>
+
+        <div class="product-box">
+            <h2>¿También te interesan los Autos?</h2>
+            <p>Descubre el servicio de mantenimiento y cuidado automotriz de Autocuidado Club.</p>
+            <a href="https://autocuidadoclub.com" class="btn">Ir a Autocuidado Club</a>
         </div>
     </div>
 
     <div class="logo-side">
-        <img src="/ice-logo.png" alt="Autocuidado ICE">
+        <img src="/logo-autocuidado-ice-banner.png" alt="Autocuidado ICE">
     </div>
-</div>
-
-    <div class="product-box">
-    <h2>¿También te interesan los Autos?</h2>
-    <p>Descubre el servicio de mantenimiento y cuidado automotriz de Autocuidado Club.</p>
-    <a href="https://autocuidadoclub.com" class="btn">Ir a Autocuidado Club</a>
 </div>
 
 <p style="margin-top: 40px; color: #555; text-align:center">Powered by AutocuidadoClub.com</p>
