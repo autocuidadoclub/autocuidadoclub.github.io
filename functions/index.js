@@ -155,7 +155,7 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
     });
 
     console.log(`✅ Proveedor: pago registrado para ${userEmail}`);
-    await sendZohoMail(userEmail, "🎉 ¡Gracias por tu pago en AutoCuidado Club!", `Pago recibido.`);
+    // await sendZohoMail(userEmail, "🎉 ¡Gracias por tu pago en AutoCuidado Club!", `Pago recibido.`);
 
     return res.status(200).send("Payment processed");
   } catch (error) {
