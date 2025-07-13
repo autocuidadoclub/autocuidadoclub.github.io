@@ -1,13 +1,13 @@
+// Clean base integrating everything from the original with supplier JSON adjustment for wompiWebhook
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const axios = require("axios");
 const Stripe = require("stripe");
-const qs = require("querystring"); // ✅ Move to top level
+const qs = require("querystring");
 
 admin.initializeApp();
 const db = admin.firestore();
 
-// 🔐 Entorno (Firebase config o GitHub Secrets)
 const {
   client_id: ZOHO_CLIENT_ID,
   client_secret: ZOHO_CLIENT_SECRET,
@@ -19,7 +19,6 @@ const {
 const stripe = Stripe(functions.config().stripe.secret);
 const endpointSecret = functions.config().stripe.webhook;
 
-// ✅ CORRECTED: Zoho Access Token Function
 async function getZohoAccessToken() {
   if (!ZOHO_CLIENT_ID || !ZOHO_CLIENT_SECRET || !ZOHO_REFRESH_TOKEN || !ZOHO_API_DOMAIN) {
     throw new Error("❌ Faltan variables de entorno de Zoho");
@@ -33,20 +32,14 @@ async function getZohoAccessToken() {
   });
 
   const response = await axios.post(`${ZOHO_API_DOMAIN}/oauth/v2/token`, body, {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
+    headers: { "Content-Type": "application/x-www-form-urlencoded" }
   });
 
   return response.data.access_token;
 }
 
-
-
-// 📧 Enviar correo con Zoho
 async function sendZohoMail(toEmail, subject, bodyContent) {
   const accessToken = await getZohoAccessToken();
- 
   const payload = {
     fromAddress: "info@autocuidadoclub.com",
     toAddress: toEmail,
@@ -58,47 +51,27 @@ async function sendZohoMail(toEmail, subject, bodyContent) {
   const response = await axios.post(
     `${ZOHO_API_DOMAIN}/mail/v1/accounts/${ZOHO_USER_ID}/messages`,
     payload,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
+    { headers: { Authorization: `Bearer ${accessToken}` } }
   );
 
   console.log("📧 Email sent:", response.data);
-  console.log("📧 Email payload:", payload);
-console.log("📧 Token:", accessToken);
   return response.data;
 }
 
-// 📩 Función de correo por referido
 exports.sendReferralEmail = functions.https.onRequest(async (req, res) => {
   try {
     const { referrerName, referrerEmail, referralName, referralEmail, referralPhone } = req.body;
-
     const subject = "🎉 ¡Nuevo referido agregado en AutoCuidado Club!";
-    const body = `
-      ¡Hola ${referrerName}!<br><br>
-      Has agregado un nuevo referido a AutoCuidado Club 🚗✨<br><br>
-      📋 Datos del referido:<br>
-      - Nombre: ${referralName}<br>
-      - Email: ${referralEmail}<br>
-      - WhatsApp: https://wa.me/${referralPhone}<br><br>
-      Te notificaremos cuando se registre y pague para que recibas tus recompensas 🎁<br><br>
-      ¡Gracias por confiar en AutoCuidado Club!
-    `;
+    const body = `¡Hola ${referrerName}!<br><br>Has agregado un nuevo referido a AutoCuidado Club 🚗✨<br><br>📋 Datos del referido:<br>- Nombre: ${referralName}<br>- Email: ${referralEmail}<br>- WhatsApp: https://wa.me/${referralPhone}<br><br>Te notificaremos cuando se registre y pague para que recibas tus recompensas 🎁<br><br>¡Gracias por confiar en AutoCuidado Club!`;
 
     await sendZohoMail(referrerEmail, subject, body);
     res.status(200).send("Correo de referido enviado correctamente.");
   } catch (error) {
-    console.error("❌ Error enviando correo:", error.toJSON?.() || error);
+    console.error("❌ Error enviando correo:", error);
     res.status(500).send("Error al enviar correo.");
   }
 });
 
-
-
-// 💳 Stripe Webhook
 exports.stripeWebhook = functions.https.onRequest((req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
@@ -111,65 +84,53 @@ exports.stripeWebhook = functions.https.onRequest((req, res) => {
   }
 
   const session = event.data.object;
-
   if (event.type === "checkout.session.completed") {
     const uid = session.metadata.uid;
 
-    return db
-      .collection("users")
-      .doc(uid)
-      .update({
-        paymentStatus: "Completed",
-        paymentDate: admin.firestore.Timestamp.now(),
-        nextPaymentDate: admin.firestore.Timestamp.fromDate(
-          new Date(new Date().setMonth(new Date().getMonth() + 1))
-        ),
-        paymentHistory: admin.firestore.FieldValue.arrayUnion({
-          date: admin.firestore.Timestamp.now(),
-          amount: session.amount_total / 100,
-          method: "Stripe",
-          status: "Completed",
-        }),
-      })
-      .then(() => {
-        console.log(`✅ Stripe: pago registrado para ${uid}`);
-        return res.status(200).send("Success");
-      })
-      .catch((err) => {
-        console.error("❌ Error al actualizar Firestore:", err);
-        return res.status(500).send("Firestore update error");
-      });
+    return db.collection("users").doc(uid).update({
+      paymentStatus: "Completed",
+      paymentDate: admin.firestore.Timestamp.now(),
+      nextPaymentDate: admin.firestore.Timestamp.fromDate(
+        new Date(new Date().setMonth(new Date().getMonth() + 1))
+      ),
+      paymentHistory: admin.firestore.FieldValue.arrayUnion({
+        date: admin.firestore.Timestamp.now(),
+        amount: session.amount_total / 100,
+        method: "Stripe",
+        status: "Completed",
+      }),
+    }).then(() => {
+      console.log(`✅ Stripe: pago registrado para ${uid}`);
+      return res.status(200).send("Success");
+    }).catch((err) => {
+      console.error("❌ Error al actualizar Firestore:", err);
+      return res.status(500).send("Firestore update error");
+    });
   }
-
   return res.status(200).send("Unhandled event type");
 });
 
-// 💰 Wompi Webhook
-// 💰 Wompi Webhook
 exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
   try {
-    const transaction = req.body?.transaction;
+    const data = req.body;
+    console.log("Webhook recibido:", JSON.stringify(data));
 
-    if (!transaction || transaction.status !== "APPROVED") {
+    const resultado = data.ResultadoTransaccion;
+    if (!data || resultado !== "ExitosaAprobada") {
       console.warn("Transacción inválida o no aprobada.");
       return res.status(400).send("Invalid transaction");
     }
 
-    const userEmail = transaction.customer_email;
+    const userEmail = data.Cliente?.EMail;
     if (!userEmail) return res.status(400).send("Missing customer email");
 
-    const snapshot = await db.collection("users")
-      .where("email", "==", userEmail).limit(1).get();
-
-    if (snapshot.empty) {
-      return res.status(404).send("User not found");
-    }
+    const snapshot = await db.collection("users").where("email", "==", userEmail).limit(1).get();
+    if (snapshot.empty) return res.status(404).send("User not found");
 
     const userRef = snapshot.docs[0].ref;
     const now = admin.firestore.Timestamp.now();
-    const nextCycle = admin.firestore.Timestamp
-      .fromMillis(now.toMillis() + 30 * 24 * 60 * 60 * 1000);
-    const paymentId = transaction.id;
+    const nextCycle = admin.firestore.Timestamp.fromMillis(now.toMillis() + 30 * 24 * 60 * 60 * 1000);
+    const paymentId = data.IdTransaccion;
     const history = snapshot.docs[0].data().paymentHistory || [];
 
     if (history.some(p => p.transactionId === paymentId)) {
@@ -186,58 +147,34 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
       checkoutLink: "",
       paymentHistory: admin.firestore.FieldValue.arrayUnion({
         date: now,
-        amount: transaction.amount_in_cents / 100,
+        amount: parseFloat(data.Monto),
         transactionId: paymentId,
-        status: transaction.status,
-        source: "Wompi",
+        status: resultado,
+        source: "Proveedor",
       }),
     });
 
-    console.log(`✅ Wompi: pago registrado para ${userEmail}`);
+    console.log(`✅ Proveedor: pago registrado para ${userEmail}`);
+    await sendZohoMail(userEmail, "🎉 ¡Gracias por tu pago en AutoCuidado Club!", `Pago recibido.`);
 
-    // ✅ Send confirmation email
-    await sendZohoMail(
-      userEmail,
-      "🎉 ¡Gracias por tu pago en AutoCuidado Club!",
-      `
-      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
-        <h2 style="color: #003893;">🚗 AutoCuidado Club</h2>
-        <p>¡Hola!</p>
-        <p>Tu pago ha sido recibido exitosamente. Gracias por confiar en nosotros.</p>
-        <p>Podes acceder a tu <a href="https://www.autocuidadoclub.com/dashboard2" style="color: #003893; text-decoration: none;">Dashboard de AutoCuidado Club</a> para ver tu información y beneficios.</p>
-        <p style="font-size: 0.9em; color: #555;">Si tenés dudas, escribinos a <a href="mailto:info@autocuidadoclub.com">info@autocuidadoclub.com</a>.<br>— El equipo de AutoCuidado Club</p>
-      </div>`
-    );
-    console.log("📧 Confirmación de pago enviada a", userEmail);
-
-    // ✅ Final send
     return res.status(200).send("Payment processed");
-
   } catch (error) {
-    console.error("❌ Error en webhook Wompi:", error);
+    console.error("❌ Error en webhook proveedor:", error);
     return res.status(500).send("Internal Server Error");
   }
 });
 
-
-
-// 🛡 Guardar token de Pagadito
 exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
   try {
     const { token_usuario, token_comercio, estado, correo_cliente } = req.body;
-
     if (!token_usuario || !token_comercio || !correo_cliente || estado !== "EX") {
       return res.status(400).send("Datos incompletos o transacción fallida.");
     }
 
     const snapshot = await db.collection("users").where("email", "==", correo_cliente).limit(1).get();
-
-    if (snapshot.empty) {
-      return res.status(404).send("Usuario no encontrado.");
-    }
+    if (snapshot.empty) return res.status(404).send("Usuario no encontrado.");
 
     const userRef = snapshot.docs[0].ref;
-
     await userRef.collection("pagadito").doc("tokens").set({
       token_usuario,
       token_comercio,
