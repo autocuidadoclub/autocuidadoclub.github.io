@@ -1,4 +1,4 @@
-// Clean base integrating everything from the original with supplier JSON adjustment for wompiWebhook
+// Clean base integrating everything from the original with supplier JSON adjustment for wompiWebhook + fullPaymentCompleted logic
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const axios = require("axios");
@@ -128,26 +128,38 @@ exports.wompiWebhook = functions.https.onRequest(async (req, res) => {
     if (snapshot.empty) return res.status(404).send("User not found");
 
     const userRef = snapshot.docs[0].ref;
+    const userData = snapshot.docs[0].data();
     const now = admin.firestore.Timestamp.now();
     const nextCycle = admin.firestore.Timestamp.fromMillis(now.toMillis() + 30 * 24 * 60 * 60 * 1000);
     const paymentId = data.IdTransaccion;
-    const history = snapshot.docs[0].data().paymentHistory || [];
+    const history = userData.paymentHistory || [];
 
     if (history.some(p => p.transactionId === paymentId)) {
       console.log("🔁 Wompi: pago ya registrado", paymentId);
       return res.status(200).send("Duplicate transaction");
     }
 
+    const fullPlanPrices = {
+      basic3mfull: 89.97,
+      plus6mfull: 179.94,
+      basic12mfull: 359.88,
+      plus12mfull: 719.76
+    };
+    const plan = userData.planType;
+    const amountPaid = parseFloat(data.Monto);
+    const fullPaymentCompleted = fullPlanPrices[plan] ? amountPaid >= fullPlanPrices[plan] : false;
+
     await userRef.update({
       paymentStatus: "Confirmado",
       subscriptionStatus: "active",
+      fullPaymentCompleted: fullPaymentCompleted,
       paymentDate: now,
       nextPaymentDate: nextCycle,
       monthsPaid: admin.firestore.FieldValue.increment(1),
       checkoutLink: "",
       paymentHistory: admin.firestore.FieldValue.arrayUnion({
         date: now,
-        amount: parseFloat(data.Monto),
+        amount: amountPaid,
         transactionId: paymentId,
         status: resultado,
         source: "Proveedor",
