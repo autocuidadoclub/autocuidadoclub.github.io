@@ -113,8 +113,41 @@
     border-radius: 8px;
     font-weight: bold;
 }
+.logo-side img {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 12px;
+}
+
+@media (min-width: 768px) {
+    .logo-side {
+        max-width: 400px;
+    }
+}
 
     </style>
+<script>
+function sendOrder() {
+    const potableQty = document.getElementById("potableQty").value;
+    const hielo50Qty = document.getElementById("hielo50Qty").value;
+    const hielo100Qty = document.getElementById("hielo100Qty").value;
+
+    let message = "Hola, quiero ordenar:\n";
+    if (potableQty > 0) message += `${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
+    if (hielo50Qty > 0) message += `${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
+    if (hielo100Qty > 0) message += `${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
+
+    if (potableQty == 0 && hielo50Qty == 0 && hielo100Qty == 0) {
+        alert("Selecciona al menos un producto antes de enviar.");
+        return;
+    }
+
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/50375704428?text=${encodedMessage}`, '_blank');
+}
+</script>
+
+    
 </head>
 <body>
 
@@ -139,6 +172,19 @@
     </ul>
 </div>
 
+<div class="box">
+    <h2>Ordena tu Hielo</h2>
+    <label>Hielo Potable 5 lb ($2.50 c/u):</label><br>
+    <input type="number" id="potableQty" min="0" value="0"><br><br>
+
+    <label>Hielo 50 lb ($12.00):</label><br>
+    <input type="number" id="hielo50Qty" min="0" value="0"><br><br>
+
+    <label>Hielo 100 lb ($24.00):</label><br>
+    <input type="number" id="hielo100Qty" min="0" value="0"><br><br>
+
+    <button onclick="sendOrder()" class="btn">Enviar Pedido por WhatsApp</button>
+</div>
 
         <div class="box">
             <h2>Área de Cobertura</h2>
@@ -172,5 +218,6 @@
 
 <p style="margin-top: 40px; color: #555; text-align:center">Powered by AutocuidadoClub.com</p>
 
+    
 </body>
 </html>
