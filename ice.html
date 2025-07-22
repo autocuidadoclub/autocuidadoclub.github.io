@@ -258,6 +258,19 @@
 
       window.open(`https://wa.me/50375704428?text=${encodeURIComponent(message)}`, '_blank');
     }
+
+document.addEventListener('scroll', function () {
+    const scrollY = window.scrollY;
+    const logo = document.querySelector('.logo-side');
+
+    if (window.innerWidth >= 768) {
+        // Clamp scroll to a max position to prevent overlapping footer
+        const maxTop = 600;
+        const newTop = Math.min(100 + scrollY * 0.2, maxTop);
+        logo.style.top = `${newTop}px`;
+    }
+});
+
   </script>
 </body>
 </html>
