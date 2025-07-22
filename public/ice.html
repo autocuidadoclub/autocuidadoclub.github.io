@@ -101,11 +101,6 @@
       border-radius: 8px;
     }
 
-    .logo-side img {
-      width: 100%;
-      border-radius: 12px;
-    }
-
     input, select {
       width: 100%;
       padding: 8px;
@@ -128,11 +123,23 @@
       padding: 40px 10px 20px;
     }
 
-    @media (max-width: 768px) {
-      .main-container {
-        flex-direction: column;
-      }
-    }
+   /* Make the logo container fixed on PC */
+@media (min-width: 768px) {
+  .logo-side {
+    position: fixed;
+    top: 100px; /* Starting position */
+    right: 40px; /* Adjust based on layout */
+    width: 200px;
+    transition: top 0.2s ease;
+    z-index: 1000;
+  }
+}
+
+.logo-side img {
+  width: 100%;
+  border-radius: 12px;
+}
+
   </style>
 </head>
 <body>
