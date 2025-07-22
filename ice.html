@@ -1,305 +1,263 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="favicon.png" type="/ice-logo.png">
-    <title>Autocuidado ICE - Compra tu Hielo Aquí</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-
-        
-    .logo-side {
-        position: sticky;
-        top: 20px;
-        align-self: flex-start;
-        max-width: 300px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autocuidado ICE - Compra tu Hielo Aquí</title>
+  <link rel="icon" href="ice-logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
     }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #C5E4EB;
+      color: #003344;
+    }
+
+    header {
+      background-color: #003344;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      color: #fff;
+      font-size: 2rem;
+    }
+
+    header .highlight {
+      color: #FF6600;
+    }
+
+    .main-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .left-column, .right-column {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .box h2 {
+      color: #007799;
+      margin-top: 0;
+    }
+
+    .highlight {
+      color: #FF6600;
+    }
+
+    .btn {
+      background-color: #FF6600;
+      color: #fff;
+      padding: 12px 20px;
+      text-decoration: none;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .price-tag {
+      background: #FF6600;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 10px 0;
+    }
+
+    .price-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .price-list li {
+      background: #003344;
+      color: #fff;
+      margin: 8px 0;
+      padding: 12px 20px;
+      border-radius: 8px;
+    }
+
     .logo-side img {
-        width: 150%;
-        border-radius: 12px;
+      width: 100%;
+      border-radius: 12px;
     }
 
-        body {
-            margin: 0;
-            font-family: 'Montserrat', sans-serif;
-            background-color: #C5E4EB;
-            color: #003344;
-        }
-        header {
-            background-color: #003344;
-            color: #fff;
-            padding: 10px 20px;
-            text-align: center;
-        }
-        header h1 {
-            color: #007799;
-            margin: 0;
-        }
-        .highlight {
-            color: #FF6600;
-            font-weight: bold;
-        }
-        .main-container {
-            display: flex;
-            justify-content: center;
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .left-column {
-            flex: 2;
-            min-width: 300px;
-        }
-        .right-column {
-            flex: 1;
-            min-width: 280px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        .box {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .btn {
-            background-color: #FF6600;
-            color: #fff;
-            padding: 12px 20px;
-            text-decoration: none;
-            border-radius: 6px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-        .logo-side img {
-            max-width: 100%;
-            border-radius: 12px;
-        }
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-
-        .price-tag {
-    background: #FF6600;
-    color: #fff;
-    padding: 10px 20px;
-    font-size: 1.4rem;
-    font-weight: bold;
-    border-radius: 8px;
-    display: inline-block;
-    margin: 10px 0;
-}
-
-.price-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.price-list li {
-    background: #003344;
-    color: #fff;
-    margin: 8px 0;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-}
-
-@media (min-width: 768px) {
-    .logo-side {
-        max-width: 400px;
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-family: 'Montserrat';
     }
-}
 
-    </style>
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: none;
+      border-radius: 12px;
+    }
 
-    
+    footer {
+      text-align: center;
+      color: #555;
+      padding: 40px 10px 20px;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<header>
+  <header>
     <h1>Autocuidado <span class="highlight">ICE</span></h1>
-</header>
+  </header>
 
-<div class="main-container">
+  <div class="main-container">
     <div class="left-column">
-        <div class="box">
-    <h2>Hielo Potable - 5 lb</h2>
-    <p>¡Hielo para tomar! <span class="highlight">Registro Sanitario</span>. Calidad pura, ideal para bebidas, bolsas selladas.</p>
-    <span class="price-tag">$2.50 c/u</span>
-</div>
+      <div class="box">
+        <h2>Hielo Potable - 5 lb</h2>
+        <p>¡Hielo para tomar! <span class="highlight">Registro Sanitario</span>. Calidad pura, ideal para bebidas, bolsas selladas.</p>
+        <span class="price-tag">$2.50 c/u</span>
+      </div>
 
+      <div class="box">
+        <h2>Hielo para Bebidas o Neveras</h2>
+        <ul class="price-list">
+          <li>$12.00 - 50 lb</li>
+          <li>$24.00 - 100 lb</li>
+        </ul>
+      </div>
 
-        <div class="box">
-    <h2>Hielo para Bebidas o Neveras</h2>
-    <ul class="price-list">
-        <li>$12.00 - 50 libras de hielo en cubitos</li>
-        <li>$24.00 - 100 libras de hielo en cubitos</li>
-    </ul>
-</div>
+      <div class="box">
+        <h2>Opciones de Pago</h2>
+        <p>💳 Tarjeta de crédito y débito</p>
+        <p>₿ Bitcoin</p>
+        <p>🏦 Transferencia bancaria</p>
+        <p>💵 Efectivo contra entrega</p>
+        <p>✔️ Tasa Cero Banco Agrícola (desde $50)</p>
+        <p>🚚 Entrega a domicilio</p>
+      </div>
 
-        <div class="box">
-            <h2>Pedidos y Pagos</h2>
-            <p>💳 Aceptamos tarjetas de crédito y débito (Visa, Mastercard).</p>
-            <p>₿ Pagos con Cripto (Bitcoin).</p>
-            <p>🏦 Depósito o transferencia bancaria.</p>
-            <p>💵 Efectivo contra entrega.</p>
-            <p>💳✔️ Tasa Cero Banco Agrícola (compras mayores a $50.00).</p>
-            <p>🚚 Entrega a domicilio.</p>
-            </div>
+      <div class="box">
+        <h2>Ordena tu Hielo</h2>
+        <label>Hielo Potable 5 lb:</label>
+        <input type="number" id="potableQty" min="0" value="0" oninput="updateTotal()">
 
-<div class="box">
-    <h2>Ordena tu Hielo</h2>
-    <label>Hielo Potable 5 lb ($2.50 c/u):</label><br>
-<input type="number" id="potableQty" min="0" value="0" oninput="updateTotal()"><br><br>
+        <label>Hielo 50 lb:</label>
+        <input type="number" id="hielo50Qty" min="0" value="0" oninput="updateTotal()">
 
-<label>Hielo 50 lb ($12.00):</label><br>
-<input type="number" id="hielo50Qty" min="0" value="0" oninput="updateTotal()"><br><br>
+        <label>Hielo 100 lb:</label>
+        <input type="number" id="hielo100Qty" min="0" value="0" oninput="updateTotal()">
 
-<label>Hielo 100 lb ($24.00):</label><br>
-<input type="number" id="hielo100Qty" min="0" value="0" oninput="updateTotal()"><br><br>
+        <label>Ubicación para entrega:</label>
+        <input type="text" id="location" placeholder="Ej: Calle Principal, Apastepeque">
 
-<label>Ubicación para Entrega:</label><br>
-<input type="text" id="location" placeholder="Ej: Calle Principal, Apastepeque"><br><br>
+        <label>Nombre de quien recibe:</label>
+        <input type="text" id="name">
 
-<label>Nombre de la persona que recibe el pedido</label><br>
-<input type="text" id="location" placeholder=" "><br><br>
+        <h3>Total: $<span id="totalAmount">0.00</span></h3>
+        <p id="promoMessage" style="color: green; font-weight: bold;"></p>
 
-<h3>Total: $<span id="totalAmount">0.00</span></h3>
-<p id="promoMessage" style="color: green; font-weight: bold;"></p>
+        <label>Método de Pago:</label>
+        <select id="paymentMethod">
+          <option value="Efectivo contra entrega">Efectivo contra entrega</option>
+          <option value="Tarjeta">Tarjeta</option>
+          <option value="Bitcoin">Bitcoin</option>
+          <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero</option>
+        </select>
 
-<label>Método de Pago:</label><br>
-<select id="paymentMethod">
-    <option value="Efectivo contra entrega">Efectivo contra entrega</option>
-    <option value="Tarjeta de crédito o débito">Tarjeta de crédito o débito</option>
-    <option value="Cripto (Bitcoin)">Cripto (Bitcoin)</option>
-    <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero</option>
-</select><br><br>
-<button onclick="sendOrder()" class="btn">Enviar Pedido por WhatsApp</button>
+        <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
+      </div>
 
+      <div class="box">
+        <h2>Mapa de Cobertura y Encuentros ICE</h2>
+        <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F"></iframe>
+      </div>
 
-</div>
-
-    <div class="box">
-  <h2>Mapa de Cobertura y Encuentros ICE</h2>
-<iframe src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F" width="640" height="480"></iframe>
-</div>
-
-        
-        <div class="box">
-            <h2>¿También te interesan los Autos?</h2>
-            <p>Descubre el servicio de mantenimiento y cuidado automotriz de Autocuidado Club.</p>
-            <a href="https://autocuidadoclub.com" class="btn">Ir a Autocuidado Club</a>
-        </div>
+      <div class="box">
+        <h2>¿También te interesan los Autos?</h2>
+        <p>Conoce nuestro servicio de mantenimiento de vehículos.</p>
+        <a href="https://autocuidadoclub.com" class="btn">Ir a Autocuidado Club</a>
+      </div>
     </div>
 
     <div class="right-column">
-        <div class="logo-side">
-            <img src="/ice-logo.png" alt="Autocuidado ICE">
-        </div>
+      <div class="logo-side">
+        <img src="ice-logo.png" alt="Autocuidado ICE">
+      </div>
     </div>
-</div>
+  </div>
 
-<p style="margin-top: 40px; color: #555; text-align:center">Powered by AutocuidadoClub.com</p>
+  <footer>
+    Powered by AutocuidadoClub.com
+  </footer>
 
-<script>
-function updateTotal() {
-    const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
-    const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
-    const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
+  <script>
+    function updateTotal() {
+      const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
+      const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
+      const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
 
-    const total = (potableQty * 2.50) + (hielo50Qty * 12) + (hielo100Qty * 24);
-    document.getElementById("totalAmount").textContent = total.toFixed(2);
-}
+      const total = (potableQty * 2.5) + (hielo50Qty * 12) + (hielo100Qty * 24);
+      document.getElementById("totalAmount").textContent = total.toFixed(2);
 
-function sendOrder() {
-    const potableQty = document.getElementById("potableQty").value;
-    const hielo50Qty = document.getElementById("hielo50Qty").value;
-    const hielo100Qty = document.getElementById("hielo100Qty").value;
-    const location = document.getElementById("location").value.trim();
+      const promo = document.getElementById("promoMessage");
+      promo.textContent = total >= 50 ? "¡Aplica para Tasa Cero Banco Agrícola!" : "";
+    }
 
-    if (!location) {
-        alert("Por favor ingresa tu ubicación de entrega.");
+    function sendOrder() {
+      const potableQty = document.getElementById("potableQty").value;
+      const hielo50Qty = document.getElementById("hielo50Qty").value;
+      const hielo100Qty = document.getElementById("hielo100Qty").value;
+      const location = document.getElementById("location").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const paymentMethod = document.getElementById("paymentMethod").value;
+      const total = document.getElementById("totalAmount").textContent;
+
+      if (!location || (!potableQty && !hielo50Qty && !hielo100Qty)) {
+        alert("Completa al menos un producto y ubicación de entrega.");
         return;
+      }
+
+      let message = `Hola, quiero ordenar:\n`;
+      if (potableQty > 0) message += `${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
+      if (hielo50Qty > 0) message += `${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
+      if (hielo100Qty > 0) message += `${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
+      message += `Total estimado: $${total}\n`;
+      message += `Método de pago: ${paymentMethod}\n`;
+      message += `Nombre: ${name}\n`;
+      message += `Ubicación de entrega: ${location}`;
+
+      window.open(`https://wa.me/50375704428?text=${encodeURIComponent(message)}`, '_blank');
     }
-
-    let message = "Hola, quiero ordenar:\n";
-    if (potableQty > 0) message += `${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
-    if (hielo50Qty > 0) message += `${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
-    if (hielo100Qty > 0) message += `${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
-
-    if (potableQty == 0 && hielo50Qty == 0 && hielo100Qty == 0) {
-        alert("Selecciona al menos un producto antes de enviar.");
-        return;
-    }
-
-    const total = document.getElementById("totalAmount").textContent;
-    message += `Total estimado: $${total}\n`;
-    message += `Ubicación de entrega: ${location}`;
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/50375704428?text=${encodedMessage}`, '_blank');
-}
-
-function updateTotal() {
-    const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
-    const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
-    const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
-
-    const total = (potableQty * 2.50) + (hielo50Qty * 12) + (hielo100Qty * 24);
-    document.getElementById("totalAmount").textContent = total.toFixed(2);
-
-    const promo = document.getElementById("promoMessage");
-    if (total >= 49.99) {
-        promo.textContent = "¡Aplica para Tasa Cero Banco Agrícola!";
-    } else {
-        promo.textContent = "";
-    }
-}
-
-function sendOrder() {
-    const potableQty = document.getElementById("potableQty").value;
-    const hielo50Qty = document.getElementById("hielo50Qty").value;
-    const hielo100Qty = document.getElementById("hielo100Qty").value;
-    const location = document.getElementById("location").value.trim();
-    const paymentMethod = document.getElementById("paymentMethod").value;
-
-    if (!location) {
-        alert("Por favor ingresa tu ubicación de entrega.");
-        return;
-    }
-
-    let message = "Hola, quiero ordenar:\n";
-    if (potableQty > 0) message += `${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
-    if (hielo50Qty > 0) message += `${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
-    if (hielo100Qty > 0) message += `${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
-
-    if (potableQty == 0 && hielo50Qty == 0 && hielo100Qty == 0) {
-        alert("Selecciona al menos un producto antes de enviar.");
-        return;
-    }
-
-    const total = document.getElementById("totalAmount").textContent;
-    message += `Total estimado: $${total}\n`;
-    message += `Método de pago: ${paymentMethod}\n`;
-    message += `Ubicación de entrega: ${location}`;
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/50375704428?text=${encodedMessage}`, '_blank');
-}
-</script>
-
-
-    
+  </script>
 </body>
 </html>
