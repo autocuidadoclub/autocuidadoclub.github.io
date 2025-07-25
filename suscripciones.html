@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -114,13 +113,14 @@
   }
 
   const stripeLinks = {
+      prueba: "https://u.wompi.sv/539830hfH",
     basic3m: "https://u.wompi.sv/379910xeV",
     basic6m: "https://u.wompi.sv/380639rcA",
     basic12m: "https://u.wompi.sv/3806769qs",
     plus3m: "https://u.wompi.sv/380690Gbx",
     plus6m: "https://u.wompi.sv/380695_Np",
     plus12m: "https://u.wompi.sv/380702xQa",
-    basic3mfull: "https://u.wompi.sv/370215SjH",
+    basic3mfull: "https://u.wompi.sv/478091RVm",
     basic6mfull: "https://u.wompi.sv/387432nHU",
     basic12mfull: "https://u.wompi.sv/387433i2m",
     plus3mfull: "https://u.wompi.sv/387439i_2",
@@ -194,13 +194,14 @@ customerAwareTimestamp: null,
       document.getElementById("successOverlay").style.display = "flex";
       // Get checkout link from Firestore or predefined
 const stripeLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
    basic3m: "https://u.wompi.sv/379910xeV",
     basic6m: "https://u.wompi.sv/380639rcA",
     basic12m: "https://u.wompi.sv/3806769qs",
     plus3m: "https://u.wompi.sv/380690Gbx",
     plus6m: "https://u.wompi.sv/380695_Np",
     plus12m: "https://u.wompi.sv/380702xQa",
-    basic3mfull: "https://u.wompi.sv/370215SjH",
+    basic3mfull: "https://u.wompi.sv/478091RVm",
     basic6mfull: "https://u.wompi.sv/387432nHU",
     basic12mfull: "https://u.wompi.sv/387433i2m",
     plus3mfull: "https://u.wompi.sv/387439i_2",
@@ -830,6 +831,23 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
 
 </div>
 
+
+<section style="border: 2px solid #FF6B00; border-radius: 16px; padding: 24px; margin: 40px auto; max-width: 700px; background: #fff8f2; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;">
+  <h2 style="font-size: 22px; color: #FF6B00; font-weight: bold; margin-bottom: 12px;">🚗 Primera Inspección Profesional</h2>
+  <p style="font-size: 16px; color: #333; margin-bottom: 10px;">
+    ¿Querés conocer nuestro servicio sin compromisos?
+  </p>
+  <p style="font-size: 16px; margin-bottom: 20px;">
+    <strong>Registrate gratis</strong> y desde tu cuenta podés agendar tu <strong>primera inspección por $35</strong>. Incluye diagnóstico completo, sello de fidelidad y asesoría personalizada.
+  </p>
+          <button class="plan-button" data-plan="prueba" style="margin-top: 16px; background-color: #003366; color: #fff; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;">
+            ¡Quiero probar el sistema!
+        </button>
+</section>
+
+
+        
+        
 <h2 style="margin-top: 30px; margin-bottom: 30px;">Planes de Suscripciones Plus (cobertura: 3 vehículos)</h2>
 <div class="subscription-row">
 
@@ -1639,6 +1657,7 @@ window.addEventListener('load', function() {
     if (!window.selectedPlanType) return;
 
     const planInfo = {
+      prueba:        { label: "Prueba sistema",      price: 34.99, months: 1,  type: "Único" },  
       basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3,  type: "Mensual" },
       plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3,  type: "Mensual" },
       basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6,  type: "Mensual" },
@@ -1999,6 +2018,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
 <script>
 function updatePlanSummary(planType) {
   const planData = {
+    prueba:        { label: "Prueba sistema",      price: 34.99, months: 1,  type: "Único" },    
     basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
     plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
     basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
