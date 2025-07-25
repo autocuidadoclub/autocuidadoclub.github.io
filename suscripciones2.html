@@ -114,6 +114,7 @@
   }
 
   const stripeLinks = {
+      prueba: "https://u.wompi.sv/539830hfH",
     basic3m: "https://u.wompi.sv/379910xeV",
     basic6m: "https://u.wompi.sv/380639rcA",
     basic12m: "https://u.wompi.sv/3806769qs",
@@ -194,6 +195,7 @@ customerAwareTimestamp: null,
       document.getElementById("successOverlay").style.display = "flex";
       // Get checkout link from Firestore or predefined
 const stripeLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
    basic3m: "https://u.wompi.sv/379910xeV",
     basic6m: "https://u.wompi.sv/380639rcA",
     basic12m: "https://u.wompi.sv/3806769qs",
@@ -839,13 +841,9 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
   <p style="font-size: 16px; margin-bottom: 20px;">
     <strong>Registrate gratis</strong> y desde tu cuenta podés agendar tu <strong>primera inspección por $35</strong>. Incluye diagnóstico completo, sello de fidelidad y asesoría personalizada.
   </p>
-          <button class="plan-button" data-plan="basic3m" style="margin-top: 16px; background-color: #003366; color: #fff; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;">
-            ¡Quiero este plan!
+          <button class="plan-button" data-plan="prueba" style="margin-top: 16px; background-color: #003366; color: #fff; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;">
+            ¡Quiero probar el sistema!
         </button>
-
-    <a href="/registro.html" style="display: inline-block; background-color: #FF6B00; color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.3s ease;">
-    Registrarme gratis
-  </a>
 </section>
 
 
@@ -1660,6 +1658,7 @@ window.addEventListener('load', function() {
     if (!window.selectedPlanType) return;
 
     const planInfo = {
+      prueba:        { label: "Prueba sistema",      price: 34.99, months: 1,  type: "Único" },  
       basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3,  type: "Mensual" },
       plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3,  type: "Mensual" },
       basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6,  type: "Mensual" },
@@ -2020,6 +2019,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
 <script>
 function updatePlanSummary(planType) {
   const planData = {
+    prueba:        { label: "Prueba sistema",      price: 34.99, months: 1,  type: "Único" },    
     basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
     plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
     basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
