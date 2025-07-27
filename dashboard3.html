@@ -732,63 +732,77 @@ function updateUserInfo(userData) {
     document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+
+    const now = new Date();
+    const nextPayment = userData.nextPaymentDate?.toDate?.() || new Date(userData.nextPaymentDate?.seconds * 1000);
+    const hasMissedPayment = nextPayment < now;
+
     if (!userData.paymentDate || userData.paymentStatus === "Pending") {
-    document.getElementById("paymentDate").innerText = "Pendiente de pago";
-    document.getElementById("nextPaymentDate").innerText = "No asignado";
-} else {
-    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
-    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-}
-// Hide countdown if payment is completed
-const countdownContainer = document.querySelector(".countdown-container");
-if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-    if (countdownContainer) countdownContainer.style.display = "none";
-} else {
-    if (countdownContainer) countdownContainer.style.display = "block";
-}
+        document.getElementById("paymentDate").innerText = "Pendiente de pago";
+        document.getElementById("nextPaymentDate").innerText = "No asignado";
+    } else {
+        document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
+        document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+    }
+
+    if (hasMissedPayment && userData.paymentStatus === "Confirmado") {
+        document.getElementById("paymentDate").innerText = "Pago vencido";
+        document.getElementById("nextPaymentDate").innerText = "Pendiente";
+        document.getElementById("payment-warning").style.display = "block";
+        document.getElementById("complete-payment").style.display = "block";
+
+        const retryLink = getPaypalLink(userData.planType);
+        if (retryLink) {
+            document.getElementById("payment-link").href = retryLink;
+        }
+    }
+
+    const countdownContainer = document.querySelector(".countdown-container");
+    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+        if (countdownContainer) countdownContainer.style.display = "none";
+    } else {
+        if (countdownContainer) countdownContainer.style.display = "block";
+    }
 
     const subscriptionCard = document.getElementById("subscription-upgrade-card");
-if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-    subscriptionCard.classList.remove("subscription-blurred");
-} else {
-    subscriptionCard.classList.add("subscription-blurred");
-}
-const lockedPopup = document.getElementById("subscription-locked-popup");
-if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-    subscriptionCard.classList.remove("subscription-blurred");
-    if (lockedPopup) lockedPopup.style.display = "none";
-} else {
-    subscriptionCard.classList.add("subscription-blurred");
-    if (lockedPopup) lockedPopup.style.display = "block";
-}
-
-        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-   // After updating schedule info
-document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
-
-// Check if user already reprogrammed
-const rescheduleInfo = document.getElementById("reschedule-info");
-if (userData.lastReschedule) {
-    const lastRescheduleDate = userData.lastReschedule.toDate();
-    const currentDate = new Date();
-
-    if (
-        lastRescheduleDate.getMonth() === currentDate.getMonth() &&
-        lastRescheduleDate.getFullYear() === currentDate.getFullYear()
-    ) {
-        rescheduleInfo.style.display = "block";
-        rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
+    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+        subscriptionCard.classList.remove("subscription-blurred");
     } else {
-        rescheduleInfo.style.display = "none";
+        subscriptionCard.classList.add("subscription-blurred");
     }
-}
 
-    
+    const lockedPopup = document.getElementById("subscription-locked-popup");
+    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+        subscriptionCard.classList.remove("subscription-blurred");
+        if (lockedPopup) lockedPopup.style.display = "none";
+    } else {
+        subscriptionCard.classList.add("subscription-blurred");
+        if (lockedPopup) lockedPopup.style.display = "block";
+    }
+
+    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
+
+    const rescheduleInfo = document.getElementById("reschedule-info");
+    if (userData.lastReschedule) {
+        const lastRescheduleDate = userData.lastReschedule.toDate();
+        const currentDate = new Date();
+
+        if (
+            lastRescheduleDate.getMonth() === currentDate.getMonth() &&
+            lastRescheduleDate.getFullYear() === currentDate.getFullYear()
+        ) {
+            rescheduleInfo.style.display = "block";
+            rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
+        } else {
+            rescheduleInfo.style.display = "none";
+        }
+    }
+
     loadVehicles(userData.vehicles);
     handlePaymentStatus(userData);
     updateLoyaltyCard(userData);
 
-    // 🔥 Plan Descriptions
     const availablePlans = {
         "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
         "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
@@ -798,30 +812,27 @@ if (userData.lastReschedule) {
         "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
     };
 
-    // Actual plan
     const currentPlanType = userData.planType;
     const currentPlan = availablePlans[currentPlanType];
 
-    // Motivational Message Logic
-const motivationalDiv = document.getElementById("motivational-message");
-let motivationalText = "";
+    const motivationalDiv = document.getElementById("motivational-message");
+    let motivationalText = "";
 
-if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
-    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-} else if (currentPlanType === "basic12m") {
-    motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-} else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
-    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
-} else if (currentPlanType === "plus12m") {
-    motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
-}
+    if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
+        motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+    } else if (currentPlanType === "basic12m") {
+        motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+    } else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
+        motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
+    } else if (currentPlanType === "plus12m") {
+        motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
+    }
 
-if (motivationalText) {
-    motivationalDiv.innerHTML = motivationalText;
-    motivationalDiv.style.display = "block";
-}
-    
-    // Set description
+    if (motivationalText) {
+        motivationalDiv.innerHTML = motivationalText;
+        motivationalDiv.style.display = "block";
+    }
+
     const planMessageElement = document.getElementById("planMessage");
     if (currentPlan) {
         planMessageElement.innerText = currentPlan.name;
@@ -829,41 +840,35 @@ if (motivationalText) {
         planMessageElement.innerText = "Tipo de plan desconocido";
     }
 
-    // Populate the select options
     const newPlanSelect = document.getElementById("new-plan");
     newPlanSelect.innerHTML = ""; // Clean existing options
-const currentLevel = currentPlan ? currentPlan.level : 0;
-let optionsAdded = false;
+    const currentLevel = currentPlan ? currentPlan.level : 0;
+    let optionsAdded = false;
 
-for (const [key, plan] of Object.entries(availablePlans)) {
-    if (plan.level > currentLevel) {
-        const option = document.createElement("option");
-        option.value = key;
-        option.text = key.startsWith("plus") ? `${plan.name} — 🚗 Añade más vehículos y ahorra más` : plan.name;
-        newPlanSelect.appendChild(option);
-        optionsAdded = true;
+    for (const [key, plan] of Object.entries(availablePlans)) {
+        if (plan.level > currentLevel) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = key.startsWith("plus") ? `${plan.name} — 🚗 Añade más vehículos y ahorra más` : plan.name;
+            newPlanSelect.appendChild(option);
+            optionsAdded = true;
+        }
     }
-}
 
-if (!optionsAdded) {
-    const option = document.createElement("option");
-    option.text = "No hay planes superiores disponibles";
-    option.disabled = true;
-    option.selected = true;
-    newPlanSelect.appendChild(option);
-}
+    if (!optionsAdded) {
+        const option = document.createElement("option");
+        option.text = "No hay planes superiores disponibles";
+        option.disabled = true;
+        option.selected = true;
+        newPlanSelect.appendChild(option);
+    }
 
-       
     showFreeRescheduleOffer(userData);
 
-    // Check for first-time payment offer
-const now = new Date();
-const registrationDate = userData.registrationDate?.toDate?.() || null;
-
-   function checkFirstTimePaymentOffer(userData) {
-  const now = new Date();
-  const regDate = userData.registrationDate?.toDate?.() || new Date(userData.registrationDate.seconds * 1000);
-  const daysSinceRegister = Math.floor((now - regDate) / (1000 * 60 * 60 * 24));
+    function checkFirstTimePaymentOffer(userData) {
+        const now = new Date();
+        const regDate = userData.registrationDate?.toDate?.() || new Date(userData.registrationDate.seconds * 1000);
+        const daysSinceRegister = Math.floor((now - regDate) / (1000 * 60 * 60 * 24));
 
   const shouldShowOffer =
     userData.monthsPaid === 0 &&
