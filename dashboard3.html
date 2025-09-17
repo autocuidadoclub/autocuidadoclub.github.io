@@ -732,82 +732,63 @@ function updateUserInfo(userData) {
     document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-
-    const now = new Date();
-    const nextPayment = userData.nextPaymentDate?.toDate?.() || new Date(userData.nextPaymentDate?.seconds * 1000);
-    const hasMissedPayment = nextPayment < now;
-
     if (!userData.paymentDate || userData.paymentStatus === "Pending") {
-        document.getElementById("paymentDate").innerText = "Pendiente de pago";
-        document.getElementById("nextPaymentDate").innerText = "No asignado";
-    } else {
-        document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
-        document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-    }
-
-    if (hasMissedPayment && userData.paymentStatus === "Confirmado") {
-        document.getElementById("paymentDate").innerText = "Pago vencido";
-        document.getElementById("nextPaymentDate").innerText = "Pendiente";
-
-        const paymentWarning = document.getElementById("payment-warning");
-        const completePayment = document.getElementById("complete-payment");
-        const paymentLink = document.getElementById("payment-link");
-
-        if (paymentWarning) paymentWarning.style.display = "block";
-        if (completePayment) completePayment.style.display = "block";
-
-        const retryLink = getPaypalLink(userData.planType);
-        if (retryLink && paymentLink) {
-            paymentLink.href = retryLink;
-        }
-    }
-
-    const countdownContainer = document.querySelector(".countdown-container");
-    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-        if (countdownContainer) countdownContainer.style.display = "none";
-    } else {
-        if (countdownContainer) countdownContainer.style.display = "block";
-    }
+    document.getElementById("paymentDate").innerText = "Pendiente de pago";
+    document.getElementById("nextPaymentDate").innerText = "No asignado";
+} else {
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+}
+// Hide countdown if payment is completed
+const countdownContainer = document.querySelector(".countdown-container");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    if (countdownContainer) countdownContainer.style.display = "none";
+} else {
+    if (countdownContainer) countdownContainer.style.display = "block";
+}
 
     const subscriptionCard = document.getElementById("subscription-upgrade-card");
-    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-        subscriptionCard.classList.remove("subscription-blurred");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    subscriptionCard.classList.remove("subscription-blurred");
+} else {
+    subscriptionCard.classList.add("subscription-blurred");
+}
+const lockedPopup = document.getElementById("subscription-locked-popup");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    subscriptionCard.classList.remove("subscription-blurred");
+    if (lockedPopup) lockedPopup.style.display = "none";
+} else {
+    subscriptionCard.classList.add("subscription-blurred");
+    if (lockedPopup) lockedPopup.style.display = "block";
+}
+
+        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+   // After updating schedule info
+document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
+
+// Check if user already reprogrammed
+const rescheduleInfo = document.getElementById("reschedule-info");
+if (userData.lastReschedule) {
+    const lastRescheduleDate = userData.lastReschedule.toDate();
+    const currentDate = new Date();
+
+    if (
+        lastRescheduleDate.getMonth() === currentDate.getMonth() &&
+        lastRescheduleDate.getFullYear() === currentDate.getFullYear()
+    ) {
+        rescheduleInfo.style.display = "block";
+        rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
     } else {
-        subscriptionCard.classList.add("subscription-blurred");
+        rescheduleInfo.style.display = "none";
     }
+}
 
-    const lockedPopup = document.getElementById("subscription-locked-popup");
-    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-        subscriptionCard.classList.remove("subscription-blurred");
-        if (lockedPopup) lockedPopup.style.display = "none";
-    } else {
-        subscriptionCard.classList.add("subscription-blurred");
-        if (lockedPopup) lockedPopup.style.display = "block";
-    }
-
-    document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
-    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
-
-    const rescheduleInfo = document.getElementById("reschedule-info");
-    if (userData.lastReschedule) {
-        const lastRescheduleDate = userData.lastReschedule.toDate();
-        const currentDate = new Date();
-
-        if (
-            lastRescheduleDate.getMonth() === currentDate.getMonth() &&
-            lastRescheduleDate.getFullYear() === currentDate.getFullYear()
-        ) {
-            rescheduleInfo.style.display = "block";
-            rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
-        } else {
-            rescheduleInfo.style.display = "none";
-        }
-    }
-
+    
     loadVehicles(userData.vehicles);
     handlePaymentStatus(userData);
     updateLoyaltyCard(userData);
 
+    // 🔥 Plan Descriptions
     const availablePlans = {
         "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
         "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
@@ -817,27 +798,30 @@ function updateUserInfo(userData) {
         "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
     };
 
+    // Actual plan
     const currentPlanType = userData.planType;
     const currentPlan = availablePlans[currentPlanType];
 
-    const motivationalDiv = document.getElementById("motivational-message");
-    let motivationalText = "";
+    // Motivational Message Logic
+const motivationalDiv = document.getElementById("motivational-message");
+let motivationalText = "";
 
-    if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
-        motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-    } else if (currentPlanType === "basic12m") {
-        motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
-    } else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
-        motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
-    } else if (currentPlanType === "plus12m") {
-        motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
-    }
+if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "basic12m") {
+    motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
+} else if (currentPlanType === "plus12m") {
+    motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
+}
 
-    if (motivationalText) {
-        motivationalDiv.innerHTML = motivationalText;
-        motivationalDiv.style.display = "block";
-    }
-
+if (motivationalText) {
+    motivationalDiv.innerHTML = motivationalText;
+    motivationalDiv.style.display = "block";
+}
+    
+    // Set description
     const planMessageElement = document.getElementById("planMessage");
     if (currentPlan) {
         planMessageElement.innerText = currentPlan.name;
@@ -845,31 +829,32 @@ function updateUserInfo(userData) {
         planMessageElement.innerText = "Tipo de plan desconocido";
     }
 
+    // Populate the select options
     const newPlanSelect = document.getElementById("new-plan");
     newPlanSelect.innerHTML = ""; // Clean existing options
-    const currentLevel = currentPlan ? currentPlan.level : 0;
-    let optionsAdded = false;
+const currentLevel = currentPlan ? currentPlan.level : 0;
+let optionsAdded = false;
 
-    for (const [key, plan] of Object.entries(availablePlans)) {
-        if (plan.level > currentLevel) {
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = key.startsWith("plus") ? `${plan.name} — 🚗 Añade más vehículos y ahorra más` : plan.name;
-            newPlanSelect.appendChild(option);
-            optionsAdded = true;
-        }
-    }
-
-    if (!optionsAdded) {
+for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.level > currentLevel) {
         const option = document.createElement("option");
-        option.text = "No hay planes superiores disponibles";
-        option.disabled = true;
-        option.selected = true;
+        option.value = key;
+        option.text = key.startsWith("plus") ? `${plan.name} — 🚗 Añade más vehículos y ahorra más` : plan.name;
         newPlanSelect.appendChild(option);
+        optionsAdded = true;
     }
-
-    showFreeRescheduleOffer(userData);
 }
+
+if (!optionsAdded) {
+    const option = document.createElement("option");
+    option.text = "No hay planes superiores disponibles";
+    option.disabled = true;
+    option.selected = true;
+    newPlanSelect.appendChild(option);
+}
+
+       
+    showFreeRescheduleOffer(userData);
 
     // Check for first-time payment offer
 const now = new Date();
@@ -952,19 +937,12 @@ function handlePaymentStatus(userData) {
 // PayPal Links
 function getPaypalLink(planType) {
     const payPalLinks = {
-    prueba: "https://u.wompi.sv/539830hfH",
-    basic3m: "https://u.wompi.sv/379910xeV",
-    basic6m: "https://u.wompi.sv/380639rcA",
-    basic12m: "https://u.wompi.sv/3806769qs",
-    plus3m: "https://u.wompi.sv/380690Gbx",
-    plus6m: "https://u.wompi.sv/380695_Np",
-    plus12m: "https://u.wompi.sv/380702xQa",
-    basic3mfull: "https://u.wompi.sv/478091RVm",
-    basic6mfull: "https://u.wompi.sv/387432nHU",
-    basic12mfull: "https://u.wompi.sv/387433i2m",
-    plus3mfull: "https://u.wompi.sv/387439i_2",
-    plus6mfull: "https://u.wompi.sv/387445Beb",
-    plus12mfull: "https://u.wompi.sv/387447ZDj"
+        "basic3m": "https://u.wompi.sv/379910xeV",
+        "basic6m": "https://u.wompi.sv/380639rcA",
+        "basic12m": "https://u.wompi.sv/3806769qs",
+        "plus3m": "https://u.wompi.sv/380690Gbx",
+        "plus6m": "https://u.wompi.sv/380695_Np",
+        "plus12m": "https://u.wompi.sv/380702xQa"
     };
     return payPalLinks[planType] || null;
 }
@@ -2412,29 +2390,12 @@ html, body {
 
         
         <!-- Payment Status Card -->
-<div class="card">
-    <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-    <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-    <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-    <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-    
-    <!-- 🧾 Warning if not paid -->
-    <div id="payment-warning" style="display:none; margin-top: 10px; color: #b30000;">
-        ⚠️ Tu suscripción aún no ha sido activada. Completa tu pago para recibir tu primera inspección.
-    </div>
-
-    
-    <!-- 💳 Button to trigger payment -->
-    <div id="complete-payment" style="display:none; margin-top: 15px;">
-        <a id="payment-link" href="#" target="_blank" class="pay-now-button" style="background-color: #ff6600; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
-            Pagar Ahora 💳
-        </a>
-    </div>
-
-    <div id="payment-warning" style="display:none;">⚠️ Tu pago está vencido</div>
-<div id="complete-payment" style="display:none;">
-  <a id="payment-link" href="#" target="_blank" class="pay-now-button">Pagar Ahora 💳</a>
-</div>
+        <div class="card">
+            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+            <p><strong>Plan Elegido</strong> <span id="PlanType">Cargando...</span></p>
 
             <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
   Cargando mensaje especial...
@@ -2454,10 +2415,10 @@ html, body {
   <p>Completa tu pago, <strong>antes que esta fase termine</strong></p>
   <div id="countdown"></div>
   </div>
-       
-</div>
 
-     
+        </div>
+
+       
         <div class="card" id="subscription-upgrade-card">
     <h3>¿Te gustaría Mejorar de Suscripción?</h3>
 
@@ -2477,9 +2438,9 @@ html, body {
 
     <!-- ✅ Wrap the content that we want to blur -->
 <div class="subscription-blur-target">
-    <p><strong>Plan Elegido:</strong> 
-    <span id="planType">Cargando...</span></p>
-    
+    <p><strong>Tipo de Plan Actual:</strong></p>
+    <p><span id="planType">Cargando...</span></p>
+
     <p><strong>Descripción:</strong></p>
     <p><span id="planMessage">Cargando...</span></p>
 
