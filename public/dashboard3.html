@@ -1845,6 +1845,7 @@ function getPlanLabel(planType) {
 }
 
 /* --- Wompi checkout links (same mapping you already have in registration) --- */
+// Map planType -> Wompi link
 const wompiLinks = {
   prueba: "https://u.wompi.sv/539830hfH",
   basic3m: "https://u.wompi.sv/379910xeV",
@@ -1861,95 +1862,54 @@ const wompiLinks = {
   plus12mfull: "https://u.wompi.sv/387447ZDj"
 };
 
-/* --- Render Estado de Pago for the given userData (call this after fetching user doc) --- */
-function renderPaymentEstado(userData, userId) {
-  const memberSinceEl = document.getElementById('member-since');
-  const lastPaymentEl = document.getElementById('last-payment');
-  const nextPaymentEl = document.getElementById('next-payment');
-  const chosenPlanEl = document.getElementById('chosen-plan');
-  const paymentCtaEl = document.getElementById('payment-cta');
+// Render Estado de Pago based on user data
+function renderEstadoPago(userData) {
+  // Elements
+  const memberSinceEl = document.getElementById("memberSince");
+  const paymentDateEl = document.getElementById("paymentDate");
+  const nextPaymentDateEl = document.getElementById("nextPaymentDate");
+  const planTypeEl = document.getElementById("PlanType");
+  const founderMsgEl = document.getElementById("founderPhaseMessage");
+  const warningEl = document.getElementById("payment-warning");
+  const completeEl = document.getElementById("complete-payment");
+  const paymentLinkEl = document.getElementById("payment-link");
 
-  // Safe guards
-  if (!memberSinceEl || !lastPaymentEl || !nextPaymentEl || !chosenPlanEl || !paymentCtaEl) return;
-
-  // Dates: convert Firestore Timestamp to JS Date (if present)
-  function prettyDate(ts) {
+  // Dates helper
+  const prettyDate = ts => {
+    if (!ts) return "No asignado";
     try {
-      if (!ts) return null;
-      const d = (typeof ts.toDate === 'function') ? ts.toDate() : new Date(ts);
-      return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-    } catch (e) { return null; }
-  }
+      const d = (typeof ts.toDate === "function") ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+    } catch { return "—"; }
+  };
 
-  memberSinceEl.textContent = prettyDate(userData.registrationDate) || '—';
-  lastPaymentEl.textContent = (userData.paymentStatus && userData.paymentStatus.toLowerCase() === 'completed' && prettyDate(userData.paymentDate)) ? prettyDate(userData.paymentDate) : 'Pendiente de pago';
-  nextPaymentEl.textContent = prettyDate(userData.nextPaymentDate) || 'No asignado';
-  chosenPlanEl.textContent = getPlanLabel(userData.planType);
+  // Fill data
+  memberSinceEl.textContent = prettyDate(userData.registrationDate) || "—";
+  paymentDateEl.textContent = (userData.paymentStatus?.toLowerCase() === "completed")
+    ? prettyDate(userData.paymentDate)
+    : "Pendiente de pago";
+  nextPaymentDateEl.textContent = prettyDate(userData.nextPaymentDate) || "No asignado";
+  planTypeEl.textContent = userData.planType || "No asignado";
 
-  // Build CTA
-  paymentCtaEl.innerHTML = ''; // reset
+  // Founder phase message
+  founderMsgEl.textContent = "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
 
-  // Prefer the stored checkoutLink on the user doc, fallback to mapping
-  const checkout = (userData.checkoutLink && userData.checkoutLink.length) ? userData.checkoutLink : (wompiLinks[userData.planType] || wompiLinks.prueba);
+  // Payment logic
+  const wompiLink = wompiLinks[userData.planType] || null;
 
-  if (!checkout) {
-    paymentCtaEl.innerHTML = `<div style="color:#c0392b;">⚠️ No hay enlace de pago asociado. Contacte soporte.</div>`;
-    return;
-  }
-
-  if (userData.paymentStatus === 'Pending' || userData.paymentStatus === 'pending') {
-    paymentCtaEl.innerHTML = `
-      <div style="border:1px solid #ffd9c2; padding:12px; border-radius:8px; background:#fff7f0;">
-        <p style="margin:0 0 8px 0;"><strong style="color:#ff6600;">⚠️ Tu pago está pendiente.</strong> Completa tu pago para activar tu plan.</p>
-        <a id="pay-now-btn" href="${checkout}" target="_blank" rel="noopener" style="display:inline-block; padding:10px 16px; background:#003366; color:#fff; border-radius:8px; text-decoration:none; margin-right:10px;">💳 Realizar pago ahora</a>
-        <button id="i-paid-btn" style="padding:10px 12px; border-radius:8px; border:1px solid #003366; background:#fff; color:#003366; cursor:pointer;">He pagado (enviar comprobante)</button>
-        <p style="font-size:13px; color:#555; margin-top:8px;">Si ya pagaste, pulsa <em>He pagado</em> y nuestro equipo verificará tu comprobante.</p>
-      </div>
-    `;
-
-    // "He pagado" handler: mark user doc for verification and notify staff
-    document.getElementById('i-paid-btn').addEventListener('click', function () {
-      if (!confirm('¿Confirmas que ya realizaste el pago? Se enviará una notificación al equipo para verificar.')) return;
-      const userRef = firebase.firestore().collection('users').doc(userId);
-      userRef.update({
-        customerAwareOfPaymentVerification: true,
-        customerAwareTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert('Gracias — tu comprobante será verificado por el equipo. Si tienes un comprobante, envíalo por WhatsApp o responde al correo que recibirás.');
-        // optional: ping admin via FormSubmit or a server endpoint
-        fetch('https://formsubmit.co/ajax/info@autocuidadoclub.com', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            subject: 'Verificación de pago - usuario ' + (userData.email || userId),
-            message: `El usuario ${userData.name || userId} indica que ya pagó. Plan: ${userData.planType}. Revisar comprobante.`
-          })
-        }).catch(err => console.warn('No se pudo notificar por correo:', err));
-      }).catch(err => {
-        console.error('Error al actualizar usuario:', err);
-        alert('Error al marcar como pagado. Intenta nuevamente o contacta soporte.');
-      });
-    });
-
-  } else if (userData.paymentStatus === 'Completed' || userData.paymentStatus === 'completed') {
-    paymentCtaEl.innerHTML = `<div style="padding:10px; border-radius:8px; background:#e9f7ec; color:#116530;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+  if (userData.paymentStatus?.toLowerCase() === "pending" && wompiLink) {
+    warningEl.style.display = "block";
+    completeEl.style.display = "block";
+    paymentLinkEl.href = wompiLink;
+  } else if (userData.paymentStatus?.toLowerCase() === "completed") {
+    warningEl.style.display = "none";
+    completeEl.innerHTML = `<div style="color:green; font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
   } else {
-    paymentCtaEl.innerHTML = `<div style="padding:10px; border-radius:8px; background:#f0f4ff; color:#133366;">Estado: ${userData.paymentStatus}</div>`;
+    warningEl.style.display = "none";
+    completeEl.style.display = "none";
   }
 }
 
-/* --- Example: fetch current userData and render (call this from your dashboard init) --- */
-firebase.auth().onAuthStateChanged(function(user) {
-  if (!user) return;
-  const uid = user.uid;
-  firebase.firestore().collection('users').doc(uid).get()
-    .then(doc => {
-      if (!doc.exists) return;
-      const userData = doc.data();
-      renderPaymentEstado(userData, uid);
-    })
-    .catch(err => console.error('Error leyendo user doc:', err));
-});
 </script>
 
     
