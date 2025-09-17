@@ -192,7 +192,15 @@ customerAwareTimestamp: null,
     })
     .then(userId => {
       loader.style.display = "none";
-      document.getElementById("successOverlay").style.display = "flex";
+document.getElementById("successOverlay").style.display = "flex";
+
+// 🆕 After redirect or overlay close, restore scroll
+setTimeout(() => {
+  document.getElementById("successOverlay").style.display = "none";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.location.href = "login.html"; // or checkout
+}, 2500);
+
       // Get checkout link from Firestore or predefined
 const stripeLinks = {
     prueba: "https://u.wompi.sv/539830hfH",
@@ -1354,28 +1362,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const planButtons = document.querySelectorAll(".plan-button");
 
-    // ✅ Attach event listeners to all plan buttons
-   planButtons.forEach(button => {
-  button.addEventListener("click", function () {
-    selectedPlanType = this.getAttribute("data-plan");
-    updateVehicleFields(selectedPlanType);
-
-    updatePlanSummary(selectedPlanType); // ✅ This triggers the summary update
-
-    registrationContainer.style.display = "block";
-
-    setTimeout(() => {
-      registrationContainer.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }, isMobileDevice() ? 400 : 100);
-
-    console.log(`✅ Plan seleccionado: ${selectedPlanType}`);
-  });
-});
-
-
 
     // ✅ Modify registerUser function to use selectedPlanType
     window.registerUser = function(event) {
@@ -2019,7 +2005,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
 <script>
 function updatePlanSummary(planType) {
   const planData = {
-    prueba:        { label: "Prueba sistema",      price: 34.99, months: 1,  type: "Único" },    
+    prueba:        { label: "Prueba sistema",      price: 35.00, months: 1,  type: "Único" },    
     basic3m:       { label: "Básico 3 meses",      price: 34.99, months: 3, type: "Mensual" },
     plus3m:        { label: "Plus 3 meses",        price: 68.99, months: 3, type: "Mensual" },
     basic6m:       { label: "Básico 6 meses",      price: 32.50, months: 6, type: "Mensual" },
@@ -2038,6 +2024,8 @@ function updatePlanSummary(planType) {
   if (!plan) return;
 
   const isContado = plan.type === "Contado";
+  const isPrueba = planType === "prueba";
+
   const monthly = isContado ? (plan.price / plan.months).toFixed(2) : plan.price.toFixed(2);
   const total = isContado ? plan.price.toFixed(2) : (plan.price * plan.months).toFixed(2);
 
@@ -2052,15 +2040,23 @@ function updatePlanSummary(planType) {
   document.getElementById("summary-type").textContent = plan.type;
   document.getElementById("summary-start-month").textContent = startMonth;
 
-  if (isContado) {
-    document.getElementById("summary-monthly").parentElement.innerHTML = `<strong>Un pago total:</strong> $${total}`;
+  if (isPrueba) {
+    // Caso especial: Prueba sistema
+    document.getElementById("summary-monthly-label").style.display = "none";
+    document.getElementById("summary-monthly").textContent = "";
+    document.getElementById("summary-total").textContent = "$35.00";
+  } else if (isContado) {
+    document.getElementById("summary-monthly-label").style.display = "none";
+    document.getElementById("summary-monthly").textContent = "";
+    document.getElementById("summary-total").textContent = `$${total}`;
   } else {
+    document.getElementById("summary-monthly-label").style.display = "inline";
     document.getElementById("summary-monthly").textContent = `$${monthly}`;
+    document.getElementById("summary-total").textContent = `$${total}`;
   }
-
-  document.getElementById("summary-total").textContent = `$${total}`;
 }
 </script>
+
 
 
     
