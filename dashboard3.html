@@ -1844,72 +1844,26 @@ function getPlanLabel(planType) {
   return labels[planType] || planType || "No asignado";
 }
 
-/* --- Wompi checkout links (same mapping you already have in registration) --- */
-// Map planType -> Wompi link
-// Map planType -> Wompi link
-const wompiLinks = {
-  prueba: "https://u.wompi.sv/539830hfH",
-  basic3m: "https://u.wompi.sv/379910xeV",
-  basic6m: "https://u.wompi.sv/380639rcA",
-  basic12m: "https://u.wompi.sv/3806769qs",
-  plus3m: "https://u.wompi.sv/380690Gbx",
-  plus6m: "https://u.wompi.sv/380695_Np",
-  plus12m: "https://u.wompi.sv/380702xQa",
-  basic3mfull: "https://u.wompi.sv/478091RVm",
-  basic6mfull: "https://u.wompi.sv/387432nHU",
-  basic12mfull: "https://u.wompi.sv/387433i2m",
-  plus3mfull: "https://u.wompi.sv/387439i_2",
-  plus6mfull: "https://u.wompi.sv/387445Beb",
-  plus12mfull: "https://u.wompi.sv/387447ZDj"
-};
-
-// Render Estado de Pago based on user data
-function renderEstadoPago(userData) {
-  // Elements
-  const memberSinceEl = document.getElementById("memberSince");
-  const paymentDateEl = document.getElementById("paymentDate");
-  const nextPaymentDateEl = document.getElementById("nextPaymentDate");
-  const planTypeEl = document.getElementById("PlanType");
-  const founderMsgEl = document.getElementById("founderPhaseMessage");
-  const warningEl = document.getElementById("payment-warning");
-  const completeEl = document.getElementById("complete-payment");
+        // After retrieving userData:
+function updatePaymentStatusSection(userData) {
+  const paymentWarningEl = document.getElementById("payment-warning");
+  const completePaymentContainerEl = document.getElementById("complete-payment");
   const paymentLinkEl = document.getElementById("payment-link");
-
-  // Dates helper
-  const prettyDate = ts => {
-    if (!ts) return "No asignado";
-    try {
-      const d = (typeof ts.toDate === "function") ? ts.toDate() : new Date(ts);
-      return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-    } catch { return "—"; }
-  };
-
-  // Fill data
-  memberSinceEl.textContent = prettyDate(userData.registrationDate) || "—";
-  paymentDateEl.textContent = (userData.paymentStatus?.toLowerCase() === "completed")
-    ? prettyDate(userData.paymentDate)
-    : "Pendiente de pago";
-  nextPaymentDateEl.textContent = prettyDate(userData.nextPaymentDate) || "No asignado";
-  planTypeEl.textContent = userData.planType || "No asignado";
-
-  // Founder phase message
-  founderMsgEl.textContent = "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
-
-  // Payment logic
-  const wompiLink = wompiLinks[userData.planType] || null;
-
-  if (userData.paymentStatus?.toLowerCase() === "pending" && wompiLink) {
-    warningEl.style.display = "block";
-    completeEl.style.display = "block";
-    paymentLinkEl.href = wompiLink;
-  } else if (userData.paymentStatus?.toLowerCase() === "completed") {
-    warningEl.style.display = "none";
-    completeEl.innerHTML = `<div style="color:green; font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-  } else {
-    warningEl.style.display = "none";
-    completeEl.style.display = "none";
-  }
+  ...
 }
+
+// Example usage:
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) return;
+  firebase.firestore().collection("users").doc(user.uid).get()
+    .then(doc => {
+      if (!doc.exists) return;
+      const userData = doc.data();
+      updatePaymentStatusSection(userData);
+    })
+    .catch(err => console.error("Error fetching user data:", err));
+});
+
 
 </script>
 
