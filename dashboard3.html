@@ -3272,11 +3272,10 @@ function updatePaymentStatusSection(userData) {
   const completePaymentEl = document.getElementById("complete-payment");
   const paymentLinkEl = document.getElementById("payment-link");
 
-  // Default hide
+  // Reset
   paymentWarningEl.style.display = "none";
   completePaymentEl.style.display = "none";
 
-  // Map plans to Wompi links
   const wompiLinks = {
     prueba: "https://u.wompi.sv/539830hfH",
     basic3m: "https://u.wompi.sv/379910xeV",
@@ -3294,22 +3293,21 @@ function updatePaymentStatusSection(userData) {
   };
 
   const status = (userData.paymentStatus || "").toLowerCase();
+  const plan = userData.planType;
 
   if (status === "pending") {
-    // Show warning + button
     paymentWarningEl.style.display = "block";
     completePaymentEl.style.display = "block";
-
-    const link = wompiLinks[userData.planType] || "#";
+    const link = wompiLinks[plan] || "#";
     paymentLinkEl.href = link;
     paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
   }
 
   if (status === "completed") {
-    // Replace button with confirmation
-    completePaymentEl.style.display = "block";
+    paymentWarningEl.style.display = "none";
     completePaymentEl.innerHTML =
       `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+    completePaymentEl.style.display = "block";
   }
 }
 
@@ -3323,6 +3321,7 @@ firebase.auth().onAuthStateChanged(user => {
       }
     });
 });
+
 
   </script>
 
