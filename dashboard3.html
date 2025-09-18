@@ -3276,6 +3276,7 @@ function updatePaymentStatusSection(userData) {
   paymentWarningEl.style.display = "none";
   completePaymentEl.style.display = "none";
 
+  // Prefer checkoutLink from Firestore
   const wompiLinks = {
     prueba: "https://u.wompi.sv/539830hfH",
     basic3m: "https://u.wompi.sv/379910xeV",
@@ -3295,32 +3296,24 @@ function updatePaymentStatusSection(userData) {
   const status = (userData.paymentStatus || "").toLowerCase();
   const plan = userData.planType;
 
+  // Use Firestore checkoutLink if exists, else fallback
+  const checkout = userData.checkoutLink || wompiLinks[plan] || "#";
+
   if (status === "pending") {
     paymentWarningEl.style.display = "block";
     completePaymentEl.style.display = "block";
-    const link = wompiLinks[plan] || "#";
-    paymentLinkEl.href = link;
+    paymentLinkEl.href = checkout;
     paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
   }
 
   if (status === "completed") {
     paymentWarningEl.style.display = "none";
+    completePaymentEl.style.display = "block";
     completePaymentEl.innerHTML =
       `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-    completePaymentEl.style.display = "block";
   }
 }
 
-// Run after login
-firebase.auth().onAuthStateChanged(user => {
-  if (!user) return;
-  firebase.firestore().collection("users").doc(user.uid).get()
-    .then(doc => {
-      if (doc.exists) {
-        updatePaymentStatusSection(doc.data());
-      }
-    });
-});
 
 
   </script>
