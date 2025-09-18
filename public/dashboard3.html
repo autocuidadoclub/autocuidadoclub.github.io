@@ -1845,14 +1845,64 @@ function getPlanLabel(planType) {
 }
 
         // After retrieving userData:
+// Payment UI logic
 function updatePaymentStatusSection(userData) {
   const paymentWarningEl = document.getElementById("payment-warning");
   const completePaymentContainerEl = document.getElementById("complete-payment");
   const paymentLinkEl = document.getElementById("payment-link");
-  ...
+
+  if (!paymentWarningEl || !completePaymentContainerEl || !paymentLinkEl) {
+    console.warn("Payment section elements missing");
+    return;
+  }
+
+  const wompiLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
+    basic3m: "https://u.wompi.sv/379910xeV",
+    basic6m: "https://u.wompi.sv/380639rcA",
+    basic12m: "https://u.wompi.sv/3806769qs",
+    plus3m: "https://u.wompi.sv/380690Gbx",
+    plus6m: "https://u.wompi.sv/380695_Np",
+    plus12m: "https://u.wompi.sv/380702xQa",
+    basic3mfull: "https://u.wompi.sv/478091RVm",
+    basic6mfull: "https://u.wompi.sv/387432nHU",
+    basic12mfull: "https://u.wompi.sv/387433i2m",
+    plus3mfull: "https://u.wompi.sv/387439i_2",
+    plus6mfull: "https://u.wompi.sv/387445Beb",
+    plus12mfull: "https://u.wompi.sv/387447ZDj"
+  };
+
+  // Hide by default
+  paymentWarningEl.style.display = "none";
+  completePaymentContainerEl.style.display = "none";
+
+  const status = (userData.paymentStatus || "").toLowerCase();
+  const plan = userData.planType;
+
+  if (status === "pending") {
+    paymentWarningEl.style.display = "block";
+    completePaymentContainerEl.style.display = "block";
+    const link = wompiLinks[plan] || null;
+    if (link) {
+      paymentLinkEl.href = link;
+      paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
+    } else {
+      paymentLinkEl.href = "#";
+      paymentLinkEl.textContent = "Enlace de pago no disponible";
+      paymentLinkEl.style.pointerEvents = "none";
+      paymentLinkEl.style.opacity = "0.5";
+    }
+  } else if (status === "completed") {
+    paymentWarningEl.style.display = "none";
+    completePaymentContainerEl.innerHTML = `<div style="color: green; font-weight: bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+    completePaymentContainerEl.style.display = "block";
+  } else {
+    paymentWarningEl.style.display = "none";
+    completePaymentContainerEl.style.display = "none";
+  }
 }
 
-// Example usage:
+// Fetch and run
 firebase.auth().onAuthStateChanged(user => {
   if (!user) return;
   firebase.firestore().collection("users").doc(user.uid).get()
@@ -1863,6 +1913,7 @@ firebase.auth().onAuthStateChanged(user => {
     })
     .catch(err => console.error("Error fetching user data:", err));
 });
+
 
 
 </script>
