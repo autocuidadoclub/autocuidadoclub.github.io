@@ -3267,6 +3267,62 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   window.addEventListener('resize', checkOrientation);
   window.addEventListener('orientationchange', checkOrientation);
 
+function updatePaymentStatusSection(userData) {
+  const paymentWarningEl = document.getElementById("payment-warning");
+  const completePaymentEl = document.getElementById("complete-payment");
+  const paymentLinkEl = document.getElementById("payment-link");
+
+  // Default hide
+  paymentWarningEl.style.display = "none";
+  completePaymentEl.style.display = "none";
+
+  // Map plans to Wompi links
+  const wompiLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
+    basic3m: "https://u.wompi.sv/379910xeV",
+    basic6m: "https://u.wompi.sv/380639rcA",
+    basic12m: "https://u.wompi.sv/3806769qs",
+    plus3m: "https://u.wompi.sv/380690Gbx",
+    plus6m: "https://u.wompi.sv/380695_Np",
+    plus12m: "https://u.wompi.sv/380702xQa",
+    basic3mfull: "https://u.wompi.sv/478091RVm",
+    basic6mfull: "https://u.wompi.sv/387432nHU",
+    basic12mfull: "https://u.wompi.sv/387433i2m",
+    plus3mfull: "https://u.wompi.sv/387439i_2",
+    plus6mfull: "https://u.wompi.sv/387445Beb",
+    plus12mfull: "https://u.wompi.sv/387447ZDj"
+  };
+
+  const status = (userData.paymentStatus || "").toLowerCase();
+
+  if (status === "pending") {
+    // Show warning + button
+    paymentWarningEl.style.display = "block";
+    completePaymentEl.style.display = "block";
+
+    const link = wompiLinks[userData.planType] || "#";
+    paymentLinkEl.href = link;
+    paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
+  }
+
+  if (status === "completed") {
+    // Replace button with confirmation
+    completePaymentEl.style.display = "block";
+    completePaymentEl.innerHTML =
+      `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+  }
+}
+
+// Run after login
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) return;
+  firebase.firestore().collection("users").doc(user.uid).get()
+    .then(doc => {
+      if (doc.exists) {
+        updatePaymentStatusSection(doc.data());
+      }
+    });
+});
 
   </script>
 
