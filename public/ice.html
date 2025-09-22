@@ -248,6 +248,7 @@
       const hielo50Qty = document.getElementById("hielo50Qty").value;
       const hielo100Qty = document.getElementById("hielo100Qty").value;
       const location = document.getElementById("location").value.trim();
+      const municipality = document.getElementById("municipality").value.trim();
       const name = document.getElementById("name").value.trim();
       const paymentMethod = document.getElementById("paymentMethod").value;
       const total = document.getElementById("totalAmount").textContent;
@@ -265,6 +266,7 @@
       message += `Método de pago: ${paymentMethod}\n`;
       message += `Nombre: ${name}\n`;
       message += `Ubicación de entrega: ${location}`;
+      message += `Ubicación de entrega: ${municipality}`;
 
       window.open(`https://wa.me/50375704428?text=${encodeURIComponent(message)}`, '_blank');
     }
