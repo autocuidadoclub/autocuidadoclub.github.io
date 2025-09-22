@@ -708,6 +708,7 @@ function updatePaymentStatusSection(userData) {
 }
 
 // Fetch and run
+// Part of your existing user-fetch logic
 firebase.auth().onAuthStateChanged(user => {
   if (!user) return;
   firebase.firestore().collection("users").doc(user.uid).get()
@@ -715,7 +716,7 @@ firebase.auth().onAuthStateChanged(user => {
       if (!doc.exists) return;
       const userData = doc.data();
 
-      // ✅ Fill Estado de Pago info
+      // Helper to convert Firestore timestamp to pretty date
       const prettyDate = ts => {
         if (!ts) return "No asignado";
         try {
@@ -726,62 +727,37 @@ firebase.auth().onAuthStateChanged(user => {
         }
       };
 
+      // Fill in the fields
       document.getElementById("memberSince").textContent = prettyDate(userData.registrationDate);
       document.getElementById("paymentDate").textContent =
-        (userData.paymentStatus && userData.paymentStatus.toLowerCase() === "completed")
+        (userData.paymentStatus || "").toLowerCase() === "completed"
           ? prettyDate(userData.paymentDate)
           : "Pendiente de pago";
       document.getElementById("nextPaymentDate").textContent = prettyDate(userData.nextPaymentDate);
       document.getElementById("PlanType").textContent = userData.planType || "No asignado";
 
-      // Founder phase message
-      document.getElementById("founderPhaseMessage").textContent =
-        "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
-
-      // ✅ Payment button logic
-      const completePaymentEl = document.getElementById("complete-payment");
-      const paymentLinkEl = document.getElementById("payment-link");
-      const warningEl = document.getElementById("payment-warning");
-
+      // Show warning and button if pending
       const status = (userData.paymentStatus || "").toLowerCase();
+      const warningEl = document.getElementById("payment-warning");
+      const completeEl = document.getElementById("complete-payment");
+      const linkEl = document.getElementById("payment-link");
 
       if (status === "pending") {
         warningEl.style.display = "block";
-        completePaymentEl.style.display = "block";
-
+        completeEl.style.display = "block";
         if (userData.checkoutLink) {
-          paymentLinkEl.href = userData.checkoutLink;
-        } else {
-          const wompiLinks = {
-            prueba: "https://u.wompi.sv/539830hfH",
-            basic3m: "https://u.wompi.sv/379910xeV",
-            basic6m: "https://u.wompi.sv/380639rcA",
-            basic12m: "https://u.wompi.sv/3806769qs",
-            plus3m: "https://u.wompi.sv/380690Gbx",
-            plus6m: "https://u.wompi.sv/380695_Np",
-            plus12m: "https://u.wompi.sv/380702xQa",
-            basic3mfull: "https://u.wompi.sv/478091RVm",
-            basic6mfull: "https://u.wompi.sv/387432nHU",
-            basic12mfull: "https://u.wompi.sv/387433i2m",
-            plus3mfull: "https://u.wompi.sv/387439i_2",
-            plus6mfull: "https://u.wompi.sv/387445Beb",
-            plus12mfull: "https://u.wompi.sv/387447ZDj"
-          };
-          if (userData.planType && wompiLinks[userData.planType]) {
-            paymentLinkEl.href = wompiLinks[userData.planType];
-          }
+          linkEl.href = userData.checkoutLink;
         }
       } else if (status === "completed") {
         warningEl.style.display = "none";
-        completePaymentEl.innerHTML = `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-        completePaymentEl.style.display = "block";
-      } else {
-        warningEl.style.display = "none";
-        completePaymentEl.style.display = "none";
+        completeEl.innerHTML = `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+        completeEl.style.display = "block";
       }
+
     })
-    .catch(err => console.error("Error fetching user data:", err));
+    .catch(error => console.error("Error fetching userData:", error));
 });
+
 
     </script>
 
@@ -1281,129 +1257,33 @@ html, body {
 <section class="dashboard-section">
 
           
-        <!-- Estado de Pago (replace the static block with this) -->
- 
- <!-- Payment Status Card -->
-        <div class="card">
-            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
-            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-            <p><strong>Plan Elegido</strong> <span id="planType">Cargando...</span></p>
+      <!-- BEGIN Estado de Pago section improved -->
+<div class="estado-pago-card">
+  <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+  <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+  <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+  <p><strong>Plan Elegido:</strong> <span id="PlanType">Cargando...</span></p>
 
-            <!-- Payment warning -->
-<div id="payment-warning" style="display:none; margin:10px 0; color:#c0392b; font-weight:bold;">
-  ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
-</div>
+  <div id="founderPhaseMessage">Cargando mensaje especial...</div>
 
-<!-- Payment button -->
-<div id="complete-payment" style="margin-top:10px; display:none;">
-  <a id="payment-link" href="#" target="_blank"
-     style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none; font-weight:bold;">
-     Completa tu pago ahora 🔗
-  </a>
-</div>
-
-
-            <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
-  Cargando mensaje especial...
-</div>
-            <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
-                ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
-            </div>
-                      
-            <!-- Countdown Timer Section -->
-<div class="countdown-container">
-  <h2>🚀 ¡Tiempo restante de la Fase Fundador!</h2>
-  <p>Completa tu pago, <strong>antes que esta fase termine</strong></p>
-  <div id="countdown"></div>
+  <!-- Payment warning -->
+  <div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
+    ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
   </div>
 
-        </div>
-
-       
-        
-<!-- SDK de Facebook (una sola vez, justo antes de </body>) -->
-<div id="fb-root"></div>
-<script async defer crossorigin="anonymous"
-  src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0">
-    
-  </script>
-
-
- <div style="display: flex; justify-content: center; margin: 30px 0;">
-  <div class="fb-page"
-       data-href="https://www.facebook.com/profile.php?id=61575027617474"
-       data-tabs="timeline"
-       data-width="1000"
-       data-height=""
-       data-small-header="true"
-       data-adapt-container-width="false"
-       data-hide-cover="false"
-       data-show-facepile="true"
-       style="max-width: 1000px; width: 100%;">
-    <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" class="fb-xfbml-parse-ignore">
-      <a href="https://www.facebook.com/profile.php?id=61575027617474">Autocuidado Club</a>
-    </blockquote>
+  <!-- Payment button container -->
+  <div id="complete-payment" style="margin-top:10px; display:none;">
+    <a id="payment-link" href="#" target="_blank"
+       style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
+       Completa tu pago ahora 🔗
+    </a>
   </div>
 </div>
-
-        
-        
-<div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
-  <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
-    <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
-    <div style="text-align: left; max-width: 300px;">
-      <p style="margin: 0; font-size: 18px; font-weight: bold;">
-        Esta app es más que tecnología.
-      </p>
-      <p style="margin: 5px 0 0; font-size: 16px;">
-        Es una forma distinta de cuidar lo que importa.
-      </p>
-    </div>
-  </div>
-  <p style="text-align: center; margin-top: 20px; font-size: 16px;">
-    <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
-  </p>
-</div>
-   
-<footer>
-    <p>&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
-    <ul>
-        <li><a href="nosotros.html">Nosotros</a></li>
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="suscripciones.html">Suscripciones</a></li>
-        <li><a href="login.html">Ingresa a tu cuenta</a></li>
-         <li><a href="tac.html">Términos y Condiciones</a></li>
-         <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
-    </ul>
-
-<div class="social-container" style="text-align: center; margin-top: 20px;">
-    <p><strong>Síguenos en nuestras redes sociales</strong></p>
-    <div class="social-buttons">
-        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-            <i class="fab fa-instagram fa-3x"></i>
-        </a>
-        <a href="https://www.facebook.com/autocareclub" target="_blank" class="social-button" style="color: #1877F2;">
-            <i class="fab fa-facebook-f fa-3x"></i>
-        </a>
-        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-            <i class="fab fa-twitter fa-3x"></i>
-        </a>
-    </div>
-</div>
-
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
-  integrity="sha512-C8dG4Oz9e2SNDY3hNXYMxdC8r44T+Qhpt8wBtaT0LgD0fXzRGv9gJ9mH6YmtFwUrLjPgD3STdJ9IjG2I+Bc2Fg=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer">
-</script>
+<!-- END Estado de Pago section improved -->
 
 
-
-</footer>
+</section>
+    </footer>
 
 
             <!-- 🔔 Notification Pop-up -->
