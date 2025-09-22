@@ -1,224 +1,143 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AutoCuidado Club - Tu servicio experto de mantenimiento personalizado para vehículos en El Salvador. Sin talleres. Sin filas. Sin excusas.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - AutoCuidado Club</title>
+  <link rel="stylesheet" href="styles.css" />
 
-    <title>Dashboard - AutoCuidado Club</title>
-    <link rel="stylesheet" href="/styles.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-     <!-- Load Environment Variables --> 
-    <script src="env.js"></script>
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-    <script>
-// ✅ Configuración Firebase desde env.js
-const firebaseConfig = {
-    apiKey: window._env_.FIREBASE_API_KEY,
-    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-    databaseURL: window._env_.FIREBASE_DATABASE_URL,
-    projectId: window._env_.FIREBASE_PROJECT_ID,
-    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-    appId: window._env_.FIREBASE_APP_ID,
-    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
-};
+  <!-- Env variables -->
+  <script src="env.js"></script>
+</head>
+<body>
+  <section class="dashboard-section">
+    <h2>Estado de Pago</h2>
 
-let auth, db;
+    <div class="estado-pago-card">
+      <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+      <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+      <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+      <p><strong>Plan Elegido:</strong> <span id="PlanType">Cargando...</span></p>
 
-// ✅ Inicialización Firebase
-document.addEventListener("DOMContentLoaded", () => {
+      <div id="founderPhaseMessage">Cargando mensaje especial...</div>
+
+      <!-- Warning -->
+      <div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
+        ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
+      </div>
+
+      <!-- Payment Button -->
+      <div id="complete-payment" style="margin-top:10px; display:none;">
+        <a id="payment-link" href="#" target="_blank"
+           style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
+           Completa tu pago ahora 🔗
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: window._env_.FIREBASE_API_KEY,
+      authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+      databaseURL: window._env_.FIREBASE_DATABASE_URL,
+      projectId: window._env_.FIREBASE_PROJECT_ID,
+      storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+      appId: window._env_.FIREBASE_APP_ID,
+      measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+    };
+
     if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("✅ Firebase inicializado correctamente.");
+      firebase.initializeApp(firebaseConfig);
+      console.log("✅ Firebase inicializado.");
     }
 
-    auth = firebase.auth();
-    db = firebase.firestore();
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    auth.onAuthStateChanged(user => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
-  db.collection("users").doc(user.uid).get()
-    .then(doc => {
-      if (!doc.exists) return;
-      const userData = doc.data();
-
-      // Update other info
-      updateUserInfo(userData);
-
-      // 🔹 Update payment button
-      updatePaymentButton(userData);
-    })
-    .catch(err => console.error("Error fetching user data:", err));
-});
-
-
-       // ✅ Check de autenticación
-  auth.onAuthStateChanged(user => {
-    if (user) {
-        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
-        loadUserProfile(user.uid);
-        loadReferrals(user.uid);
-        listenForReferralUpdates(user.uid, user.email);
-        listenToReferredUserPayments(user.uid);
-        listenToReferredUserRegistrations(user.uid); // ✅ Add this line
-        } else {
-        window.location.href = "login.html";
-    }
-      // ✅ Show payment button if pending, or thank-you message if completed
-// 🔹 Show payment button if pending, thank-you message if completed
-function updatePaymentButton(userData) {
-  const warningEl = document.getElementById("payment-warning");
-  const completeEl = document.getElementById("complete-payment");
-  const paymentLinkEl = document.getElementById("payment-link");
-
-  if (!warningEl || !completeEl || !paymentLinkEl) {
-    console.warn("⚠️ Payment UI elements missing in DOM");
-    return;
-  }
-
-  const status = (userData.paymentStatus || "").toLowerCase();
-
-  if (status === "pending") {
-    // Show warning + button
-    warningEl.style.display = "block";
-    completeEl.style.display = "block";
-
-    // Prefer Firestore checkoutLink, fallback to Wompi map
-    if (userData.checkoutLink) {
-      paymentLinkEl.href = userData.checkoutLink;
-    } else {
-      const wompiLinks = {
-        prueba: "https://u.wompi.sv/539830hfH",
-        basic3m: "https://u.wompi.sv/379910xeV",
-        basic6m: "https://u.wompi.sv/380639rcA",
-        basic12m: "https://u.wompi.sv/3806769qs",
-        plus3m: "https://u.wompi.sv/380690Gbx",
-        plus6m: "https://u.wompi.sv/380695_Np",
-        plus12m: "https://u.wompi.sv/380702xQa",
-        basic3mfull: "https://u.wompi.sv/478091RVm",
-        basic6mfull: "https://u.wompi.sv/387432nHU",
-        basic12mfull: "https://u.wompi.sv/387433i2m",
-        plus3mfull: "https://u.wompi.sv/387439i_2",
-        plus6mfull: "https://u.wompi.sv/387445Beb",
-        plus12mfull: "https://u.wompi.sv/387447ZDj"
-      };
-      if (userData.planType && wompiLinks[userData.planType]) {
-        paymentLinkEl.href = wompiLinks[userData.planType];
-      } else {
-        paymentLinkEl.href = "#";
-        paymentLinkEl.style.pointerEvents = "none";
-        paymentLinkEl.style.opacity = "0.5";
+    // Helper
+    function prettyDate(ts) {
+      if (!ts) return "No asignado";
+      try {
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+      } catch {
+        return "—";
       }
     }
-  } else if (status === "completed" || status === "confirmado") {
-    // Replace button with success message
-    warningEl.style.display = "none";
-    completeEl.innerHTML = `<div style="color:green; font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-    completeEl.style.display = "block";
-  } else {
-    // Hide everything
-    warningEl.style.display = "none";
-    completeEl.style.display = "none";
-  }
-}
-});
 
-});
+    // Default Wompi links
+    const wompiLinks = {
+      prueba: "https://u.wompi.sv/539830hfH",
+      basic3m: "https://u.wompi.sv/379910xeV",
+      basic6m: "https://u.wompi.sv/380639rcA",
+      basic12m: "https://u.wompi.sv/3806769qs",
+      plus3m: "https://u.wompi.sv/380690Gbx",
+      plus6m: "https://u.wompi.sv/380695_Np",
+      plus12m: "https://u.wompi.sv/380702xQa",
+      basic3mfull: "https://u.wompi.sv/478091RVm",
+      basic6mfull: "https://u.wompi.sv/387432nHU",
+      basic12mfull: "https://u.wompi.sv/387433i2m",
+      plus3mfull: "https://u.wompi.sv/387439i_2",
+      plus6mfull: "https://u.wompi.sv/387445Beb",
+      plus12mfull: "https://u.wompi.sv/387447ZDj"
+    };
 
-        
-/
-// Update User Info in Dashboard
-function updateUserInfo(userData) {
-    document.getElementById("name").innerText = userData.name || "N/A";
-    document.getElementById("phone").innerText = userData.phone || "N/A";
-    document.getElementById("planType").innerText = userData.planType || "N/A";
-    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
-    document.getElementById("user-department").innerText = userData.department || "Desconocido";
-    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-    if (!userData.paymentDate || userData.paymentStatus === "Pending") {
-    document.getElementById("paymentDate").innerText = "Pendiente de pago";
-    document.getElementById("nextPaymentDate").innerText = "No asignado";
-} else {
-    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
-    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
-}
-// Hide countdown if payment is completed
-const countdownContainer = document.querySelector(".countdown-container");
-if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-    if (countdownContainer) countdownContainer.style.display = "none";
-} else {
-    if (countdownContainer) countdownContainer.style.display = "block";
-}
+    // UI Update
+    function updateUI(userData) {
+      document.getElementById("memberSince").textContent = prettyDate(userData.registrationDate);
+      document.getElementById("paymentDate").textContent =
+        userData.paymentStatus?.toLowerCase() === "completed" && userData.paymentDate
+          ? prettyDate(userData.paymentDate)
+          : "Pendiente de pago";
+      document.getElementById("nextPaymentDate").textContent = prettyDate(userData.nextPaymentDate);
+      document.getElementById("PlanType").textContent = userData.planType || "No asignado";
+      document.getElementById("founderPhaseMessage").textContent =
+        "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
 
-    const subscriptionCard = document.getElementById("subscription-upgrade-card");
-if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-    subscriptionCard.classList.remove("subscription-blurred");
-} else {
-    subscriptionCard.classList.add("subscription-blurred");
-}
-const lockedPopup = document.getElementById("subscription-locked-popup");
-if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
-    subscriptionCard.classList.remove("subscription-blurred");
-    if (lockedPopup) lockedPopup.style.display = "none";
-} else {
-    subscriptionCard.classList.add("subscription-blurred");
-    if (lockedPopup) lockedPopup.style.display = "block";
-}
+      const warningEl = document.getElementById("payment-warning");
+      const completeEl = document.getElementById("complete-payment");
+      const linkEl = document.getElementById("payment-link");
 
-        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+      warningEl.style.display = "none";
+      completeEl.style.display = "none";
 
+      const status = (userData.paymentStatus || "").toLowerCase();
 
-    </script>
+      if (status === "pending") {
+        warningEl.style.display = "block";
+        completeEl.style.display = "block";
+        const link = userData.checkoutLink || wompiLinks[userData.planType] || "#";
+        linkEl.href = link;
+        linkEl.textContent = "Completa tu pago ahora 🔗";
+      } else if (status === "completed" || status === "confirmado") {
+        completeEl.innerHTML = `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+        completeEl.style.display = "block";
+      }
+    }
 
-    
- 
-    <!-- Dashboard Content -->
-  <!-- Dashboard Content -->
-<section class="dashboard-section">
+    // Auth listener
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
 
-          
-      <!-- BEGIN Estado de Pago section improved -->
-<div class="estado-pago-card">
-  <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-  <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-  <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-  <p><strong>Plan Elegido:</strong> <span id="planType">Cargando...</span></p>
-
-  <div id="founderPhaseMessage">Cargando mensaje especial...</div>
-
- <!-- Payment warning -->
-<div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
-  ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
-</div>
-
-<!-- Payment button container -->
-<div id="complete-payment" style="margin-top:10px; display:none;">
-  <a id="payment-link" href="#" target="_blank"
-     style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
-     Completa tu pago ahora 🔗
-  </a>
-</div>
-
-</div>
-<!-- END Estado de Pago section improved -->
-
-
-</section>
-    </footer>
-
-
-           </body>
+      db.collection("users").doc(user.uid).onSnapshot(doc => {
+        if (doc.exists) {
+          updateUI(doc.data());
+        }
+      });
+    });
+  });
+  </script>
+</body>
 </html>
