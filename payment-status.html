@@ -45,6 +45,26 @@ document.addEventListener("DOMContentLoaded", () => {
     auth = firebase.auth();
     db = firebase.firestore();
 
+    auth.onAuthStateChanged(user => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  db.collection("users").doc(user.uid).get()
+    .then(doc => {
+      if (!doc.exists) return;
+      const userData = doc.data();
+
+      // Update other info
+      updateUserInfo(userData);
+
+      // 🔹 Update payment button
+      updatePaymentButton(userData);
+    })
+    .catch(err => console.error("Error fetching user data:", err));
+});
+
+
        // ✅ Check de autenticación
   auth.onAuthStateChanged(user => {
     if (user) {
@@ -58,26 +78,28 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "login.html";
     }
       // ✅ Show payment button if pending, or thank-you message if completed
-function updatePaymentStatus(userData) {
+// 🔹 Show payment button if pending, thank-you message if completed
+function updatePaymentButton(userData) {
   const warningEl = document.getElementById("payment-warning");
   const completeEl = document.getElementById("complete-payment");
   const paymentLinkEl = document.getElementById("payment-link");
 
   if (!warningEl || !completeEl || !paymentLinkEl) {
-    console.warn("⚠️ Payment elements missing in DOM");
+    console.warn("⚠️ Payment UI elements missing in DOM");
     return;
   }
 
   const status = (userData.paymentStatus || "").toLowerCase();
 
   if (status === "pending") {
+    // Show warning + button
     warningEl.style.display = "block";
     completeEl.style.display = "block";
 
+    // Prefer Firestore checkoutLink, fallback to Wompi map
     if (userData.checkoutLink) {
       paymentLinkEl.href = userData.checkoutLink;
     } else {
-      // fallback links
       const wompiLinks = {
         prueba: "https://u.wompi.sv/539830hfH",
         basic3m: "https://u.wompi.sv/379910xeV",
@@ -95,18 +117,23 @@ function updatePaymentStatus(userData) {
       };
       if (userData.planType && wompiLinks[userData.planType]) {
         paymentLinkEl.href = wompiLinks[userData.planType];
+      } else {
+        paymentLinkEl.href = "#";
+        paymentLinkEl.style.pointerEvents = "none";
+        paymentLinkEl.style.opacity = "0.5";
       }
     }
   } else if (status === "completed" || status === "confirmado") {
+    // Replace button with success message
     warningEl.style.display = "none";
-    completeEl.innerHTML = `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+    completeEl.innerHTML = `<div style="color:green; font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
     completeEl.style.display = "block";
   } else {
+    // Hide everything
     warningEl.style.display = "none";
     completeEl.style.display = "none";
   }
 }
-
 });
 
 });
@@ -172,18 +199,19 @@ if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confir
 
   <div id="founderPhaseMessage">Cargando mensaje especial...</div>
 
-  <!-- Payment warning -->
-  <div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
-    ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
-  </div>
+ <!-- Payment warning -->
+<div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
+  ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
+</div>
 
-  <!-- Payment button container -->
-  <div id="complete-payment" style="margin-top:10px; display:none;">
-    <a id="payment-link" href="#" target="_blank"
-       style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
-       Completa tu pago ahora 🔗
-    </a>
-  </div>
+<!-- Payment button container -->
+<div id="complete-payment" style="margin-top:10px; display:none;">
+  <a id="payment-link" href="#" target="_blank"
+     style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
+     Completa tu pago ahora 🔗
+  </a>
+</div>
+
 </div>
 <!-- END Estado de Pago section improved -->
 
