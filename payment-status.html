@@ -43,16 +43,14 @@
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Firebase config
+    // ✅ Firebase config
     const firebaseConfig = {
       apiKey: window._env_.FIREBASE_API_KEY,
       authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
-      databaseURL: window._env_.FIREBASE_DATABASE_URL,
       projectId: window._env_.FIREBASE_PROJECT_ID,
       storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
       messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
-      appId: window._env_.FIREBASE_APP_ID,
-      measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+      appId: window._env_.FIREBASE_APP_ID
     };
 
     if (!firebase.apps.length) {
@@ -91,60 +89,69 @@
       plus12mfull: "https://u.wompi.sv/387447ZDj"
     };
 
-    // UI Update
-function updateUI(userData) {
-  const memberSinceEl = document.getElementById("memberSince");
-  const paymentDateEl = document.getElementById("paymentDate");
-  const nextPaymentEl = document.getElementById("nextPaymentDate");
-  const planTypeEl = document.getElementById("PlanType");
-  const founderPhaseEl = document.getElementById("founderPhaseMessage");
-  const warningEl = document.getElementById("payment-warning");
-  const completeEl = document.getElementById("complete-payment");
-  const linkEl = document.getElementById("payment-link");
+    // ✅ Update UI
+    function updateUI(userData) {
+      const memberSinceEl = document.getElementById("memberSince");
+      const paymentDateEl = document.getElementById("paymentDate");
+      const nextPaymentEl = document.getElementById("nextPaymentDate");
+      const planTypeEl = document.getElementById("PlanType");
+      const founderPhaseEl = document.getElementById("founderPhaseMessage");
+      const warningEl = document.getElementById("payment-warning");
+      const completeEl = document.getElementById("complete-payment");
+      const linkEl = document.getElementById("payment-link");
 
-  const status = (userData.paymentStatus || "").toLowerCase();
-  const today = new Date();
-  const nextPaymentDate = userData.nextPaymentDate?.toDate
-    ? userData.nextPaymentDate.toDate()
-    : userData.nextPaymentDate
-    ? new Date(userData.nextPaymentDate)
-    : null;
+      const status = (userData.paymentStatus || "").toLowerCase();
+      const today = new Date();
+      const nextPaymentDate = userData.nextPaymentDate?.toDate
+        ? userData.nextPaymentDate.toDate()
+        : userData.nextPaymentDate
+        ? new Date(userData.nextPaymentDate)
+        : null;
 
-  // Fill base info
-  memberSinceEl.textContent = prettyDate(userData.registrationDate);
-  paymentDateEl.textContent =
-    status === "completed" && userData.paymentDate
-      ? prettyDate(userData.paymentDate)
-      : "Pendiente de pago";
-  nextPaymentEl.textContent = prettyDate(userData.nextPaymentDate);
-  planTypeEl.textContent = userData.planType || "No asignado";
-  founderPhaseEl.textContent =
-    "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
+      // Fill base info
+      memberSinceEl.textContent = prettyDate(userData.registrationDate);
+      paymentDateEl.textContent =
+        status === "completed" && userData.paymentDate
+          ? prettyDate(userData.paymentDate)
+          : "Pendiente de pago";
+      nextPaymentEl.textContent = prettyDate(userData.nextPaymentDate);
+      planTypeEl.textContent = userData.planType || "No asignado";
+      founderPhaseEl.textContent =
+        "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
 
-  // Hide all by default
-  warningEl.style.display = "none";
-  completeEl.style.display = "none";
+      // Hide all by default
+      warningEl.style.display = "none";
+      completeEl.style.display = "none";
 
-  // --- Payment Logic ---
-  const isExpired = nextPaymentDate && nextPaymentDate < today;
+      // --- Payment Logic ---
+      const isExpired = nextPaymentDate && nextPaymentDate < today;
 
-  if (status === "pending" || isExpired) {
-    // Show pending message and button
-    warningEl.style.display = "block";
-    completeEl.style.display = "block";
-    const link = userData.checkoutLink || wompiLinks[userData.planType] || "#";
-    linkEl.href = link;
-    linkEl.textContent = "Completa tu pago ahora 🔗";
-  } else if (status === "completed" || status === "confirmado") {
-    // Only show green if not expired
-    if (!isExpired) {
-      completeEl.innerHTML =
-        `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-      completeEl.style.display = "block";
+      if (status === "pending" || isExpired) {
+        warningEl.style.display = "block";
+        completeEl.style.display = "block";
+        const link = userData.checkoutLink || wompiLinks[userData.planType] || "#";
+        linkEl.href = link;
+        linkEl.textContent = "Completa tu pago ahora 🔗";
+      } else if (status === "completed" || status === "confirmado") {
+        if (!isExpired) {
+          completeEl.innerHTML =
+            `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+          completeEl.style.display = "block";
+        }
+      }
     }
-  }
-}
 
+    // ✅ Auth listener
+    auth.onAuthStateChanged(user => {
+      if (!user) return;
+      db.collection("users").doc(user.uid).get()
+        .then(doc => {
+          if (doc.exists) {
+            updateUI(doc.data());
+          }
+        })
+        .catch(err => console.error("❌ Error obteniendo userData:", err));
+    });
   });
   </script>
 </body>
