@@ -92,51 +92,59 @@
     };
 
     // UI Update
-    function updateUI(userData) {
-      document.getElementById("memberSince").textContent = prettyDate(userData.registrationDate);
-      document.getElementById("paymentDate").textContent =
-        userData.paymentStatus?.toLowerCase() === "completed" && userData.paymentDate
-          ? prettyDate(userData.paymentDate)
-          : "Pendiente de pago";
-      document.getElementById("nextPaymentDate").textContent = prettyDate(userData.nextPaymentDate);
-      document.getElementById("PlanType").textContent = userData.planType || "No asignado";
-      document.getElementById("founderPhaseMessage").textContent =
-        "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
+function updateUI(userData) {
+  const memberSinceEl = document.getElementById("memberSince");
+  const paymentDateEl = document.getElementById("paymentDate");
+  const nextPaymentEl = document.getElementById("nextPaymentDate");
+  const planTypeEl = document.getElementById("PlanType");
+  const founderPhaseEl = document.getElementById("founderPhaseMessage");
+  const warningEl = document.getElementById("payment-warning");
+  const completeEl = document.getElementById("complete-payment");
+  const linkEl = document.getElementById("payment-link");
 
-      const warningEl = document.getElementById("payment-warning");
-      const completeEl = document.getElementById("complete-payment");
-      const linkEl = document.getElementById("payment-link");
+  const status = (userData.paymentStatus || "").toLowerCase();
+  const today = new Date();
+  const nextPaymentDate = userData.nextPaymentDate?.toDate
+    ? userData.nextPaymentDate.toDate()
+    : userData.nextPaymentDate
+    ? new Date(userData.nextPaymentDate)
+    : null;
 
-      warningEl.style.display = "none";
-      completeEl.style.display = "none";
+  // Fill base info
+  memberSinceEl.textContent = prettyDate(userData.registrationDate);
+  paymentDateEl.textContent =
+    status === "completed" && userData.paymentDate
+      ? prettyDate(userData.paymentDate)
+      : "Pendiente de pago";
+  nextPaymentEl.textContent = prettyDate(userData.nextPaymentDate);
+  planTypeEl.textContent = userData.planType || "No asignado";
+  founderPhaseEl.textContent =
+    "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
 
-      const status = (userData.paymentStatus || "").toLowerCase();
+  // Hide all by default
+  warningEl.style.display = "none";
+  completeEl.style.display = "none";
 
-      if (status === "pending") {
-        warningEl.style.display = "block";
-        completeEl.style.display = "block";
-        const link = userData.checkoutLink || wompiLinks[userData.planType] || "#";
-        linkEl.href = link;
-        linkEl.textContent = "Completa tu pago ahora 🔗";
-      } else if (status === "completed" || status === "confirmado") {
-        completeEl.innerHTML = `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-        completeEl.style.display = "block";
-      }
+  // --- Payment Logic ---
+  const isExpired = nextPaymentDate && nextPaymentDate < today;
+
+  if (status === "pending" || isExpired) {
+    // Show pending message and button
+    warningEl.style.display = "block";
+    completeEl.style.display = "block";
+    const link = userData.checkoutLink || wompiLinks[userData.planType] || "#";
+    linkEl.href = link;
+    linkEl.textContent = "Completa tu pago ahora 🔗";
+  } else if (status === "completed" || status === "confirmado") {
+    // Only show green if not expired
+    if (!isExpired) {
+      completeEl.innerHTML =
+        `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+      completeEl.style.display = "block";
     }
+  }
+}
 
-    // Auth listener
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      db.collection("users").doc(user.uid).onSnapshot(doc => {
-        if (doc.exists) {
-          updateUI(doc.data());
-        }
-      });
-    });
   });
   </script>
 </body>
