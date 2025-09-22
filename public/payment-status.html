@@ -57,6 +57,56 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
         window.location.href = "login.html";
     }
+      // ✅ Show payment button if pending, or thank-you message if completed
+function updatePaymentStatus(userData) {
+  const warningEl = document.getElementById("payment-warning");
+  const completeEl = document.getElementById("complete-payment");
+  const paymentLinkEl = document.getElementById("payment-link");
+
+  if (!warningEl || !completeEl || !paymentLinkEl) {
+    console.warn("⚠️ Payment elements missing in DOM");
+    return;
+  }
+
+  const status = (userData.paymentStatus || "").toLowerCase();
+
+  if (status === "pending") {
+    warningEl.style.display = "block";
+    completeEl.style.display = "block";
+
+    if (userData.checkoutLink) {
+      paymentLinkEl.href = userData.checkoutLink;
+    } else {
+      // fallback links
+      const wompiLinks = {
+        prueba: "https://u.wompi.sv/539830hfH",
+        basic3m: "https://u.wompi.sv/379910xeV",
+        basic6m: "https://u.wompi.sv/380639rcA",
+        basic12m: "https://u.wompi.sv/3806769qs",
+        plus3m: "https://u.wompi.sv/380690Gbx",
+        plus6m: "https://u.wompi.sv/380695_Np",
+        plus12m: "https://u.wompi.sv/380702xQa",
+        basic3mfull: "https://u.wompi.sv/478091RVm",
+        basic6mfull: "https://u.wompi.sv/387432nHU",
+        basic12mfull: "https://u.wompi.sv/387433i2m",
+        plus3mfull: "https://u.wompi.sv/387439i_2",
+        plus6mfull: "https://u.wompi.sv/387445Beb",
+        plus12mfull: "https://u.wompi.sv/387447ZDj"
+      };
+      if (userData.planType && wompiLinks[userData.planType]) {
+        paymentLinkEl.href = wompiLinks[userData.planType];
+      }
+    }
+  } else if (status === "completed" || status === "confirmado") {
+    warningEl.style.display = "none";
+    completeEl.innerHTML = `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+    completeEl.style.display = "block";
+  } else {
+    warningEl.style.display = "none";
+    completeEl.style.display = "none";
+  }
+}
+
 });
 
 });
