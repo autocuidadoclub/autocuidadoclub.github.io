@@ -1,0 +1,3376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AutoCuidado Club - Tu servicio experto de mantenimiento personalizado para vehículos en El Salvador. Sin talleres. Sin filas. Sin excusas.">
+
+    <title>Dashboard - AutoCuidado Club</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+     <!-- Load Environment Variables --> 
+    <script src="env.js"></script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <script>
+// ✅ Configuración Firebase desde env.js
+const firebaseConfig = {
+    apiKey: window._env_.FIREBASE_API_KEY,
+    authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+    databaseURL: window._env_.FIREBASE_DATABASE_URL,
+    projectId: window._env_.FIREBASE_PROJECT_ID,
+    storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+    appId: window._env_.FIREBASE_APP_ID,
+    measurementId: window._env_.FIREBASE_MEASUREMENT_ID
+};
+
+let auth, db;
+
+// ✅ Inicialización Firebase
+document.addEventListener("DOMContentLoaded", () => {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("✅ Firebase inicializado correctamente.");
+    }
+
+    auth = firebase.auth();
+    db = firebase.firestore();
+
+       // ✅ Check de autenticación
+  auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+        loadUserProfile(user.uid);
+        loadReferrals(user.uid);
+        listenForReferralUpdates(user.uid, user.email);
+        listenToReferredUserPayments(user.uid);
+        listenToReferredUserRegistrations(user.uid); // ✅ Add this line
+        } else {
+        window.location.href = "login.html";
+    }
+});
+
+});
+
+// ✅ Guardar Referido
+// ✅ Debounce helper function
+document.addEventListener("DOMContentLoaded", () => {
+    const referralForm = document.getElementById("referralForm");
+    const nameInput = document.getElementById("referralName");
+    const emailInput = document.getElementById("referralEmail");
+    const phoneInput = document.getElementById("referralPhone");
+    const submitButton = referralForm.querySelector("button[type='submit']");
+
+
+    let currentUserEmail = null;
+    let isOwnEmail = true;
+    let phoneValid = false;
+
+    // Disable autocomplete
+    [referralForm, nameInput, emailInput, phoneInput].forEach(input => input.setAttribute("autocomplete", "off"));
+
+    // Prevent copy/paste in email
+    emailInput.addEventListener("paste", (e) => e.preventDefault());
+    emailInput.addEventListener("copy", (e) => e.preventDefault());
+
+    // Feedback containers
+    const createFeedbackContainer = (inputElement) => {
+        const container = document.createElement("div");
+        container.style.display = "flex";
+        container.style.alignItems = "center";
+        container.style.marginTop = "5px";
+
+        const message = document.createElement("span");
+        message.style.fontWeight = "bold";
+
+        container.appendChild(message);
+        inputElement.parentNode.appendChild(container);
+
+        return { container, message };
+    };
+
+    const emailFeedback = createFeedbackContainer(emailInput);
+    const phoneFeedback = createFeedbackContainer(phoneInput);
+
+    const updateSubmitButtonState = () => {
+        submitButton.disabled = isOwnEmail || !phoneValid;
+    };
+
+    // ✅ Get current user email
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUserEmail = user.email;
+        }
+    });
+
+    // ✅ WhatsApp number format validation
+    const validatePhoneNumber = () => {
+        const phone = phoneInput.value.trim();
+        const regex = /^\+503\d{8}$/;
+
+        if (regex.test(phone)) {
+            phoneFeedback.message.style.color = "green";
+            phoneFeedback.message.textContent = "✅ Número válido";
+            phoneValid = true;
+        } else {
+            phoneFeedback.message.style.color = "red";
+            phoneFeedback.message.textContent = "❌ Formato incorrecto. Usa: +503XXXXXXXX";
+            phoneValid = false;
+        }
+
+        updateSubmitButtonState();
+    };
+
+    phoneInput.addEventListener("input", validatePhoneNumber);
+
+    // ✅ Simple own email check (no Firebase read!)
+    const checkOwnEmail = () => {
+        const email = emailInput.value.trim().toLowerCase();
+
+        if (email === "") {
+            emailFeedback.message.textContent = "";
+            isOwnEmail = true;
+        } else if (email === currentUserEmail) {
+            emailFeedback.message.style.color = "red";
+            emailFeedback.message.textContent = "❌ No puedes ingresar tu propio correo electrónico.";
+            isOwnEmail = true;
+        } else {
+            emailFeedback.message.style.color = "green";
+            emailFeedback.message.textContent = "";
+            isOwnEmail = false;
+        }
+
+        updateSubmitButtonState();
+    };
+
+    emailInput.addEventListener("input", checkOwnEmail);
+
+    // ✅ Form submit
+    referralForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const phone = phoneInput.value.trim();
+        const user = auth.currentUser;
+        // ✅ Validate against global users and referrals
+        const globalValidation = await validateReferralEmailGlobal(email);
+        if (!globalValidation.valid) {
+            showErrorPopup("Estimado cliente", globalValidation.message);
+            return;
+        }
+
+        if (!user) {
+            alert("Debes iniciar sesión para enviar referidos.");
+            return;
+        }
+
+        if (isOwnEmail || !phoneValid) {
+            alert("Por favor verifica que el correo y el número de WhatsApp sean válidos.");
+            return;
+        }
+
+        try {
+            const referralId = Date.now().toString();
+
+            await db.collection("users").doc(user.uid).collection("referrals").doc(referralId).set({
+                name,
+                email,
+                phone,
+                registered: false,
+                paid: false,
+                timestamp: firebase.firestore.Timestamp.now()
+            });
+
+            await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+                method: 'POST',
+                body: new URLSearchParams({
+                    name,
+                    email,
+                    phone,
+                    message: `Nuevo referido agregado por cliente actual. Nombre: ${name}, Email: ${email}, Teléfono: ${phone}`
+                })
+            });
+
+            showSuccessPopup("🎉 Referido enviado con éxito", "Ahora puedes seguir su progreso en tiempo real en tu dashboard.");
+
+            sendCustomerEmail(
+    "🎉 Nuevo referido agregado - AutoCuidado Club",
+    `
+       ¡Has agregado un nuevo referido!
+        Nombre: ${name}
+        Email: ${email}
+        WhatsApp:https://wa.me/${phone.replace('+', '')}
+        Ahora puedes seguir el progreso de este referido directamente desde tu panel.
+    `,
+    user.email
+);
+
+            
+            referralForm.reset();
+            emailFeedback.message.textContent = "";
+            phoneFeedback.message.textContent = "";
+            isOwnEmail = true;
+            phoneValid = false;
+            updateSubmitButtonState();
+
+        } catch (error) {
+            console.error("Error al enviar el referido:", error);
+            }
+    });
+});
+
+        
+// ✅ Función para mostrar popup de éxito
+function showSuccessPopup(title, message) {
+    const successMessage = document.createElement("div");
+    successMessage.innerHTML = `
+      <div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
+          background: #d4edda; color: #155724; padding: 20px; border-radius: 8px;
+          box-shadow: 0px 4px 12px rgba(0,0,0,0.15); z-index: 9999; text-align: center;">
+        <strong>${title}</strong>
+        <p>${message}</p>
+      </div>`;
+    document.body.appendChild(successMessage);
+    setTimeout(() => successMessage.remove(), 4000);
+}
+
+        // ✅ Función para mostrar popup de error
+function showErrorPopup(title, message) {
+    const errorMessage = document.createElement("div");
+    errorMessage.innerHTML = `
+      <div style="
+          position: fixed;
+          top: 20%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: #ffe6e6;
+          color: #b30000;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+          z-index: 9999;
+          text-align: center;
+        ">
+        <strong>${title}</strong>
+        <p>${message}</p>
+      </div>
+    `;
+    document.body.appendChild(errorMessage); // ✅ FIXED
+    setTimeout(() => errorMessage.remove(), 4000);
+}
+
+
+// ✅ Cargar Referidos del Usuario
+function loadReferrals(userId) {
+    const referralList = document.getElementById("referralList");
+    referralList.innerHTML = "<p>Cargando tus referidos...</p>";
+
+    db.collection("users").doc(userId).collection("referrals").orderBy("timestamp", "desc")
+        .onSnapshot(snapshot => {
+            if (snapshot.empty) {
+                referralList.innerHTML = "<p>No tienes referidos aún.</p>";
+                return;
+            }
+
+            let html = "";
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                html += `
+                    <div class="referral-item">
+                        <h4>${data.email || "Correo no disponible"}</h4>
+                        <div class="referral-step">${data.timestamp ? "✅" : "⏳"} <span>${data.timestamp ? '1. Información enviada' : '1. Información enviada: Esperando...'}</span></div>
+                        <div class="referral-step">${data.registered ? "✅" : "⏳"} <span>${data.registered ? '2. Cliente registrado' : '2. Cliente registrado: Esperando...'}</span></div>
+                        <div class="referral-step">${data.paid ? "✅" : "⏳"} <span>${data.paid ? '3. Cliente completo su suscripción: Pago recibido' : '3. Cliente completo su suscripción: Esperando...'}</span></div>
+                    </div>`;
+            });
+            referralList.innerHTML = html;
+        });
+}
+
+// ✅ Listener de Cambios en Referidos (Tiempo Real)
+function listenForReferralUpdates(userId, userEmail) {
+    const referralsRef = db.collection("users").doc(userId).collection("referrals");
+    const lastReferralStates = {};
+
+    referralsRef.onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+            const referral = change.doc.data();
+            const referralId = change.doc.id;
+
+            if (!lastReferralStates[referralId]) {
+                lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
+                return;
+            }
+
+            if (!lastReferralStates[referralId].registered && referral.registered) {
+                showDashboardNotification(`🎉 Tu referido ${referral.name} se registró en AutoCuidado Club.`);
+             
+                notifyReferralRegistered(userEmail, referral.email, referral.name, referral.phone);
+
+            }
+
+            if (!lastReferralStates[referralId].paid && referral.paid) {
+                showDashboardNotification(`💸 Tu referido ${referral.name} completó su primer pago. ¡Bono desbloqueado! 🎁`);
+
+                notifyReferralPaid(userEmail, referral.email, referral.name, referral.phone);
+
+
+            }
+
+            lastReferralStates[referralId] = { registered: referral.registered, paid: referral.paid };
+        });
+    });
+}
+
+async function validateReferralEmailGlobal(referralEmail) {
+    try {
+        const usersRef = db.collection('users');
+        const referralsRef = db.collectionGroup('referrals');
+
+        const currentUser = firebase.auth().currentUser;
+        let referrerName = "Cliente";
+        let referrerEmail = currentUser?.email || "Desconocido";
+
+        if (!currentUser) {
+            return { valid: false, message: "❌ Usuario no autenticado. Intenta nuevamente." };
+        }
+
+        // ✅ 🚨 First, check global referrals across all clients
+        const globalReferralSnapshot = await referralsRef.where('email', '==', referralEmail).get();
+        if (!globalReferralSnapshot.empty) {
+            console.log("🚫 Este correo ya está referenciado por otro cliente.");
+            return { valid: false, message: "❌ Este correo ya está siendo utilizado en otro programa de referidos." };
+        }
+
+        // ✅ Check user's own referrals subcollection for duplicates (double safety)
+        const userReferralsSnapshot = await db.collection('users').doc(currentUser.uid).collection('referrals')
+            .where('email', '==', referralEmail)
+            .get();
+
+        if (!userReferralsSnapshot.empty) {
+            console.log("🚫 Este correo ya fue referido por el usuario actual.");
+            return { valid: false, message: "❌ Ya has referido este correo anteriormente." };
+        }
+
+        // ✅ Fetch referrer name for personalized notifications
+        const referrerDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (referrerDoc.exists) {
+            const referrerData = referrerDoc.data();
+            referrerName = referrerData.name || referrerEmail;
+        }
+
+        // ✅ Step 1: Check if email already exists in users collection
+        const userQuerySnapshot = await usersRef.where('email', '==', referralEmail).get();
+
+        if (!userQuerySnapshot.empty) {
+            const userDoc = userQuerySnapshot.docs[0];
+            const userData = userDoc.data();
+
+            console.log("📌 Usuario encontrado en base de datos:", userData);
+
+            if (userData.paymentStatus === "Confirmado") {
+                return { valid: false, message: "❌ Este usuario ya ha completado su suscripción. No es elegible para referidos." };
+            }
+
+            if (userData.paymentStatus === "Pending") {
+                const emailSubject = `🎯 Nuevo referido de: ${referrerName} - Cliente pendiente de pago`;
+
+                showDashboardNotification(`👋 Cliente referenciado pendiente de pago: ${userData.name} (${userData.email})`);
+
+                sendEmail("info@autocuidadoclub.com", emailSubject, `
+                    Se ha referenciado un cliente existente que aún no ha completado su pago.<br><br>
+                    Nombre: ${userData.name}<br>
+                    Email: ${userData.email}<br>
+                    Teléfono: ${userData.phone}<br>
+                    Plan: ${userData.planType}<br>
+                    Departamento: ${userData.department || 'N/A'}<br>
+                    Municipio: ${userData.municipality || 'N/A'}<br><br>
+                    📞 Recomendación: Contactar manualmente para cerrar la venta.
+                `);
+
+                sendEmail("info@autocuidadoclub.com", "🎉 ¡Has sido referido a AutoCuidado Club!", `
+                    ¡Hola ${userData.name || "amigo"}!<br><br>
+                    Tu contacto ha sido compartido por tu amigo <strong>${referrerEmail}</strong> para que disfrutes de los beneficios de AutoCuidado Club 🚗.<br><br>
+                    Ayuda a tu amigo a desbloquear su premio completando tu suscripción inicial y ambos ganan.<br><br>
+                    ✅ Beneficios exclusivos<br>
+                    ✅ Seguimiento personalizado para tu vehículo<br>
+                    ✅ Bonos de mantenimiento y regalos<br><br>
+                    <a href="https://www.autocuidadoclub.com/suscripciones.html" style="background-color:#003366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Activa tu plan ahora 🚀</a><br><br>
+                    ¡Bienvenido a AutoCuidado Club!<br><br>
+                    Síguenos en nuestras redes sociales:<br>
+                    📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+                    📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+                    💬 WhatsApp: https://wa.me/50376064756
+                `);
+
+                console.log("✅ Notificación y correos enviados para cliente pendiente de pago.");
+
+                return { valid: true };
+            }
+        }
+
+        console.log("✅ Correo válido para referidos, puedes continuar.");
+        return { valid: true };
+
+    } catch (error) {
+        console.error("❌ Error al validar correo global:", error);
+        return { valid: false, message: "Error al validar el correo. Intenta nuevamente." };
+    }
+}
+
+
+        
+// ✅ Notificación Interna del Dashboard
+function showDashboardNotification(message) {
+  const existing = document.getElementById("notificationPopup");
+  if (existing) existing.remove(); // remove old one if present
+
+  const popup = document.createElement("div");
+  popup.id = "notificationPopup";
+  popup.innerHTML = `
+    <div style="
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #003366;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 9999;
+      max-width: 300px;
+      font-size: 14px;
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span>${message}</span>
+        <span style="cursor:pointer; font-weight:bold; margin-left: 10px;" onclick="document.getElementById('notificationPopup').remove()">✖</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(popup);
+}
+
+function sendEmail(destinationEmail, subject, acmessage) {
+    const styledMessage = `
+        ${acmessage}
+        <br><br>
+        Síguenos en nuestras redes sociales:<br>
+        📷 Instagram: https://www.instagram.com/autocuidadoclub<br>
+        📘 Facebook: https://www.facebook.com/profile.php?id=61566547237325<br>
+        💬 WhatsApp: https://wa.me/50376064756
+    `;
+
+    return fetch("https://formsubmit.co/ajax/" + destinationEmail, {
+        method: 'POST',
+        body: new URLSearchParams({
+            email: destinationEmail,
+            subject,
+            message: styledMessage
+        })
+    });
+}
+
+        function notifyNewReferral(referrerEmail, referralEmail, referralName, referralPhone) {
+    const subject = "🎉 Nuevo referido agregado - AutoCuidado Club";
+    const message = `
+        ¡Se ha agregado un nuevo referido!
+        Nombre:> ${referralName}
+        Email: ${referralEmail}
+        WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
+    `;
+
+    sendEmail("info@autocuidadoclub.com", subject, message);
+    sendEmail(referrerEmail, subject, message);
+    sendEmail(referralEmail, subject, `
+        ¡Hola ${referralName}!<br><br>
+        Te damos la bienvenida a AutoCuidado Club. Tu contacto ha sido compartido para recibir información exclusiva sobre mantenimiento personalizado para tu vehículo 🚗.<br><br>
+        Pronto recibirás más detalles de nuestro equipo. 😉
+    `);
+}
+
+function notifyReferralRegistered(referrerEmail, referralEmail, referralName, referralPhone) {
+    const subject = "🎉 Tu referido se ha registrado - AutoCuidado Club";
+    const message = `
+        ¡Tu referido ha completado el registro!
+        Nombre: ${referralName}
+        Email: ${referralEmail}<br>
+        WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
+        Sigue pendiente, recibirás otra notificación cuando complete su pago.
+    `;
+
+    sendEmail("info@autocuidadoclub.com", subject, message);
+    sendEmail(referrerEmail, subject, message);
+    sendEmail(referralEmail, subject, `
+        ¡Hola ${referralName}!
+        Has completado tu registro con éxito en AutoCuidado Club 🚗.
+        El siguiente paso es completar tu pago para activar todos tus beneficios. 💳
+        Nuestro equipo está listo para asistirte en lo que necesites.
+    `);
+}
+
+function notifyReferralPaid(referrerEmail, referralEmail, referralName, referralPhone) {
+    const subject = "🎉 ¡Tu referido completó el pago! - AutoCuidado Club";
+    const message = `
+        ¡Tu referido ha realizado su pago! ✅
+        Nombre: ${referralName}
+        Email: ${referralEmail}
+        WhatsApp: https://wa.me/${referralPhone.replace('+', '')}
+        🎁 ¡Felicidades! Has desbloqueado tu bono por este referido.
+    `;
+
+    sendEmail("info@autocuidadoclub.com", subject, message);
+    sendEmail(referrerEmail, subject, message);
+    sendEmail(referralEmail, subject, `
+        ¡Hola ${referralName}!
+        Hemos confirmado tu pago exitoso 🧾.
+        Te damos la bienvenida oficial a AutoCuidado Club 🚗.
+        Nuestro equipo estará en contacto contigo para coordinar todos los detalles de tu plan.
+    `);
+}
+
+     
+// Founder Phase Settings
+const founderStartDate = new Date('2025-05-01T00:00:00'); // May 1, 2025
+const founderDurationDays = 90; // Founder Phase lasts 90 days
+const founderEndDate = new Date(founderStartDate.getTime() + founderDurationDays * 24 * 60 * 60 * 1000);
+const msInDay = 24 * 60 * 60 * 1000;
+
+// Message Timeline
+const messages = [
+  "¡Bienvenido a la Fase Fundador! Asegura el mejor precio para siempre.",
+  "¡Ya pasó 1 semana! No dejes pasar esta oportunidad única.",
+  "2 semanas menos, y los precios cambiarán para siempre. ¡Actúa hoy!",
+  "🚨 ¡El acceso exclusivo ya está en cuenta regresiva! ¡Activa tu membresía antes de que cierre!",
+  "¡1 mes transcurrido! Cada día cuenta. Aprovecha antes que otros.",
+  "🎯 ¡Cada día cuenta! No dejes pasar la oportunidad de ser Fundador.",
+  "¡Quedan menos de 2 meses! Reserva tu lugar como Fundador.",
+  "¡Cada semana más cerca del cierre! Activa ahora tu beneficio exclusivo.",
+  "Tiempo limitado: Asegura beneficios de Fundador antes que termine.",
+  "🔥 ¡Últimas 4 semanas! Última llamada para obtener el mejor precio.",
+  "⏳ ¡Últimas 3 semanas! Se acerca el final de la Fase Fundador.",
+  "¡Últimas 2 semanas! ¿Qué estás esperando? Tu beneficio especial está por terminar.",
+  "¡Última semana! Esta es tu última oportunidad para ser Fundador. ¡Actúa YA!",
+  "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas."
+];
+
+// Initialize on page load
+function startFounderPhaseCountdown() {
+  updateFounderMessage(); 
+  updateCountdown(); 
+}
+
+// Update the message based on weeks elapsed
+function updateFounderMessage() {
+  const today = new Date();
+  const daysElapsed = Math.floor((today - founderStartDate) / msInDay);
+
+  let messageIndex = Math.floor(daysElapsed / 7);
+  if (messageIndex < 0) messageIndex = 0;
+  if (messageIndex >= messages.length) messageIndex = messages.length - 1;
+
+  const founderMessage = document.getElementById('founderPhaseMessage');
+  if (founderMessage) {
+    founderMessage.textContent = messages[messageIndex];
+  }
+}
+
+// Update the 7-day countdown
+function updateCountdown() {
+  const now = new Date();
+
+  if (now >= founderEndDate) {
+    document.getElementById("countdown").innerHTML = "Fase Fundador Cerrada ⏳";
+    clearInterval(countdownInterval);
+    return;
+  }
+
+  // Calculate which 7-day cycle we are currently in
+  const daysElapsed = Math.floor((now - founderStartDate) / msInDay);
+  const currentCycleStart = new Date(founderStartDate.getTime() + Math.floor(daysElapsed / 7) * 7 * msInDay);
+  const currentCycleEnd = new Date(currentCycleStart.getTime() + 7 * msInDay);
+
+  const distance = currentCycleEnd - now;
+
+  if (distance <= 0) {
+    document.getElementById("countdown").innerHTML = "Nuevo ciclo iniciando...";
+    return;
+  }
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+// Update both countdown and message every 1 second
+const countdownInterval = setInterval(() => {
+  updateFounderMessage();
+  updateCountdown();
+}, 1000);
+
+startFounderPhaseCountdown(); // Run once on load     
+
+async function upgradePlan() {
+    const selectedPlan = document.getElementById("new-plan").value;
+    if (!selectedPlan) {
+        alert("❌ Por favor selecciona un nuevo plan válido.");
+        return;
+    }
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para mejorar el plan.");
+        return;
+    }
+
+    const confirmation = confirm(`¿Estás seguro que deseas cambiar tu suscripción a: ${selectedPlan}?`);
+    if (!confirmation) return;
+
+    try {
+        const userRef = db.collection("users").doc(user.uid);
+        const userDoc = await userRef.get();
+        const userData = userDoc.data();
+
+        const lastUpgradeDate = userData.lastPlanUpgradeDate?.toDate();
+const now = new Date();
+
+if (lastUpgradeDate) {
+    const diffMonths = (now.getFullYear() - lastUpgradeDate.getFullYear()) * 12 + (now.getMonth() - lastUpgradeDate.getMonth());
+    if (diffMonths < 1) {
+        alert(`⚠️ Solo puedes solicitar una mejora de plan una vez por ciclo mensual. Por favor espera hasta el próximo mes para realizar otro cambio.`);
+        return;
+    }
+}
+        // ✅ Update Firestore with the new plan and timestamp
+        await userRef.update({
+            planType: selectedPlan,
+            lastPlanUpgradeDate: firebase.firestore.Timestamp.now()
+        });
+
+        // ✅ Send email to staff notifying the change
+        console.log("📧 Enviando correo de cambio de plan a staff...");
+        await sendEmail(
+            "info@autocuidadoclub.com",
+            "🚨 Cambio de plan de suscripción - AutoCuidado Club",
+            `
+                El cliente ha solicitado un cambio de plan.<br><br>
+                Plan nuevo seleccionado: <strong>${selectedPlan}</strong><br>
+                Cliente: ${user.email}<br><br>
+                🚗 Verifica y ajusta la facturación de este cliente.
+            `
+        ).then(() => {
+    console.log("✅ Correo enviado correctamente al staff.");
+}).catch(error => {
+    console.error("❌ Error al enviar correo al staff:", error);
+});
+
+        alert(`✅ ¡Tu plan ha sido actualizado exitosamente a: ${selectedPlan}!`);
+
+// ✅ Smooth scroll to vehicle form
+document.getElementById("addVehicleForm").scrollIntoView({ behavior: "smooth" });
+
+// ✅ Refresh user profile
+loadUserProfile(user.uid);
+
+
+        // ✅ If Plus plan, show the vehicle add form
+        if (selectedPlan.startsWith("plus")) {
+            document.getElementById("addVehicleForm").style.display = "block";
+            showDashboardNotification("🚗 Ahora puedes añadir hasta 3 vehículos a tu cuenta.");
+        }
+
+        // ✅ Refresh user profile
+        loadUserProfile(user.uid);
+
+    } catch (error) {
+        console.error("❌ Error al actualizar el plan:", error);
+        alert("Ocurrió un error al actualizar tu plan. Por favor, intenta nuevamente.");
+    }
+}
+
+
+    
+// Logout Function
+function logoutUser() {
+    auth.signOut().then(() => {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    }).catch((error) => {
+        alert("Error al cerrar sesión: " + error.message);
+    });
+}
+
+// Load User Profile
+function loadUserProfile(uid) {
+    db.collection("users").doc(uid).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            updateUserInfo(userData);
+        } else {
+            console.error("❌ No se encontró perfil.");
+        }
+    }).catch((error) => console.error("❌ Error:", error));
+}
+
+// Update User Info in Dashboard
+function updateUserInfo(userData) {
+    document.getElementById("name").innerText = userData.name || "N/A";
+    document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
+    document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
+    document.getElementById("user-department").innerText = userData.department || "Desconocido";
+    document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
+    if (!userData.paymentDate || userData.paymentStatus === "Pending") {
+    document.getElementById("paymentDate").innerText = "Pendiente de pago";
+    document.getElementById("nextPaymentDate").innerText = "No asignado";
+} else {
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+}
+// Hide countdown if payment is completed
+const countdownContainer = document.querySelector(".countdown-container");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    if (countdownContainer) countdownContainer.style.display = "none";
+} else {
+    if (countdownContainer) countdownContainer.style.display = "block";
+}
+
+    const subscriptionCard = document.getElementById("subscription-upgrade-card");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    subscriptionCard.classList.remove("subscription-blurred");
+} else {
+    subscriptionCard.classList.add("subscription-blurred");
+}
+const lockedPopup = document.getElementById("subscription-locked-popup");
+if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+    subscriptionCard.classList.remove("subscription-blurred");
+    if (lockedPopup) lockedPopup.style.display = "none";
+} else {
+    subscriptionCard.classList.add("subscription-blurred");
+    if (lockedPopup) lockedPopup.style.display = "block";
+}
+
+        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+   // After updating schedule info
+document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
+
+// Check if user already reprogrammed
+const rescheduleInfo = document.getElementById("reschedule-info");
+if (userData.lastReschedule) {
+    const lastRescheduleDate = userData.lastReschedule.toDate();
+    const currentDate = new Date();
+
+    if (
+        lastRescheduleDate.getMonth() === currentDate.getMonth() &&
+        lastRescheduleDate.getFullYear() === currentDate.getFullYear()
+    ) {
+        rescheduleInfo.style.display = "block";
+        rescheduleInfo.innerText = `⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastRescheduleDate.toLocaleDateString("es-ES")}`;
+    } else {
+        rescheduleInfo.style.display = "none";
+    }
+}
+
+    
+    loadVehicles(userData.vehicles);
+    handlePaymentStatus(userData);
+    updateLoyaltyCard(userData);
+
+    // 🔥 Plan Descriptions
+    const availablePlans = {
+        "basic3m": { name: "Plan Básico de 3 meses", level: 1 },
+        "basic6m": { name: "Plan Básico de 6 meses", level: 2 },
+        "basic12m": { name: "Plan Básico de 12 meses", level: 3 },
+        "plus3m": { name: "Plan Plus de 3 meses", level: 4 },
+        "plus6m": { name: "Plan Plus de 6 meses", level: 5 },
+        "plus12m": { name: "Plan Plus de 12 meses", level: 6 }
+    };
+
+    // Actual plan
+    const currentPlanType = userData.planType;
+    const currentPlan = availablePlans[currentPlanType];
+
+    // Motivational Message Logic
+const motivationalDiv = document.getElementById("motivational-message");
+let motivationalText = "";
+
+if (currentPlanType === "basic3m" || currentPlanType === "basic6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥<br>¿Deseas añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "basic12m") {
+    motivationalText = "🎉 ¡Felicidades! Nivel máximo alcanzado para Basic. ¿Quieres añadir más vehículos? Mejora a <strong>Plan Plus</strong>.";
+} else if (currentPlanType === "plus3m" || currentPlanType === "plus6m") {
+    motivationalText = "¡A un paso del máximo nivel! Alcanza el máximo nivel con el plan de cobertura para 12 meses. 🚗🔥";
+} else if (currentPlanType === "plus12m") {
+    motivationalText = "🚀 ¡Eres nuestro PRO! Nivel máximo alcanzado.";
+}
+
+if (motivationalText) {
+    motivationalDiv.innerHTML = motivationalText;
+    motivationalDiv.style.display = "block";
+}
+    
+    // Set description
+    const planMessageElement = document.getElementById("planMessage");
+    if (currentPlan) {
+        planMessageElement.innerText = currentPlan.name;
+    } else {
+        planMessageElement.innerText = "Tipo de plan desconocido";
+    }
+
+    // Populate the select options
+    const newPlanSelect = document.getElementById("new-plan");
+    newPlanSelect.innerHTML = ""; // Clean existing options
+const currentLevel = currentPlan ? currentPlan.level : 0;
+let optionsAdded = false;
+
+for (const [key, plan] of Object.entries(availablePlans)) {
+    if (plan.level > currentLevel) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.text = key.startsWith("plus") ? `${plan.name} — 🚗 Añade más vehículos y ahorra más` : plan.name;
+        newPlanSelect.appendChild(option);
+        optionsAdded = true;
+    }
+}
+
+if (!optionsAdded) {
+    const option = document.createElement("option");
+    option.text = "No hay planes superiores disponibles";
+    option.disabled = true;
+    option.selected = true;
+    newPlanSelect.appendChild(option);
+}
+
+       
+    showFreeRescheduleOffer(userData);
+
+    // Check for first-time payment offer
+const now = new Date();
+const registrationDate = userData.registrationDate?.toDate?.() || null;
+
+   function checkFirstTimePaymentOffer(userData) {
+  const now = new Date();
+  const regDate = userData.registrationDate?.toDate?.() || new Date(userData.registrationDate.seconds * 1000);
+  const daysSinceRegister = Math.floor((now - regDate) / (1000 * 60 * 60 * 24));
+
+  const shouldShowOffer =
+    userData.monthsPaid === 0 &&
+    userData.paymentStatus === "Pending" &&
+    daysSinceRegister >= 0;
+
+  console.log("📌 Checking first-time offer:");
+  console.log("monthsPaid:", userData.monthsPaid);
+  console.log("paymentStatus:", userData.paymentStatus);
+  console.log("daysSinceRegister:", daysSinceRegister);
+  console.log("👉 shouldShowOffer:", shouldShowOffer);
+
+ if (shouldShowOffer) {
+  // Show UI offer
+  const promoDiv = document.createElement("div");
+  promoDiv.innerHTML = `
+    <div id="promo-popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
+                background:#fffbe6; padding:20px; border-radius:15px; border:2px solid #ff9800;
+                z-index:9999; box-shadow:0px 4px 12px rgba(0,0,0,0.15); text-align:center; max-width:90%;">
+      <h3>🚀 ¡Fase de Fundadores!</h3>
+      <p style="margin-top:10px;">Activa tu plan ahora y asegura tu precio exclusivo antes que termine esta etapa especial.</p>
+          <br>
+      <button onclick="closePromoPopup()" style="margin-top:10px; background:#cccccc; color:#333; padding:8px 16px; border:none; border-radius:5px;">Cerrar</button>
+    </div>
+  `;
+  document.body.appendChild(promoDiv);
+
+
+  // ✅ Tag in PushEngage
+  if (typeof _pe !== "undefined") {
+    _pe.tagPushSubscriber('not_paid_yet');
+    console.log("📬 PushEngage tag applied: not_paid_yet");
+  }
+}
+
+}
+
+updateLoyaltyCard(userData);
+    showFreeRescheduleOffer(userData);
+checkFirstTimePaymentOffer(userData); // ✅ add this here
+showSmartFollowupMessage(userData); // ✅ Add this here
+}
+
+  // ✅ Function to close the popup
+  function closePromoPopup() {
+    const popup = document.getElementById("promo-popup");
+    if (popup) {
+      popup.remove();
+    }
+  }
+
+// Payment Status Function
+function handlePaymentStatus(userData) {
+    const paymentWarning = document.getElementById("payment-warning");
+    const completePayment = document.getElementById("complete-payment");
+    const paymentLink = document.getElementById("payment-link");
+
+    if (userData.paymentStatus === "Pending") {
+        paymentWarning.style.display = "block";
+        let payPalURL = getPaypalLink(userData.planType);
+        if (payPalURL) {
+            paymentLink.href = payPalURL;
+            completePayment.style.display = "block";
+        }
+    } else {
+        paymentWarning.style.display = "none";
+        completePayment.style.display = "none";
+    }
+}
+
+// PayPal Links
+function getPaypalLink(planType) {
+    const payPalLinks = {
+        "basic3m": "https://u.wompi.sv/379910xeV",
+        "basic6m": "https://u.wompi.sv/380639rcA",
+        "basic12m": "https://u.wompi.sv/3806769qs",
+        "plus3m": "https://u.wompi.sv/380690Gbx",
+        "plus6m": "https://u.wompi.sv/380695_Np",
+        "plus12m": "https://u.wompi.sv/380702xQa"
+    };
+    return payPalLinks[planType] || null;
+}
+
+// Load Vehicles Function
+function loadVehicles(vehicles = []) {
+  const vehiclesList = document.getElementById("vehiclesList");
+  vehiclesList.innerHTML = "";
+
+  if (!vehicles.length) {
+    vehiclesList.innerHTML = "<p>No hay vehículos registrados.</p>";
+    return;
+  }
+
+  vehicles.forEach((vehicle, index) => {
+    vehiclesList.innerHTML += `
+      <div class="vehicle-card">
+        <h4>Vehículo ${index + 1}</h4>
+        <p><strong>Marca:</strong> ${vehicle.brand}</p>
+        <p><strong>Modelo:</strong> ${vehicle.model}</p>
+        <p><strong>Placa:</strong> ${vehicle.plate}</p>
+        <p><strong>Año:</strong> ${vehicle.year}</p>
+      </div>
+    `;
+  });
+}
+
+async function addNewVehicle() {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Debes estar autenticado para añadir vehículos.");
+    return;
+  }
+
+  const brand = document.getElementById("newBrand").value.trim();
+  const model = document.getElementById("newModel").value.trim();
+  const plate = document.getElementById("newPlate").value.trim();
+  const year = document.getElementById("newYear").value.trim();
+
+  if (!brand || !model || !plate || !year) {
+    alert("Completa todos los campos para añadir el vehículo.");
+    return;
+  }
+
+  try {
+    const userRef = db.collection("users").doc(user.uid);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) throw new Error("Usuario no encontrado.");
+
+    const userData = userDoc.data();
+    const vehicles = userData.vehicles || [];
+
+    // ✅ Check plan type and vehicle limit
+    const plan = userData.planType || "basic3m";
+    const maxVehicles = plan.startsWith("plus") ? 3 : 1;
+
+    if (vehicles.length >= maxVehicles) {
+      alert(`Tu plan actual permite hasta ${maxVehicles} vehículos.`);
+      return;
+    }
+
+    // ✅ Add vehicle
+    vehicles.push({ brand, model, plate, year });
+
+    await userRef.update({ vehicles });
+
+    alert("🚗 Vehículo añadido correctamente.");
+    loadVehicles(vehicles);
+
+    // Clear form
+    document.getElementById("newBrand").value = "";
+    document.getElementById("newModel").value = "";
+    document.getElementById("newPlate").value = "";
+    document.getElementById("newYear").value = "";
+
+  } catch (error) {
+    console.error("Error añadiendo vehículo:", error);
+    alert("Error al añadir el vehículo. Intenta nuevamente.");
+  }
+}
+
+
+function upgradeToPlus() {
+    const targetPlan = document.getElementById("add-vehicles-button").getAttribute("data-target-plan");
+    if (!targetPlan) return;
+
+    if (!confirm(`¿Quieres añadir más vehículos y mejorar a ${targetPlan}?`)) return;
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para mejorar el plan.");
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.update({
+        planType: targetPlan
+    }).then(() => {
+        alert(`✅ ¡Ahora tienes acceso para añadir más vehículos! Plan actualizado a: ${targetPlan}`);
+        loadUserProfile(user.uid); // Refresh
+    }).catch((error) => {
+        console.error("❌ Error al actualizar el plan:", error);
+        alert("Ocurrió un error al actualizar. Intenta nuevamente.");
+    });
+}
+
+    
+// Format Timestamp
+function formatTimestamp(timestamp) {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+}
+
+// Schedule Selection
+function selectScheduleBox(cell) {
+    const cells = document.querySelectorAll(".schedule-table tbody td");
+    const timeBlock = cell.innerText.trim();
+    if (timeBlock === "-" || timeBlock === "") {
+        alert("❌ Selecciona un horario válido.");
+        return;
+    }
+    cells.forEach((c) => c.classList.remove("selected-box"));
+    cell.classList.add("selected-box");
+    const dayIndex = cell.cellIndex;
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+    document.getElementById("selectedDay").value = day;
+    document.getElementById("selectedTime").value = timeBlock;
+}
+
+
+    
+// Update Schedule
+function updateSchedule() {
+    const selectedCell = document.querySelector(".schedule-table td.selected-box");
+    if (!selectedCell) {
+        alert("❌ Por favor selecciona un horario.");
+        return;
+    }
+
+    const dayIndex = selectedCell.cellIndex;
+    const timeBlock = selectedCell.innerText.trim();
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "Día desconocido";
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para cambiar el horario.");
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            const lastReschedule = userData.lastReschedule ? userData.lastReschedule.toDate() : null;
+            const currentDate = new Date();
+
+            if (lastReschedule) {
+                const rescheduleMonth = lastReschedule.getMonth();
+                const currentMonth = currentDate.getMonth();
+                const rescheduleYear = lastReschedule.getFullYear();
+                const currentYear = currentDate.getFullYear();
+                if (rescheduleMonth === currentMonth && rescheduleYear === currentYear) {
+                    alert(`⚠️ Solo puedes reprogramar una vez al mes. Última reprogramación: ${lastReschedule.toLocaleDateString("es-ES")}`);
+                    return;
+                }
+            }
+
+            userRef.update({
+                selectedSchedule: `${day} - ${timeBlock}`,
+                lastReschedule: firebase.firestore.Timestamp.now(),
+            }).then(() => {
+                alert(`✅ Horario actualizado correctamente a: ${day} - ${timeBlock}`);
+                document.getElementById("current-schedule").innerText = `${day} - ${timeBlock}`;
+            }).catch((error) => {
+                alert("❌ Error al actualizar el horario.");
+            });
+        } else {
+            alert("❌ Perfil no encontrado.");
+        }
+    }).catch((error) => {
+        console.error("❌ Error al obtener perfil:", error);
+    });
+}
+
+// Loyalty Card
+// ✅ Final version: Update Loyalty Card Visual + Rewards Unlock + Redeem Form Trigger
+function updateLoyaltyCard(userData) {
+    const holes = document.querySelectorAll('.hole');
+    let progress = 0;
+
+    // Step 1: Registration complete ✅
+    if (userData.registrationDate) {
+        holes[progress].classList.add('completed');
+        progress++;
+    }
+
+    // Step 2: Initial payment confirmed ✅
+    if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
+        holes[progress].classList.add('completed');
+        progress++;
+    }
+
+    // Step 3+: Based on unique months in paymentHistory
+    const paymentHistory = userData.paymentHistory || [];
+    let totalMonths = 0;
+
+// Step 1: Detect from planType if it's a full upfront plan
+const fullPlanRegex = /(basic|plus)(\d{1,2})mfull/;
+const match = userData.planType?.match(fullPlanRegex);
+if (match) {
+    totalMonths = parseInt(match[2]); // e.g., 3, 6, or 12
+} else {
+    // Fallback to old logic if not a full upfront plan
+    const uniqueMonths = new Set();
+    (userData.paymentHistory || []).forEach(entry => {
+        const date = entry.date?.toDate ? entry.date.toDate() : new Date(entry.date.seconds * 1000);
+        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+        uniqueMonths.add(monthYear);
+    });
+    totalMonths = uniqueMonths.size;
+}
+    const holeSteps = [2, 4, 6, 7, 8, 9]; // Corresponding unique month milestones
+
+    holeSteps.forEach((step, index) => {
+        if (totalMonths >= step && progress < holes.length) {
+            holes[progress].classList.add('completed');
+            progress++;
+        }
+    });
+
+    // Update progress text
+    const progressDescription = document.querySelector('.description p strong');
+    if (progressDescription) {
+        progressDescription.textContent = `Progreso Actual: ${progress} de 8 pasos completados.`;
+    }
+
+    const rewardStatus = document.querySelector('.reward-status');
+    const redeemButton = document.getElementById('redeemRewardsButton');
+
+    if (uniqueMonthCount >= 9) {
+        if (rewardStatus) {
+            rewardStatus.textContent = "🎉 Desbloqueado";
+            rewardStatus.classList.remove('locked');
+            rewardStatus.classList.add('unlocked');
+        }
+
+        if (redeemButton && !userData.rewardsRedeemed) {
+            redeemButton.style.display = 'inline-block'; // Show redeem button
+        }
+
+        // ✅ Send email ONCE to notify completion
+        if (!userData.rewardsUnlockedEmailSent) {
+            db.collection("users").doc(userData.uid).update({
+                rewardsUnlockedEmailSent: true
+            }).then(() => {
+                sendEmail(userData.email, "🎉 ¡Premios desbloqueados!", `
+                    ¡Felicidades ${userData.name}!
+                    Has completado tu ciclo de lealtad y tus premios ahora están disponibles 🎁.
+                    Ingresa a tu dashboard y haz clic en "Redimir Premios" para solicitarlos.
+                `);
+            }).catch(console.error);
+        }
+    } else {
+        if (rewardStatus) {
+            rewardStatus.textContent = "🔒 Bloqueado";
+            rewardStatus.classList.remove('unlocked');
+            rewardStatus.classList.add('locked');
+        }
+        if (redeemButton) {
+            redeemButton.style.display = 'none'; // Hide if not eligible
+        }
+    }
+}
+
+// ✅ Redeem Prize Form Submission (Safe)
+document.addEventListener("DOMContentLoaded", () => {
+    const redeemForm = document.getElementById("redeemRewardsForm");
+    const redeemButton = document.getElementById("redeemRewardsButton");
+
+    if (redeemForm && redeemButton) {
+        redeemForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            redeemButton.disabled = true; // Disable to prevent double click
+
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert("Debes estar autenticado para redimir tus premios.");
+                redeemButton.disabled = false;
+                return;
+            }
+
+            const name = redeemForm.redeemName.value.trim();
+            const email = redeemForm.redeemEmail.value.trim();
+            const phone = redeemForm.redeemPhone.value.trim();
+            const month = redeemForm.redeemMonth.value.trim();
+
+            try {
+                await db.collection("users").doc(user.uid).update({
+                    rewardsRedeemed: true,
+                    redeemRequest: {
+                        name,
+                        email,
+                        phone,
+                        month,
+                        timestamp: firebase.firestore.Timestamp.now()
+                    }
+                });
+
+                // Optional: send notification to admin
+                sendEmail("info@autocuidadoclub.com", "🎁 Nuevo pedido de premios de lealtad", `
+                    Cliente: ${name}<br>
+                    Email: ${email}<br>
+                    WhatsApp: ${phone}<br>
+                    Mes seleccionado: ${month}
+                `);
+
+                alert("Premios enviados, espera confirmación de nuestro equipo.");
+                document.getElementById("redeemRewardsModal").style.display = "none";
+            } catch (error) {
+                console.error("Error al enviar premios:", error);
+                alert("Error al enviar tu solicitud. Intenta nuevamente.");
+                redeemButton.disabled = false;
+            }
+        });
+    }
+});
+
+
+        // Place this in the JS script block of dashboard3.html
+// 📜 View Payment History Function
+function loadPaymentHistory() {
+  const user = firebase.auth().currentUser;
+  const body = document.getElementById("customerHistoryBody");
+  const table = document.getElementById("customerHistoryTable");
+  body.innerHTML = "";
+
+  if (!user) return;
+
+  db.collection("users").doc(user.uid).get().then(doc => {
+    const data = doc.data();
+    const history = data.paymentHistory || [];
+
+    if (history.length === 0) {
+      body.innerHTML = '<tr><td colspan="4">Sin historial registrado.</td></tr>';
+    } else {
+      history.forEach(entry => {
+        const date = entry.date?.toDate().toLocaleDateString("es-ES") || "-";
+        body.innerHTML += `
+          <tr>
+            <td>${date}</td>
+            <td>$${entry.amount || "N/A"}</td>
+            <td>${entry.method || "-"}</td>
+            <td>${entry.status || "-"}</td>
+          </tr>
+        `;
+      });
+    }
+
+    table.style.display = "table";
+  }).catch(error => {
+    console.error("❌ Error al cargar historial de pagos:", error);
+    alert("Error al cargar el historial de pagos.");
+  });
+}
+
+        
+
+function showFreeRescheduleOffer(userData) {
+  const uid = userData.uid;
+  const now = new Date();
+  const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
+
+  const monthsUnpaid = lastPaymentDate
+    ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
+    : 6;
+
+  // Check if banner was already shown via Firestore
+  if (userData.freeInspectionBannerShown || monthsUnpaid < 1) return;
+
+  const offerBox = document.createElement("div");
+  offerBox.id = "freeRescheduleBox";
+  offerBox.innerHTML = `
+    <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
+      <h3>🎁 ¡Te regalamos una cita!</h3>
+      <p>Han pasado más de ${monthsUnpaid} mes${monthsUnpaid > 1 ? "es" : ""} sin pago. Agenda gratis tu próxima inspección.</p>
+      <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
+        Agendar ahora
+      </button>
+    </div>
+  `;
+  document.body.prepend(offerBox);
+
+  document.getElementById("claimFreeReschedule").addEventListener("click", async () => {
+    const loader = document.createElement("div");
+    loader.innerHTML = `<img src="loading.gif" alt="Cargando..." style="width:50px;">`;
+    offerBox.innerHTML = "";
+    offerBox.appendChild(loader);
+
+    const formData = new FormData();
+    formData.append("_subject", "🎁 Cliente solicitó inspección gratis");
+    formData.append("_cc", "info@autocuidadoclub.com");
+    formData.append("message", `
+      Cliente: ${userData.name || "N/A"}
+      Correo: ${userData.email || "N/A"}
+      Teléfono: ${userData.phone || "N/A"}
+      Departamento: ${userData.department || "N/A"}
+      Municipio: ${userData.municipality || "N/A"}
+      Fecha de último pago: ${lastPaymentDate?.toLocaleDateString("es-ES") || "Desconocida"}
+      Plan: ${userData.planType}
+    `);
+
+    try {
+      await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        body: formData
+      });
+
+      // ✅ Mark banner as shown in Firestore
+      await db.collection("users").doc(uid).update({
+        freeInspectionBannerShown: true
+      });
+
+      offerBox.innerHTML = `<p style="color: green; font-weight: bold;">✅ Inspección extra gratis solicitada.</p>`;
+    } catch (error) {
+      offerBox.innerHTML = `<p style="color: red;">❌ Error al enviar la solicitud. Intenta de nuevo más tarde.</p>`;
+    }
+  });
+}
+
+
+
+
+function showReminderBanner() {
+  const banner = document.createElement("div");
+  banner.style = "background:#e6f7e6; border-left:5px solid #28a745; padding:15px; margin:20px; border-radius:5px;";
+  banner.innerHTML = `
+    <strong>📌 Inspección gratis solicitada</strong><br>
+    Nuestro staff ya recibió tu solicitud. Te contactaremos pronto.
+  `;
+  document.querySelector("main")?.prepend(banner) || document.body.prepend(banner);
+}
+
+
+
+     function showFirstTimePaymentOffer(userData) {
+  const offerBox = document.createElement("div");
+  const planType = userData.planType || "basic3m"; // fallback if missing
+  const payPalURL = getPaypalLink(planType) || "pago.html"; // fallback if missing link
+
+  offerBox.innerHTML = `
+    <div style="background:#fff3e0; border:2px solid #ff9800; padding:20px; margin:20px 0; border-radius:12px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:10000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-width:90%; text-align:center;">
+      <span onclick="document.getElementById('founderOfferBox').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
+      <h2>🚀 ¡Fase de Fundadores!</h2>
+      <p style="margin-top:10px;">Activa tu plan ahora y asegura tu precio exclusivo antes que termine esta etapa especial.</p>
+      <button onclick="window.location.href='${payPalURL}'" style="background:#ff6600; color:white; padding:10px 20px; border:none; border-radius:8px; margin-top:15px; font-size:16px;">Activar Plan</button>
+    </div>
+  `;
+  offerBox.id = "founderOfferBox";
+  document.body.appendChild(offerBox);
+}
+        
+function redirectToPayment() {
+  // Redirect to your payment page or PayPal link
+  window.location.href = "https://www.paypal.com/pay/basic1m"; // Example link
+}
+
+ // 🔥 Open and close popup functions
+function openLocationPopup() {
+  document.getElementById("locationPopup").style.display = "block";
+}
+
+function closeLocationPopup() {
+  document.getElementById("locationPopup").style.display = "none";
+}
+
+// 🔥 Populate department and municipalities
+const locations = {
+  "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
+  "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
+  "Sonsonate": ["Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonsonate", "Sonzacate"],
+  "Chalatenango": ["Agua Caliente", "Arcatao", "Azacualpa", "Chalatenango", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "Las Flores", "Las Vueltas", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+  "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
+  "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
+  "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+  "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+  "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
+  "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
+  "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
+  "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+  "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
+};
+
+
+function populatePopupDepartments() {
+  const departmentSelect = document.getElementById("popupDepartment");
+  departmentSelect.innerHTML = '<option value="">Seleccione un departamento</option>';
+  for (const dept in locations) {
+    const option = document.createElement("option");
+    option.value = dept;
+    option.textContent = dept;
+    departmentSelect.appendChild(option);
+  }
+}
+
+function updatePopupMunicipalities() {
+  const department = document.getElementById("popupDepartment").value;
+  const municipalitySelect = document.getElementById("popupMunicipality");
+  municipalitySelect.innerHTML = '<option value="">Seleccione un municipio</option>';
+  if (locations[department]) {
+    locations[department].forEach(muni => {
+      const option = document.createElement("option");
+      option.value = muni;
+      option.textContent = muni;
+      municipalitySelect.appendChild(option);
+    });
+  }
+}
+
+// 🔥 Save location change to Firestore
+function saveLocationChange() {
+  const department = document.getElementById("popupDepartment").value;
+  const municipality = document.getElementById("popupMunicipality").value;
+
+  if (!department || !municipality) {
+    alert("❌ Por favor selecciona un departamento y municipio.");
+    return;
+  }
+
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Debes estar autenticado para cambiar tu ubicación.");
+    return;
+  }
+
+  const userRef = db.collection("users").doc(user.uid);
+  userRef.get().then(doc => {
+    if (!doc.exists) {
+      alert("❌ Usuario no encontrado.");
+      return;
+    }
+
+    const userData = doc.data();
+    const lastChange = userData.lastMunicipalityChange ? userData.lastMunicipalityChange.toDate() : null;
+    const now = new Date();
+
+    if (lastChange && lastChange.getMonth() === now.getMonth() && lastChange.getFullYear() === now.getFullYear()) {
+      alert("⚠️ Solo puedes cambiar tu municipio una vez al mes.");
+      return;
+    }
+
+    userRef.update({
+      department,
+      municipality,
+      lastMunicipalityChange: firebase.firestore.Timestamp.now()
+    }).then(() => {
+      alert(`✅ Ubicación actualizada a: ${department}, ${municipality}`);
+      document.getElementById("user-municipality").innerText = municipality;
+      closeLocationPopup();
+    }).catch(error => {
+      console.error("❌ Error actualizando ubicación:", error);
+      alert("❌ Error actualizando ubicación. Intenta nuevamente.");
+    });
+  }).catch(error => {
+    console.error("❌ Error consultando usuario:", error);
+    alert("❌ Error consultando usuario. Intenta nuevamente.");
+  });
+}
+
+        function listenToReferredUserPayments(userId) {
+    const referralsRef = db.collection("users").doc(userId).collection("referrals");
+
+    referralsRef.get().then(snapshot => {
+        snapshot.forEach(referralDoc => {
+            const referralData = referralDoc.data();
+
+            if (!referralData.email) return;
+
+            db.collection("users").where("email", "==", referralData.email).onSnapshot(userSnapshot => {
+                userSnapshot.forEach(userDoc => {
+                    const userData = userDoc.data();
+
+                    if (userData.paymentStatus === "Confirmado" && !referralData.paid) {
+                        // Update referral to mark as paid
+                        referralsRef.doc(referralDoc.id).update({
+                            paid: true
+                        }).then(() => {
+                            console.log(`✅ Referral ${referralData.email} marked as paid automatically.`);
+
+                            showDashboardNotification(`🎉 Tu referido ${referralData.email} completó su pago. ¡Bono desbloqueado! 🎁`);
+
+                            sendEmail(
+                                firebase.auth().currentUser.email,
+                                "🎉 Tu bono ha sido desbloqueado",
+                                `¡Felicidades! Tu referido ${referralData.email} completó su pago y has desbloqueado tu bono.`
+                            );
+
+                        }).catch(error => {
+                            console.error("Error updating referral status:", error);
+                        });
+                    }
+                });
+            });
+        });
+    }).catch(error => {
+        console.error("Error loading referrals for real-time payment listener:", error);
+    });
+}
+
+function listenToReferredUserRegistrations(userId) {
+    const referralsRef = db.collection("users").doc(userId).collection("referrals");
+
+    referralsRef.get().then(snapshot => {
+        snapshot.forEach(referralDoc => {
+            const referralData = referralDoc.data();
+
+            if (!referralData.email) return;
+
+            db.collection("users").where("email", "==", referralData.email).onSnapshot(userSnapshot => {
+                userSnapshot.forEach(userDoc => {
+                    const userData = userDoc.data();
+
+                    if (!referralData.registered) {
+                        referralsRef.doc(referralDoc.id).update({
+                            registered: true
+                        }).then(() => {
+                            console.log(`✅ Referral ${referralData.email} marked as registered automatically.`);
+
+                            showDashboardNotification(`🎉 Tu referido ${referralData.email} se ha registrado en AutoCuidado Club.`);
+
+                            if (auth.currentUser) {
+                                notifyNewReferral(
+                                    auth.currentUser.email,
+                                    referralData.email,
+                                    referralData.name,
+                                    referralData.phone
+                                );
+                            }
+                        }).catch(error => {
+                            console.error("Error updating referral as registered:", error);
+                        });
+                    }
+                });
+            });
+        });
+    }).catch(error => {
+        console.error("Error loading referrals for real-time registration listener:", error);
+    });
+}
+
+function handleRedeemConfirmation(isYes) {
+    const popup = document.getElementById("redeemConfirmationPopup");
+    popup.style.display = "none";
+    window.onclick = null; // Clean up the click listener
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para continuar.");
+        return;
+    }
+
+    if (isYes) {
+        // ✅ Prefill email and month in the form
+        const redeemForm = document.getElementById("redeemRewardsForm");
+        redeemForm.redeemEmail.value = user.email;
+
+        const nextMonthDate = new Date();
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+        const options = { month: 'long', year: 'numeric' };
+        redeemForm.redeemMonth.value = nextMonthDate.toLocaleDateString('es-ES', options);
+
+        document.getElementById("redeemRewardsModal").style.display = "block";
+    } else {
+        incrementNoClickCount();
+    }
+}
+
+        function incrementNoClickCount() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const userRef = db.collection("users").doc(user.uid);
+    userRef.update({
+        loyaltyNoClickCount: firebase.firestore.FieldValue.increment(1)
+    }).then(() => {
+        console.log("✅ 'No por ahora' o cierre del popup registrado exitosamente.");
+    }).catch(error => {
+        console.error("Error registrando 'No por ahora':", error);
+    });
+}
+
+        function openUpgradeModal() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para solicitar una mejora de plan.");
+        return;
+    }
+
+    // Prefill fields if possible
+    db.collection("users").doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            document.getElementById("upgradeName").value = data.name || "";
+            document.getElementById("upgradePhone").value = data.phone || "";
+        }
+    });
+
+    document.getElementById("upgradeModal").style.display = "block";
+}
+
+function closeUpgradeModal() {
+    document.getElementById("upgradeModal").style.display = "none";
+}
+
+function submitUpgradeRequest() {
+    const name = document.getElementById("upgradeName").value.trim();
+    const phone = document.getElementById("upgradePhone").value.trim();
+    const user = firebase.auth().currentUser;
+
+    if (!name || !phone) {
+        alert("❌ Por favor completa todos los campos.");
+        return;
+    }
+
+    if (!user) {
+        alert("Debes estar autenticado para solicitar la mejora de plan.");
+        return;
+    }
+
+    sendEmail("info@autocuidadoclub.com", "🚗 Solicitud de mejora de plan - AutoCuidado Club", `
+        Cliente: ${name}<br>
+        Email: ${user.email}<br>
+        Teléfono: ${phone}<br>
+        🚗 Solicita añadir más vehículos y mejorar su plan actual.
+    `).then(() => {
+        alert("✅ Solicitud enviada con éxito. Nuestro equipo te contactará pronto.");
+        closeUpgradeModal();
+    }).catch(error => {
+        console.error("❌ Error enviando solicitud:", error);
+        alert("❌ Error al enviar la solicitud. Intenta nuevamente.");
+    });
+}
+
+function openAddVehiclesModal() {
+    document.getElementById("addVehiclesModal").style.display = "block";
+}
+
+function closeAddVehiclesModal() {
+    document.getElementById("addVehiclesModal").style.display = "none";
+}
+
+async function submitAdditionalVehicles() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Debes estar autenticado para añadir vehículos.");
+        return;
+    }
+
+    const vehicle1 = {
+        brand: document.getElementById("vehicle1Brand").value.trim(),
+        model: document.getElementById("vehicle1Model").value.trim(),
+        plate: document.getElementById("vehicle1Plate").value.trim(),
+        year: document.getElementById("vehicle1Year").value.trim()
+    };
+
+    const vehicle2 = {
+        brand: document.getElementById("vehicle2Brand").value.trim(),
+        model: document.getElementById("vehicle2Model").value.trim(),
+        plate: document.getElementById("vehicle2Plate").value.trim(),
+        year: document.getElementById("vehicle2Year").value.trim()
+    };
+
+    const vehiclesToAdd = [];
+    if (vehicle1.brand || vehicle1.model || vehicle1.plate || vehicle1.year) vehiclesToAdd.push(vehicle1);
+    if (vehicle2.brand || vehicle2.model || vehicle2.plate || vehicle2.year) vehiclesToAdd.push(vehicle2);
+
+    if (vehiclesToAdd.length === 0) {
+        alert("Por favor ingresa al menos un vehículo.");
+        return;
+    }
+
+    try {
+        const userRef = db.collection("users").doc(user.uid);
+        await userRef.update({
+            vehicles: firebase.firestore.FieldValue.arrayUnion(...vehiclesToAdd)
+        });
+
+        alert("✅ Vehículos añadidos exitosamente.");
+        closeAddVehiclesModal();
+        loadUserProfile(user.uid); // Refresh UI
+    } catch (error) {
+        console.error("❌ Error añadiendo vehículos:", error);
+        alert("Ocurrió un error al guardar tus vehículos. Intenta nuevamente.");
+    }
+}
+        
+function showSmartFollowupMessage(userData) {
+  if (!userData || userData.paymentStatus !== "Pending" || !userData.registrationDate) return;
+
+  const now = new Date();
+  const regDate = userData.registrationDate.toDate ? userData.registrationDate.toDate() : new Date(userData.registrationDate.seconds * 1000);
+  const hoursPassed = (now - regDate) / (1000 * 60 * 60);
+
+  let message = "";
+  let tag = "";
+
+  if (hoursPassed >= 2 && hoursPassed < 24) {
+    message = "👋 ¿Te llegó la información? Queremos saber si esta solución se ajusta a lo que necesitas.";
+    tag = "silent_2h";
+  } else if (hoursPassed >= 24 && hoursPassed < 48) {
+    message = "📩 ¿Tienes dudas sobre cómo te ayudamos a lograr una rutina sin estrés con tu vehículo?";
+    tag = "silent_24h";
+  } else if (hoursPassed >= 48) {
+    message = "⌛ Sabemos que tu agenda es ocupada. Si necesitas apoyo para el pago o tienes preguntas, estamos aquí.";
+    tag = "silent_48h";
+  }
+
+  if (message) {
+    showDashboardNotification(message);
+
+    if (typeof _pe !== "undefined") {
+      _pe.tagPushSubscriber(tag);
+      console.log(`📬 PushEngage tag applied: ${tag}`);
+    }
+
+    showFollowUpCard();
+  }
+}
+
+function showFollowUpCard() {
+  const existing = document.getElementById("followUpCard");
+  if (existing) return;
+
+  const paymentCard = document.querySelector(".countdown-container");
+  if (!paymentCard) return;
+
+  const followUp = document.createElement("div");
+  followUp.id = "followUpCard";
+  followUp.style.cssText = `
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+  `;
+
+  followUp.innerHTML = `
+    <h4 style="margin-top:0;">¿Aún tienes dudas antes de pagar?</h4>
+    <ul style="padding-left: 20px; margin-top: 10px; margin-bottom: 15px;">
+      <li>✅ ¿Ya revisaste todos los beneficios?</li>
+      <li>💬 ¿Quieres agendar una llamada rápida con nuestro staff?</li>
+      <li>🎁 Tu bono especial de bienvenida sigue activo.</li>
+    </ul>
+    <button onclick="window.open('contacto.html', '_blank');" class="orange-button">
+      Hablar con un asesor ahora
+    </button>
+  `;
+
+  paymentCard.parentNode.insertBefore(followUp, paymentCard.nextSibling);
+}
+
+  function checkOrientation() {
+    const banner = document.getElementById("rotateBanner");
+    const isPortrait = window.innerHeight > window.innerWidth;
+    if (isPortrait) {
+      banner.style.display = "block";
+    } else {
+      banner.style.display = "none";
+    }
+  }
+
+  window.addEventListener("load", checkOrientation);
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("orientationchange", checkOrientation);
+
+
+// Initialize departments on load
+document.addEventListener("DOMContentLoaded", populatePopupDepartments);
+  
+/* --- Helper: plan label mapping (keeps labels user-friendly) --- */
+function getPlanLabel(planType) {
+  const labels = {
+    prueba: "Prueba sistema",
+    basic3m: "Básico 3 meses",
+    basic6m: "Básico 6 meses",
+    basic12m: "Básico 12 meses",
+    plus3m: "Plus 3 meses",
+    plus6m: "Plus 6 meses",
+    plus12m: "Plus 12 meses",
+    basic3mfull: "Básico 3 meses (Contado)",
+    basic6mfull: "Básico 6 meses (Contado)",
+    basic12mfull: "Básico 12 meses (Contado)",
+    plus3mfull: "Plus 3 meses (Contado)",
+    plus6mfull: "Plus 6 meses (Contado)",
+    plus12mfull: "Plus 12 meses (Contado)"
+  };
+  return labels[planType] || planType || "No asignado";
+}
+
+        // After retrieving userData:
+// Payment UI logic
+function updatePaymentStatusSection(userData) {
+  const paymentWarningEl = document.getElementById("payment-warning");
+  const completePaymentContainerEl = document.getElementById("complete-payment");
+  const paymentLinkEl = document.getElementById("payment-link");
+
+  if (!paymentWarningEl || !completePaymentContainerEl || !paymentLinkEl) {
+    console.warn("Payment section elements missing");
+    return;
+  }
+
+  const wompiLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
+    basic3m: "https://u.wompi.sv/379910xeV",
+    basic6m: "https://u.wompi.sv/380639rcA",
+    basic12m: "https://u.wompi.sv/3806769qs",
+    plus3m: "https://u.wompi.sv/380690Gbx",
+    plus6m: "https://u.wompi.sv/380695_Np",
+    plus12m: "https://u.wompi.sv/380702xQa",
+    basic3mfull: "https://u.wompi.sv/478091RVm",
+    basic6mfull: "https://u.wompi.sv/387432nHU",
+    basic12mfull: "https://u.wompi.sv/387433i2m",
+    plus3mfull: "https://u.wompi.sv/387439i_2",
+    plus6mfull: "https://u.wompi.sv/387445Beb",
+    plus12mfull: "https://u.wompi.sv/387447ZDj"
+  };
+
+  // Hide by default
+  paymentWarningEl.style.display = "none";
+  completePaymentContainerEl.style.display = "none";
+
+  const status = (userData.paymentStatus || "").toLowerCase();
+  const plan = userData.planType;
+
+  if (status === "pending") {
+    paymentWarningEl.style.display = "block";
+    completePaymentContainerEl.style.display = "block";
+    const link = wompiLinks[plan] || null;
+    if (link) {
+      paymentLinkEl.href = link;
+      paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
+    } else {
+      paymentLinkEl.href = "#";
+      paymentLinkEl.textContent = "Enlace de pago no disponible";
+      paymentLinkEl.style.pointerEvents = "none";
+      paymentLinkEl.style.opacity = "0.5";
+    }
+  } else if (status === "completed") {
+    paymentWarningEl.style.display = "none";
+    completePaymentContainerEl.innerHTML = `<div style="color: green; font-weight: bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+    completePaymentContainerEl.style.display = "block";
+  } else {
+    paymentWarningEl.style.display = "none";
+    completePaymentContainerEl.style.display = "none";
+  }
+}
+
+// Fetch and run
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) return;
+
+  firebase.firestore().collection("users").doc(user.uid).get()
+    .then(doc => {
+      if (!doc.exists) return;
+      const userData = doc.data();
+
+      // 🔹 Estado de Pago button logic
+      if ((userData.paymentStatus || "").toLowerCase() === "pending") {
+        const completePaymentEl = document.getElementById("complete-payment");
+        const paymentLinkEl = document.getElementById("payment-link");
+
+        if (completePaymentEl && paymentLinkEl) {
+          completePaymentEl.style.display = "block";
+
+          // Prefer the checkoutLink saved in Firestore
+          if (userData.checkoutLink) {
+            paymentLinkEl.href = userData.checkoutLink;
+          } else {
+            // fallback to wompiLinks mapping if exists
+            const wompiLinks = {
+              prueba: "https://u.wompi.sv/539830hfH",
+              basic3m: "https://u.wompi.sv/379910xeV",
+              basic6m: "https://u.wompi.sv/380639rcA",
+              basic12m: "https://u.wompi.sv/3806769qs",
+              plus3m: "https://u.wompi.sv/380690Gbx",
+              plus6m: "https://u.wompi.sv/380695_Np",
+              plus12m: "https://u.wompi.sv/380702xQa",
+              basic3mfull: "https://u.wompi.sv/478091RVm",
+              basic6mfull: "https://u.wompi.sv/387432nHU",
+              basic12mfull: "https://u.wompi.sv/387433i2m",
+              plus3mfull: "https://u.wompi.sv/387439i_2",
+              plus6mfull: "https://u.wompi.sv/387445Beb",
+              plus12mfull: "https://u.wompi.sv/387447ZDj"
+            };
+
+            if (userData.planType && wompiLinks[userData.planType]) {
+              paymentLinkEl.href = wompiLinks[userData.planType];
+            }
+          }
+        }
+      } else if ((userData.paymentStatus || "").toLowerCase() === "completed") {
+        const completePaymentEl = document.getElementById("complete-payment");
+        if (completePaymentEl) {
+          completePaymentEl.innerHTML = `<div style="color:green;font-weight:bold;">
+            ✅ Pago confirmado. ¡Gracias por unirte!
+          </div>`;
+          completePaymentEl.style.display = "block";
+        }
+      }
+
+    })
+    .catch(err => console.error("Error fetching user data:", err));
+});
+</script>
+
+    
+  <style>
+      /* Prevent body overflow */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+      body {
+  overflow-x: hidden;
+}
+
+/* Set consistent max width and center content */
+.container,
+.standard-block,
+.dashboard-section,
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+/* Make sure sections align full width on mobile */
+@media (max-width: 768px) {
+  .container,
+  .standard-block,
+  .dashboard-section,
+  .dashboard-content {
+    padding: 0 10px;
+  }
+}
+
+      @media (max-width: 768px) {
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+      /* Make sure all containers respect padding/margins */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 10px;
+}
+
+/* Optional: Set max width for the table if needed */
+.schedule-table {
+  min-width: 700px;
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+.card {
+  box-sizing: border-box;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+        /* Styles for Loyalty Card */
+        .loyalty-card {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .holes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            justify-items: center;
+            margin-bottom: 20px;
+        }
+
+        .hole {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease-in-out;
+            border: 2px dashed #ccc;
+            background-color: #fff;
+            color: #ccc;
+        }
+
+        .hole.completed {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+        }
+
+        .hole.star {
+            font-size: 24px;
+            color: gold;
+        }
+
+        .hole.star.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .rewards {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .reward-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .reward-card:hover {
+            background-color: #e6f7e6;
+        }
+
+        .reward-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .reward-info h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .reward-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .reward-status {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .reward-status.locked {
+            background-color: #ccc;
+            color: white;
+        }
+
+        .reward-status.unlocked {
+            background-color: #4caf50;
+            color: white;
+        }
+    
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 0 20px; /* optional: to align with Reprogramar box padding */
+    box-sizing: border-box;
+}
+
+.dashboard-section {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+      .orange-button {
+    padding: 10px 15px;
+    background-color: #ff6600;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.orange-button:hover {
+    background-color: #cc5500;
+}
+
+.reschedule-section p {
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.reschedule-section {
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+      .reschedule-section p {
+    margin: 5px 0; /* reduces unnecessary vertical spacing */
+    line-height: 1.4; /* clean look */
+}
+
+.reschedule-warning {
+    color: red;
+    font-weight: bold;
+}
+.countdown-container {
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+
+.countdown-container h2 {
+  color: #333;
+  font-size: 24px;
+}
+
+#countdown {
+  font-size: 30px;
+  font-weight: bold;
+  color: #e74c3c; /* Red color for urgency */
+  margin: 15px 0;
+}
+
+.cta-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.cta-button:hover {
+  background-color: #0056b3;
+}
+
+      #floating-offer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background: #fffbec;
+    border: 2px solid #ffc107;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    animation: pop-in 0.5s ease-out;
+}
+
+/* Fix blur only for the title of subscription section */
+.subscription-blurred #subscription-upgrade-card > h3 {
+  filter: none !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
+}
+
+.subscription-blurred #subscription-upgrade-card > h3:hover {
+  color: #ff6600;
+  cursor: pointer;
+}
+
+      @media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card, .referral-submission-section, .referral-progress-section, .loyalty-card, .rewards {
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    width: 100% !important;
+  }
+
+
+  .cta-button {
+    width: 100%;
+  }
+
+  .schedule-table {
+    font-size: 12px;
+  }
+}
+
+      
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.schedule-table {
+  min-width: 700px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.schedule-table th,
+.schedule-table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.schedule-table th {
+  background-color: #003366;
+  color: white;
+}
+
+.schedule-table td:hover {
+  cursor: pointer;
+  background-color: #ffe0b2;
+}
+
+      
+.referral-submission-section {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-submission-section label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.referral-submission-section input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.referral-submission-section button {
+  background-color: #003366;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.referral-submission-section button:hover {
+  background-color: #ff6600;
+}
+
+    .subscription-blurred .subscription-blur-target {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.subscription-blurred h3 {
+  filter: none;
+  pointer-events: auto;
+}
+
+.subscription-blurred #subscription-locked-popup {
+  display: block;
+}
+
+    .subscription-blur-target {
+  transition: filter 0.3s ease;
+}
+
+ @keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -60%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}   
+
+    .referral-progress-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+}
+
+.referral-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+}
+
+.referral-step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.referral-step span {
+  margin-left: 10px;
+}
+
+.referral-step .completed {
+  color: green;
+  font-weight: bold;
+}
+
+.referral-step .pending {
+  color: orange;
+}
+
+    #notificationPopup {
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+    </style>
+</head>
+
+    <body>
+
+        <div id="rotateBanner" style="display: none; background-color: #ff9800; color: white; text-align: center; padding: 10px; font-weight: bold;">
+  📱 Para una mejor experiencia, gira tu teléfono a modo horizontal.
+</div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
+            <li><a href="tac.html">Términos y Condiciones</a></li>
+
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+        
+    </nav>
+
+    
+    <!-- Header -->
+    <header>
+    <div class="header-container">
+        <h2 id="user-info">Cargando usuario...</h2>
+          </div>
+        </header>
+    
+        <button class="orange-button" onclick="logoutUser()" style="margin-left: 10px;">Cerrar Sesión</button>
+
+   
+
+    <!-- Dashboard Content -->
+  <!-- Dashboard Content -->
+<section class="dashboard-section">
+
+    <!-- Grid Start -->
+    <div class="dashboard-grid">
+
+        <!-- User Info Card -->
+        <div class="card">
+            <h3><i class="fas fa-user"></i> Información del Usuario</h3>
+            <p><strong>Nombre:</strong> <span id="name">Cargando...</span></p>
+            <p><strong>Teléfono:</strong> <span id="phone">Cargando...</span></p>
+            <p><strong>Horario Actual:</strong> <span id="current-schedule">Cargando...</span></p>
+            <p><strong>Departamento:</strong> <span id="user-department">Cargando...</span></p>
+          <p><strong>Municipio:</strong> <span id="user-municipality">Cargando...</span></p>
+
+<div class="disclaimer-box" style="background-color: #f8f8f8; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 13px;">
+  <p style="margin: 0; color: #333;">
+    ¿Necesitas actualizar el municipio donde realizaremos la inspección? Puedes hacerlo 1 vez y lo ejecutaremos el mes próximo.
+  </p>
+  <button onclick="openLocationPopup()" style="margin-top: 8px; background-color: #ff6600; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer;">
+    Cambiar Municipio
+  </button>
+</div>
+
+            <div id="locationPopup" style="
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+  z-index: 10000;
+  width: 300px;
+  text-align: center;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+">
+
+  <h3>📍 Cambiar Ubicación</h3>
+  <p>Selecciona tu nuevo departamento y municipio:</p>
+
+  <label for="popupDepartment">Departamento:</label>
+  <select id="popupDepartment" onchange="updatePopupMunicipalities()" style="width: 100%; padding: 6px; margin-bottom: 10px;">
+    <option value="">Seleccione un departamento</option>
+  </select>
+
+  <label for="popupMunicipality">Municipio:</label>
+  <select id="popupMunicipality" style="width: 100%; padding: 6px;">
+    <option value="">Seleccione un municipio</option>
+  </select>
+
+  <div style="margin-top: 15px;">
+    <button onclick="saveLocationChange()" style="background-color: #003366; color: white; border: none; border-radius: 4px; padding: 8px 12px; margin-right: 5px;">Guardar</button>
+    <button onclick="closeLocationPopup()" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px;">Cancelar</button>
+  </div>
+</div>
+
+        </div>
+
+          <!-- Tip del Mes Card -->
+        <div class="card">
+            <h3>🚗✨ Tip del mes</h3>
+            <p><strong>🔧 Consejo experto:</strong> En AutoCuidado Club no vendemos repuestos ni aceites, te damos algo mejor: <strong>asesoría experta y sin estrés</strong>. Nuestro staff certificado te avisa exactamente cuándo cambiar aceite, filtros, o cualquier pieza. Te recomendamos solo las mejores marcas, en la tienda adecuada y al mejor precio. Y aún mejor: ¡nosotros nos encargamos de ir por las piezas, cambiarlas en el momento indicado y coordinamos todo el proceso por ti! 💪✨</p>
+            <p><strong>❄️ Mantenimiento inteligente:</strong> El nivel del refrigerante es solo una parte. Nosotros también medimos el <strong>pH del refrigerante</strong> para proteger el motor contra corrosión interna 🔬🔥. Todo esto, mientras tú sigues tranquilo con tu agenda. Así funciona un servicio pensado para profesionales como tú. 😉🚙</p>
+        </div>
+
+        
+        <!-- Estado de Pago (replace the static block with this) -->
+ 
+ <!-- Payment Status Card -->
+        <div class="card">
+            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+            <p><strong>Plan Elegido</strong> <span id="planType">Cargando...</span></p>
+
+            <!-- Payment warning -->
+<div id="payment-warning" style="display:none; margin:10px 0; color:#c0392b; font-weight:bold;">
+  ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
+</div>
+
+<!-- Payment button -->
+<div id="complete-payment" style="margin-top:10px; display:none;">
+  <a id="payment-link" href="#" target="_blank"
+     style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none; font-weight:bold;">
+     Completa tu pago ahora 🔗
+  </a>
+</div>
+
+
+            <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
+  Cargando mensaje especial...
+</div>
+            <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+                ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
+            </div>
+                      
+            <!-- Countdown Timer Section -->
+<div class="countdown-container">
+  <h2>🚀 ¡Tiempo restante de la Fase Fundador!</h2>
+  <p>Completa tu pago, <strong>antes que esta fase termine</strong></p>
+  <div id="countdown"></div>
+  </div>
+
+        </div>
+
+       
+        <div class="card" id="subscription-upgrade-card">
+    <h3>¿Te gustaría Mejorar de Suscripción?</h3>
+
+    <!-- Locked popup -->
+    <div id="subscription-locked-popup" style="
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 2;
+    ">
+      <strong>🔒 Desbloquea esta opción al pagar tu plan actual de suscripción</strong>
+    </div>
+
+    <!-- ✅ Wrap the content that we want to blur -->
+<div class="subscription-blur-target">
+    <p><strong>Tipo de Plan Actual:</strong></p>
+    <p><span id="planType">Cargando...</span></p>
+
+    <p><strong>Descripción:</strong></p>
+    <p><span id="planMessage">Cargando...</span></p>
+
+    <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
+
+    <!-- ✅ Add the missing select and button -->
+    <div style="margin-top: 15px;">
+        <label for="new-plan"><strong>Selecciona tu nuevo plan:</strong></label>
+        <select id="new-plan" style="width: 100%; padding: 8px; margin-top: 5px;">
+            <option selected disabled>Cargando opciones...</option>
+        </select>
+
+        <button onclick="upgradePlan()" class="orange-button" style="margin-top: 10px;">
+            Actualizar Plan 🚀
+        </button>
+            </div>
+
+    <div id="add-vehicles-button" style="margin-top:10px; display:none;">
+        <button onclick="openAddVehiclesModal()" style="background-color:#ff6600; color:white; padding:10px 15px; border:none; border-radius:5px;">
+            Añade más vehículos: Mejora a Plan Plus 🚗✨
+        </button>
+    </div>
+</div>
+
+        </div>
+        
+            
+      <!-- 🚗 Centralized Vehicle Management Section -->
+<div class="card">
+  <h3><i class="fas fa-car"></i> Mis Vehículos Registrados</h3>
+  <div id="vehiclesList">
+    <p>Cargando vehículos...</p>
+  </div>
+</div>
+    
+<div class="dashboard-section">
+  <div id="addVehicleForm" style="margin-top: 20px;">
+
+  <h3><i class="fas fa-car"></i> Mis Vehículos Registrados</h3>
+      <h4>Añadir Nuevo Vehículo</h4>
+    <label for="newBrand">Marca:</label>
+    <input type="text" id="newBrand" placeholder="Ej. Toyota">
+
+    <label for="newModel">Modelo:</label>
+    <input type="text" id="newModel" placeholder="Ej. Corolla">
+
+    <label for="newPlate">Placa:</label>
+    <input type="text" id="newPlate" placeholder="Ej. P123456">
+
+    <label for="newYear">Año:</label>
+    <input type="number" id="newYear" placeholder="Ej. 2020">
+
+    <button onclick="addNewVehicle()" class="orange-button">Añadir Vehículo 🚗</button>
+  </div>
+
+  <p style="margin-top: 10px; font-size: 13px; color: #777;">
+    * Solo podrás modificar los vehículos después de finalizar tu periodo de suscripción actual.
+  </p>
+</div>
+
+               
+    <!-- Reschedule Section -->
+    <div class="card reschedule-section">
+        <h3><i class="fas fa-clock"></i> Reprogramar Horario</h3>
+        <p>En caso sea necesario y desees cambiar el dia y la hora para tu inspección mensual puedes seleccionar el nuevo :</p>
+        <div id="reschedule-warning" style="color: red; font-weight: bold; display: none;">
+        Ten en cuenta que solo puedes cambiar la preferencia de día y hora de tu inspección una vez al mes.
+        </div>
+            <div id="reschedule-info" style="color: orange; font-weight: bold; margin-top: 10px; display: none;">
+    </div>
+         <div class="table-container">
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Horario</th>
+                    <th>Lunes</th>
+                    <th>Miércoles</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bloque 1</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                    <td onclick="selectScheduleBox(this)">10:00 - 12:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">8:00 - 10:00</td>
+                    <td onclick="selectScheduleBox(this)">9:00 - 11:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 2</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                    <td onclick="selectScheduleBox(this)">13:00 - 15:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">11:00 - 13:00</td>
+                    <td onclick="selectScheduleBox(this)">12:00 - 14:00</td>
+                </tr>
+                <tr>
+                    <td>Bloque 3</td>
+                    <td onclick="selectScheduleBox(this)">15:00 - 17:00</td>
+                    <td onclick="selectScheduleBox(this)">16:00 - 18:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                    <td onclick="selectScheduleBox(this)">14:00 - 16:00</td>
+                    <td onclick="selectScheduleBox(this)">-</td>
+                </tr>
+            </tbody>
+        </table>
+         </div>
+        
+       <button id="save-schedule-btn" onclick="updateSchedule()">
+<input type="hidden" id="selectedDay" name="selectedDay" required>
+<input type="hidden" id="selectedTime" name="selectedTime" required>
+
+    <strong>Guardar Nuevo Horario</strong>
+</button>
+    </div>
+
+<div class="dashboard-section">
+        <section class="referral-progress-section">
+  <h2>¿Querés pagar menos en tu próxima mensualidad? Recomendá y ganá.</h2>
+  <p><strong>Traé a tus amigos y ganá recompensas exclusivas mientras ayudás a otros con su carro.</strong></p>
+
+  <ul style="text-align: left; max-width: 700px; margin: 0 auto; font-size: 1.1em;">
+    <li>🚗¿Conocés a alguien con problemas en su vehículo?</li>
+    <li>📩 Comparte su nombre, número o correo. Nosotros nos encargamos del resto.</li>
+    <li>💸 Si se suscribe, vos pagás menos en tu siguiente ciclo.</li>
+    <li>📈 Entre más referidos activos, más ahorros acumulás.</li>
+    <li>🏅 Convertite en embajador de AutoCuidado Club y ayudá a más gente a prevenir problemas en su carro.</li>
+  </ul>
+
+            
+            <section class="referral-submission-section">
+  <h2>Agregar un Nuevo Referido</h2>
+  <p>Comparte los datos de tu referido y sigue su progreso en tiempo real.</p>
+
+  <form id="referralForm">
+    <label for="referralName">Nombre del referido:</label>
+    <input type="text" id="referralName" name="referralName" required placeholder="Ej. Juan Pérez">
+
+    <label for="referralEmail">Correo electrónico del referido:</label>
+    <input type="email" id="referralEmail" name="referralEmail" required placeholder="correo@ejemplo.com">
+
+    <label for="referralPhone">Número de WhatsApp:</label>
+    <input type="text" id="referralPhone" name="referralPhone" required placeholder="+50312345678">
+
+    <button type="submit">Enviar Referido 🎉</button>
+  </form>
+</section>
+</div>
+        
+  <div id="referralList">
+    <p>Cargando tus referidos...</p>
+  </div>
+</section>
+
+    
+    <!-- Loyalty Rewards Section -->
+        <div class="dashboard-section">
+        <div class="card">
+            <h3><i class="fas fa-star"></i> Programa de lealtad </h3>
+            <div class="loyalty-card">
+                <p>Completa 8 meses continuos y desbloquea los beneficios🔥</p>
+                <div class="holes">
+                   <div class="hole">○</div>
+                    <p>Proceso de registro completo</p>
+                    <div class="hole">○</div>
+                    <p>Pago inicial procesado en tu suscripción</p>
+                    <div class="hole">○</div>
+                    <p>1er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>3er Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>5to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>6to Mes de suscripción activo</p>
+                    <div class="hole">○</div>
+                    <p>7to Mes de suscripción activo</p>
+                    <div class="hole star">★</div>
+                    <p>8to Mes de suscripción activo</p>
+                </div>
+                <div class="description">
+                    <p><strong>Progreso atual:</strong></p>
+                </div>
+            </div>
+
+           <!-- Rewards -->
+<div class="dashboard-section">
+  <div class="rewards">
+    <h3><i class="fas fa-gift"></i> Premios Disponibles 
+        <span class="reward-status locked" style="margin-left:10px;"><i class="fas fa-lock"></i> Bloqueado</span>
+         <!-- 🎁 Redeem Rewards Button -->
+<button id="redeemRewardsButton" style="
+    display: none;
+    margin-top: 15px;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+">
+    Redimir Premios 🎁
+</button>
+    </h3>
+    
+    <div class="reward-row"> <!-- FLEX ROW CONTAINER -->
+        <div class="reward-card">
+            <div class="reward-icon">🎐</div>
+            <div class="reward-info">
+                <h4>Recarga de A/C</h4>
+                <p><span id="ac-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
+        </div>
+        <div class="reward-card">
+            <div class="reward-icon">🚗</div>
+            <div class="reward-info">
+                <h4>Carwash gratis</h4>
+                <p><span id="carwash-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
+        </div>
+        <div class="reward-card">
+            <div class="reward-icon">📝</div>
+            <div class="reward-info">
+                <h4>Revisión extra del mes en curso</h4>
+                <p><span id="review-rewards">1x</span> por cada vehículo registrado</p>
+            </div>
+        </div>
+    </div> <!-- End Flex Row -->
+</div>
+
+    
+        </div>
+    </div>
+    </div>
+    </div>   
+
+<!-- 🎁 Redeem Rewards Modal Form -->
+<div id="redeemConfirmationPopup" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: 300px;
+    text-align: center;
+    max-width: 90%;
+">
+    <h3>🎉 ¿Deseas disfrutar tus premios el próximo mes?</h3>
+    <p>Confirma si deseas solicitar tus premios para el próximo mes.</p>
+    <button onclick="handleRedeemConfirmation(true)" style="background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px; margin-right: 8px;">Sí quiero ✅</button>
+    <button onclick="handleRedeemConfirmation(false)" style="background-color: #f44336; color: white; border: none; border-radius: 4px; padding: 8px 12px;">No por ahora ❌</button>
+</div>
+
+    <!-- 🎁 Redeem Rewards Modal Form -->
+<div class="dashboard-section">
+    <div id="redeemRewardsModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: 300px;
+    text-align: center;
+    max-width: 90%;
+">
+    <h3>🎁 Solicitud de Premios</h3>
+    <form id="redeemRewardsForm">
+        <label for="redeemName">Nombre:</label>
+        <input type="text" id="redeemName" name="redeemName" required placeholder="Tu nombre completo">
+
+        <label for="redeemEmail">Email:</label>
+        <input type="email" id="redeemEmail" name="redeemEmail" required readonly>
+
+        <label for="redeemPhone">Teléfono:</label>
+        <input type="text" id="redeemPhone" name="redeemPhone" required placeholder="+50312345678">
+
+        <label for="redeemMonth">Mes de Redención:</label>
+        <input type="text" id="redeemMonth" name="redeemMonth" required readonly>
+
+        <button type="submit" style="margin-top: 10px; background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px;">Enviar Solicitud ✅</button>
+        <button type="button" onclick="document.getElementById('redeemRewardsModal').style.display='none';" style="background-color: #ccc; color: #333; border: none; border-radius: 4px; padding: 8px 12px; margin-top: 10px;">Cancelar</button>
+    </form>
+</div>
+</div>
+
+<script>
+// 🎉 Open Redeem Modal
+document.getElementById("redeemRewardsButton").addEventListener("click", () => {
+    const popup = document.getElementById("redeemConfirmationPopup");
+    popup.style.display = "block";
+
+    // Optional: close if clicked outside
+    window.onclick = function(event) {
+        if (event.target === popup) {
+            incrementNoClickCount();
+            popup.style.display = "none";
+        }
+    };
+});
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const newPlanSelect = document.getElementById("new-plan");
+    newPlanSelect.addEventListener("change", function () {
+        const selectedPlan = this.value;
+        const addVehicleForm = document.getElementById("addVehicleForm");
+
+        if (selectedPlan.startsWith("plus")) {
+            // ✅ Mostrar formulario para vehículos
+            addVehicleForm.style.display = "block";
+
+            // ✅ Mostrar popup motivacional
+           const subscriptionCard = document.getElementById("subscription-upgrade-card");
+const subscriptionRect = subscriptionCard.getBoundingClientRect();
+
+const popup = document.createElement("div");
+popup.innerHTML = `
+    <div style="
+        position: fixed;
+        top: ${subscriptionRect.bottom + window.scrollY + 20}px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        z-index: 10000;
+        text-align: center;
+        max-width: 90%;
+        animation: fadeIn 0.5s;
+    ">
+        <h3>🎉 ¡Aprovecha esta oportunidad!</h3>
+        <p>No dejes pasar la oportunidad de tener todos tus vehículos bajo el programa de mantenimiento en nuestro club.</p>
+        <div style="
+            background-color: #ff6600;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-top: 12px;
+            display: inline-block;
+            font-weight: bold;
+            cursor: pointer;
+        ">
+            💡 Cámbiate a Plus, ahorra en tu suscripción por vehículo y añade más vehículos a tu plan 🚗
+        </div>
+        <button onclick="this.parentElement.remove()" style="
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        ">Cerrar</button>
+    </div>
+`;
+document.body.appendChild(popup);
+
+            // ✅ Scroll hacia la sección de vehículos para motivar acción
+            addVehicleForm.scrollIntoView({ behavior: "smooth" });
+
+        } else {
+            // ✅ Ocultar si no es Plus
+            addVehicleForm.style.display = "none";
+        }
+    });
+});
+
+</script>
+
+</section>
+
+
+<!-- SDK de Facebook (una sola vez, justo antes de </body>) -->
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous"
+  src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0">
+    
+  </script>
+
+
+ <div style="display: flex; justify-content: center; margin: 30px 0;">
+  <div class="fb-page"
+       data-href="https://www.facebook.com/profile.php?id=61575027617474"
+       data-tabs="timeline"
+       data-width="1000"
+       data-height=""
+       data-small-header="true"
+       data-adapt-container-width="false"
+       data-hide-cover="false"
+       data-show-facepile="true"
+       style="max-width: 1000px; width: 100%;">
+    <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" class="fb-xfbml-parse-ignore">
+      <a href="https://www.facebook.com/profile.php?id=61575027617474">Autocuidado Club</a>
+    </blockquote>
+  </div>
+</div>
+
+        
+        
+<div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+  <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
+    <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
+    <div style="text-align: left; max-width: 300px;">
+      <p style="margin: 0; font-size: 18px; font-weight: bold;">
+        Esta app es más que tecnología.
+      </p>
+      <p style="margin: 5px 0 0; font-size: 16px;">
+        Es una forma distinta de cuidar lo que importa.
+      </p>
+    </div>
+  </div>
+  <p style="text-align: center; margin-top: 20px; font-size: 16px;">
+    <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
+  </p>
+</div>
+   
+<footer>
+    <p>&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
+    <ul>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+         <li><a href="tac.html">Términos y Condiciones</a></li>
+         <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
+    </ul>
+
+<div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/autocareclub" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Include Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+  integrity="sha512-C8dG4Oz9e2SNDY3hNXYMxdC8r44T+Qhpt8wBtaT0LgD0fXzRGv9gJ9mH6YmtFwUrLjPgD3STdJ9IjG2I+Bc2Fg=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer">
+</script>
+
+
+
+</footer>
+
+
+            <!-- 🔔 Notification Pop-up -->
+<div id="notificationPopup" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #003366;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 9999;
+  max-width: 300px;
+  font-size: 14px;
+">
+  <span id="notificationMessage">Notificación aquí</span>
+</div>
+
+
+      <!-- CTA Footer -->
+<div id="cta-install-bar" style="display:none;">
+ <div class="cta-message">
+  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+</div>
+    
+      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
+      <a href="contacto.html">💬 Contácta con nuestro staff</a>
+      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
+    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+<!-- Feedback Modal -->
+<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
+    <button onclick="closeFeedbackModal()" style="
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #ff0000;
+      font-weight: bold;
+    ">❌</button>
+  </div>
+
+  <form id="voiceFeedbackForm">
+    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between;">
+      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
+      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
+    </div>
+  </form>
+
+  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+    <img src="loading.gif" alt="Cargando..." style="width:80px;">
+  </div>
+
+  </div>
+</div>
+
+
+<!-- Botón para volver a mostrar el menú -->
+<button id="reopen-cta-btn" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 9999;
+  opacity: 0;
+  max-width: 180px;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+">
+📲 Abrir menú
+</button>
+
+
+
+
+  <script>
+     let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Stop the browser from showing the default prompt
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Optional: you could show the button ONLY when install is available
+  document.getElementById('how-to-install-btn').style.display = 'inline-block';
+});
+
+document.getElementById('how-to-install-btn').addEventListener('click', async () => {
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+
+  if (deferredPrompt) {
+    // If install is supported, show browser-native prompt
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === 'accepted') {
+      console.log('✅ User accepted the install prompt');
+    } else {
+      console.log('❌ User dismissed the install prompt');
+    }
+    deferredPrompt = null;
+  } else if (isIos) {
+    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+  } else if (isAndroid) {
+    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
+  } else {
+    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
+  }
+});
+
+    function openFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'flex';
+      document.getElementById('feedbackText').focus();
+    }
+
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'none';
+      document.getElementById('voiceFeedbackForm').reset();
+      document.getElementById('feedbackLoader').style.display = 'none';
+    }
+
+    function startVoiceInput() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz.");
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'es-ES';
+
+      const feedbackText = document.getElementById('feedbackText');
+      feedbackText.placeholder = "🎙️ Escuchando...";
+      feedbackText.style.border = "2px solid orange";
+
+      recognition.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.onerror = (event) => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+        alert("Error de voz: " + event.error);
+      };
+
+      recognition.onend = () => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.start();
+    }
+
+   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
+      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
+      e.preventDefault();
+      document.getElementById('feedbackLoader').style.display = 'block';
+
+      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        body: new FormData(this)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        if (data.success) {
+          alert("¡Gracias por tu opinión!");
+          closeFeedbackModal();
+        } else {
+          alert("Error al enviar. Intenta de nuevo.");
+        }
+      })
+      .catch(() => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        alert("Hubo un problema al enviar el mensaje.");
+      });
+    };
+
+      function closeCtaInstallBar() {
+    const ctaBar = document.getElementById('cta-install-bar');
+    const reopenBtn = document.getElementById('reopen-cta-btn');
+
+    // Animación suave antes de ocultarlo
+    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    ctaBar.style.opacity = '0';
+    ctaBar.style.transform = 'translateY(20px)';
+
+    setTimeout(() => {
+      ctaBar.style.display = 'none';
+
+      // Mostrar botón flotante después de 5 segundos
+      setTimeout(() => {
+        reopenBtn.style.display = 'block';
+        setTimeout(() => {
+          reopenBtn.style.opacity = '1';
+        }, 10);
+      }, 5000);
+    }, 300); // esperar a que termine la transición
+  }
+
+      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
+    
+  function checkOrientation() {
+    const isMobile = window.innerWidth < 768;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const banner = document.getElementById('rotate-device-banner');
+
+    if (isMobile && isPortrait) {
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('load', checkOrientation);
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
+
+function updatePaymentStatusSection(userData) {
+  const paymentWarningEl = document.getElementById("payment-warning");
+  const completePaymentEl = document.getElementById("complete-payment");
+  const paymentLinkEl = document.getElementById("payment-link");
+
+  // Reset
+  paymentWarningEl.style.display = "none";
+  completePaymentEl.style.display = "none";
+
+  // Prefer checkoutLink from Firestore
+  const wompiLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
+    basic3m: "https://u.wompi.sv/379910xeV",
+    basic6m: "https://u.wompi.sv/380639rcA",
+    basic12m: "https://u.wompi.sv/3806769qs",
+    plus3m: "https://u.wompi.sv/380690Gbx",
+    plus6m: "https://u.wompi.sv/380695_Np",
+    plus12m: "https://u.wompi.sv/380702xQa",
+    basic3mfull: "https://u.wompi.sv/478091RVm",
+    basic6mfull: "https://u.wompi.sv/387432nHU",
+    basic12mfull: "https://u.wompi.sv/387433i2m",
+    plus3mfull: "https://u.wompi.sv/387439i_2",
+    plus6mfull: "https://u.wompi.sv/387445Beb",
+    plus12mfull: "https://u.wompi.sv/387447ZDj"
+  };
+
+  const status = (userData.paymentStatus || "").toLowerCase();
+  const plan = userData.planType;
+
+  // Use Firestore checkoutLink if exists, else fallback
+  const checkout = userData.checkoutLink || wompiLinks[plan] || "#";
+
+  if (status === "pending") {
+    paymentWarningEl.style.display = "block";
+    completePaymentEl.style.display = "block";
+    paymentLinkEl.href = checkout;
+    paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
+  }
+
+  if (status === "completed") {
+    paymentWarningEl.style.display = "none";
+    completePaymentEl.style.display = "block";
+    completePaymentEl.innerHTML =
+      `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+  }
+}
+
+
+
+  </script>
+
+        <div id="rotate-device-banner" style="display:none;">
+  <p>📱 Para ver mejor el contenido, gira tu dispositivo a modo horizontal.</p>
+</div>
+
+
+</body>
+</html>
