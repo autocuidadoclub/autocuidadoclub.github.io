@@ -1909,10 +1909,19 @@ firebase.auth().onAuthStateChanged(user => {
     .then(doc => {
       if (!doc.exists) return;
       const userData = doc.data();
-      updatePaymentStatusSection(userData);
+
+      // 🔹 Show payment button if status = Pending
+      if ((userData.paymentStatus || "").toLowerCase() === "pending") {
+        document.getElementById("complete-payment").style.display = "block";
+        const paymentLinkEl = document.getElementById("payment-link");
+        if (userData.checkoutLink) {
+          paymentLinkEl.href = userData.checkoutLink;
+        }
+      }
     })
     .catch(err => console.error("Error fetching user data:", err));
 });
+
 
 
 
