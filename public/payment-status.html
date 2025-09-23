@@ -89,8 +89,7 @@
       plus12mfull: "https://u.wompi.sv/387447ZDj"
     };
 
-    // ✅ Update UI
-function updateUI(userData) {
+  function updateUI(userData) {
   const memberSinceEl = document.getElementById("memberSince");
   const paymentDateEl = document.getElementById("paymentDate");
   const nextPaymentEl = document.getElementById("nextPaymentDate");
@@ -130,13 +129,17 @@ function updateUI(userData) {
     warningEl.style.display = "block";
     completeEl.style.display = "block";
 
-    // ✅ FIX HERE: Check if the plan type has a known good link and prioritize it.
-    let rawLink = (userData.checkoutLink || "").trim();
-    if (userData.planType === 'plus12m' && wompiLinks['plus12m']) {
-      rawLink = wompiLinks['plus12m'];
-    } else if (rawLink === "" || rawLink === "#") {
-      rawLink = wompiLinks[userData.planType] || "#";
+    // ✅ NEW AND IMPROVED LOGIC
+    // Prioritize the link from the local wompiLinks list.
+    let rawLink = wompiLinks[userData.planType];
+    
+    // If no link is found in the local list, use the one from Firebase.
+    if (!rawLink) {
+        rawLink = userData.checkoutLink;
     }
+
+    // Default to a placeholder if no link is found
+    rawLink = rawLink || "#";
 
     console.log("Final payment link:", JSON.stringify(rawLink));
 
@@ -151,7 +154,7 @@ function updateUI(userData) {
       completeEl.style.display = "block";
     }
   }
-} // ✅ close function here, nothing more
+}// ✅ close function here, nothing more
 
 
     // ✅ Auth listener
