@@ -124,27 +124,32 @@ function updateUI(userData) {
   completeEl.style.display = "none";
 
   // --- Payment Logic ---
-  const isExpired = nextPaymentDate && nextPaymentDate < today;
+ // --- Payment Logic ---
+const isExpired = nextPaymentDate && nextPaymentDate < today;
 
-  if (status === "pending" || isExpired) {
-    warningEl.style.display = "block";
+if (status === "pending" || isExpired) {
+  warningEl.style.display = "block";
+  completeEl.style.display = "block";
+
+  const rawLink = (userData.checkoutLink || wompiLinks[userData.planType] || "#").trim();
+  console.log("Final payment link:", JSON.stringify(rawLink));
+
+  // Instead of setting href only, attach a safe click handler
+  paymentLinkEl.removeAttribute("href"); // avoid browser rewriting
+  paymentLinkEl.onclick = (e) => {
+    e.preventDefault();
+    window.open(rawLink, "_blank", "noopener,noreferrer");
+  };
+  paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
+
+} else if (status === "completed" || status === "confirmado") {
+  if (!isExpired) {
+    completeEl.innerHTML =
+      `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
     completeEl.style.display = "block";
-
-    const rawLink = (userData.checkoutLink || wompiLinks[userData.planType] || "#").trim();
-    console.log("Final payment link:", JSON.stringify(rawLink));
-
-    paymentLinkEl.setAttribute("href", rawLink);
-    paymentLinkEl.target = "_blank";
-    paymentLinkEl.rel = "noopener noreferrer";
-    paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
-
-  } else if (status === "completed" || status === "confirmado") {
-    if (!isExpired) {
-      completeEl.innerHTML =
-        `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-      completeEl.style.display = "block";
-    }
   }
+}
+
 } // ✅ close function here, nothing more
 
 
