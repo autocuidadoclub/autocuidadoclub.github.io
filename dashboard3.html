@@ -1911,53 +1911,7 @@ firebase.auth().onAuthStateChanged(user => {
       if (!doc.exists) return;
       const userData = doc.data();
 
-      // 🔹 Estado de Pago button logic
-      if ((userData.paymentStatus || "").toLowerCase() === "pending") {
-        const completePaymentEl = document.getElementById("complete-payment");
-        const paymentLinkEl = document.getElementById("payment-link");
-
-        if (completePaymentEl && paymentLinkEl) {
-          completePaymentEl.style.display = "block";
-
-          // Prefer the checkoutLink saved in Firestore
-          if (userData.checkoutLink) {
-            paymentLinkEl.href = userData.checkoutLink;
-          } else {
-            // fallback to wompiLinks mapping if exists
-            const wompiLinks = {
-              prueba: "https://u.wompi.sv/539830hfH",
-              basic3m: "https://u.wompi.sv/379910xeV",
-              basic6m: "https://u.wompi.sv/380639rcA",
-              basic12m: "https://u.wompi.sv/3806769qs",
-              plus3m: "https://u.wompi.sv/380690Gbx",
-              plus6m: "https://u.wompi.sv/380695_Np",
-              plus12m: "https://u.wompi.sv/380702xQa",
-              basic3mfull: "https://u.wompi.sv/478091RVm",
-              basic6mfull: "https://u.wompi.sv/387432nHU",
-              basic12mfull: "https://u.wompi.sv/387433i2m",
-              plus3mfull: "https://u.wompi.sv/387439i_2",
-              plus6mfull: "https://u.wompi.sv/387445Beb",
-              plus12mfull: "https://u.wompi.sv/387447ZDj"
-            };
-
-            if (userData.planType && wompiLinks[userData.planType]) {
-              paymentLinkEl.href = wompiLinks[userData.planType];
-            }
-          }
-        }
-      } else if ((userData.paymentStatus || "").toLowerCase() === "completed") {
-        const completePaymentEl = document.getElementById("complete-payment");
-        if (completePaymentEl) {
-          completePaymentEl.innerHTML = `<div style="color:green;font-weight:bold;">
-            ✅ Pago confirmado. ¡Gracias por unirte!
-          </div>`;
-          completePaymentEl.style.display = "block";
-        }
-      }
-
-    })
-    .catch(err => console.error("Error fetching user data:", err));
-});
+    
 </script>
 
     
@@ -2545,7 +2499,6 @@ html, body {
            Completa tu pago ahora 🔗
         </a>
       </div>
-    </div>
 
 
             <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
