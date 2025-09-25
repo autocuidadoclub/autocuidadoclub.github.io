@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1911,7 +1912,53 @@ firebase.auth().onAuthStateChanged(user => {
       if (!doc.exists) return;
       const userData = doc.data();
 
-    
+      // 🔹 Estado de Pago button logic
+      if ((userData.paymentStatus || "").toLowerCase() === "pending") {
+        const completePaymentEl = document.getElementById("complete-payment");
+        const paymentLinkEl = document.getElementById("payment-link");
+
+        if (completePaymentEl && paymentLinkEl) {
+          completePaymentEl.style.display = "block";
+
+          // Prefer the checkoutLink saved in Firestore
+          if (userData.checkoutLink) {
+            paymentLinkEl.href = userData.checkoutLink;
+          } else {
+            // fallback to wompiLinks mapping if exists
+            const wompiLinks = {
+              prueba: "https://u.wompi.sv/539830hfH",
+              basic3m: "https://u.wompi.sv/379910xeV",
+              basic6m: "https://u.wompi.sv/380639rcA",
+              basic12m: "https://u.wompi.sv/3806769qs",
+              plus3m: "https://u.wompi.sv/380690Gbx",
+              plus6m: "https://u.wompi.sv/380695_Np",
+              plus12m: "https://u.wompi.sv/380702xQa",
+              basic3mfull: "https://u.wompi.sv/478091RVm",
+              basic6mfull: "https://u.wompi.sv/387432nHU",
+              basic12mfull: "https://u.wompi.sv/387433i2m",
+              plus3mfull: "https://u.wompi.sv/387439i_2",
+              plus6mfull: "https://u.wompi.sv/387445Beb",
+              plus12mfull: "https://u.wompi.sv/387447ZDj"
+            };
+
+            if (userData.planType && wompiLinks[userData.planType]) {
+              paymentLinkEl.href = wompiLinks[userData.planType];
+            }
+          }
+        }
+      } else if ((userData.paymentStatus || "").toLowerCase() === "completed") {
+        const completePaymentEl = document.getElementById("complete-payment");
+        if (completePaymentEl) {
+          completePaymentEl.innerHTML = `<div style="color:green;font-weight:bold;">
+            ✅ Pago confirmado. ¡Gracias por unirte!
+          </div>`;
+          completePaymentEl.style.display = "block";
+        }
+      }
+
+    })
+    .catch(err => console.error("Error fetching user data:", err));
+});
 </script>
 
     
@@ -2492,13 +2539,13 @@ html, body {
   ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
 </div>
 
- <!-- Payment Button -->
-      <div id="complete-payment" style="margin-top:10px; display:none;">
-        <a id="payment-link" href="#" target="_blank"
-           style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
-           Completa tu pago ahora 🔗
-        </a>
-      </div>
+<!-- Payment button -->
+<div id="complete-payment" style="margin-top:10px; display:none;">
+  <a id="payment-link" href="#" target="_blank"
+     style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none; font-weight:bold;">
+     Completa tu pago ahora 🔗
+  </a>
+</div>
 
 
             <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
@@ -3270,121 +3317,52 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   window.addEventListener('resize', checkOrientation);
   window.addEventListener('orientationchange', checkOrientation);
 
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-      console.log("✅ Firebase inicializado.");
-    }
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Helper
-    function prettyDate(ts) {
-      if (!ts) return "No asignado";
-      try {
-        const d = ts.toDate ? ts.toDate() : new Date(ts);
-        return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-      } catch {
-        return "—";
-      }
-    }
-
-    // Default Wompi links
-    const wompiLinks = {
-      prueba: "https://u.wompi.sv/539830hfH",
-      basic3m: "https://u.wompi.sv/379910xeV",
-      basic6m: "https://u.wompi.sv/380639rcA",
-      basic12m: "https://u.wompi.sv/3806769qs",
-      plus3m: "https://u.wompi.sv/380690Gbx",
-      plus6m: "https://u.wompi.sv/380695_Np",
-      plus12m: "https://u.wompi.sv/380702xQa",
-      basic3mfull: "https://u.wompi.sv/387439i_2",
-      basic6mfull: "https://u.wompi.sv/387432nHU",
-      basic12mfull: "https://u.wompi.sv/387433i2m",
-      plus3mfull: "https://u.wompi.sv/387439i_2",
-      plus6mfull: "https://u.wompi.sv/387445Beb",
-      plus12mfull: "https://u.wompi.sv/387447ZDj"
-    };
-
-  function updateUI(userData) {
-  const memberSinceEl = document.getElementById("memberSince");
-  const paymentDateEl = document.getElementById("paymentDate");
-  const nextPaymentEl = document.getElementById("nextPaymentDate");
-  const planTypeEl = document.getElementById("PlanType");
-  const founderPhaseEl = document.getElementById("founderPhaseMessage");
-  const warningEl = document.getElementById("payment-warning");
-  const completeEl = document.getElementById("complete-payment");
+function updatePaymentStatusSection(userData) {
+  const paymentWarningEl = document.getElementById("payment-warning");
+  const completePaymentEl = document.getElementById("complete-payment");
   const paymentLinkEl = document.getElementById("payment-link");
 
+  // Reset
+  paymentWarningEl.style.display = "none";
+  completePaymentEl.style.display = "none";
+
+  // Prefer checkoutLink from Firestore
+  const wompiLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
+    basic3m: "https://u.wompi.sv/379910xeV",
+    basic6m: "https://u.wompi.sv/380639rcA",
+    basic12m: "https://u.wompi.sv/3806769qs",
+    plus3m: "https://u.wompi.sv/380690Gbx",
+    plus6m: "https://u.wompi.sv/380695_Np",
+    plus12m: "https://u.wompi.sv/380702xQa",
+    basic3mfull: "https://u.wompi.sv/478091RVm",
+    basic6mfull: "https://u.wompi.sv/387432nHU",
+    basic12mfull: "https://u.wompi.sv/387433i2m",
+    plus3mfull: "https://u.wompi.sv/387439i_2",
+    plus6mfull: "https://u.wompi.sv/387445Beb",
+    plus12mfull: "https://u.wompi.sv/387447ZDj"
+  };
+
   const status = (userData.paymentStatus || "").toLowerCase();
-  const today = new Date();
-  const nextPaymentDate = userData.nextPaymentDate?.toDate
-    ? userData.nextPaymentDate.toDate()
-    : userData.nextPaymentDate
-    ? new Date(userData.nextPaymentDate)
-    : null;
+  const plan = userData.planType;
 
-  // Fill base info
-  memberSinceEl.textContent = prettyDate(userData.registrationDate);
-  paymentDateEl.textContent =
-    status === "completed" && userData.paymentDate
-      ? prettyDate(userData.paymentDate)
-      : "Pendiente de pago";
-  nextPaymentEl.textContent = prettyDate(userData.nextPaymentDate);
-  planTypeEl.textContent = userData.planType || "No asignado";
-  founderPhaseEl.textContent =
-    "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
+  // Use Firestore checkoutLink if exists, else fallback
+  const checkout = userData.checkoutLink || wompiLinks[plan] || "#";
 
-  // Hide all by default
-  warningEl.style.display = "none";
-  completeEl.style.display = "none";
-
-  // --- Payment Logic ---
-  const isExpired = nextPaymentDate && nextPaymentDate < today;
-
-  if (status === "pending" || isExpired) {
-    warningEl.style.display = "block";
-    completeEl.style.display = "block";
-
-    // ✅ NEW AND IMPROVED LOGIC
-    // Prioritize the link from the local wompiLinks list.
-    let rawLink = wompiLinks[userData.planType];
-    
-    // If no link is found in the local list, use the one from Firebase.
-    if (!rawLink) {
-        rawLink = userData.checkoutLink;
-    }
-
-    // Default to a placeholder if no link is found
-    rawLink = rawLink || "#";
-
-    console.log("Final payment link:", JSON.stringify(rawLink));
-
-    paymentLinkEl.setAttribute("href", rawLink);
-    paymentLinkEl.target = "_blank";
-    paymentLinkEl.rel = "noopener noreferrer";
+  if (status === "pending") {
+    paymentWarningEl.style.display = "block";
+    completePaymentEl.style.display = "block";
+    paymentLinkEl.href = checkout;
     paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
-  } else if (status === "completed" || status === "confirmado") {
-    if (!isExpired) {
-      completeEl.innerHTML =
-        `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-      completeEl.style.display = "block";
-    }
   }
-}// ✅ close function here, nothing more
 
-
-    // ✅ Auth listener
-    auth.onAuthStateChanged(user => {
-      if (!user) return;
-      db.collection("users").doc(user.uid).get()
-        .then(doc => {
-          if (doc.exists) {
-            updateUI(doc.data());
-          }
-        })
-        .catch(err => console.error("❌ Error obteniendo userData:", err));
-    })
+  if (status === "completed") {
+    paymentWarningEl.style.display = "none";
+    completePaymentEl.style.display = "block";
+    completePaymentEl.innerHTML =
+      `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+  }
+}
 
 
 
