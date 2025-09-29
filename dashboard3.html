@@ -2426,7 +2426,7 @@ html, body {
         </div>
 
        
-        <div class="card" id="subscription-upgrade-card">
+         <div class="card" id="subscription-upgrade-card">
     <h3>¿Te gustaría Mejorar de Suscripción?</h3>
 
     <!-- Locked popup -->
@@ -2445,7 +2445,10 @@ html, body {
 
     <!-- ✅ Wrap the content that we want to blur -->
 <div class="subscription-blur-target">
-        <p><strong>Descripción del plan actual:</strong></p>
+    <p><strong>Tipo de Plan Actual:</strong></p>
+    <p><span id="planType">Cargando...</span></p>
+
+    <p><strong>Descripción:</strong></p>
     <p><span id="planMessage">Cargando...</span></p>
 
     <div id="motivational-message" style="display:none; margin-top:10px; padding:10px; background-color:#ffebe8; border-radius:5px;"></div>
@@ -2468,7 +2471,6 @@ html, body {
         </button>
     </div>
 </div>
-
         </div>
         
             
