@@ -46,41 +46,19 @@ document.addEventListener("DOMContentLoaded", () => {
     db = firebase.firestore();
 
        // ✅ Check de autenticación
-// ✅ Check de autenticación
-// ✅ Auth listener
-auth.onAuthStateChanged(user => {
-  if (!user) {
-    // Redirect to login or handle unauthorized state
-    window.location.href = "login.html"; 
-    return;
-  }
-  
-  // --- NEW PAYMENT LOGIC DATA FETCH ---
-  db.collection("users").doc(user.uid).get()
-    .then(doc => {
-      if (doc.exists) {
-        const userData = doc.data();
-        
-        // 🔑 1. CALL THE NEW PAYMENT UI FUNCTION
-        updateUI(userData); 
-        
-        // 🔑 2. CALL ANY OTHER EXISTING FUNCTIONS THAT NEED USER DATA
-        // Example: loadUserProfile(user.uid); 
-        // Example: otherUpdateFunction(userData);
-
-      } else {
-        updateUI({}); // Ensure UI defaults are set if profile not found
-        console.error("❌ Error: No se encontró perfil de usuario en Firestore.");
-      }
-    })
-    .catch(err => {
-        updateUI({}); // Ensure UI defaults are set on error
-        console.error("❌ Error obteniendo userData (Firestore access failed):", err);
-    });
-
-    // NOTE: If you have other functions like loadReferrals(user.uid) 
-    // that don't depend on the doc.data(), you can keep them outside the .then() chain.
+  auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById("user-info").innerText = `Bienvenido, ${user.email}`;
+        loadUserProfile(user.uid);
+        loadReferrals(user.uid);
+        listenForReferralUpdates(user.uid, user.email);
+        listenToReferredUserPayments(user.uid);
+        listenToReferredUserRegistrations(user.uid); // ✅ Add this line
+        } else {
+        window.location.href = "login.html";
+    }
 });
+
 });
 
 // ✅ Guardar Referido
@@ -750,10 +728,17 @@ function loadUserProfile(uid) {
 function updateUserInfo(userData) {
     document.getElementById("name").innerText = userData.name || "N/A";
     document.getElementById("phone").innerText = userData.phone || "N/A";
+    document.getElementById("planType").innerText = userData.planType || "N/A";
     document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
     document.getElementById("user-department").innerText = userData.department || "Desconocido";
     document.getElementById("user-municipality").innerText = userData.municipality || "Desconocido";
-   
+    if (!userData.paymentDate || userData.paymentStatus === "Pending") {
+    document.getElementById("paymentDate").innerText = "Pendiente de pago";
+    document.getElementById("nextPaymentDate").innerText = "No asignado";
+} else {
+    document.getElementById("paymentDate").innerText = formatTimestamp(userData.paymentDate);
+    document.getElementById("nextPaymentDate").innerText = formatTimestamp(userData.nextPaymentDate) || "No asignado";
+}
 // Hide countdown if payment is completed
 const countdownContainer = document.querySelector(".countdown-container");
 if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confirmado") {
@@ -777,7 +762,8 @@ if (userData.paymentStatus === "Completed" || userData.paymentStatus === "Confir
     if (lockedPopup) lockedPopup.style.display = "block";
 }
 
-        // After updating schedule info
+        document.getElementById("memberSince").innerText = formatTimestamp(userData.registrationDate) || "Desconocido";
+   // After updating schedule info
 document.getElementById("current-schedule").innerText = userData.schedule ? `${userData.schedule.day} - ${userData.schedule.time}` : "No asignado";
 
 // Check if user already reprogrammed
@@ -799,6 +785,7 @@ if (userData.lastReschedule) {
 
     
     loadVehicles(userData.vehicles);
+    handlePaymentStatus(userData);
     updateLoyaltyCard(userData);
 
     // 🔥 Plan Descriptions
@@ -928,6 +915,24 @@ showSmartFollowupMessage(userData); // ✅ Add this here
     }
   }
 
+// Payment Status Function
+function handlePaymentStatus(userData) {
+    const paymentWarning = document.getElementById("payment-warning");
+    const completePayment = document.getElementById("complete-payment");
+    const paymentLink = document.getElementById("payment-link");
+
+    if (userData.paymentStatus === "Pending") {
+        paymentWarning.style.display = "block";
+        let payPalURL = getPaypalLink(userData.planType);
+        if (payPalURL) {
+            paymentLink.href = payPalURL;
+            completePayment.style.display = "block";
+        }
+    } else {
+        paymentWarning.style.display = "none";
+        completePayment.style.display = "none";
+    }
+}
 
 // PayPal Links
 function getPaypalLink(planType) {
@@ -1818,104 +1823,6 @@ function showFollowUpCard() {
 
 // Initialize departments on load
 document.addEventListener("DOMContentLoaded", populatePopupDepartments);
-
-        // Helper function for date formatting
-function prettyDate(ts) {
-  if (!ts) return "No asignado";
-  try {
-    // Handles both Firestore Timestamp objects and standard Date objects/strings
-    const d = ts.toDate ? ts.toDate() : new Date(ts); 
-    return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-  } catch {
-    return "—";
-  }
-}
-
-// Default Wompi links for recurring and full plans
-const wompiLinks = {
-  prueba: "https://u.wompi.sv/539830hfH",
-  basic3m: "https://u.wompi.sv/379910xeV",
-  basic6m: "https://u.wompi.sv/380639rcA",
-  basic12m: "https://u.wompi.sv/3806769qs",
-  plus3m: "https://u.wompi.sv/380690Gbx",
-  plus6m: "https://u.wompi.sv/380695_Np",
-  plus12m: "https://u.wompi.sv/380702xQa",
-  basic3mfull: "https://u.wompi.sv/387439i_2",
-  basic6mfull: "https://u.wompi.sv/387432nHU",
-  basic12mfull: "https://u.wompi.sv/387433i2m",
-  plus3mfull: "https://u.wompi.sv/387439i_2",
-  plus6mfull: "https://u.wompi.sv/387445Beb",
-  plus12mfull: "https://u.wompi.sv/387447ZDj"
-};
-
-// Main function to update Payment UI based on user data
-function updateUI(userData) {
-  const memberSinceEl = document.getElementById("memberSince");
-  const paymentDateEl = document.getElementById("paymentDate");
-  const nextPaymentEl = document.getElementById("nextPaymentDate");
-  const planTypeEl = document.getElementById("PlanType");
-  const founderPhaseEl = document.getElementById("founderPhaseMessage");
-  const warningEl = document.getElementById("payment-warning");
-  const completeEl = document.getElementById("complete-payment");
-  const paymentLinkEl = document.getElementById("payment-link");
-
-  // Default to empty object if no data is passed (e.g., if Firebase retrieval fails)
-  userData = userData || {};
-
-  const status = (userData.paymentStatus || "").toLowerCase();
-  const today = new Date();
-  
-  const nextPaymentDate = userData.nextPaymentDate?.toDate
-    ? userData.nextPaymentDate.toDate()
-    : userData.nextPaymentDate
-    ? new Date(userData.nextPaymentDate)
-    : null;
-
-  // Fill base info
-  memberSinceEl.textContent = prettyDate(userData.registrationDate);
-  paymentDateEl.textContent =
-    status === "completed" && userData.paymentDate
-      ? prettyDate(userData.paymentDate)
-      : "Pendiente de pago";
-  nextPaymentEl.textContent = prettyDate(userData.nextPaymentDate);
-  planTypeEl.textContent = userData.planType || "No asignado";
-  founderPhaseEl.textContent =
-    "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
-
-  // Hide all by default
-  warningEl.style.display = "none";
-  completeEl.style.display = "none";
-
-  // --- Payment Logic ---
-  const isExpired = nextPaymentDate && nextPaymentDate < today;
-
-  if (status === "pending" || isExpired) {
-    // Show warning and button for pending/expired status
-    warningEl.style.display = "block";
-    completeEl.style.display = "block";
-
-    // ✅ Link Priority: 1. Local wompiLinks list, 2. Firebase's checkoutLink, 3. Placeholder '#'
-    let rawLink = wompiLinks[userData.planType];
-    
-    if (!rawLink) {
-      rawLink = userData.checkoutLink;
-    }
-
-    rawLink = rawLink || "#";
-
-    paymentLinkEl.setAttribute("href", rawLink);
-    paymentLinkEl.target = "_blank";
-    paymentLinkEl.rel = "noopener noreferrer";
-    paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
-  } else if (status === "completed" || status === "confirmado") {
-    // Show confirmation message for paid status
-    if (!isExpired) {
-      completeEl.innerHTML =
-        `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
-      completeEl.style.display = "block";
-    }
-  }
-}
   
 </script>
 
@@ -2482,34 +2389,25 @@ html, body {
         </div>
 
         
-      <section class="dashboard-section">
-    <h2>Estado de Pago</h2>
+        <!-- Payment Status Card -->
+        <div class="card">
+            <h3><i class="fas fa-credit-card"></i> Estado de Pago</h3>
+            <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+            <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+            <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+            <p><strong>Plan Elegido</strong> <span id="planType">Cargando...</span></p>
 
-    <div class="estado-pago-card">
-      <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-      <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-      <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-      <p><strong>Plan Elegido:</strong> <span id="PlanType">Cargando...</span></p>
-
-      <div id="founderPhaseMessage">Cargando mensaje especial...</div>
-
-      <!-- Warning -->
-      <div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
-        ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
-      </div>
-
-      <!-- Payment Button -->
-      <div id="complete-payment" style="margin-top:10px; display:none;">
-        <a id="payment-link" href="#" target="_blank"
-           style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
-           Completa tu pago ahora 🔗
-        </a>
-      </div>
-    </div>
-  </section>
-
-
-        <section>
+            <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
+  Cargando mensaje especial...
+</div>
+            <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
+                ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
+            </div>
+            <div id="complete-payment" style="margin-top: 10px; display: none;">
+                <a id="payment-link" href="#" target="_blank" class="btn-primary" style="padding: 10px 15px; background-color: #ff6600; color: white; border-radius: 5px; text-decoration: none;">
+                    Completa tu pago ahora 🔗
+                </a>
+            </div>
             
             <!-- Countdown Timer Section -->
 <div class="countdown-container">
@@ -3280,7 +3178,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   <p>📱 Para ver mejor el contenido, gira tu dispositivo a modo horizontal.</p>
 </div>
 
-         <script>
+          <script>
   document.addEventListener("DOMContentLoaded", () => {
     // ✅ Firebase config
     const firebaseConfig = {
