@@ -915,38 +915,6 @@ showSmartFollowupMessage(userData); // ✅ Add this here
     }
   }
 
-// Payment Status Function
-function handlePaymentStatus(userData) {
-    const paymentWarning = document.getElementById("payment-warning");
-    const completePayment = document.getElementById("complete-payment");
-    const paymentLink = document.getElementById("payment-link");
-
-    if (userData.paymentStatus === "Pending") {
-        paymentWarning.style.display = "block";
-        let payPalURL = getPaypalLink(userData.planType);
-        if (payPalURL) {
-            paymentLink.href = payPalURL;
-            completePayment.style.display = "block";
-        }
-    } else {
-        paymentWarning.style.display = "none";
-        completePayment.style.display = "none";
-    }
-}
-
-// PayPal Links
-function getPaypalLink(planType) {
-    const payPalLinks = {
-        "basic3m": "https://u.wompi.sv/379910xeV",
-        "basic6m": "https://u.wompi.sv/380639rcA",
-        "basic12m": "https://u.wompi.sv/3806769qs",
-        "plus3m": "https://u.wompi.sv/380690Gbx",
-        "plus6m": "https://u.wompi.sv/380695_Np",
-        "plus12m": "https://u.wompi.sv/380702xQa"
-    };
-    return payPalLinks[planType] || null;
-}
-
 // Load Vehicles Function
 function loadVehicles(vehicles = []) {
   const vehiclesList = document.getElementById("vehiclesList");
