@@ -2482,29 +2482,32 @@ html, body {
         </div>
 
         
-       <section class="dashboard-section">
-  <h2>Estado de Pago</h2>
+      <section class="dashboard-section">
+    <h2>Estado de Pago</h2>
 
-  <div class="estado-pago-card">
-    <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
-    <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
-    <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
-    <p><strong>Plan Elegido:</strong> <span id="PlanType">Cargando...</span></p>
+    <div class="estado-pago-card">
+      <p><strong>Miembro Desde:</strong> <span id="memberSince">Cargando...</span></p>
+      <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
+      <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
+      <p><strong>Plan Elegido:</strong> <span id="PlanType">Cargando...</span></p>
 
-    <div id="founderPhaseMessage">Cargando mensaje especial...</div>
+      <div id="founderPhaseMessage">Cargando mensaje especial...</div>
 
-    <div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
-      ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
+      <!-- Warning -->
+      <div id="payment-warning" style="display:none; color:#c0392b; font-weight:bold; margin-top:10px;">
+        ⚠️ Tu pago está pendiente. Completa tu pago para activar tu plan.
+      </div>
+
+      <!-- Payment Button -->
+      <div id="complete-payment" style="margin-top:10px; display:none;">
+        <a id="payment-link" href="#" target="_blank"
+           style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
+           Completa tu pago ahora 🔗
+        </a>
+      </div>
     </div>
+  </section>
 
-    <div id="complete-payment" style="margin-top:10px; display:none;">
-      <a id="payment-link" href="#" target="_blank"
-        style="padding:10px 15px; background:#ff6600; color:white; border-radius:5px; text-decoration:none;">
-        Completa tu pago ahora 🔗
-      </a>
-    </div>
-  </div>
-</section>
 
         <section>
             
@@ -3277,6 +3280,135 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   <p>📱 Para ver mejor el contenido, gira tu dispositivo a modo horizontal.</p>
 </div>
 
+         <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // ✅ Firebase config
+    const firebaseConfig = {
+      apiKey: window._env_.FIREBASE_API_KEY,
+      authDomain: window._env_.FIREBASE_AUTH_DOMAIN,
+      projectId: window._env_.FIREBASE_PROJECT_ID,
+      storageBucket: window._env_.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window._env_.FIREBASE_MESSAGING_SENDER_ID,
+      appId: window._env_.FIREBASE_APP_ID
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+      console.log("✅ Firebase inicializado.");
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Helper
+    function prettyDate(ts) {
+      if (!ts) return "No asignado";
+      try {
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+      } catch {
+        return "—";
+      }
+    }
+
+    // Default Wompi links
+    const wompiLinks = {
+      prueba: "https://u.wompi.sv/539830hfH",
+      basic3m: "https://u.wompi.sv/379910xeV",
+      basic6m: "https://u.wompi.sv/380639rcA",
+      basic12m: "https://u.wompi.sv/3806769qs",
+      plus3m: "https://u.wompi.sv/380690Gbx",
+      plus6m: "https://u.wompi.sv/380695_Np",
+      plus12m: "https://u.wompi.sv/380702xQa",
+      basic3mfull: "https://u.wompi.sv/387439i_2",
+      basic6mfull: "https://u.wompi.sv/387432nHU",
+      basic12mfull: "https://u.wompi.sv/387433i2m",
+      plus3mfull: "https://u.wompi.sv/387439i_2",
+      plus6mfull: "https://u.wompi.sv/387445Beb",
+      plus12mfull: "https://u.wompi.sv/387447ZDj"
+    };
+
+  function updateUI(userData) {
+  const memberSinceEl = document.getElementById("memberSince");
+  const paymentDateEl = document.getElementById("paymentDate");
+  const nextPaymentEl = document.getElementById("nextPaymentDate");
+  const planTypeEl = document.getElementById("PlanType");
+  const founderPhaseEl = document.getElementById("founderPhaseMessage");
+  const warningEl = document.getElementById("payment-warning");
+  const completeEl = document.getElementById("complete-payment");
+  const paymentLinkEl = document.getElementById("payment-link");
+
+  const status = (userData.paymentStatus || "").toLowerCase();
+  const today = new Date();
+  const nextPaymentDate = userData.nextPaymentDate?.toDate
+    ? userData.nextPaymentDate.toDate()
+    : userData.nextPaymentDate
+    ? new Date(userData.nextPaymentDate)
+    : null;
+
+  // Fill base info
+  memberSinceEl.textContent = prettyDate(userData.registrationDate);
+  paymentDateEl.textContent =
+    status === "completed" && userData.paymentDate
+      ? prettyDate(userData.paymentDate)
+      : "Pendiente de pago";
+  nextPaymentEl.textContent = prettyDate(userData.nextPaymentDate);
+  planTypeEl.textContent = userData.planType || "No asignado";
+  founderPhaseEl.textContent =
+    "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas.";
+
+  // Hide all by default
+  warningEl.style.display = "none";
+  completeEl.style.display = "none";
+
+  // --- Payment Logic ---
+  const isExpired = nextPaymentDate && nextPaymentDate < today;
+
+  if (status === "pending" || isExpired) {
+    warningEl.style.display = "block";
+    completeEl.style.display = "block";
+
+    // ✅ NEW AND IMPROVED LOGIC
+    // Prioritize the link from the local wompiLinks list.
+    let rawLink = wompiLinks[userData.planType];
+    
+    // If no link is found in the local list, use the one from Firebase.
+    if (!rawLink) {
+        rawLink = userData.checkoutLink;
+    }
+
+    // Default to a placeholder if no link is found
+    rawLink = rawLink || "#";
+
+    console.log("Final payment link:", JSON.stringify(rawLink));
+
+    paymentLinkEl.setAttribute("href", rawLink);
+    paymentLinkEl.target = "_blank";
+    paymentLinkEl.rel = "noopener noreferrer";
+    paymentLinkEl.textContent = "Completa tu pago ahora 🔗";
+  } else if (status === "completed" || status === "confirmado") {
+    if (!isExpired) {
+      completeEl.innerHTML =
+        `<div style="color:green;font-weight:bold;">✅ Pago confirmado. ¡Gracias por unirte!</div>`;
+      completeEl.style.display = "block";
+    }
+  }
+}// ✅ close function here, nothing more
+
+
+    // ✅ Auth listener
+    auth.onAuthStateChanged(user => {
+      if (!user) return;
+      db.collection("users").doc(user.uid).get()
+        .then(doc => {
+          if (doc.exists) {
+            updateUI(doc.data());
+          }
+        })
+        .catch(err => console.error("❌ Error obteniendo userData:", err));
+    });
+  });
+  </script>
 
 </body>
 </html>
