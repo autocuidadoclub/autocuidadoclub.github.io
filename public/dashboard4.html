@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1304,84 +1305,54 @@ function loadPaymentHistory() {
   });
 }
 
-        
-
-function showFreeRescheduleOffer(userData) {
-  const uid = userData.uid;
+    function showFreeRescheduleOffer(userData) {
+        console.log("Verificando oferta gratuita de reprogramación...");
   const now = new Date();
   const lastPaymentDate = userData.paymentDate?.toDate?.() || null;
-
   const monthsUnpaid = lastPaymentDate
     ? (now.getFullYear() - lastPaymentDate.getFullYear()) * 12 + (now.getMonth() - lastPaymentDate.getMonth())
-    : 6;
+    : 3; // default to 3 if missing
 
-  // Check if banner was already shown via Firestore
-  if (userData.freeInspectionBannerShown || monthsUnpaid < 1) return;
-
-  const offerBox = document.createElement("div");
-  offerBox.id = "freeRescheduleBox";
-  offerBox.innerHTML = `
-    <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
-      <h3>🎁 ¡Te regalamos una cita!</h3>
-      <p>Han pasado más de ${monthsUnpaid} mes${monthsUnpaid > 1 ? "es" : ""} sin pago. Agenda gratis tu próxima inspección.</p>
-      <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;">
-        Agendar ahora
-      </button>
-    </div>
-  `;
-  document.body.prepend(offerBox);
-
-  document.getElementById("claimFreeReschedule").addEventListener("click", async () => {
-    const loader = document.createElement("div");
-    loader.innerHTML = `<img src="loading.gif" alt="Cargando..." style="width:50px;">`;
-    offerBox.innerHTML = "";
-    offerBox.appendChild(loader);
-
-    const formData = new FormData();
-    formData.append("_subject", "🎁 Cliente solicitó inspección gratis");
-    formData.append("_cc", "info@autocuidadoclub.com");
-    formData.append("message", `
-      Cliente: ${userData.name || "N/A"}
-      Correo: ${userData.email || "N/A"}
-      Teléfono: ${userData.phone || "N/A"}
-      Departamento: ${userData.department || "N/A"}
-      Municipio: ${userData.municipality || "N/A"}
-      Fecha de último pago: ${lastPaymentDate?.toLocaleDateString("es-ES") || "Desconocida"}
-      Plan: ${userData.planType}
-    `);
-
-    try {
-      await fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: "POST",
-        body: formData
-      });
-
-      // ✅ Mark banner as shown in Firestore
-      await db.collection("users").doc(uid).update({
-        freeInspectionBannerShown: true
-      });
-
-      offerBox.innerHTML = `<p style="color: green; font-weight: bold;">✅ Inspección extra gratis solicitada.</p>`;
-    } catch (error) {
-      offerBox.innerHTML = `<p style="color: red;">❌ Error al enviar la solicitud. Intenta de nuevo más tarde.</p>`;
-    }
-  });
+  if (
+    userData.monthsPaid === 0 &&
+    monthsUnpaid >= 2 &&
+    userData.freeRescheduleClaimed === false
+  ) {
+    console.log("✅ Condiciones cumplidas, mostrando oferta...");
+    const offerBox = document.createElement("div");
+    offerBox.innerHTML = `
+      <div style="background:#fffbec; border:2px solid #ffc107; padding:20px; margin:20px 0; border-radius:10px;">
+        <h3>🎁 ¡Te regalamos una cita!</h3>
+        <p>Han pasado más de 2 meses. Agenda gratis tu próxima inspección.</p>
+        <button id="claimFreeReschedule" style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" #claimFreeReschedule {
+  animation: pulse 2s infinite;
 }
 
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+>Agendar ahora</button>
+      </div>
+    `;
+    document.body.prepend(offerBox);
 
+    document.getElementById("claimFreeReschedule").addEventListener("click", () => {
+      // Redirect to booking page or open modal
+      window.location.href = "agenda.html?gratis=true";
 
-
-function showReminderBanner() {
-  const banner = document.createElement("div");
-  banner.style = "background:#e6f7e6; border-left:5px solid #28a745; padding:15px; margin:20px; border-radius:5px;";
-  banner.innerHTML = `
-    <strong>📌 Inspección gratis solicitada</strong><br>
-    Nuestro staff ya recibió tu solicitud. Te contactaremos pronto.
-  `;
-  document.querySelector("main")?.prepend(banner) || document.body.prepend(banner);
+      // Optionally mark it as claimed (or after they book)
+      db.collection("users").doc(userData.uid).update({
+        freeRescheduleClaimed: true
+      });
+    });
+  }
 }
 
-
+     if (typeof _pe !== "undefined") {
+  _pe.tagPushSubscriber('inactive_2months');
+}
 
      function showFirstTimePaymentOffer(userData) {
   const offerBox = document.createElement("div");
@@ -2289,7 +2260,6 @@ html, body {
             <li><a href="suscripciones.html">Suscripciones</a></li>
             <li><a href="contacto.html">Contacto</a></li>
             <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
-            <li><a href="tac.html">Términos y Condiciones</a></li>
 
         </ul>
         <div class="logo-container">
@@ -2554,19 +2524,9 @@ html, body {
 
 <div class="dashboard-section">
         <section class="referral-progress-section">
-  <h2>¿Querés pagar menos en tu próxima mensualidad? Recomendá y ganá.</h2>
-  <p><strong>Traé a tus amigos y ganá recompensas exclusivas mientras ayudás a otros con su carro.</strong></p>
-
-  <ul style="text-align: left; max-width: 700px; margin: 0 auto; font-size: 1.1em;">
-    <li>🚗¿Conocés a alguien con problemas en su vehículo?</li>
-    <li>📩 Comparte su nombre, número o correo. Nosotros nos encargamos del resto.</li>
-    <li>💸 Si se suscribe, vos pagás menos en tu siguiente ciclo.</li>
-    <li>📈 Entre más referidos activos, más ahorros acumulás.</li>
-    <li>🏅 Convertite en embajador de AutoCuidado Club y ayudá a más gente a prevenir problemas en su carro.</li>
-  </ul>
-
-            
-            <section class="referral-submission-section">
+  <h2>Mi Progreso de Referidos</h2>
+  <p>Comparte los datos de tus referidos directamente desde tu panel, y sigue su progreso hasta obtener tu recompensa 🎁</p>
+<section class="referral-submission-section">
   <h2>Agregar un Nuevo Referido</h2>
   <p>Comparte los datos de tu referido y sigue su progreso en tiempo real.</p>
 
@@ -2921,13 +2881,15 @@ document.body.appendChild(popup);
   <span id="notificationMessage">Notificación aquí</span>
 </div>
 
+   <!-- CTA Footer -->
+  <div id="cta-install-bar">
+    <div class="cta-message">
+  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+</div>
 
       <!-- CTA Footer -->
 <div id="cta-install-bar" style="display:none;">
- <div class="cta-message">
-  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
-</div>
-    
+
       <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
       <a href="contacto.html">💬 Contácta con nuestro staff</a>
       <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
@@ -3001,39 +2963,19 @@ document.body.appendChild(popup);
 
 
   <script>
-     let deferredPrompt = null;
+    const installBtn = document.getElementById('how-to-install-btn');
+    installBtn.addEventListener('click', () => {
+      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+      if (isIos) {
+        alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+      } else if (isAndroid) {
+        alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
+      } else {
+        alert("Instalación no disponible en este dispositivo.");
+      }
+    });
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Stop the browser from showing the default prompt
-  e.preventDefault();
-  deferredPrompt = e;
-
-  // Optional: you could show the button ONLY when install is available
-  document.getElementById('how-to-install-btn').style.display = 'inline-block';
-});
-
-document.getElementById('how-to-install-btn').addEventListener('click', async () => {
-  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-
-  if (deferredPrompt) {
-    // If install is supported, show browser-native prompt
-    deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
-    if (choiceResult.outcome === 'accepted') {
-      console.log('✅ User accepted the install prompt');
-    } else {
-      console.log('❌ User dismissed the install prompt');
-    }
-    deferredPrompt = null;
-  } else if (isIos) {
-    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-  } else if (isAndroid) {
-    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
-  } else {
-    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
-  }
-});
     function openFeedbackModal() {
       document.getElementById('feedbackModal').style.display = 'flex';
       document.getElementById('feedbackText').focus();
@@ -3145,29 +3087,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   reopenBtn.style.display = 'none';
 });
 
-    
-  function checkOrientation() {
-    const isMobile = window.innerWidth < 768;
-    const isPortrait = window.innerHeight > window.innerWidth;
-    const banner = document.getElementById('rotate-device-banner');
-
-    if (isMobile && isPortrait) {
-      banner.style.display = 'block';
-    } else {
-      banner.style.display = 'none';
-    }
-  }
-
-  window.addEventListener('load', checkOrientation);
-  window.addEventListener('resize', checkOrientation);
-  window.addEventListener('orientationchange', checkOrientation);
-
-
   </script>
-
-        <div id="rotate-device-banner" style="display:none;">
-  <p>📱 Para ver mejor el contenido, gira tu dispositivo a modo horizontal.</p>
-</div>
 
 
 </body>
