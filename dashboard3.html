@@ -1812,38 +1812,6 @@ function showSmartFollowupMessage(userData) {
   }
 }
 
-function showFollowUpCard() {
-  const existing = document.getElementById("followUpCard");
-  if (existing) return;
-
-  const paymentCard = document.querySelector(".countdown-container");
-  if (!paymentCard) return;
-
-  const followUp = document.createElement("div");
-  followUp.id = "followUpCard";
-  followUp.style.cssText = `
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-  `;
-
-  followUp.innerHTML = `
-    <h4 style="margin-top:0;">¿Aún tienes dudas antes de pagar?</h4>
-    <ul style="padding-left: 20px; margin-top: 10px; margin-bottom: 15px;">
-      <li>✅ ¿Ya revisaste todos los beneficios?</li>
-      <li>💬 ¿Quieres agendar una llamada rápida con nuestro staff?</li>
-      <li>🎁 Tu bono especial de bienvenida sigue activo.</li>
-    </ul>
-    <button onclick="window.open('contacto.html', '_blank');" class="orange-button">
-      Hablar con un asesor ahora
-    </button>
-  `;
-
-  paymentCard.parentNode.insertBefore(followUp, paymentCard.nextSibling);
-}
-
   function checkOrientation() {
     const banner = document.getElementById("rotateBanner");
     const isPortrait = window.innerHeight > window.innerWidth;
