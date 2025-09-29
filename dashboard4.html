@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -540,88 +539,36 @@ function notifyReferralPaid(referrerEmail, referralEmail, referralName, referral
 }
 
      
-// Founder Phase Settings
-const founderStartDate = new Date('2025-05-01T00:00:00'); // May 1, 2025
-const founderDurationDays = 90; // Founder Phase lasts 90 days
-const founderEndDate = new Date(founderStartDate.getTime() + founderDurationDays * 24 * 60 * 60 * 1000);
-const msInDay = 24 * 60 * 60 * 1000;
+  // Try to get the saved end time from localStorage
+  var savedEndTime = localStorage.getItem("countdownEndTime");
 
-// Message Timeline
-const messages = [
-  "¡Bienvenido a la Fase Fundador! Asegura el mejor precio para siempre.",
-  "¡Ya pasó 1 semana! No dejes pasar esta oportunidad única.",
-  "2 semanas menos, y los precios cambiarán para siempre. ¡Actúa hoy!",
-  "🚨 ¡El acceso exclusivo ya está en cuenta regresiva! ¡Activa tu membresía antes de que cierre!",
-  "¡1 mes transcurrido! Cada día cuenta. Aprovecha antes que otros.",
-  "🎯 ¡Cada día cuenta! No dejes pasar la oportunidad de ser Fundador.",
-  "¡Quedan menos de 2 meses! Reserva tu lugar como Fundador.",
-  "¡Cada semana más cerca del cierre! Activa ahora tu beneficio exclusivo.",
-  "Tiempo limitado: Asegura beneficios de Fundador antes que termine.",
-  "🔥 ¡Últimas 4 semanas! Última llamada para obtener el mejor precio.",
-  "⏳ ¡Últimas 3 semanas! Se acerca el final de la Fase Fundador.",
-  "¡Últimas 2 semanas! ¿Qué estás esperando? Tu beneficio especial está por terminar.",
-  "¡Última semana! Esta es tu última oportunidad para ser Fundador. ¡Actúa YA!",
-  "⚠️ Fase Fundador Cerrada – Ahora puedes registrarte, pero con nuevas tarifas."
-];
-
-// Initialize on page load
-function startFounderPhaseCountdown() {
-  updateFounderMessage(); 
-  updateCountdown(); 
-}
-
-// Update the message based on weeks elapsed
-function updateFounderMessage() {
-  const today = new Date();
-  const daysElapsed = Math.floor((today - founderStartDate) / msInDay);
-
-  let messageIndex = Math.floor(daysElapsed / 7);
-  if (messageIndex < 0) messageIndex = 0;
-  if (messageIndex >= messages.length) messageIndex = messages.length - 1;
-
-  const founderMessage = document.getElementById('founderPhaseMessage');
-  if (founderMessage) {
-    founderMessage.textContent = messages[messageIndex];
-  }
-}
-
-// Update the 7-day countdown
-function updateCountdown() {
-  const now = new Date();
-
-  if (now >= founderEndDate) {
-    document.getElementById("countdown").innerHTML = "Fase Fundador Cerrada ⏳";
-    clearInterval(countdownInterval);
-    return;
+  // If no saved end time exists, set a new one (48 hours from now)
+  if (!savedEndTime) {
+    savedEndTime = new Date().getTime() + 48 * 60 * 60 * 1000; // 48 hours from now
+    localStorage.setItem("countdownEndTime", savedEndTime); // Save it in localStorage
   }
 
-  // Calculate which 7-day cycle we are currently in
-  const daysElapsed = Math.floor((now - founderStartDate) / msInDay);
-  const currentCycleStart = new Date(founderStartDate.getTime() + Math.floor(daysElapsed / 7) * 7 * msInDay);
-  const currentCycleEnd = new Date(currentCycleStart.getTime() + 7 * msInDay);
+  // Update the countdown every 1 second
+  var x = setInterval(function() {
+    var now = new Date().getTime();
+    var distance = savedEndTime - now;
 
-  const distance = currentCycleEnd - now;
+    // Time calculations for hours, minutes, and seconds
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-  if (distance <= 0) {
-    document.getElementById("countdown").innerHTML = "Nuevo ciclo iniciando...";
-    return;
-  }
+    // Display the countdown
+    document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
 
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-  document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-}
-
-// Update both countdown and message every 1 second
-const countdownInterval = setInterval(() => {
-  updateFounderMessage();
-  updateCountdown();
-}, 1000);
-
-startFounderPhaseCountdown(); // Run once on load     
+    // If the countdown finishes, clear the interval and show EXPIRED
+    if (distance < 0) {
+      clearInterval(x);
+      document.getElementById("countdown").innerHTML = "EXPIRED";
+      document.getElementById("upgrade-now").disabled = true;
+    }
+  }, 1000);
+     
 
 async function upgradePlan() {
     const selectedPlan = document.getElementById("new-plan").value;
@@ -884,9 +831,13 @@ const registrationDate = userData.registrationDate?.toDate?.() || null;
     <div id="promo-popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
                 background:#fffbe6; padding:20px; border-radius:15px; border:2px solid #ff9800;
                 z-index:9999; box-shadow:0px 4px 12px rgba(0,0,0,0.15); text-align:center; max-width:90%;">
-      <h3>🚀 ¡Fase de Fundadores!</h3>
-      <p style="margin-top:10px;">Activa tu plan ahora y asegura tu precio exclusivo antes que termine esta etapa especial.</p>
-          <br>
+      <h3>🎁 ¡Activa tu plan ahora!</h3>
+      <p>Recibe una oferta especial por ser nuevo cliente: <strong>Tu primer mes por solo $5</strong></p>
+      <button onclick="window.location.href='pago.html'" style="background:#ff6600; color:white;
+              border:none; padding:10px 20px; border-radius:8px; font-size:16px; margin-top:10px;">
+        Activar Plan Ahora
+      </button>
+      <br>
       <button onclick="closePromoPopup()" style="margin-top:10px; background:#cccccc; color:#333; padding:8px 16px; border:none; border-radius:5px;">Cerrar</button>
     </div>
   `;
@@ -1354,23 +1305,19 @@ function loadPaymentHistory() {
   _pe.tagPushSubscriber('inactive_2months');
 }
 
-     function showFirstTimePaymentOffer(userData) {
+     function showFirstTimePaymentOffer() {
   const offerBox = document.createElement("div");
-  const planType = userData.planType || "basic3m"; // fallback if missing
-  const payPalURL = getPaypalLink(planType) || "pago.html"; // fallback if missing link
-
   offerBox.innerHTML = `
-    <div style="background:#fff3e0; border:2px solid #ff9800; padding:20px; margin:20px 0; border-radius:12px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:10000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-width:90%; text-align:center;">
-      <span onclick="document.getElementById('founderOfferBox').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
-      <h2>🚀 ¡Fase de Fundadores!</h2>
-      <p style="margin-top:10px;">Activa tu plan ahora y asegura tu precio exclusivo antes que termine esta etapa especial.</p>
-      <button onclick="window.location.href='${payPalURL}'" style="background:#ff6600; color:white; padding:10px 20px; border:none; border-radius:8px; margin-top:15px; font-size:16px;">Activar Plan</button>
+    <div style="background:#fff4e5; border:2px solid #ffa500; padding:20px; margin:20px 0; border-radius:10px; position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); z-index:1000; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" id="first-payment-offer">
+      <span onclick="document.getElementById('first-payment-offer').remove();" style="position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold;">✖</span>
+      <h3>🎉 ¡Activa tu plan ahora!</h3>
+      <p>Recibe un beneficio especial: tu primer mes por solo <strong>$5</strong>. 🚗✨</p>
+      <button style="padding:10px 15px; background:#003366; color:white; border:none; border-radius:5px;" onclick="redirectToPayment()">Activar Plan Ahora</button>
     </div>
   `;
-  offerBox.id = "founderOfferBox";
   document.body.appendChild(offerBox);
 }
-        
+
 function redirectToPayment() {
   // Redirect to your payment page or PayPal link
   window.location.href = "https://www.paypal.com/pay/basic1m"; // Example link
@@ -1961,7 +1908,27 @@ html, body {
             background-color: #4caf50;
             color: white;
         }
-    
+      .floating-contact-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff6600;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-contact-button:hover {
+    background-color: #cc5500;
+    transform: scale(1.05);
+}
+
   .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -2093,6 +2060,12 @@ html, body {
     width: 100% !important;
   }
 
+  .floating-contact-button {
+    bottom: 15px;
+    right: 15px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
 
   .cta-button {
     width: 100%;
@@ -2278,7 +2251,10 @@ html, body {
     
         <button class="orange-button" onclick="logoutUser()" style="margin-left: 10px;">Cerrar Sesión</button>
 
-   
+     <!-- Contact Button -->
+<button class="floating-contact-button" onclick="window.open('contacto.html', '_blank');">
+    <i class="fas fa-headset"></i> Contactar Staff
+</button>
 
     <!-- Dashboard Content -->
   <!-- Dashboard Content -->
@@ -2359,9 +2335,6 @@ html, body {
             <p><strong>Fecha del último pago:</strong> <span id="paymentDate">Cargando...</span></p>
             <p><strong>Próximo Pago:</strong> <span id="nextPaymentDate">Cargando...</span></p>
 
-            <div id="founderPhaseMessage" style="margin-top: 10px; font-weight: bold; font-size: 1em; color: #003366;">
-  Cargando mensaje especial...
-</div>
             <div id="payment-warning" style="color: red; font-weight: bold; background: #ffebe8; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;">
                 ¡Estamos esperándote! ✨ Solo realiza tu pago y nos encargamos de todo. 🚗🔧
             </div>
@@ -2373,10 +2346,12 @@ html, body {
             
             <!-- Countdown Timer Section -->
 <div class="countdown-container">
-  <h2>🚀 ¡Tiempo restante de la Fase Fundador!</h2>
-  <p>Completa tu pago, <strong>antes que esta fase termine</strong></p>
+  <h2>Hurry up! Limited-time offer</h2>
+  <p>Complete your payment to enjoy a <strong>45% discount</strong>!</p>
   <div id="countdown"></div>
-  </div>
+  <p><strong>$35 Savings</strong> if you pay now.</p>
+  <button id="upgrade-now" class="cta-button">Upgrade Now</button>
+</div>
 
         </div>
 
@@ -2787,25 +2762,25 @@ document.body.appendChild(popup);
     
   </script>
 
-
- <div style="display: flex; justify-content: center; margin: 30px 0;">
+<!-- Contenedor centrado -->
+<div style="display: flex; justify-content: center; margin: 20px 0;">
   <div class="fb-page"
-       data-href="https://www.facebook.com/profile.php?id=61575027617474"
-       data-tabs="timeline"
-       data-width="1000"
-       data-height=""
-       data-small-header="true"
-       data-adapt-container-width="false"
-       data-hide-cover="false"
-       data-show-facepile="true"
-       style="max-width: 1000px; width: 100%;">
-    <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" class="fb-xfbml-parse-ignore">
-      <a href="https://www.facebook.com/profile.php?id=61575027617474">Autocuidado Club</a>
+    data-href="https://www.facebook.com/profile.php?id=61575027617474"
+    data-tabs="timeline"
+    data-width="340"
+    data-height=""
+    data-small-header="true"
+    data-adapt-container-width="true"
+    data-hide-cover="false"
+    data-show-facepile="true">
+    <blockquote
+      cite="https://www.facebook.com/profile.php?id=61575027617474"
+      class="fb-xfbml-parse-ignore">
+      <a href="https://www.facebook.com/profile.php?id=61575027617474">AutoCuidado Club</a>
     </blockquote>
   </div>
 </div>
 
-        
         
 <div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
   <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
@@ -2842,7 +2817,7 @@ document.body.appendChild(popup);
         <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
             <i class="fab fa-instagram fa-3x"></i>
         </a>
-        <a href="https://www.facebook.com/autocareclub" target="_blank" class="social-button" style="color: #1877F2;">
+        <a href="https://www.facebook.com/profile.php?id=61566547237325" target="_blank" class="social-button" style="color: #1877F2;">
             <i class="fab fa-facebook-f fa-3x"></i>
         </a>
         <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
@@ -2880,214 +2855,6 @@ document.body.appendChild(popup);
 ">
   <span id="notificationMessage">Notificación aquí</span>
 </div>
-
-   <!-- CTA Footer -->
-  <div id="cta-install-bar">
-    <div class="cta-message">
-  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
-</div>
-
-      <!-- CTA Footer -->
-<div id="cta-install-bar" style="display:none;">
-
-      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
-      <a href="contacto.html">💬 Contácta con nuestro staff</a>
-      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
-
-    </div>
-  </div>
-
-  <!-- Feedback Modal -->
-<!-- Feedback Modal -->
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-  
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
-    <button onclick="closeFeedbackModal()" style="
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #ff0000;
-      font-weight: bold;
-    ">❌</button>
-  </div>
-
-  <form id="voiceFeedbackForm">
-    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-    <div style="display:flex; justify-content:space-between;">
-      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
-      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
-    </div>
-  </form>
-
-  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-    <img src="loading.gif" alt="Cargando..." style="width:80px;">
-  </div>
-
-  </div>
-</div>
-
-
-<!-- Botón para volver a mostrar el menú -->
-<button id="reopen-cta-btn" style="
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 13px;
-  cursor: pointer;
-  z-index: 9999;
-  opacity: 0;
-  max-width: 180px;
-  width: auto;
-  white-space: nowrap;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-">
-📲 Abrir menú
-</button>
-
-
-
-
-  <script>
-    const installBtn = document.getElementById('how-to-install-btn');
-    installBtn.addEventListener('click', () => {
-      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-      if (isIos) {
-        alert("En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-      } else if (isAndroid) {
-        alert("En Android, abre el menú de Chrome (⋮) y selecciona 'Agregar a pantalla de inicio'.");
-      } else {
-        alert("Instalación no disponible en este dispositivo.");
-      }
-    });
-
-    function openFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'flex';
-      document.getElementById('feedbackText').focus();
-    }
-
-    function closeFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'none';
-      document.getElementById('voiceFeedbackForm').reset();
-      document.getElementById('feedbackLoader').style.display = 'none';
-    }
-
-    function startVoiceInput() {
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        alert("Tu navegador no soporta reconocimiento de voz.");
-        return;
-      }
-
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'es-ES';
-
-      const feedbackText = document.getElementById('feedbackText');
-      feedbackText.placeholder = "🎙️ Escuchando...";
-      feedbackText.style.border = "2px solid orange";
-
-      recognition.onresult = (event) => {
-        const result = event.results[0][0].transcript;
-        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-      };
-
-      recognition.onerror = (event) => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-        alert("Error de voz: " + event.error);
-      };
-
-      recognition.onend = () => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-      };
-
-      recognition.start();
-    }
-
-   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
-
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
-
-      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
-      e.preventDefault();
-      document.getElementById('feedbackLoader').style.display = 'block';
-
-      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: "POST",
-        body: new FormData(this)
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        if (data.success) {
-          alert("¡Gracias por tu opinión!");
-          closeFeedbackModal();
-        } else {
-          alert("Error al enviar. Intenta de nuevo.");
-        }
-      })
-      .catch(() => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        alert("Hubo un problema al enviar el mensaje.");
-      });
-    };
-
-      function closeCtaInstallBar() {
-    const ctaBar = document.getElementById('cta-install-bar');
-    const reopenBtn = document.getElementById('reopen-cta-btn');
-
-    // Animación suave antes de ocultarlo
-    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-    ctaBar.style.opacity = '0';
-    ctaBar.style.transform = 'translateY(20px)';
-
-    setTimeout(() => {
-      ctaBar.style.display = 'none';
-
-      // Mostrar botón flotante después de 5 segundos
-      setTimeout(() => {
-        reopenBtn.style.display = 'block';
-        setTimeout(() => {
-          reopenBtn.style.opacity = '1';
-        }, 10);
-      }, 5000);
-    }, 300); // esperar a que termine la transición
-  }
-
-      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
-
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
-
-  </script>
 
 
 </body>
