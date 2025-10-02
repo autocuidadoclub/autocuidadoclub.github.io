@@ -570,7 +570,7 @@ async function confirmPayment(userId) {
   try {
     console.log("🔍 Confirming payment for:", userId);
 
-    const res = await fetch("https://us-central1-YOUR_PROJECT.cloudfunctions.net/confirmPayment", {
+    const res = await fetch("https://us-central1-bookings-autocuidad-club.cloudfunctions.net/confirmPayment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId })
