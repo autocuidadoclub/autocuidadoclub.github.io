@@ -4,6 +4,8 @@ const admin = require("firebase-admin");
 const axios = require("axios");
 const Stripe = require("stripe");
 const qs = require("querystring");
+const cors = require("cors")({ origin: true });
+
 
 admin.initializeApp();
 const db = admin.firestore();
