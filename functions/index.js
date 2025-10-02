@@ -203,3 +203,57 @@ exports.guardarTokenPagadito = functions.https.onRequest(async (req, res) => {
     return res.status(500).send("Error del servidor.");
   }
 });
+
+exports.confirmPayment = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).send({ error: "Only POST allowed" });
+    }
+
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).send({ error: "Missing userId" });
+    }
+
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    const userData = userDoc.data();
+    const currentMonthsPaid = userData.monthsPaid || 0;
+    const newMonthsPaid = currentMonthsPaid + 1;
+
+    const paymentDate = new Date();
+    const nextPaymentDate = new Date();
+    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
+
+    const newPaymentEntry = {
+      date: admin.firestore.Timestamp.fromDate(paymentDate),
+      amount: userData.subscriptionAmount || 0,
+      method: "Confirmado por Staff",
+      status: "Completado",
+    };
+
+    const updates = {
+      paymentStatus: "Confirmado",
+      paymentDate: admin.firestore.Timestamp.fromDate(paymentDate),
+      nextPaymentDate: admin.firestore.Timestamp.fromDate(nextPaymentDate),
+      monthsPaid: newMonthsPaid >= 8 ? 0 : newMonthsPaid,
+      paymentHistory: admin.firestore.FieldValue.arrayUnion(newPaymentEntry),
+    };
+
+    await userRef.update(updates);
+
+    return res.status(200).send({
+      success: true,
+      message: "Payment updated",
+      userData: { ...userData, ...updates },
+    });
+  } catch (error) {
+    console.error("❌ Error in confirmPayment:", error);
+    return res.status(500).send({ error: error.message });
+  }
+});
