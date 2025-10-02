@@ -570,53 +570,32 @@ async function confirmPayment(userId) {
   try {
     console.log("🔍 Confirming payment for:", userId);
 
-    const userRef = db.collection("users").doc(userId);
-    const userDoc = await userRef.get();
+    const res = await fetch("https://us-central1-YOUR_PROJECT.cloudfunctions.net/confirmPayment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId })
+    });
 
-    if (!userDoc.exists) {
-      alert("Usuario no encontrado.");
-      return;
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(`✅ Pago confirmado para ${userId}`);
+
+      // 🔥 Optional: refresh table after update
+      findUsersByDate();
+
+      // 🔥 If you want to auto-show email template after confirmation
+      if (data.userData) {
+        showEmailTemplate(data.userData);
+      }
+
+    } else {
+      console.error("❌ Error:", data.error);
+      alert("❌ Error al actualizar el pago: " + data.error);
     }
-
-    const userData = userDoc.data();
-    const currentMonthsPaid = userData.monthsPaid || 0;
-    const newMonthsPaid = currentMonthsPaid + 1;
-
-    const paymentDate = new Date();
-    const nextPaymentDate = new Date();
-    nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
-
-    const newPaymentEntry = {
-      date: firebase.firestore.Timestamp.fromDate(paymentDate),
-      amount: userData.subscriptionAmount || 0,
-      method: "Confirmado por Staff",
-      status: "Completado"
-    };
-
-    const updates = {
-      paymentStatus: "Confirmado",
-      paymentDate: firebase.firestore.Timestamp.fromDate(paymentDate),
-      nextPaymentDate: firebase.firestore.Timestamp.fromDate(nextPaymentDate),
-      monthsPaid: newMonthsPaid >= 8 ? 0 : newMonthsPaid,
-      paymentHistory: firebase.firestore.FieldValue.arrayUnion(newPaymentEntry)
-    };
-
-    await userRef.update(updates);
-
-    alert(`✅ Pago confirmado. Meses acumulados: ${newMonthsPaid >= 8 ? 0 : newMonthsPaid}`);
-
-    // 🔥 Auto show email draft
-    showEmailTemplate(userData);
-
-    if (newMonthsPaid >= 8) {
-      console.log("⭐️ Ciclo de lealtad completado y reiniciado para:", userData.email);
-    }
-
-    findUsersByDate(); // Optional table refresh
-
   } catch (error) {
-    console.error("❌ Error al actualizar el pago:", error);
-    alert("❌ Error al actualizar el pago. Revisa la consola.");
+    console.error("❌ Request failed:", error);
+    alert("❌ Error al conectar con el servidor.");
   }
 }
 
