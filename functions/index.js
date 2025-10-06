@@ -261,3 +261,36 @@ exports.confirmPayment = functions.https.onRequest((req, res) => {
     }
   });
 });
+
+
+// ✅ Secure Cloud Function for Staff Updates
+exports.staffUpdateUser = functions.https.onCall(async (data, context) => {
+  try {
+    // Ensure user is logged in
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'El usuario no está autenticado.');
+    }
+
+    const staffRef = admin.firestore().collection('users').doc(context.auth.uid);
+    const staffSnap = await staffRef.get();
+
+    // Ensure only staff can run this
+    if (!staffSnap.exists || staffSnap.data().role !== 'staff') {
+      throw new functions.https.HttpsError('permission-denied', 'Solo el personal autorizado puede realizar esta acción.');
+    }
+
+    const { userId, updates } = data;
+    if (!userId || !updates) {
+      throw new functions.https.HttpsError('invalid-argument', 'Faltan parámetros necesarios.');
+    }
+
+    // Update Firestore document
+    await admin.firestore().collection('users').doc(userId).update(updates);
+
+    console.log(`✅ staffUpdateUser: Datos actualizados para ${userId}`);
+    return { success: true, message: "Datos actualizados correctamente." };
+  } catch (error) {
+    console.error('❌ staffUpdateUser error:', error);
+    throw new functions.https.HttpsError('internal', error.message);
+  }
+});
