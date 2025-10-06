@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -151,21 +152,6 @@ table td, table th {
   <div id="vehicleInspectionList"></div>
 </div>
 
-<div id="paymentHistorySection" style="margin-top:20px;">
-  <h4>💳 Historial de Pagos</h4>
-  <table id="paymentHistoryTable" style="width:100%;border-collapse:collapse;">
-    <thead>
-      <tr>
-        <th>Fecha</th><th>Monto</th><th>Método</th><th>Estado</th>
-      </tr>
-    </thead>
-    <tbody id="paymentHistoryBody">
-      <tr><td colspan="4">Sin historial disponible.</td></tr>
-    </tbody>
-  </table>
-</div>
-
-    
     <h4>Deseas confimar pago?<h4>
     <p><button onclick="confirmPayment(selectedStaffUserId)">Confirmar Pago</button><br></p>
       
@@ -259,38 +245,6 @@ table td, table th {
     <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
   </p>
 </div>
-
-      
-
-         <div id="emailModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px #000; z-index:1000;">
-  <h3>📧 Email para el Cliente</h3>
-  <textarea id="emailTemplate" style="width:100%; height:200px;"></textarea>
-  <button onclick="copyEmail()">📋 Copiar correo</button>
-  <button onclick="closeEmailModal()">❌ Cerrar</button>
-</div>
-
-
-      <!-- Loading Spinner for Payment Confirmation -->
-<div id="paymentLoadingOverlay" style="
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.8);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-">
-  <img src="/loading.gif" alt="Verificando..." style="width:100px;height:100px;margin-bottom:15px;">
-  <p style="font-weight:bold;color:#003366;font-size:18px;">
-    ⏳ Verificando pago... por favor espera unos segundos
-  </p>
-</div>
-
 
   <script src="env.js"></script>
   <script>
@@ -615,35 +569,22 @@ async function exportAllUsersToExcel() {
     
 // ✅ Correct – call your Cloud Function instead
 async function confirmPayment(userId) {
-  const overlay = document.getElementById("paymentLoadingOverlay");
-  overlay.style.display = "flex"; // Show loading overlay
-
   try {
     console.log("🔍 Confirming payment for:", userId);
-
-    const response = await fetch(
-      "https://us-central1-bookings-autocuidad-club.cloudfunctions.net/confirmPayment",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId })
-      }
-    );
+    const response = await fetch("https://us-central1-bookings-autocuidad-club.cloudfunctions.net/confirmPayment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId })
+    });
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Request failed");
 
     console.log("✅ Payment confirmed:", data);
-
-    overlay.style.display = "none"; // Hide loader
-    alert("✅ Pago confirmado correctamente");
-
-    // Optional: reload after a short delay to reflect new data
-    setTimeout(() => location.reload(), 1000);
+    alert("Pago confirmado correctamente ✅");
   } catch (err) {
-    console.error("❌ Error al confirmar pago:", err);
-    overlay.style.display = "none"; // Hide loader
-    alert("❌ Error al confirmar pago. Intenta nuevamente.");
+    console.error("❌ Error al actualizar el pago:", err);
+    alert("Error al confirmar pago ❌");
   }
 }
 
@@ -878,23 +819,6 @@ function selectScheduleBox(cell) {
   document.getElementById("staffControlForm").prepend(note);
 }
 
-      
-if (user.paymentHistory && Array.isArray(user.paymentHistory)) {
-  const tbody = document.getElementById("paymentHistoryBody");
-  tbody.innerHTML = "";
-  user.paymentHistory.forEach(entry => {
-    const date = entry.date?.toDate?.() ? entry.date.toDate().toLocaleDateString("es-ES") : "-";
-    tbody.innerHTML += `
-      <tr>
-        <td>${date}</td>
-        <td>$${entry.amount || "-"}</td>
-        <td>${entry.method || "-"}</td>
-        <td>${entry.status || "-"}</td>
-      </tr>
-    `;
-  });
-}
-
     })
     .catch(error => {
       console.error("❌ Error al buscar cliente:", error);
@@ -978,94 +902,16 @@ if (user.paymentHistory && Array.isArray(user.paymentHistory)) {
 
 
   // Guardar cambios en Firestore
-  // ✅ New secure Cloud Function path
-const functions = firebase.app().functions("us-central1");
-
-async function saveStaffClientChanges() {
-  if (!selectedStaffUserId) {
-    showCustomAlert("❌ Por favor busca primero un cliente.", "error");
-    return;
-  }
-
-  const currentDepartment = document.getElementById("currentDepartment").innerText.trim();
-  const currentMunicipality = document.getElementById("currentMunicipality").innerText.trim();
-  const currentSchedule = document.getElementById("currentSchedule").innerText.trim();
-
-  const newDepartment = document.getElementById("department").value.trim();
-  const newMunicipality = document.getElementById("municipality").value.trim();
-
-  const selectedCell = document.querySelector(".schedule-table td.selected-box");
-  let isScheduleChanged = false;
-  let selectedScheduleText = "";
-
-  if (selectedCell) {
-    const dayIndex = selectedCell.cellIndex;
-    const timeBlock = selectedCell.innerText.trim();
-    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
-    const day = dayHeader ? dayHeader.innerText.trim() : "";
-    selectedScheduleText = `${day} - ${timeBlock}`;
-    if (selectedScheduleText !== currentSchedule && timeBlock !== "-") {
-      isScheduleChanged = true;
-    }
-  }
-
-  const isDepartmentChanged = newDepartment && newDepartment !== currentDepartment;
-  const isMunicipalityChanged = newMunicipality && newMunicipality !== currentMunicipality;
-
-  if (!isDepartmentChanged && !isMunicipalityChanged && !isScheduleChanged) {
-    showCustomAlert("❌ No se detectaron cambios para guardar.", "error");
-    return;
-  }
-
-  // Build updates
-  const updates = {};
-  const nowTimestamp = firebase.firestore.Timestamp.now();
-  const now = new Date();
-  const formattedDate = now.toLocaleDateString("es-ES");
-  const formattedTime = now.toLocaleTimeString("es-ES");
-  updates.staffLastChangeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
-
-  if (isDepartmentChanged) {
-    updates.department = newDepartment;
-    updates.lastDepartmentChange = nowTimestamp;
-  }
-  if (isMunicipalityChanged) {
-    updates.municipality = newMunicipality;
-    updates.lastMunicipalityChange = nowTimestamp;
-  }
-  if (isScheduleChanged) {
-    const [selectedDay, selectedTime] = selectedScheduleText.split(" - ");
-    updates.schedule = { day: selectedDay.trim(), time: selectedTime.trim() };
-    updates.lastReschedule = nowTimestamp;
-  }
-
-  // 🔄 Show loading.gif while saving
-  const overlay = document.createElement("div");
-  overlay.style.cssText = `
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:rgba(255,255,255,0.7);display:flex;
-    align-items:center;justify-content:center;z-index:9999;
-    flex-direction:column;text-align:center;
-  `;
-  overlay.innerHTML = `
-    <img src="/loading.gif" style="width:120px;margin-bottom:10px;">
-    <p style="font-weight:bold;color:#003366;">Guardando cambios...</p>
-  `;
-  document.body.appendChild(overlay);
-
-  try {
-    const callable = functions.httpsCallable("staffUpdateUser");
-    await callable({ userId: selectedStaffUserId, updates });
-    showCustomAlert("✅ Cambios guardados correctamente.", "success");
-    setTimeout(() => location.reload(), 1000);
-  } catch (err) {
-    console.error("❌ Error Cloud Function:", err);
-    showCustomAlert("❌ Error al guardar cambios.", "error");
-  } finally {
-    overlay.remove();
-  }
+  db.collection("users").doc(selectedStaffUserId).update(updates)
+    .then(() => {
+      showCustomAlert("✅ Cambios guardados correctamente.", "success");
+      setTimeout(() => location.reload(), 1500);
+    })
+    .catch(error => {
+      console.error("❌ Error al guardar cambios:", error);
+      showCustomAlert("❌ Error al guardar cambios.", "error");
+    });
 }
-
 
 function showCustomAlert(message, type = "success") {
   const alertBox = document.getElementById("customAlert");
@@ -1224,6 +1070,121 @@ function getNextMonthName() {
   </script>
 
 
+
+       <!-- Feedback Button + Modal -->
+<a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
+  📝 Opinión
+</a>
+
+
+
+<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+    <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
+    <form id="voiceFeedbackForm">
+      <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+      <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+      <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+      <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between;">
+        <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
+        <button type="submit">Enviar</button>
+      </div>
+    </form>
+    <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
+    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+      <img src="loading.gif" alt="Cargando..." style="width:400px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  const feedbackText = document.getElementById('feedbackText');
+  const feedbackForm = document.getElementById('voiceFeedbackForm');
+  const feedbackLoader = document.getElementById('feedbackLoader');
+
+  function openFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'flex';
+    feedbackText.focus();
+  }
+
+  function closeFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'none';
+    feedbackForm.reset();
+    feedbackLoader.style.display = 'none';
+  }
+
+  function startVoiceInput() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'es-ES';
+
+    feedbackText.placeholder = "🎙️ Escuchando...";
+    feedbackText.style.border = "2px solid orange";
+
+    recognition.onresult = (event) => {
+      const result = event.results[0][0].transcript;
+      feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+    };
+
+    recognition.onerror = (event) => {
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+
+      if (event.error === 'no-speech') {
+        alert("No se detectó voz. Intentá nuevamente.");
+      } else {
+        alert("Error de voz: " + event.error);
+      }
+    };
+
+    recognition.onend = () => {
+      feedbackText.placeholder = "Habla o escribe tu mensaje...";
+      feedbackText.style.border = "1px solid #ccc";
+    };
+
+    recognition.start();
+  }
+
+  feedbackForm.onsubmit = function(event) {
+    event.preventDefault();
+    feedbackLoader.style.display = 'block';
+
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+      method: "POST",
+      body: new FormData(feedbackForm)
+    })
+    .then(response => response.json())
+    .then(data => {
+      feedbackLoader.style.display = 'none';
+      if (data.success === "true") {
+        alert("¡Gracias por tu opinión!");
+        closeFeedbackModal();
+      } else {
+        alert("Error al enviar. Intenta de nuevo.");
+      }
+    })
+    .catch(error => {
+      feedbackLoader.style.display = 'none';
+      console.error("Error:", error);
+      alert("Hubo un problema al enviar el mensaje.");
+    });
+  };
+</script>
+
+      <div id="emailModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px #000; z-index:1000;">
+  <h3>📧 Email para el Cliente</h3>
+  <textarea id="emailTemplate" style="width:100%; height:200px;"></textarea>
+  <button onclick="copyEmail()">📋 Copiar correo</button>
+  <button onclick="closeEmailModal()">❌ Cerrar</button>
+</div>
+      
       
 </body>
 </html>
