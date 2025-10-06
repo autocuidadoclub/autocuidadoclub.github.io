@@ -151,6 +151,21 @@ table td, table th {
   <div id="vehicleInspectionList"></div>
 </div>
 
+<div id="paymentHistorySection" style="margin-top:20px;">
+  <h4>💳 Historial de Pagos</h4>
+  <table id="paymentHistoryTable" style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Fecha</th><th>Monto</th><th>Método</th><th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="paymentHistoryBody">
+      <tr><td colspan="4">Sin historial disponible.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+    
     <h4>Deseas confimar pago?<h4>
     <p><button onclick="confirmPayment(selectedStaffUserId)">Confirmar Pago</button><br></p>
       
@@ -831,6 +846,23 @@ function selectScheduleBox(cell) {
   document.getElementById("staffControlForm").prepend(note);
 }
 
+      
+if (user.paymentHistory && Array.isArray(user.paymentHistory)) {
+  const tbody = document.getElementById("paymentHistoryBody");
+  tbody.innerHTML = "";
+  user.paymentHistory.forEach(entry => {
+    const date = entry.date?.toDate?.() ? entry.date.toDate().toLocaleDateString("es-ES") : "-";
+    tbody.innerHTML += `
+      <tr>
+        <td>${date}</td>
+        <td>$${entry.amount || "-"}</td>
+        <td>${entry.method || "-"}</td>
+        <td>${entry.status || "-"}</td>
+      </tr>
+    `;
+  });
+}
+
     })
     .catch(error => {
       console.error("❌ Error al buscar cliente:", error);
@@ -914,16 +946,94 @@ function selectScheduleBox(cell) {
 
 
   // Guardar cambios en Firestore
-  db.collection("users").doc(selectedStaffUserId).update(updates)
-    .then(() => {
-      showCustomAlert("✅ Cambios guardados correctamente.", "success");
-      setTimeout(() => location.reload(), 1500);
-    })
-    .catch(error => {
-      console.error("❌ Error al guardar cambios:", error);
-      showCustomAlert("❌ Error al guardar cambios.", "error");
-    });
+  // ✅ New secure Cloud Function path
+const functions = firebase.app().functions("us-central1");
+
+async function saveStaffClientChanges() {
+  if (!selectedStaffUserId) {
+    showCustomAlert("❌ Por favor busca primero un cliente.", "error");
+    return;
+  }
+
+  const currentDepartment = document.getElementById("currentDepartment").innerText.trim();
+  const currentMunicipality = document.getElementById("currentMunicipality").innerText.trim();
+  const currentSchedule = document.getElementById("currentSchedule").innerText.trim();
+
+  const newDepartment = document.getElementById("department").value.trim();
+  const newMunicipality = document.getElementById("municipality").value.trim();
+
+  const selectedCell = document.querySelector(".schedule-table td.selected-box");
+  let isScheduleChanged = false;
+  let selectedScheduleText = "";
+
+  if (selectedCell) {
+    const dayIndex = selectedCell.cellIndex;
+    const timeBlock = selectedCell.innerText.trim();
+    const dayHeader = document.querySelector(`.schedule-table thead th:nth-child(${dayIndex + 1})`);
+    const day = dayHeader ? dayHeader.innerText.trim() : "";
+    selectedScheduleText = `${day} - ${timeBlock}`;
+    if (selectedScheduleText !== currentSchedule && timeBlock !== "-") {
+      isScheduleChanged = true;
+    }
+  }
+
+  const isDepartmentChanged = newDepartment && newDepartment !== currentDepartment;
+  const isMunicipalityChanged = newMunicipality && newMunicipality !== currentMunicipality;
+
+  if (!isDepartmentChanged && !isMunicipalityChanged && !isScheduleChanged) {
+    showCustomAlert("❌ No se detectaron cambios para guardar.", "error");
+    return;
+  }
+
+  // Build updates
+  const updates = {};
+  const nowTimestamp = firebase.firestore.Timestamp.now();
+  const now = new Date();
+  const formattedDate = now.toLocaleDateString("es-ES");
+  const formattedTime = now.toLocaleTimeString("es-ES");
+  updates.staffLastChangeNote = `Cambio hecho por staff el ${formattedDate} a las ${formattedTime}`;
+
+  if (isDepartmentChanged) {
+    updates.department = newDepartment;
+    updates.lastDepartmentChange = nowTimestamp;
+  }
+  if (isMunicipalityChanged) {
+    updates.municipality = newMunicipality;
+    updates.lastMunicipalityChange = nowTimestamp;
+  }
+  if (isScheduleChanged) {
+    const [selectedDay, selectedTime] = selectedScheduleText.split(" - ");
+    updates.schedule = { day: selectedDay.trim(), time: selectedTime.trim() };
+    updates.lastReschedule = nowTimestamp;
+  }
+
+  // 🔄 Show loading.gif while saving
+  const overlay = document.createElement("div");
+  overlay.style.cssText = `
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(255,255,255,0.7);display:flex;
+    align-items:center;justify-content:center;z-index:9999;
+    flex-direction:column;text-align:center;
+  `;
+  overlay.innerHTML = `
+    <img src="/loading.gif" style="width:120px;margin-bottom:10px;">
+    <p style="font-weight:bold;color:#003366;">Guardando cambios...</p>
+  `;
+  document.body.appendChild(overlay);
+
+  try {
+    const callable = functions.httpsCallable("staffUpdateUser");
+    await callable({ userId: selectedStaffUserId, updates });
+    showCustomAlert("✅ Cambios guardados correctamente.", "success");
+    setTimeout(() => location.reload(), 1000);
+  } catch (err) {
+    console.error("❌ Error Cloud Function:", err);
+    showCustomAlert("❌ Error al guardar cambios.", "error");
+  } finally {
+    overlay.remove();
+  }
 }
+
 
 function showCustomAlert(message, type = "success") {
   const alertBox = document.getElementById("customAlert");
