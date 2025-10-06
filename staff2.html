@@ -260,6 +260,38 @@ table td, table th {
   </p>
 </div>
 
+      
+
+         <div id="emailModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px #000; z-index:1000;">
+  <h3>📧 Email para el Cliente</h3>
+  <textarea id="emailTemplate" style="width:100%; height:200px;"></textarea>
+  <button onclick="copyEmail()">📋 Copiar correo</button>
+  <button onclick="closeEmailModal()">❌ Cerrar</button>
+</div>
+
+
+      <!-- Loading Spinner for Payment Confirmation -->
+<div id="paymentLoadingOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.8);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+">
+  <img src="/loading.gif" alt="Verificando..." style="width:100px;height:100px;margin-bottom:15px;">
+  <p style="font-weight:bold;color:#003366;font-size:18px;">
+    ⏳ Verificando pago... por favor espera unos segundos
+  </p>
+</div>
+
+
   <script src="env.js"></script>
   <script>
     const firebaseConfig = {
@@ -1191,143 +1223,6 @@ function getNextMonthName() {
     
   </script>
 
-
-
-       <!-- Feedback Button + Modal -->
-<a onclick="openFeedbackModal()" id="feedbackToggleButton" class="floating-contact-button left-button">
-  📝 Opinión
-</a>
-
-
-
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-    <h3 style="margin-top:0;">Tu opinión sobre AutoCuidado Club</h3>
-    <form id="voiceFeedbackForm">
-      <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-      <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-      <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-      <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between;">
-        <button type="button" onclick="startVoiceInput()">🎤 Hablar</button>
-        <button type="submit">Enviar</button>
-      </div>
-    </form>
-    <button onclick="closeFeedbackModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px;">❌</button>
-    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-      <img src="loading.gif" alt="Cargando..." style="width:400px;">
-    </div>
-  </div>
-</div>
-
-<script>
-  const feedbackText = document.getElementById('feedbackText');
-  const feedbackForm = document.getElementById('voiceFeedbackForm');
-  const feedbackLoader = document.getElementById('feedbackLoader');
-
-  function openFeedbackModal() {
-    document.getElementById('feedbackModal').style.display = 'flex';
-    feedbackText.focus();
-  }
-
-  function closeFeedbackModal() {
-    document.getElementById('feedbackModal').style.display = 'none';
-    feedbackForm.reset();
-    feedbackLoader.style.display = 'none';
-  }
-
-  function startVoiceInput() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert("Tu navegador no soporta reconocimiento de voz.");
-      return;
-    }
-
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'es-ES';
-
-    feedbackText.placeholder = "🎙️ Escuchando...";
-    feedbackText.style.border = "2px solid orange";
-
-    recognition.onresult = (event) => {
-      const result = event.results[0][0].transcript;
-      feedbackText.value += (feedbackText.value ? ' ' : '') + result;
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-    };
-
-    recognition.onerror = (event) => {
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-
-      if (event.error === 'no-speech') {
-        alert("No se detectó voz. Intentá nuevamente.");
-      } else {
-        alert("Error de voz: " + event.error);
-      }
-    };
-
-    recognition.onend = () => {
-      feedbackText.placeholder = "Habla o escribe tu mensaje...";
-      feedbackText.style.border = "1px solid #ccc";
-    };
-
-    recognition.start();
-  }
-
-  feedbackForm.onsubmit = function(event) {
-    event.preventDefault();
-    feedbackLoader.style.display = 'block';
-
-    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-      method: "POST",
-      body: new FormData(feedbackForm)
-    })
-    .then(response => response.json())
-    .then(data => {
-      feedbackLoader.style.display = 'none';
-      if (data.success === "true") {
-        alert("¡Gracias por tu opinión!");
-        closeFeedbackModal();
-      } else {
-        alert("Error al enviar. Intenta de nuevo.");
-      }
-    })
-    .catch(error => {
-      feedbackLoader.style.display = 'none';
-      console.error("Error:", error);
-      alert("Hubo un problema al enviar el mensaje.");
-    });
-  };
-</script>
-
-      <div id="emailModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px #000; z-index:1000;">
-  <h3>📧 Email para el Cliente</h3>
-  <textarea id="emailTemplate" style="width:100%; height:200px;"></textarea>
-  <button onclick="copyEmail()">📋 Copiar correo</button>
-  <button onclick="closeEmailModal()">❌ Cerrar</button>
-</div>
-
-
-      <!-- Loading Spinner for Payment Confirmation -->
-<div id="paymentLoadingOverlay" style="
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.8);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-">
-  <img src="/loading.gif" alt="Verificando..." style="width:100px;height:100px;margin-bottom:15px;">
-  <p style="font-weight:bold;color:#003366;font-size:18px;">
-    ⏳ Verificando pago... por favor espera unos segundos
-  </p>
-</div>
 
       
 </body>
