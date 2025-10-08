@@ -294,3 +294,13 @@ exports.staffUpdateUser = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('internal', error.message);
   }
 });
+
+// 🚀 Temporary staff role assignment
+const STAFF_EMAIL = "info@autocuidadoclub.com";
+
+admin.auth().getUserByEmail(STAFF_EMAIL)
+  .then(user => {
+    return admin.auth().setCustomUserClaims(user.uid, { role: "staff" });
+  })
+  .then(() => console.log(`✅ Staff role added for ${STAFF_EMAIL}`))
+  .catch(console.error);
