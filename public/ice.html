@@ -158,8 +158,8 @@
       <div class="box">
         <h2>Hielo para helar Bebidas o Neveras.</h2>
         <ul class="price-list">
-          <li>$12.00 - 50 lb</li>
-          <li>$24.00 - 100 lb</li>
+          <li>$10.00 - 50 lb</li>
+          <li>$20.00 - 100 lb</li>
         </ul>
       </div>
 
@@ -236,7 +236,7 @@
       const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
       const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
 
-      const total = (potableQty * 2.0) + (hielo50Qty * 12) + (hielo100Qty * 24);
+      const total = (potableQty * 2.0) + (hielo50Qty * 10) + (hielo100Qty * 20);
       document.getElementById("totalAmount").textContent = total.toFixed(2);
 
       const promo = document.getElementById("promoMessage");
