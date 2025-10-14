@@ -36,16 +36,24 @@
     .main-container {
       display: flex;
       justify-content: center;
-      gap: 30px;
+      /* Adjusted gap for better spacing */
+      gap: 40px; 
       flex-wrap: wrap;
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
 
+    /*
+    Removed fixed logo and combined the two columns for content. 
+    The logo will now be part of the right column's flow.
+    */
     .left-column, .right-column {
       flex: 1;
-      min-width: 300px;
+      /* Adjusted min-width to ensure they stack on smaller screens */
+      min-width: 350px; 
+      /* Equalize the column widths for a nice 50/50 split on desktop */
+      max-width: 500px;
     }
 
     .box {
@@ -74,6 +82,9 @@
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
+      display: block; /* Make the button full width */
+      text-align: center;
+      margin-top: 15px;
     }
 
     .price-tag {
@@ -103,11 +114,18 @@
 
     input, select {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin: 5px 0 15px;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-family: 'Montserrat';
+      font-size: 1rem;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 700;
     }
 
     iframe {
@@ -121,25 +139,27 @@
       text-align: center;
       color: #555;
       padding: 40px 10px 20px;
+      clear: both; /* Ensures footer is below both columns */
     }
 
-   /* Make the logo container fixed on PC */
-@media (min-width: 768px) {
-  .logo-side {
-    position: fixed;
-    top: 100px; /* Starting position */
-    right: 40px; /* Adjust based on layout */
-    width: 200px;
-    transition: top 0.2s ease;
-    z-index: 1000;
-  }
-}
+    /* Styling for the logo within the column flow */
+    .logo-side {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-.logo-side img {
-  width: 100%;
-  border-radius: 12px;
-}
-
+    .logo-side img {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 12px;
+    }
+    
+    /* Remove fixed positioning for simplicity and better two-column flow */
+    @media (min-width: 768px) {
+        .logo-side {
+            margin-top: 0;
+        }
+    }
   </style>
 </head>
 <body>
@@ -172,31 +192,42 @@
         <p>✔️ Tasa Cero Banco Agrícola (desde $50)</p>
         <p>🚚 Entrega a domicilio</p>
       </div>
+      
+       <div class="box">
+        <h2>Mapa de Cobertura y Encuentros ICE</h2>
+        <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F"></iframe>
+      </div>
+    </div>
 
+    <div class="right-column">
+      <div class="logo-side">
+        <img src="ice-logo.png" alt="Autocuidado ICE Logo">
+      </div>
+      
       <div class="box">
         <h2>Ordena tu Hielo</h2>
-        <label>Hielo Potable 5 lb:</label>
+        <label for="potableQty">Hielo Potable 5 lb:</label>
         <input type="number" id="potableQty" min="0" value="0" oninput="updateTotal()">
 
-        <label>Hielo 50 lb:</label>
+        <label for="hielo50Qty">Hielo 50 lb:</label>
         <input type="number" id="hielo50Qty" min="0" value="0" oninput="updateTotal()">
 
-        <label>Hielo 100 lb:</label>
+        <label for="hielo100Qty">Hielo 100 lb:</label>
         <input type="number" id="hielo100Qty" min="0" value="0" oninput="updateTotal()">
 
-        <label>Ubicación para entrega:</label>
+        <label for="location">Ubicación para entrega:</label>
         <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje">
 
-        <label>Municipio:</label>
+        <label for="municipality">Municipio:</label>
         <input type="text" id="municipality" placeholder="Ej: Anamoros, San Vicente">
 
-        <label>Nombre de quien recibe:</label>
+        <label for="name">Nombre de quien recibe:</label>
         <input type="text" id="name">
 
         <h3>Total: $<span id="totalAmount">0.00</span></h3>
         <p id="promoMessage" style="color: green; font-weight: bold;"></p>
 
-        <label>Método de Pago:</label>
+        <label for="paymentMethod">Método de Pago:</label>
         <select id="paymentMethod">
           <option value="Efectivo contra entrega">Efectivo contra entrega</option>
           <option value="Tarjeta">Tarjeta</option>
@@ -206,22 +237,11 @@
 
         <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
       </div>
-
-      <div class="box">
-        <h2>Mapa de Cobertura y Encuentros ICE</h2>
-        <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F"></iframe>
-      </div>
-
+      
       <div class="box">
         <h2>¿También te interesan los Autos?</h2>
         <p>Conoce nuestro servicio de mantenimiento de vehículos.</p>
-        <a href="https://autocuidadoclub.com" class="btn">Ir a Autocuidado Club</a>
-      </div>
-    </div>
-
-    <div class="right-column">
-      <div class="logo-side">
-        <img src="ice-logo.png" alt="Autocuidado ICE">
+        <a href="https://autocuidadoclub.com" class="btn" target="_blank">Ir a Autocuidado Club</a>
       </div>
     </div>
   </div>
@@ -236,6 +256,7 @@
       const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
       const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
 
+      // Prices: 5lb @ 2.00, 50lb @ 10, 100lb @ 20
       const total = (potableQty * 2.0) + (hielo50Qty * 10) + (hielo100Qty * 20);
       document.getElementById("totalAmount").textContent = total.toFixed(2);
 
@@ -252,36 +273,38 @@
       const name = document.getElementById("name").value.trim();
       const paymentMethod = document.getElementById("paymentMethod").value;
       const total = document.getElementById("totalAmount").textContent;
+      
+      // WhatsApp number (example from original code: +503 7570 4428)
+      const whatsappNumber = "50375704428"; 
 
-      if (!location || (!potableQty && !hielo50Qty && !hielo100Qty)) {
-        alert("Completa al menos un producto y ubicación de entrega.");
+      if ((!potableQty && !hielo50Qty && !hielo100Qty) || !location || !name) {
+        alert("Por favor, completa la cantidad de al menos un producto, la ubicación, y tu nombre.");
         return;
       }
 
-      let message = `Hola, quiero ordenar:\n`;
-      if (potableQty > 0) message += `${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
-      if (hielo50Qty > 0) message += `${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
-      if (hielo100Qty > 0) message += `${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
-      message += `Total estimado: $${total}\n`;
-      message += `Método de pago: ${paymentMethod}\n`;
-      message += `Nombre: ${name}\n`;
-      message += `Ubicación de entrega: ${location}`;
-      message += `Ubicación de entrega: ${municipality}`;
+      let message = `*ORDEN DE HIELO*\n\n`;
+      message += `*Productos:*\n`;
+      if (potableQty > 0) message += `🧊 ${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
+      if (hielo50Qty > 0) message += `🧊 ${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
+      if (hielo100Qty > 0) message += `🧊 ${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
+      message += `\n*Total Estimado: $${total}*\n`;
+      message += `*Método de pago:* ${paymentMethod}\n`;
+      message += `\n*Detalles de Entrega:*\n`;
+      message += `*Nombre:* ${name}\n`;
+      message += `*Municipio:* ${municipality}\n`;
+      message += `*Ubicación:* ${location}\n`;
 
-      window.open(`https://wa.me/50375704428?text=${encodeURIComponent(message)}`, '_blank');
+
+      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     }
 
-document.addEventListener('scroll', function () {
-    const scrollY = window.scrollY;
-    const logo = document.querySelector('.logo-side');
-
-    if (window.innerWidth >= 768) {
-        // Clamp scroll to a max position to prevent overlapping footer
-        const maxTop = 600;
-        const newTop = Math.min(100 + scrollY * 0.2, maxTop);
-        logo.style.top = `${newTop}px`;
-    }
-});
+    // Removing the scroll event for the now-static logo.
+    // The previous scroll function is not needed if the logo is static.
+    /*
+    document.addEventListener('scroll', function () {
+      //...
+    });
+    */
 
   </script>
 </body>
