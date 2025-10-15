@@ -14,7 +14,7 @@
             --color-ice: #3498db; /* Azul Hielo */
             --color-fit: #e74c3c; /* Rojo Energía/Fuerza */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            --logo-size: 80px; /* Nuevo tamaño grande para el logo */
+            --logo-size: 110px; /* ¡NUEVO TAMAÑO MÁS GRANDE! */
         }
 
         /* Estilos base */
@@ -46,8 +46,8 @@
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 850px; /* Espacio extra para los logos flotantes */
-            height: 850px;
+            max-width: 900px; /* Aumentar el área para los logos más grandes */
+            height: 900px; /* Aumentar altura */
             margin: 0 auto;
         }
 
@@ -71,7 +71,6 @@
             box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7);
             animation: pulse-core 2s infinite;
         }
-        /* ... (Estilos internos del Core Vision sin cambios) ... */
         .core-text h3 { margin: 0 0 8px 0; font-size: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 8px; }
         .core-text p { margin: 0; font-size: 1rem; padding: 0 20px; }
         @keyframes pulse-core {
@@ -79,6 +78,10 @@
             70% { box-shadow: 0 0 0 20px rgba(255, 102, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
         }
+
+        /* LÍNEAS CONECTORAS ELIMINADAS */
+        .line { display: none; }
+
 
         /* LOGO ORB (Nuevo Contenedor para la imagen grande) */
         .logo-orb {
@@ -97,20 +100,20 @@
         .logo-orb img {
             width: 85%;
             height: 85%;
-            object-fit: contain; /* Asegura que la imagen quepa sin cortarse */
+            object-fit: contain;
         }
         
         /* Posicionamiento de los Orbes de Logo (Escritorio) */
-        /* La posición se define relativa al contenedor .ecosystem-diagram */
-        .club-logo { top: 15px; right: 15px; border: 4px solid var(--color-club); }
-        .home-logo { bottom: 15px; right: 15px; border: 4px solid var(--color-home); }
-        .ice-logo-pos { bottom: 15px; left: 15px; border: 4px solid var(--color-ice); }
-        .fit-logo { top: 15px; left: 15px; border: 4px solid var(--color-fit); }
+        /* La posición se ajusta para el nuevo tamaño de 110px */
+        .club-logo { top: -10px; right: -10px; border: 4px solid var(--color-club); }
+        .home-logo { bottom: -10px; right: -10px; border: 4px solid var(--color-home); }
+        .ice-logo-pos { bottom: -10px; left: -10px; border: 4px solid var(--color-ice); }
+        .fit-logo { top: -10px; left: -10px; border: 4px solid var(--color-fit); }
 
 
         /* Estilo de las Cajas de División */
         .division {
-            width: 240px;
+            width: 260px; /* Un poco más anchas para compensar */
             padding: 20px;
             background-color: white;
             border-radius: 12px;
@@ -127,27 +130,26 @@
         }
         .division-header {
             display: flex;
-            justify-content: flex-start; /* Alineación izquierda */
+            justify-content: flex-start;
             align-items: center;
             margin-bottom: 10px;
             border-bottom: 2px solid;
             padding-bottom: 5px;
         }
-        .division h4 { /* H4 ya no necesita flex-start, pues lo hace el header */
-            font-size: 1.3rem;
+        .division h4 {
+            font-size: 1.4rem; /* H4 también un poco más grande */
             margin: 0;
             display: flex;
             align-items: center;
             font-weight: bold;
         }
-        /* Eliminamos .division-logo pues la imagen está fuera */
         
         /* ... (Estilos internos de la división sin cambios) ... */
         .division p { font-size: 1rem; color: #444; margin: 5px 0 10px 0; min-height: 45px; }
         .division .concept { font-style: italic; font-size: 0.9rem; display: block; padding-top: 8px; font-weight: 600; }
-        .division .icon { font-size: 1.6rem; margin-right: 10px; }
+        .division .icon { font-size: 1.8rem; margin-right: 10px; }
 
-        /* Color Coding by Division (ajuste solo en el header) */
+        /* Color Coding by Division (sin cambios) */
         .club { border-left: 5px solid var(--color-club); }
         .club h4 { color: var(--color-club); }
         .club .division-header { border-color: var(--color-club); }
@@ -170,29 +172,29 @@
 
 
         /* Posicionamiento de las 4 Divisiones (Espacio Aumentado) */
-        /* Posiciones ajustadas para compensar los logos que sobresalen */
-        .club { top: 95px; right: 95px; }
-        .home { bottom: 95px; right: 95px; }
-        .ice { bottom: 95px; left: 95px; }
-        .fit { top: 95px; left: 95px; }
+        /* Posiciones ajustadas para el logo de 110px que sobresale */
+        .club { top: 120px; right: 120px; }
+        .home { bottom: 120px; right: 120px; }
+        .ice { bottom: 120px; left: 120px; }
+        .fit { top: 120px; left: 120px; }
 
 
         /* --- VISTA MÓVIL (Ajustes de Diseño y Logos) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 1100px; /* Aumentar altura total para acomodar logos encima */
+                height: 1150px; /* Aumentar altura total para acomodar el logo de 110px */
                 max-width: 90%;
             }
             .core-vision {
-                top: 80px; /* Bajar el núcleo para dar espacio arriba */
+                top: 80px;
                 width: 180px;
                 height: 180px;
             }
 
             /* Los logos se colocan encima y centrados en móvil */
             .logo-orb {
-                width: 70px;
-                height: 70px;
+                width: 90px; /* Tamaño del logo en móvil ajustado */
+                height: 90px;
                 left: 50%;
                 transform: translateX(-50%);
                 border-width: 3px;
@@ -200,10 +202,11 @@
             }
             
             /* Posicionamiento de los Orbes de Logo (Móvil) */
+            /* Espacio necesario para el logo de 90px + caja de división */
             .club-logo { top: 250px; right: auto; }
-            .home-logo { top: 430px; right: auto; }
-            .ice-logo-pos { top: 610px; left: auto; }
-            .fit-logo { top: 790px; left: auto; }
+            .home-logo { top: 440px; right: auto; }
+            .ice-logo-pos { top: 630px; left: auto; }
+            .fit-logo { top: 820px; left: auto; }
 
 
             .division {
@@ -213,15 +216,12 @@
                 transform: translateX(-50%);
                 padding: 15px;
             }
-            .division:hover {
-                transform: translateX(-50%) scale(1.03);
-            }
             
             /* Apilado Vertical de las Cajas de División (Debajo de los logos) */
-            .club { top: 340px; right: auto; }
-            .home { top: 520px; right: auto; }
-            .ice { top: 700px; left: auto; }
-            .fit { top: 880px; left: auto; }
+            .club { top: 380px; right: auto; }
+            .home { top: 570px; right: auto; }
+            .ice { top: 760px; left: auto; }
+            .fit { top: 950px; left: auto; }
         }
     </style>
 </head>
