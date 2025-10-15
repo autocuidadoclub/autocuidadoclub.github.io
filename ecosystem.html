@@ -1,27 +1,4 @@
-The current ecosystem diagram template is well-structured and uses clear CSS to create a hub-and-spoke layout.
 
-The main area for improvement is enhancing the **visual connection** between the core and the divisions and making the design feel more modern and integrated.
-
-Here is an analysis and an adjusted CSS/HTML template that enhances the visual appeal, strengthens the connections, and improves the overall presentation.
-
------
-
-## Analysis and Visual Adjustments
-
-| Component | Current Status (Good) | Adjustment / Improvement |
-| :--- | :--- | :--- |
-| **Connection Lines** | Simple orange lines (`.line`). | Replace the plain lines with **directional arrows** that visually show the energy/focus flowing *out* from the core to the divisions. |
-| **Core Vision** | Strong blue circle with an orange border. | Add a subtle **pulse effect or shadow** to make the core feel like the active origin point of the ecosystem. |
-| **Division Boxes** | Standard white boxes with a gray border. | Apply **color coding** based on the division's concept (e.g., Green for FIT, Blue/Gray for CLUB) to improve visual identity and differentiation. |
-| **Mobile View** | Uses simple stacking (`@media (max-width: 650px)`). | Optimize the vertical spacing and ensure the boxes are clearly linked conceptually, even without the diagonal lines. |
-
------
-
-## Adjusted `ecosystem.html` Template
-
-This adjusted code replaces the previous CSS and HTML content with a more polished and visually dynamic version.
-
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,7 +6,7 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecosistema AutoCuidado - Visión Integral</title>
     <style>
-        /* Define your custom brand colors for easy reference */
+        /* Define tus colores de marca para fácil referencia */
         :root {
             --color-core: #002b5c; /* AutoCuidado Azul Principal */
             --color-accent: #ff6600; /* Naranja Acento */
@@ -40,7 +17,7 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
 
-        /* Estilos base para el Diagrama de Ecosistema */
+        /* Estilos base */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -48,7 +25,7 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
             background-color: #f8f8f8;
         }
         .ecosystem-container {
-            max-width: 1000px;
+            max-width: 1200px; /* Aumentar el espacio horizontal */
             margin: 4rem auto;
             padding: 20px;
             text-align: center;
@@ -62,22 +39,22 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
             color: var(--color-accent);
             font-size: 1.3rem;
             font-weight: 600;
-            margin-bottom: 3rem;
+            margin-bottom: 5rem; /* Más espacio debajo del título */
         }
 
         /* Contenedor del Diagrama */
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 650px; /* Tamaño ligeramente más grande */
-            height: 650px;
+            max-width: 800px; /* Aumentar el tamaño del área de juego del diagrama */
+            height: 800px; /* Aumentar la altura */
             margin: 0 auto;
         }
 
         /* Círculo Central (Core Vision) */
         .core-vision {
-            width: 220px;
-            height: 220px;
+            width: 250px; /* Círculo más grande */
+            height: 250px;
             background-color: var(--color-core);
             color: white;
             border-radius: 50%;
@@ -90,21 +67,21 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
-            border: 6px solid var(--color-accent);
+            border: 8px solid var(--color-accent);
             /* Animación de Pulso Suave */
             box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7);
             animation: pulse-core 2s infinite;
         }
         .core-text h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.8rem;
+            margin: 0 0 8px 0;
+            font-size: 2rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-            padding-bottom: 5px;
+            padding-bottom: 8px;
         }
         .core-text p {
             margin: 0;
-            font-size: 0.95rem;
-            padding: 0 15px;
+            font-size: 1rem;
+            padding: 0 20px;
         }
         @keyframes pulse-core {
             0% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7); }
@@ -112,42 +89,14 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
             100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
         }
 
-        /* Líneas Conectoras (con flechas) */
-        .line {
-            position: absolute;
-            width: 150px; /* Longitud del brazo */
-            height: 4px;
-            background-color: var(--color-accent);
-            transform-origin: left center;
-            top: 50%;
-            left: 50%;
-            z-index: 5;
-        }
+        /* LÍNEAS CONECTORAS ELIMINADAS */
+        .line { display: none; }
 
-        /* Flecha/Triángulo al final de la línea */
-        .line::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: -8px; /* Posicionado para que la punta toque la caja de división */
-            width: 0;
-            height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid var(--color-accent);
-            transform: translateY(-50%);
-        }
-
-        /* Posicionamiento y rotación de las 4 líneas */
-        .line-1 { transform: rotate(45deg) translate(0, -2px); }
-        .line-2 { transform: rotate(135deg) translate(0, -2px); }
-        .line-3 { transform: rotate(225deg) translate(0, -2px); }
-        .line-4 { transform: rotate(315deg) translate(0, -2px); }
 
         /* Estilo de las Cajas de División */
         .division {
-            width: 200px;
-            padding: 18px;
+            width: 240px; /* Cajas más anchas */
+            padding: 20px;
             background-color: white;
             border-radius: 12px;
             box-shadow: var(--shadow);
@@ -162,8 +111,8 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
         .division h4 {
-            font-size: 1.2rem;
-            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            margin: 0 0 8px 0;
             display: flex;
             align-items: center;
             font-weight: bold;
@@ -171,24 +120,24 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
             padding-bottom: 5px;
         }
         .division p {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #444;
             margin: 5px 0 10px 0;
-            min-height: 40px; 
+            min-height: 45px; 
         }
         .division .concept {
             font-style: italic;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             display: block;
             padding-top: 8px;
             font-weight: 600;
         }
         .division .icon {
-            font-size: 1.4rem;
-            margin-right: 8px;
+            font-size: 1.6rem;
+            margin-right: 10px;
         }
 
-        /* Color Coding by Division */
+        /* Color Coding by Division (sin cambios) */
         .club { border-left: 5px solid var(--color-club); }
         .club h4 { color: var(--color-club); border-color: var(--color-club); }
         .club .concept { color: var(--color-club); }
@@ -203,29 +152,28 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
         .fit .concept { color: var(--color-fit); }
 
 
-        /* Posicionamiento de las 4 Divisiones (Ligeramente más separadas) */
-        .club { top: 75px; right: 75px; }
-        .home { bottom: 75px; right: 75px; }
-        .ice { bottom: 75px; left: 75px; }
-        .fit { top: 75px; left: 75px; }
+        /* Posicionamiento de las 4 Divisiones (Más separadas para aprovechar el espacio) */
+        /* CLUB - Arriba Derecha */
+        .club { top: 50px; right: 50px; }
+        /* HOME - Abajo Derecha */
+        .home { bottom: 50px; right: 50px; }
+        /* ICE - Abajo Izquierda */
+        .ice { bottom: 50px; left: 50px; }
+        /* FIT - Arriba Izquierda */
+        .fit { top: 50px; left: 50px; }
 
-        /* Media Query para hacerlo Responsivo en Móviles */
-        @media (max-width: 680px) {
+        /* Media Query para hacerlo Responsivo en Móviles (Ajustado) */
+        @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 900px;
+                height: 950px; /* Ajusta la altura para el apilado vertical */
                 max-width: 90%;
             }
             .core-vision {
                 top: 50px;
-                left: 50%;
                 width: 180px;
                 height: 180px;
             }
-            .core-text p { padding: 0 10px; }
 
-            /* Ocultar las líneas de conexión en móvil */
-            .line { display: none; }
-            
             /* Posicionamiento de las Divisiones en columna */
             .division {
                 position: absolute;
@@ -237,11 +185,11 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
                 transform: translateX(-50%) scale(1.03);
             }
             
-            /* Apilado Vertical */
-            .club { top: 280px; right: auto; }
-            .home { top: 440px; right: auto; }
-            .ice { top: 600px; left: auto; }
-            .fit { top: 760px; left: auto; }
+            /* Apilado Vertical con más espacio */
+            .club { top: 300px; right: auto; }
+            .home { top: 480px; right: auto; }
+            .ice { top: 660px; left: auto; }
+            .fit { top: 840px; left: auto; }
         }
     </style>
 </head>
@@ -257,10 +205,6 @@ This adjusted code replaces the previous CSS and HTML content with a more polish
                     <h3>AutoCuidado</h3>
                     <p>Cuidarte es nuestra misión. Empoderamos a las personas para vivir con más productividad, salud y bienestar.</p>
                 </div>
-                <div class="line line-1"></div>
-                <div class="line line-2"></div>
-                <div class="line line-3"></div>
-                <div class="line line-4"></div>
             </div>
 
             <div class="division club">
