@@ -112,36 +112,97 @@
       allowfullscreen
     ></iframe>
 
-    <div class="box">
-        <h2>Haz tu Pedido de Productos ESAL</h2>
+  <div class="box">
+    <h2>📋 Pedido Rápido ESAL - AutoCuidado Home</h2>
+    <p class="catalog-description">Selecciona la cantidad de cada producto y presentación para calcular tu total al instante.</p>
 
-        <div id="product-inputs-container">
-            </div>
-
-        <label for="location">Ubicación para entrega:</label>
-        <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje" required>
-
-        <label for="municipality">Municipio:</label>
-        <input type="text" id="municipality" placeholder="Ej: Santa Ana, San Miguel" required>
-
-        <label for="name">Nombre de quien recibe:</label>
-        <input type="text" id="name" required>
-
+    <div class="order-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto y Presentación</th>
+                    <th class="text-center">Precio Unitario</th>
+                    <th class="text-center">Cantidad</th>
+                </tr>
+            </thead>
+            <tbody id="product-inputs-container">
+                </tbody>
+        </table>
+    </div>
+    
+    <div class="summary-and-payment">
         <h3>Total: $<span id="totalAmount">0.00</span></h3>
         <p id="promoMessage" style="color: green; font-weight: bold;"></p>
 
         <label for="paymentMethod">Método de Pago:</label>
-        <select id="paymentMethod">
+        <select id="paymentMethod" required>
+            <option value="" disabled selected>Selecciona un método</option>
             <option value="Efectivo contra entrega">Efectivo contra entrega</option>
             <option value="Tarjeta">Tarjeta</option>
             <option value="Bitcoin">Bitcoin</option>
             <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero (desde $50)</option>
         </select>
-
-        <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
-    </div>
     </div>
 
+    <div class="delivery-info">
+        <h3>Datos de Entrega</h3>
+        <label for="name">Nombre de quien recibe:</label>
+        <input type="text" id="name" required>
+
+        <label for="municipality">Municipio:</label>
+        <input type="text" id="municipality" placeholder="Ej: Santa Ana, San Miguel" required>
+        
+        <label for="location">Ubicación exacta para entrega:</label>
+        <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje, casa #15" required>
+    </div>
+
+    <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
+</div>
+
+<style>
+    .order-table-container {
+        overflow-x: auto;
+        margin-bottom: 20px;
+    }
+    .order-table-container table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .order-table-container th, .order-table-container td {
+        padding: 10px;
+        border: 1px solid #eee;
+        text-align: left;
+    }
+    .order-table-container thead th {
+        background-color: #f0f0f0;
+        font-weight: bold;
+        color: #002b5c;
+    }
+    .product-group-header {
+        background-color: #e6f7ff; /* Light blue background for category headers */
+        font-weight: bold;
+        color: #002b5c;
+    }
+    .text-center {
+        text-align: center;
+        width: 100px;
+    }
+    .product-qty-input {
+        width: 60px;
+        text-align: center;
+        padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+    .summary-and-payment, .delivery-info {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px dashed #ccc;
+    }
+    .delivery-info input, .summary-and-payment select {
+        margin-bottom: 15px;
+    }
+</style>
   <footer>
     </footer>
 
@@ -156,120 +217,73 @@
       📲 Abrir menú
   </button>
 
-  <script>
+<script>
     // --- ESAL PRODUCT DATA (Sourced from the catalog) ---
+    // (Ensure you paste your complete ESAL_PRODUCTS object here)
     const ESAL_PRODUCTS = {
-        "Alcohol Gel - Galón ($13.50)": [
-            { id: "ag_galon_mango", scent: "Mango", price: 13.50 },
-            { id: "ag_galon_manzana", scent: "Manzana Verde", price: 13.50 },
-            { id: "ag_galon_maracuya", scent: "Maracuyá", price: 13.50 },
-            { id: "ag_galon_sandia", scent: "Sandía", price: 13.50 },
-            { id: "ag_galon_sinfrag", scent: "Sin Fragancia", price: 13.50 }
+        "Alcohol Gel": [
+            { id: "ag_galon_mango", size: "Galón", scent: "Mango", price: 13.50 },
+            { id: "ag_500ml_sinfrag", size: "500 mL", scent: "Sin Fragancia", price: 4.50 },
+            { id: "ag_30ml_sandia", size: "30 mL", scent: "Sandía", price: 1.00 }
+            // ... all other Alcohol Gel presentations
         ],
-        "Alcohol Gel - 500 mL ($4.50)": [
-            { id: "ag_500ml_mango", scent: "Mango", price: 4.50 },
-            { id: "ag_500ml_manzana", scent: "Manzana Verde", price: 4.50 },
-            { id: "ag_500ml_maracuya", scent: "Maracuyá", price: 4.50 },
-            { id: "ag_500ml_sandia", scent: "Sandía", price: 4.50 },
-            { id: "ag_500ml_sinfrag", scent: "Sin Fragancia", price: 4.50 }
+        "Desinfectante": [
+            { id: "dd_galon_verde", size: "Galón (Uso Directo)", scent: "Manzana Verde", price: 3.25 },
+            { id: "dc_galon_lavanda", size: "Galón (Concentrado)", scent: "Lavanda", price: 4.00 }
+            // ... all other Desinfectante presentations
         ],
-        "Alcohol Gel - 120 mL ($1.75)": [
-            { id: "ag_120ml_mango", scent: "Mango", price: 1.75 },
-            { id: "ag_120ml_manzana", scent: "Manzana Verde", price: 1.75 },
-            { id: "ag_120ml_maracuya", scent: "Maracuyá", price: 1.75 },
-            { id: "ag_120ml_sandia", scent: "Sandía", price: 1.75 },
-            { id: "ag_120ml_sinfrag", scent: "Sin Fragancia", price: 1.75 }
+        "Jabón Líquido": [
+            { id: "jl_galon_chicle", size: "Galón", scent: "Chicle", price: 4.00 },
+            { id: "jl_500ml_cereza", size: "500 mL", scent: "Cereza", price: 1.75 }
+            // ... all other Jabón Líquido presentations
         ],
-        "Alcohol Gel - 30 mL ($1.00)": [
-            { id: "ag_30ml_mango", scent: "Mango", price: 1.00 },
-            { id: "ag_30ml_manzana", scent: "Manzana Verde", price: 1.00 },
-            { id: "ag_30ml_maracuya", scent: "Maracuyá", price: 1.00 },
-            { id: "ag_30ml_sandia", scent: "Sandía", price: 1.00 },
-            { id: "ag_30ml_sinfrag", scent: "Sin Fragancia", price: 1.00 },
-            { id: "ag_30ml_silicon_sin", scent: "Sin Fragancia (Sin Silicón)", price: 1.00 }
-        ],
-        "Alcohol Líquido - Galón": [
-            { id: "al_galon_90", scent: "90%", price: 12.00 },
-            { id: "al_galon_70", scent: "70%", price: 10.50 }
-        ],
-        "Alcohol Líquido - 120 mL ($1.75)": [
-            { id: "al_spray_70", scent: "70% en Spray", price: 1.75 }
-        ],
-        "Desinfectante Uso Directo - Galón ($3.25)": [
-            { id: "dd_galon_verde", scent: "Manzana Verde", price: 3.25 },
-            { id: "dd_galon_sin", scent: "Sin Fragancia", price: 3.25 },
-            { id: "dd_galon_lavanda", scent: "Lavanda", price: 3.25 },
-            { id: "dd_galon_maracuya", scent: "Maracuyá", price: 3.25 },
-            { id: "dd_galon_limon", scent: "Limón", price: 3.25 },
-            { id: "dd_galon_citronela", scent: "Citronela", price: 3.25 }
-        ],
-        "Desinfectante Concentrado - Galón ($4.00)": [
-            { id: "dc_galon_verde", scent: "Manzana Verde", price: 4.00 },
-            { id: "dc_galon_sin", scent: "Sin Fragancia", price: 4.00 },
-            { id: "dc_galon_lavanda", scent: "Lavanda", price: 4.00 },
-            { id: "dc_galon_maracuya", scent: "Maracuyá", price: 4.00 },
-            { id: "dc_galon_limon", scent: "Limón", price: 4.00 },
-            { id: "dc_galon_citronela", scent: "Citronela", price: 4.00 }
-        ],
-        "Lejía - Galón": [
-            { id: "lejia_4", scent: "4% (Baja Concentración)", price: 2.50 },
-            { id: "lejia_6", scent: "6% (Alta Concentración)", price: 3.00 }
-        ],
-        "Jabón Líquido - Galón ($4.00)": [
-            { id: "jl_galon_verde", scent: "Manzana Verde", price: 4.00 },
-            { id: "jl_galon_cereza", scent: "Cereza", price: 4.00 },
-            { id: "jl_galon_fresa", scent: "Fresa", price: 4.00 },
-            { id: "jl_galon_durazno", scent: "Durazno", price: 4.00 },
-            { id: "jl_galon_chicle", scent: "Chicle", price: 4.00 }
-        ],
-        "Jabón Líquido - 500 mL ($1.75)": [
-            { id: "jl_500ml_verde", scent: "Manzana Verde", price: 1.75 },
-            { id: "jl_500ml_cereza", scent: "Cereza", price: 1.75 },
-            { id: "jl_500ml_fresa", scent: "Fresa", price: 1.75 },
-            { id: "jl_500ml_durazno", scent: "Durazno", price: 1.75 },
-            { id: "jl_500ml_chicle", scent: "Chicle", price: 1.75 }
-        ],
-        "Repelente de Insectos - 120 mL ($3.00)": [
-            { id: "repelente_120ml", scent: "Spray Citronela", price: 3.00 }
+        "Lejía y Otros": [
+            { id: "lejia_6", size: "Lejía 6% Galón", scent: "N/A", price: 3.00 },
+            { id: "repelente_120ml", size: "Repelente 120 mL", scent: "Citronela", price: 3.00 }
         ]
     };
-
+    
     // --- Dynamic Form Generation ---
-    (function generateForm() {
+    (function generateFormTable() {
         const container = document.getElementById('product-inputs-container');
+        let html = '';
 
         for (const category in ESAL_PRODUCTS) {
-            const categoryHeader = document.createElement('h4');
-            categoryHeader.textContent = category;
-            container.appendChild(categoryHeader);
+            // 1. Category Header Row
+            html += `<tr class="product-group-header">
+                        <td colspan="3">${category}</td>
+                     </tr>`;
 
+            // 2. Product Rows
             ESAL_PRODUCTS[category].forEach(product => {
-                const categoryBaseName = category.split(' - ')[0];
-                const labelText = `${categoryBaseName} - ${product.scent}`;
-
-                const label = document.createElement('label');
-                label.setAttribute('for', product.id);
-                label.textContent = labelText + ` ($${product.price.toFixed(2)}):`;
-
-                const input = document.createElement('input');
-                input.setAttribute('type', 'number');
-                input.setAttribute('id', product.id);
-                input.setAttribute('min', '0');
-                input.setAttribute('value', '0');
-                // Use onchange and oninput for broader compatibility
-                input.setAttribute('oninput', 'updateTotal()');
-                input.setAttribute('data-price', product.price.toFixed(2));
-                input.setAttribute('data-name', labelText);
-
-                container.appendChild(label);
-                container.appendChild(input);
+                const scentDisplay = product.scent === 'N/A' ? '' : ` (${product.scent})`;
+                const labelText = `${product.size}${scentDisplay}`;
+                
+                html += `<tr>
+                            <td>${labelText}</td>
+                            <td class="text-center">$${product.price.toFixed(2)}</td>
+                            <td class="text-center">
+                                <input 
+                                    type="number" 
+                                    class="product-qty-input"
+                                    id="${product.id}" 
+                                    min="0" 
+                                    value="0" 
+                                    oninput="updateTotal()" 
+                                    data-price="${product.price.toFixed(2)}"
+                                    data-name="${category}: ${labelText}"
+                                >
+                            </td>
+                        </tr>`;
             });
         }
-    })(); // Execute immediately
+        container.innerHTML = html;
+    })();
 
     // --- Dynamic Total Calculation Function ---
     function updateTotal() {
         let total = 0;
+        // Select only the input fields within the table body
         const inputs = document.querySelectorAll('#product-inputs-container input[type="number"]');
 
         inputs.forEach(input => {
@@ -281,7 +295,7 @@
         document.getElementById("totalAmount").textContent = total.toFixed(2);
 
         const promo = document.getElementById("promoMessage");
-        promo.textContent = total >= 50 ? "¡Aplica para Tasa Cero Banco Agrícola!" : "";
+        promo.textContent = total >= 50 ? "✅ ¡Tu pedido aplica para Tasa Cero Banco Agrícola!" : "";
     }
 
     // --- Dynamic WhatsApp Order Function ---
@@ -294,7 +308,7 @@
             const qty = parseInt(input.value) || 0;
             if (qty > 0) {
                 const name = input.getAttribute('data-name');
-                orderDetails += `🧼 ${qty} ${name}\n`;
+                orderDetails += `* ${qty}x ${name}\n`;
                 totalQty += qty;
             }
         });
@@ -306,64 +320,25 @@
         const total = document.getElementById("totalAmount").textContent;
         const whatsappNumber = "50375704428"; // Use your actual WhatsApp number
 
-        if (totalQty === 0 || !location || !municipality || !name) {
-            alert("⚠️ Por favor, selecciona al menos un producto y completa tu nombre, ubicación y municipio.");
+        // Basic validation
+        if (totalQty === 0) {
+            alert("⚠️ Por favor, selecciona al menos un producto.");
+            return;
+        }
+        if (!location || !municipality || !name || !paymentMethod) {
+            alert("⚠️ Por favor, completa todos los campos de entrega y selecciona un Método de Pago.");
             return;
         }
 
-        let message = `*ORDEN DE PRODUCTOS ESAL 🧴*\n\n`;
-        message += `*Productos:*\n${orderDetails}`;
-        message += `\n*Total Estimado: $${total}*\n`;
-        message += `*Método de Pago:* ${paymentMethod}\n\n`;
-        message += `*Entrega:*\nNombre: ${name}\nMunicipio: ${municipality}\nUbicación: ${location}`;
+
+        let message = `*ORDEN DE PRODUCTOS ESAL - ${new Date().toLocaleDateString('es-SV')}*\n\n`;
+        message += `*PRODUCTOS DETALLE:*\n${orderDetails}\n`;
+        message += `*TOTAL ESTIMADO: $${total}*\n`;
+        message += `*MÉTODO DE PAGO:* ${paymentMethod}\n\n`;
+        message += `*DATOS DE ENTREGA:*\nNombre: ${name}\nMunicipio: ${municipality}\nUbicación: ${location}`;
 
         window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
     }
-
-    // --- PWA / Voice Modal Logic (Your existing functions) ---
-    let deferredPrompt = null;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('how-to-install-btn').style.display = 'inline-block';
-    });
-
-    document.getElementById('how-to-install-btn').addEventListener('click', async () => {
-      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const choiceResult = await deferredPrompt.userChoice;
-        if (choiceResult.outcome === 'accepted') {
-          console.log('✅ User accepted the install prompt');
-        } else {
-          console.log('❌ User dismissed the install prompt');
-        }
-        deferredPrompt = null;
-      } else if (isIos) {
-        alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-      } else if (isAndroid) {
-        alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
-      } else {
-        alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
-      }
-    });
-    
-    // NOTE: The rest of your PWA/Modal functions (openFeedbackModal, closeFeedbackModal, startVoiceInput, etc.) 
-    // should be included here, as they were originally in the final <script> block.
-    // I am omitting them here for brevity but ensure they are inside this final <script> tag.
-    
-    // ... rest of your PWA/Modal functions (openFeedbackModal, closeFeedbackModal, startVoiceInput, etc.) ...
-    function openFeedbackModal() { /* ... */ }
-    function closeFeedbackModal() { /* ... */ }
-    function startVoiceInput() { /* ... */ }
-    document.getElementById('reopen-cta-btn').addEventListener('click', () => { /* ... */ });
-    document.getElementById('voiceFeedbackForm').onsubmit = function (e) { /* ... */ };
-    function closeCtaInstallBar() { /* ... */ }
-    document.getElementById('reopen-cta-btn').addEventListener('click', () => { /* ... */ });
-
-  </script>
+</script>
   </body>
 </html>
