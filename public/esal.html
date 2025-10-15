@@ -116,19 +116,8 @@
     <h2>📋 Pedido Rápido ESAL - AutoCuidado Home</h2>
     <p class="catalog-description">Selecciona la cantidad de cada producto y presentación para calcular tu total al instante.</p>
 
-    <div class="order-table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Producto y Presentación (Aroma/Concentración)</th>
-                    <th class="text-center">Precio Unitario</th>
-                    <th class="text-center">Cantidad</th>
-                </tr>
-            </thead>
-            <tbody id="product-inputs-container">
-                </tbody>
-        </table>
-    </div>
+    <div id="product-inputs-container">
+        </div>
 
     <div class="summary-and-payment">
         <h3>Total: $<span id="totalAmount">0.00</span></h3>
@@ -160,16 +149,18 @@
 </div>
 
 <style>
+    /* ... (Mantener estilos de .box, .delivery-info, .summary-and-payment, etc.) ... */
+
     .order-table-container {
         overflow-x: auto;
-        margin-bottom: 20px;
+        margin-bottom: 30px; /* Más espacio entre categorías */
     }
     .order-table-container table {
         width: 100%;
         border-collapse: collapse;
     }
     .order-table-container th, .order-table-container td {
-        padding: 10px;
+        padding: 10px 5px; /* Ajuste para celdas más pequeñas */
         border: 1px solid #eee;
         text-align: left;
     }
@@ -177,15 +168,23 @@
         background-color: #f0f0f0;
         font-weight: bold;
         color: #002b5c;
+        font-size: 0.85em; /* Fuente más pequeña para encabezados de columna */
+        vertical-align: middle;
+        text-align: center;
     }
     .product-group-header {
-        background-color: #e6f7ff; /* Light blue background for category headers */
+        background-color: #e6f7ff;
+        font-weight: bold;
+        color: #002b5c;
+        text-align: center;
+    }
+    .vertical-category-header {
+        background-color: #e6f7ff;
         font-weight: bold;
         color: #002b5c;
     }
     .text-center {
         text-align: center;
-        width: 100px;
     }
     .product-qty-input {
         width: 60px;
@@ -193,23 +192,23 @@
         padding: 5px;
         border-radius: 4px;
         border: 1px solid #ccc;
+        font-size: 0.9em;
     }
-    .summary-and-payment, .delivery-info {
-        margin-top: 25px;
-        padding-top: 15px;
-        border-top: 1px dashed #ccc;
+    /* Estilo para las filas de aroma en la matriz */
+    .matrix-scent-cell {
+        font-weight: 500;
+        color: #333;
+        width: 150px;
+        text-align: left !important;
     }
-    .delivery-info input, .summary-and-payment select {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-        margin-bottom: 15px;
+    .matrix-size-cell {
+        width: 90px;
+        text-align: center;
     }
 </style>
-  <footer>
+    
+    
+    <footer>
     </footer>
 
 
@@ -224,28 +223,24 @@
   </button>
 
 <script>
-    // --- DATOS DE PRODUCTOS ESAL (Completo y Organizado) ---
+    // --- DATOS DE PRODUCTOS ESAL (Completo) ---
     const ESAL_PRODUCTS = {
         "Alcohol Gel": [
-            // GALON ($13.50) - 5 Aromas
             { id: "ag_galon_mango", size: "Galón", scent: "Mango", price: 13.50 },
             { id: "ag_galon_manzana", size: "Galón", scent: "Manzana Verde", price: 13.50 },
             { id: "ag_galon_maracuya", size: "Galón", scent: "Maracuyá", price: 13.50 },
             { id: "ag_galon_sandia", size: "Galón", scent: "Sandía", price: 13.50 },
             { id: "ag_galon_sinfrag", size: "Galón", scent: "Sin Fragancia", price: 13.50 },
-            // 500 mL ($4.50) - 5 Aromas
             { id: "ag_500ml_mango", size: "500 mL", scent: "Mango", price: 4.50 },
             { id: "ag_500ml_manzana", size: "500 mL", scent: "Manzana Verde", price: 4.50 },
             { id: "ag_500ml_maracuya", size: "500 mL", scent: "Maracuyá", price: 4.50 },
             { id: "ag_500ml_sandia", size: "500 mL", scent: "Sandía", price: 4.50 },
             { id: "ag_500ml_sinfrag", size: "500 mL", scent: "Sin Fragancia", price: 4.50 },
-            // 120 mL ($1.75) - 5 Aromas
             { id: "ag_120ml_mango", size: "120 mL", scent: "Mango", price: 1.75 },
             { id: "ag_120ml_manzana", size: "120 mL", scent: "Manzana Verde", price: 1.75 },
             { id: "ag_120ml_maracuya", size: "120 mL", scent: "Maracuyá", price: 1.75 },
             { id: "ag_120ml_sandia", size: "120 mL", scent: "Sandía", price: 1.75 },
             { id: "ag_120ml_sinfrag", size: "120 mL", scent: "Sin Fragancia", price: 1.75 },
-            // 30 mL ($1.00) - 5 Aromas + 1 Sin Silicón
             { id: "ag_30ml_mango", size: "30 mL", scent: "Mango", price: 1.00 },
             { id: "ag_30ml_manzana", size: "30 mL", scent: "Manzana Verde", price: 1.00 },
             { id: "ag_30ml_maracuya", size: "30 mL", scent: "Maracuyá", price: 1.00 },
@@ -254,12 +249,11 @@
             { id: "ag_30ml_silicon_sin", size: "30 mL", scent: "Sin Fragancia (Sin Silicón)", price: 1.00 }
         ],
         "Alcohol Líquido": [
-            { id: "al_galon_90", size: "Galón", scent: "90%", price: 12.00 },
-            { id: "al_galon_70", size: "Galón", scent: "70%", price: 10.50 },
-            { id: "al_spray_70", size: "120 mL Spray", scent: "70%", price: 1.75 }
+            { id: "al_galon_90", size: "Galón", scent: "90%", price: 12.00, display: "Galón 90%" },
+            { id: "al_galon_70", size: "Galón", scent: "70%", price: 10.50, display: "Galón 70%" },
+            { id: "al_spray_70", size: "120 mL Spray", scent: "70%", price: 1.75, display: "120 mL Spray 70%" }
         ],
         "Desinfectante Uso Directo (Piso)": [
-            // GALON ($3.25) - 6 Aromas
             { id: "dd_galon_verde", size: "Galón", scent: "Manzana Verde", price: 3.25 },
             { id: "dd_galon_sin", size: "Galón", scent: "Sin Fragancia", price: 3.25 },
             { id: "dd_galon_lavanda", size: "Galón", scent: "Lavanda", price: 3.25 },
@@ -268,7 +262,6 @@
             { id: "dd_galon_citronela", size: "Galón", scent: "Citronela", price: 3.25 }
         ],
         "Desinfectante Concentrado (Piso)": [
-            // GALON ($4.00) - 6 Aromas
             { id: "dc_galon_verde", size: "Galón", scent: "Manzana Verde", price: 4.00 },
             { id: "dc_galon_sin", size: "Galón", scent: "Sin Fragancia", price: 4.00 },
             { id: "dc_galon_lavanda", size: "Galón", scent: "Lavanda", price: 4.00 },
@@ -277,18 +270,15 @@
             { id: "dc_galon_citronela", size: "Galón", scent: "Citronela", price: 4.00 }
         ],
         "Lejía": [
-            // GALON
-            { id: "lejia_4", size: "Galón", scent: "4%", price: 2.50 },
-            { id: "lejia_6", size: "Galón", scent: "6%", price: 3.00 }
+            { id: "lejia_4", size: "Galón", scent: "4%", price: 2.50, display: "Galón 4%" },
+            { id: "lejia_6", size: "Galón", scent: "6%", price: 3.00, display: "Galón 6%" }
         ],
         "Jabón Líquido para Manos": [
-            // GALON ($4.00) - 5 Fragancias
             { id: "jl_galon_verde", size: "Galón", scent: "Manzana Verde", price: 4.00 },
             { id: "jl_galon_cereza", size: "Galón", scent: "Cereza", price: 4.00 },
             { id: "jl_galon_fresa", size: "Galón", scent: "Fresa", price: 4.00 },
             { id: "jl_galon_durazno", size: "Galón", scent: "Durazno", price: 4.00 },
             { id: "jl_galon_chicle", size: "Galón", scent: "Chicle", price: 4.00 },
-            // 500 mL ($1.75) - 5 Fragancias
             { id: "jl_500ml_verde", size: "500 mL", scent: "Manzana Verde", price: 1.75 },
             { id: "jl_500ml_cereza", size: "500 mL", scent: "Cereza", price: 1.75 },
             { id: "jl_500ml_fresa", size: "500 mL", scent: "Fresa", price: 1.75 },
@@ -296,53 +286,142 @@
             { id: "jl_500ml_chicle", size: "500 mL", scent: "Chicle", price: 1.75 }
         ],
         "Repelente de Insectos": [
-            { id: "repelente_120ml", size: "120 mL Spray", scent: "Citronela", price: 3.00 }
+            { id: "repelente_120ml", size: "120 mL Spray", scent: "Citronela", price: 3.00, display: "120 mL Spray Citronela" }
         ]
     };
 
-    // --- Dynamic Form Generation ---
+    const matrixCategories = ["Alcohol Gel", "Jabón Líquido para Manos"];
+
+    // --- Funciones Auxiliares para Generar HTML de la Tabla ---
+
+    function generateInput(product, category) {
+        // Genera el input de cantidad con data-price y data-name
+        const productName = `${category}: ${product.size} (${product.scent})`;
+        const displayPrice = product.price.toFixed(2);
+
+        return product
+            ? `<input 
+                type="number" 
+                class="product-qty-input"
+                id="${product.id}" 
+                min="0" 
+                value="0" 
+                oninput="updateTotal()" 
+                data-price="${displayPrice}"
+                data-name="${productName} ($${displayPrice})"
+            >`
+            : '';
+    }
+
+    function generateMatrixCategoryHtml(category, products) {
+        const sizes = category === "Alcohol Gel" 
+            ? ["Galón", "500 mL", "120 mL", "30 mL"] 
+            : ["Galón", "500 mL"];
+            
+        // Usar un Set para obtener solo aromas únicos
+        const scents = [...new Set(products.map(p => p.scent))].filter(s => s !== "Sin Fragancia (Sin Silicón)").sort();
+        
+        // Mapear productos por aroma y tamaño para acceso rápido
+        const productMap = {};
+        products.forEach(p => {
+            if (!productMap[p.scent]) productMap[p.scent] = {};
+            productMap[p.scent][p.size] = p;
+        });
+
+        let html = `<div class="order-table-container">
+            <table>
+                <thead>
+                    <tr class="product-group-header"><th colspan="${sizes.length + 1}">🧴 ${category}</th></tr>
+                    <tr>
+                        <th class="matrix-scent-cell">Aroma/Fragancia</th>`;
+        
+        sizes.forEach(size => {
+            // Obtener el precio base para mostrarlo en el encabezado de la columna
+            const exampleProduct = products.find(p => p.size === size);
+            const priceText = exampleProduct ? `($${exampleProduct.price.toFixed(2)})` : '';
+            html += `<th class="matrix-size-cell">${size}<br>${priceText}</th>`;
+        });
+        html += `</tr></thead><tbody>`;
+
+        // Generar filas por aroma
+        scents.forEach(scent => {
+            html += `<tr><td class="matrix-scent-cell">${scent}</td>`;
+            sizes.forEach(size => {
+                const product = productMap[scent] ? productMap[scent][size] : null;
+                const content = product ? generateInput(product, category) : '—';
+                html += `<td class="matrix-size-cell">${content}</td>`;
+            });
+            html += `</tr>`;
+        });
+
+        // Caso especial: 30 mL Sin Silicón (solo en Alcohol Gel)
+        if (category === "Alcohol Gel") {
+            const specialProduct = products.find(p => p.scent === "Sin Fragancia (Sin Silicón)");
+            if (specialProduct) {
+                const content = generateInput(specialProduct, category);
+                html += `<tr>
+                    <td class="matrix-scent-cell">${specialProduct.scent}</td>
+                    <td>—</td><td>—</td><td>—</td>
+                    <td class="matrix-size-cell">${content}</td>
+                </tr>`;
+            }
+        }
+
+        html += `</tbody></table></div>`;
+        return html;
+    }
+
+    function generateVerticalCategoryHtml(category, products) {
+        // Usado para Alcohol Líquido, Desinfectante, Lejía y Repelente
+        let html = `<div class="order-table-container">
+            <table>
+                <thead>
+                    <tr class="product-group-header"><th colspan="3">🧴 ${category}</th></tr>
+                    <tr>
+                        <th>Producto y Presentación</th>
+                        <th class="text-center">Precio Unitario</th>
+                        <th class="text-center">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+        
+        products.forEach(product => {
+            const labelText = product.display || `${product.size} (${product.scent})`;
+            const content = generateInput(product, category);
+
+            html += `<tr>
+                        <td>${labelText}</td>
+                        <td class="text-center">$${product.price.toFixed(2)}</td>
+                        <td class="text-center">${content}</td>
+                    </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+        return html;
+    }
+
+    // --- Función Principal de Generación ---
     (function generateFormTable() {
         const container = document.getElementById('product-inputs-container');
-        let html = '';
+        let fullHtml = '';
 
         for (const category in ESAL_PRODUCTS) {
-            // 1. Fila de Encabezado de Categoría
-            html += `<tr class="product-group-header">
-                        <td colspan="3">🧴 ${category}</td>
-                     </tr>`;
+            const products = ESAL_PRODUCTS[category];
 
-            // 2. Filas de Productos
-            ESAL_PRODUCTS[category].forEach(product => {
-                // Combina Tamaño y Aroma/Concentración para la visualización en tabla
-                let scentDisplay = (category === "Lejía" || category === "Alcohol Líquido") ? `${product.scent}` : `(${product.scent})`;
-                if (product.scent === 'N/A' || product.scent === 'Citronela') scentDisplay = ''; // Evita (N/A)
-
-                const labelText = `${product.size} ${scentDisplay}`.trim();
-
-                html += `<tr>
-                            <td>${labelText}</td>
-                            <td class="text-center">$${product.price.toFixed(2)}</td>
-                            <td class="text-center">
-                                <input 
-                                    type="number" 
-                                    class="product-qty-input"
-                                    id="${product.id}" 
-                                    min="0" 
-                                    value="0" 
-                                    oninput="updateTotal()" 
-                                    data-price="${product.price.toFixed(2)}"
-                                    data-name="${category}: ${labelText}"
-                                >
-                            </td>
-                        </tr>`;
-            });
+            if (matrixCategories.includes(category)) {
+                fullHtml += generateMatrixCategoryHtml(category, products);
+            } else {
+                fullHtml += generateVerticalCategoryHtml(category, products);
+            }
         }
-        container.innerHTML = html;
+        container.innerHTML = fullHtml;
     })();
 
-    // --- Dynamic Total Calculation Function ---
+    // --- Funciones de Lógica (sin cambios) ---
+
     function updateTotal() {
         let total = 0;
+        // Selecciona todos los inputs de cantidad en el contenedor
         const inputs = document.querySelectorAll('#product-inputs-container input[type="number"]');
 
         inputs.forEach(input => {
@@ -357,7 +436,6 @@
         promo.textContent = total >= 50 ? "✅ ¡Tu pedido aplica para Tasa Cero Banco Agrícola!" : "";
     }
 
-    // --- Dynamic WhatsApp Order Function ---
     function sendOrder() {
         const inputs = document.querySelectorAll('#product-inputs-container input[type="number"]');
         let totalQty = 0;
@@ -377,7 +455,7 @@
         const name = document.getElementById("name").value.trim();
         const paymentMethod = document.getElementById("paymentMethod").value;
         const total = document.getElementById("totalAmount").textContent;
-        const whatsappNumber = "50375704428"; // Número de WhatsApp
+        const whatsappNumber = "50375704428";
 
         // Validación
         if (totalQty === 0) {
@@ -389,7 +467,6 @@
             return;
         }
 
-
         let message = `*ORDEN DE PRODUCTOS ESAL - ${new Date().toLocaleDateString('es-SV')}*\n\n`;
         message += `*PRODUCTOS DETALLE:*\n${orderDetails}\n`;
         message += `*TOTAL ESTIMADO: $${total}*\n`;
@@ -398,6 +475,19 @@
 
         window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
     }
+
+    // Las funciones de PWA/Modal deben ir aquí si las quieres mantener:
+    // let deferredPrompt = null;
+    // window.addEventListener('beforeinstallprompt', (e) => { /* ... */ });
+    // document.getElementById('how-to-install-btn').addEventListener('click', async () => { /* ... */ });
+    // function openFeedbackModal() { /* ... */ }
+    // function closeFeedbackModal() { /* ... */ }
+    // function startVoiceInput() { /* ... */ }
+    // document.getElementById('voiceFeedbackForm').onsubmit = function (e) { /* ... */ };
+    // function closeCtaInstallBar() { /* ... */ }
+    // document.getElementById('reopen-cta-btn').addEventListener('click', () => { /* ... */ });
 </script>
+
+    
   </body>
 </html>
