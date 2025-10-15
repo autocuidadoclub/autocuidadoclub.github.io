@@ -250,6 +250,233 @@
     Powered by AutocuidadoClub.com
   </footer>
 
+
+<!-- CTA Footer -->
+<div id="cta-install-bar" style="display:none;">
+     <div class="cta-message">
+  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+</div>
+
+      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
+      <a href="contacto.html">💬 Contácta con nuestro staff</a>
+      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
+    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+<!-- Feedback Modal -->
+<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
+    <button onclick="closeFeedbackModal()" style="
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #ff0000;
+      font-weight: bold;
+    ">❌</button>
+  </div>
+
+  <form id="voiceFeedbackForm">
+    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between;">
+      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
+      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
+    </div>
+  </form>
+
+  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+    <img src="loading.gif" alt="Cargando..." style="width:80px;">
+  </div>
+
+  </div>
+</div>
+
+
+<!-- Botón para volver a mostrar el menú -->
+<button id="reopen-cta-btn" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 9999;
+  opacity: 0;
+  max-width: 180px;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+">
+📲 Abrir menú
+</button>
+
+
+
+
+  <script>
+     let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Stop the browser from showing the default prompt
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Optional: you could show the button ONLY when install is available
+  document.getElementById('how-to-install-btn').style.display = 'inline-block';
+});
+
+document.getElementById('how-to-install-btn').addEventListener('click', async () => {
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+
+  if (deferredPrompt) {
+    // If install is supported, show browser-native prompt
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === 'accepted') {
+      console.log('✅ User accepted the install prompt');
+    } else {
+      console.log('❌ User dismissed the install prompt');
+    }
+    deferredPrompt = null;
+  } else if (isIos) {
+    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+  } else if (isAndroid) {
+    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
+  } else {
+    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
+  }
+});
+    function openFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'flex';
+      document.getElementById('feedbackText').focus();
+    }
+
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'none';
+      document.getElementById('voiceFeedbackForm').reset();
+      document.getElementById('feedbackLoader').style.display = 'none';
+    }
+
+    function startVoiceInput() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz.");
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'es-ES';
+
+      const feedbackText = document.getElementById('feedbackText');
+      feedbackText.placeholder = "🎙️ Escuchando...";
+      feedbackText.style.border = "2px solid orange";
+
+      recognition.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.onerror = (event) => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+        alert("Error de voz: " + event.error);
+      };
+
+      recognition.onend = () => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.start();
+    }
+
+   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
+      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
+      e.preventDefault();
+      document.getElementById('feedbackLoader').style.display = 'block';
+
+      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        body: new FormData(this)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        if (data.success) {
+          alert("¡Gracias por tu opinión!");
+          closeFeedbackModal();
+        } else {
+          alert("Error al enviar. Intenta de nuevo.");
+        }
+      })
+      .catch(() => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        alert("Hubo un problema al enviar el mensaje.");
+      });
+    };
+
+      function closeCtaInstallBar() {
+    const ctaBar = document.getElementById('cta-install-bar');
+    const reopenBtn = document.getElementById('reopen-cta-btn');
+
+    // Animación suave antes de ocultarlo
+    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    ctaBar.style.opacity = '0';
+    ctaBar.style.transform = 'translateY(20px)';
+
+    setTimeout(() => {
+      ctaBar.style.display = 'none';
+
+      // Mostrar botón flotante después de 5 segundos
+      setTimeout(() => {
+        reopenBtn.style.display = 'block';
+        setTimeout(() => {
+          reopenBtn.style.opacity = '1';
+        }, 10);
+      }, 5000);
+    }, 300); // esperar a que termine la transición
+  }
+
+      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
+  </script>
+
+  
   <script>
     function updateTotal() {
       const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
