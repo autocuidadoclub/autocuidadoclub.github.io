@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoCuidado Home • Catálogo ESAL</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .catalog-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      text-align: center;
+    }
+    .catalog-title {
+      font-size: 2rem;
+      color: #002b5c;  /* your blue color */
+      margin-bottom: 1rem;
+    }
+    .catalog-description {
+      font-size: 1.1rem;
+      color: #444;
+      margin-bottom: 1.5rem;
+    }
+    .catalog-buttons {
+      margin-bottom: 2rem;
+    }
+    .catalog-buttons a {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      margin: 0 0.5rem;
+      background-color: #ff6600;  /* your orange accent */
+      color: white;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .catalog-buttons a:hover {
+      background-color: #e65c00;
+    }
+    .catalog-embed {
+      width: 100%;
+      height: 700px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- include your existing header / nav partial -->
+    <nav>
+      <!-- your nav links ... -->
+      <!-- ensure “Divisiones” dropdown includes this page if needed -->
+    </nav>
+  </header>
+
+  <div class="catalog-container">
+    <h1 class="catalog-title">Catálogo AutoCuidado Home • ESAL</h1>
+    <p class="catalog-description">
+      Descubre nuestra línea de productos de limpieza, desinfectantes, jabones, repelentes y más.  
+      Todo lo que necesitas para el cuidado del hogar con la calidad ESAL.
+    </p>
+    <div class="catalog-buttons">
+      <a href="/esalcatalog.pdf" target="_blank" download>📥 Descargar PDF</a>
+      <a href="/">← Volver a AutoCuidado Club</a>
+    </div>
+    <iframe
+      src="/esalcatalog.pdf"
+      class="catalog-embed"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <footer>
+    <!-- your existing footer partial -->
+  </footer>
+</body>
+</html>
