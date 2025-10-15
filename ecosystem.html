@@ -7,12 +7,12 @@
     <style>
         /* Define tus colores de marca para fácil referencia */
         :root {
-            --color-core: #002b5c; /* AutoCuidado Azul Principal */
-            --color-accent: #ff6600; /* Naranja Acento */
-            --color-club: #3a4e6e; /* Azul Automotriz */
-            --color-home: #1abc9c; /* Verde Limpieza/Fresco */
-            --color-ice: #3498db; /* Azul Hielo */
-            --color-fit: #e74c3c; /* Rojo Energía/Fuerza */
+            --color-core: #002b5c; 
+            --color-accent: #ff6600; 
+            --color-club: #3a4e6e; 
+            --color-home: #1abc9c; 
+            --color-ice: #3498db; 
+            --color-fit: #e74c3c; 
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             --logo-size: 110px; 
         }
@@ -84,15 +84,29 @@
 
 
         /* LOGO ORB (Contenedor para la imagen grande) */
-        .logo-orb {
+        /* Hacemos el enlace (a) el elemento posicionado */
+        a.logo-link {
+            text-decoration: none;
+            position: absolute; 
             width: var(--logo-size);
             height: var(--logo-size);
+            z-index: 20;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        /* Efecto hover al hacer clic en el logo */
+        a.logo-link:hover {
+            transform: scale(1.1);
+        }
+
+        .logo-orb {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             overflow: hidden;
-            position: absolute;
             background-color: white;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -103,22 +117,21 @@
             object-fit: contain;
         }
         
-        /* Posicionamiento de los Orbes de Logo (Escritorio) */
-        .club-logo { top: -10px; right: -10px; border: 4px solid var(--color-club); }
-        .home-logo { bottom: -10px; right: -10px; border: 4px solid var(--color-home); }
-        .ice-logo-pos { bottom: -10px; left: -10px; border: 4px solid var(--color-ice); }
-        .fit-logo { top: -10px; left: -10px; border: 4px solid var(--color-fit); }
+        /* Posicionamiento y color del borde de los Orbes de Logo (Escritorio) */
+        .club-logo-link { top: -10px; right: -10px; border: 4px solid var(--color-club); }
+        .home-logo-link { bottom: -10px; right: -10px; border: 4px solid var(--color-home); }
+        .ice-logo-link { bottom: -10px; left: -10px; border: 4px solid var(--color-ice); }
+        .fit-logo-link { top: -10px; left: -10px; border: 4px solid var(--color-fit); }
 
 
         /* Enlace Contenedor (para hacer toda la caja clickeable) */
         a.division-link {
-            text-decoration: none; /* Quitar el subrayado de los enlaces */
+            text-decoration: none; 
             color: inherit;
-            position: absolute; /* Es crucial que el enlace sea absoluto para la colocación */
-            /* Las posiciones de .division-link se establecen en el HTML para cada enlace */
+            position: absolute; 
         }
         
-        /* Estilo de las Cajas de División */
+        /* Estilo de las Cajas de División (sin cambios en la apariencia) */
         .division {
             width: 260px; 
             padding: 20px;
@@ -129,7 +142,7 @@
             z-index: 15;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
-            height: 100%; /* Asegura que el div interior llene el enlace */
+            height: 100%; 
         }
         /* El efecto hover se aplica a la división DENTRO del enlace */
         a.division-link:hover .division {
@@ -144,19 +157,12 @@
             border-bottom: 2px solid;
             padding-bottom: 5px;
         }
-        .division h4 {
-            font-size: 1.4rem; 
-            margin: 0;
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-        }
-        
+        .division h4 { font-size: 1.4rem; margin: 0; display: flex; align-items: center; font-weight: bold; }
         .division p { font-size: 1rem; color: #444; margin: 5px 0 10px 0; min-height: 45px; }
         .division .concept { font-style: italic; font-size: 0.9rem; display: block; padding-top: 8px; font-weight: 600; }
         .division .icon { font-size: 1.8rem; margin-right: 10px; }
 
-        /* Color Coding by Division (sin cambios) */
+        /* Color Coding (sin cambios) */
         .club { border-left: 5px solid var(--color-club); }
         .club h4 { color: var(--color-club); }
         .club .division-header { border-color: var(--color-club); }
@@ -191,28 +197,20 @@
                 height: 1150px; 
                 max-width: 90%;
             }
-            .core-vision {
-                top: 80px;
-                width: 180px;
-                height: 180px;
-            }
+            .core-vision { top: 80px; width: 180px; height: 180px; }
 
-            /* Los logos se colocan encima y centrados en móvil */
-            .logo-orb {
+            /* Posicionamiento de los Orbes de Logo (Móvil) */
+            a.logo-link {
                 width: 90px; 
                 height: 90px;
                 left: 50%;
                 transform: translateX(-50%);
-                border-width: 3px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             }
-            
-            /* Posicionamiento de los Orbes de Logo (Móvil) */
-            .club-logo { top: 250px; right: auto; }
-            .home-logo { top: 440px; right: auto; }
-            .ice-logo-pos { top: 630px; left: auto; }
-            .fit-logo { top: 820px; left: auto; }
 
+            .club-logo-link { top: 250px; right: auto; }
+            .home-logo-link { top: 440px; right: auto; }
+            .ice-logo-link { top: 630px; left: auto; }
+            .fit-logo-link { top: 820px; left: auto; }
 
             .division-link {
                 left: 50%;
@@ -222,10 +220,6 @@
             .division {
                 width: 85%; 
                 padding: 15px;
-            }
-            
-            a.division-link:hover .division {
-                transform: scale(1.03);
             }
             
             /* Apilado Vertical de las Cajas de División (Móvil) */
@@ -243,21 +237,30 @@
         <p class="ecosystem-tagline">"Productividad, salud y confianza — en cada detalle."</p>
 
         <div class="ecosystem-diagram">
-            <div class="logo-orb club-logo">
-                <img src="logo.jpg" alt="Logo CLUB">
-            </div>
             
-            <div class="logo-orb home-logo">
-                <img src="ruta/a/logo-home.png" alt="Logo HOME">
-            </div>
+            <a href="https://www.autocuidadoclub.com" class="logo-link club-logo-link">
+                <div class="logo-orb">
+                    <img src="logo.jpg" alt="Logo CLUB">
+                </div>
+            </a>
             
-            <div class="logo-orb ice-logo-pos">
-                <img src="ice-logo.png" alt="Logo ICE">
-            </div>
+            <a href="https://www.autocuidadoclub.com/home" class="logo-link home-logo-link">
+                <div class="logo-orb">
+                    <img src="ruta/a/logo-home.png" alt="Logo HOME">
+                </div>
+            </a>
             
-            <div class="logo-orb fit-logo">
-                <img src="ruta/a/logo-fit.png" alt="Logo FIT">
-            </div>
+            <a href="https://www.autocuidadoclub.com/ice" class="logo-link ice-logo-link">
+                <div class="logo-orb">
+                    <img src="ice-logo.png" alt="Logo ICE">
+                </div>
+            </a>
+            
+            <a href="https://www.autocuidadoclub.com/fit" class="logo-link fit-logo-link">
+                <div class="logo-orb">
+                    <img src="ruta/a/logo-fit.png" alt="Logo FIT">
+                </div>
+            </a>
 
             <div class="core-vision">
                 <div class="core-text">
