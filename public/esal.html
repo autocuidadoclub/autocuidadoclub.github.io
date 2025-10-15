@@ -74,6 +74,82 @@
     ></iframe>
   </div>
 
+  <!-- Order section -->
+  <div class="box">
+    <h2>Haz tu Pedido con Entrega a Domicilio</h2>
+    <label for="potableQty">Alcohol Gel Galón:</label>
+    <input type="number" id="potableQty" min="0" value="0" oninput="updateTotal()">
+
+    <label for="hielo50Qty">Desinfectante Galón:</label>
+    <input type="number" id="hielo50Qty" min="0" value="0" oninput="updateTotal()">
+
+    <label for="hielo100Qty">Jabón Líquido Galón:</label>
+    <input type="number" id="hielo100Qty" min="0" value="0" oninput="updateTotal()">
+
+    <label for="location">Ubicación para entrega:</label>
+    <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje">
+
+    <label for="municipality">Municipio:</label>
+    <input type="text" id="municipality" placeholder="Ej: Santa Ana, San Miguel">
+
+    <label for="name">Nombre de quien recibe:</label>
+    <input type="text" id="name">
+
+    <h3>Total: $<span id="totalAmount">0.00</span></h3>
+    <p id="promoMessage" style="color: green; font-weight: bold;"></p>
+
+    <label for="paymentMethod">Método de Pago:</label>
+    <select id="paymentMethod">
+      <option value="Efectivo contra entrega">Efectivo contra entrega</option>
+      <option value="Tarjeta">Tarjeta</option>
+      <option value="Bitcoin">Bitcoin</option>
+      <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero (desde $50)</option>
+    </select>
+
+    <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
+  </div>
+
+  <script>
+    function updateTotal() {
+      const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
+      const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
+      const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
+      const total = (potableQty * 13.5) + (hielo50Qty * 4) + (hielo100Qty * 4);
+      document.getElementById("totalAmount").textContent = total.toFixed(2);
+      const promo = document.getElementById("promoMessage");
+      promo.textContent = total >= 50 ? "¡Aplica para Tasa Cero Banco Agrícola!" : "";
+    }
+
+    function sendOrder() {
+      const potableQty = document.getElementById("potableQty").value;
+      const hielo50Qty = document.getElementById("hielo50Qty").value;
+      const hielo100Qty = document.getElementById("hielo100Qty").value;
+      const location = document.getElementById("location").value.trim();
+      const municipality = document.getElementById("municipality").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const paymentMethod = document.getElementById("paymentMethod").value;
+      const total = document.getElementById("totalAmount").textContent;
+      const whatsappNumber = "50375704428";
+
+      if ((!potableQty && !hielo50Qty && !hielo100Qty) || !location || !name) {
+        alert("Por favor, completa al menos un producto, ubicación y nombre.");
+        return;
+      }
+
+      let message = `*ORDEN DE PRODUCTOS ESAL 🧴*\n\n`;
+      message += `*Productos:*\n`;
+      if (potableQty > 0) message += `🧼 ${potableQty} Alcohol Gel Galón\n`;
+      if (hielo50Qty > 0) message += `🧴 ${hielo50Qty} Desinfectante Galón\n`;
+      if (hielo100Qty > 0) message += `🧴 ${hielo100Qty} Jabón Líquido Galón\n`;
+      message += `\n*Total Estimado: $${total}*\n`;
+      message += `*Método de Pago:* ${paymentMethod}\n\n`;
+      message += `*Entrega:*\n${name}\n${municipality}\n${location}`;
+
+      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
+    }
+  </script>
+
+  
   <footer>
     <!-- your existing footer partial -->
   </footer>
