@@ -1,0 +1,229 @@
+Certainly. I will take the complete HTML and CSS for the **AutoCuidado Ecosystem Diagram** that I previously generated and wrap it into a standalone file named `ecosystem.html`.
+
+This file is ready for you to save and view directly in a web browser.
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosistema AutoCuidado - Visión Integral</title>
+    <style>
+        /* Estilos base para el Diagrama de Ecosistema */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+        }
+        .ecosystem-container {
+            max-width: 1000px;
+            margin: 4rem auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .ecosystem-title {
+            color: #002b5c; /* Azul Principal */
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .ecosystem-tagline {
+            color: #ff6600; /* Naranja Acento */
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 3rem;
+        }
+
+        /* Contenedor del Diagrama */
+        .ecosystem-diagram {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Tamaño máximo del área del diagrama */
+            height: 600px;
+            margin: 0 auto;
+        }
+
+        /* Círculo Central (Core Vision) */
+        .core-vision {
+            width: 200px;
+            height: 200px;
+            background-color: #002b5c; /* Azul Principal */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            border: 5px solid #ff6600; /* Borde naranja */
+        }
+        .core-text h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 5px;
+        }
+        .core-text p {
+            margin: 0;
+            font-size: 0.9rem;
+            padding: 0 10px;
+        }
+
+        /* Líneas Conectoras (del centro a las divisiones) */
+        .line {
+            position: absolute;
+            width: 130px; /* Longitud del brazo */
+            height: 2px;
+            background-color: #ff6600; /* Naranja Acento */
+            transform-origin: left center;
+            top: 50%;
+            left: 50%;
+            z-index: 5;
+        }
+
+        /* Posicionamiento y rotación de las 4 líneas */
+        .line-1 { transform: rotate(45deg) translate(0, -1px); }
+        .line-2 { transform: rotate(135deg) translate(0, -1px); }
+        .line-3 { transform: rotate(225deg) translate(0, -1px); }
+        .line-4 { transform: rotate(315deg) translate(0, -1px); }
+
+        /* Estilo de las Cajas de División */
+        .division {
+            width: 180px;
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            text-align: left;
+            z-index: 15;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .division:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        .division h4 {
+            font-size: 1.1rem;
+            color: #002b5c;
+            margin: 0 0 5px 0;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+        .division p {
+            font-size: 0.9rem;
+            color: #444;
+            margin: 0 0 10px 0;
+            min-height: 40px; /* Altura consistente para alineación */
+        }
+        .division .concept {
+            font-style: italic;
+            color: #ff6600;
+            font-size: 0.85rem;
+            display: block;
+            border-top: 1px dashed #eee;
+            padding-top: 5px;
+        }
+        .division .icon {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+
+        /* Posicionamiento de las 4 Divisiones */
+        .club { top: 100px; right: 100px; }
+        .home { bottom: 100px; right: 100px; }
+        .ice { bottom: 100px; left: 100px; }
+        .fit { top: 100px; left: 100px; }
+
+        /* Media Query para hacerlo Responsivo en Móviles */
+        @media (max-width: 650px) {
+            .ecosystem-diagram {
+                height: 800px; /* Aumenta la altura para apilar mejor */
+                max-width: 400px;
+            }
+            .core-vision {
+                top: 50px; /* Mueve el núcleo hacia arriba */
+                left: 50%;
+                width: 160px;
+                height: 160px;
+            }
+
+            /* Ocultar las líneas para simplificar el diseño en móviles */
+            .line { display: none; }
+
+            /* Posicionamiento de las Divisiones en columna */
+            .division {
+                position: absolute;
+                width: 80%; /* Ancho completo */
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            /* Apilado Vertical con espaciado */
+            .club { top: 250px; right: auto; }
+            .home { top: 400px; right: auto; }
+            .ice { top: 550px; left: auto; }
+            .fit { top: 700px; left: auto; }
+
+            .division:hover {
+                transform: translateX(-50%) scale(1.03); /* Ajustar el hover en móvil */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ecosystem-container">
+        <h2 class="ecosystem-title">El Ecosistema AutoCuidado</h2>
+        <p class="ecosystem-tagline">"Cuidarte a ti, tu entorno y tu tiempo."</p>
+
+        <div class="ecosystem-diagram">
+            <div class="core-vision">
+                <div class="core-text">
+                    <h3>AutoCuidado</h3>
+                    <p>Cuidarte es nuestra misión. Empoderamos a las personas para vivir con más productividad, salud y bienestar.</p>
+                </div>
+                <div class="line line-1"></div>
+                <div class="line line-2"></div>
+                <div class="line line-3"></div>
+                <div class="line line-4"></div>
+            </div>
+
+            <div class="division club">
+                <h4><span class="icon">🚗</span> CLUB</h4>
+                <p>Mantenimiento, seguridad y productividad automotriz, liberando tiempo.</p>
+                <span class="concept">Tu vehículo en buenas manos, tu vida en marcha.</span>
+            </div>
+
+            <div class="division home">
+                <h4><span class="icon">🏠</span> HOME (ESAL)</h4>
+                <p>Limpieza, salud y seguridad en el hogar con productos de calidad salvadoreña.</p>
+                <span class="concept">Un hogar limpio es una mente productiva.</span>
+            </div>
+
+            <div class="division ice">
+                <h4><span class="icon">🧊</span> ICE</h4>
+                <p>Hielo purificado, con registro sanitario y entrega directa para confiar.</p>
+                <span class="concept">Pureza, calidad y confianza, en cada cubo.</span>
+            </div>
+
+            <div class="division fit">
+                <h4><span class="icon">💪</span> FIT</h4>
+                <p>Autocuidado físico, nutricional y mental para potenciar el rendimiento.</p>
+                <span class="concept">Cuida tu cuerpo, impulsa tu rendimiento.</span>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
+```
