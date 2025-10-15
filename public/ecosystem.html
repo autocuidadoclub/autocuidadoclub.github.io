@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,7 +24,7 @@
             background-color: #f8f8f8;
         }
         .ecosystem-container {
-            max-width: 1200px; /* Aumentar el espacio horizontal */
+            max-width: 1200px;
             margin: 4rem auto;
             padding: 20px;
             text-align: center;
@@ -39,21 +38,21 @@
             color: var(--color-accent);
             font-size: 1.3rem;
             font-weight: 600;
-            margin-bottom: 5rem; /* Más espacio debajo del título */
+            margin-bottom: 5rem;
         }
 
         /* Contenedor del Diagrama */
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 800px; /* Aumentar el tamaño del área de juego del diagrama */
-            height: 800px; /* Aumentar la altura */
+            max-width: 800px;
+            height: 800px;
             margin: 0 auto;
         }
 
         /* Círculo Central (Core Vision) */
         .core-vision {
-            width: 250px; /* Círculo más grande */
+            width: 250px;
             height: 250px;
             background-color: var(--color-core);
             color: white;
@@ -68,7 +67,6 @@
             transform: translate(-50%, -50%);
             z-index: 10;
             border: 8px solid var(--color-accent);
-            /* Animación de Pulso Suave */
             box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7);
             animation: pulse-core 2s infinite;
         }
@@ -95,7 +93,7 @@
 
         /* Estilo de las Cajas de División */
         .division {
-            width: 240px; /* Cajas más anchas */
+            width: 240px;
             padding: 20px;
             background-color: white;
             border-radius: 12px;
@@ -110,14 +108,24 @@
             transform: scale(1.05);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
+        .division-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid;
+            padding-bottom: 5px;
+        }
         .division h4 {
             font-size: 1.3rem;
-            margin: 0 0 8px 0;
+            margin: 0;
             display: flex;
             align-items: center;
             font-weight: bold;
-            border-bottom: 2px solid;
-            padding-bottom: 5px;
+        }
+        .division-logo {
+            height: 35px; /* Tamaño del logo en escritorio */
+            width: auto;
         }
         .division p {
             font-size: 1rem;
@@ -139,33 +147,36 @@
 
         /* Color Coding by Division (sin cambios) */
         .club { border-left: 5px solid var(--color-club); }
-        .club h4 { color: var(--color-club); border-color: var(--color-club); }
+        .club h4 { color: var(--color-club); }
+        .club .division-header { border-color: var(--color-club); }
         .club .concept { color: var(--color-club); }
+        
         .home { border-left: 5px solid var(--color-home); }
-        .home h4 { color: var(--color-home); border-color: var(--color-home); }
+        .home h4 { color: var(--color-home); }
+        .home .division-header { border-color: var(--color-home); }
         .home .concept { color: var(--color-home); }
+        
         .ice { border-left: 5px solid var(--color-ice); }
-        .ice h4 { color: var(--color-ice); border-color: var(--color-ice); }
+        .ice h4 { color: var(--color-ice); }
+        .ice .division-header { border-color: var(--color-ice); }
         .ice .concept { color: var(--color-ice); }
+        
         .fit { border-left: 5px solid var(--color-fit); }
-        .fit h4 { color: var(--color-fit); border-color: var(--color-fit); }
+        .fit h4 { color: var(--color-fit); }
+        .fit .division-header { border-color: var(--color-fit); }
         .fit .concept { color: var(--color-fit); }
 
 
-        /* Posicionamiento de las 4 Divisiones (Más separadas para aprovechar el espacio) */
-        /* CLUB - Arriba Derecha */
+        /* Posicionamiento de las 4 Divisiones (Espacio Aumentado) */
         .club { top: 50px; right: 50px; }
-        /* HOME - Abajo Derecha */
         .home { bottom: 50px; right: 50px; }
-        /* ICE - Abajo Izquierda */
         .ice { bottom: 50px; left: 50px; }
-        /* FIT - Arriba Izquierda */
         .fit { top: 50px; left: 50px; }
 
-        /* Media Query para hacerlo Responsivo en Móviles (Ajustado) */
+        /* --- VISTA MÓVIL (Ajustes de Diseño y Logos) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 950px; /* Ajusta la altura para el apilado vertical */
+                height: 980px; /* Altura ajustada para el apilado vertical */
                 max-width: 90%;
             }
             .core-vision {
@@ -174,18 +185,21 @@
                 height: 180px;
             }
 
-            /* Posicionamiento de las Divisiones en columna */
             .division {
                 position: absolute;
                 width: 85%; 
                 left: 50%;
                 transform: translateX(-50%);
+                padding: 15px; /* Reducir padding en móvil */
             }
             .division:hover {
                 transform: translateX(-50%) scale(1.03);
             }
+            .division-logo {
+                height: 30px; /* Reducir tamaño del logo en móvil */
+            }
             
-            /* Apilado Vertical con más espacio */
+            /* Apilado Vertical con espaciado ajustado */
             .club { top: 300px; right: auto; }
             .home { top: 480px; right: auto; }
             .ice { top: 660px; left: auto; }
@@ -208,25 +222,37 @@
             </div>
 
             <div class="division club">
-                <h4><span class="icon">🚗</span> CLUB</h4>
+                <div class="division-header">
+                    <h4><span class="icon">🚗</span> CLUB</h4>
+                    <img class="division-logo" src="ruta/a/logo-club.png" alt="Logo CLUB">
+                </div>
                 <p>Mantenimiento, seguridad y productividad automotriz, liberando tiempo.</p>
                 <span class="concept">Tu vehículo en buenas manos, tu vida en marcha.</span>
             </div>
 
             <div class="division home">
-                <h4><span class="icon">🏠</span> HOME (ESAL)</h4>
+                <div class="division-header">
+                    <h4><span class="icon">🏠</span> HOME (ESAL)</h4>
+                    <img class="division-logo" src="ruta/a/logo-home.png" alt="Logo HOME">
+                </div>
                 <p>Limpieza, salud y seguridad en el hogar con productos de calidad salvadoreña.</p>
                 <span class="concept">Un hogar limpio es una mente productiva.</span>
             </div>
 
             <div class="division ice">
-                <h4><span class="icon">🧊</span> ICE</h4>
+                <div class="division-header">
+                    <h4><span class="icon">🧊</span> ICE</h4>
+                    <img class="division-logo" src="image_399e89.png" alt="Logo ICE">
+                </div>
                 <p>Hielo purificado, con registro sanitario y entrega directa para confiar.</p>
                 <span class="concept">Pureza, calidad y confianza, en cada cubo.</span>
             </div>
 
             <div class="division fit">
-                <h4><span class="icon">💪</span> FIT</h4>
+                <div class="division-header">
+                    <h4><span class="icon">💪</span> FIT</h4>
+                    <img class="division-logo" src="ruta/a/logo-fit.png" alt="Logo FIT">
+                </div>
                 <p>Autocuidado físico, nutricional y mental para potenciar el rendimiento.</p>
                 <span class="concept">Cuida tu cuerpo, impulsa tu rendimiento.</span>
             </div>
@@ -236,4 +262,3 @@
 
 </body>
 </html>
-```
