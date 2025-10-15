@@ -14,6 +14,7 @@
             --color-ice: #3498db; /* Azul Hielo */
             --color-fit: #e74c3c; /* Rojo Energía/Fuerza */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --logo-size: 80px; /* Nuevo tamaño grande para el logo */
         }
 
         /* Estilos base */
@@ -45,8 +46,8 @@
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 800px;
-            height: 800px;
+            max-width: 850px; /* Espacio extra para los logos flotantes */
+            height: 850px;
             margin: 0 auto;
         }
 
@@ -70,25 +71,41 @@
             box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7);
             animation: pulse-core 2s infinite;
         }
-        .core-text h3 {
-            margin: 0 0 8px 0;
-            font-size: 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-            padding-bottom: 8px;
-        }
-        .core-text p {
-            margin: 0;
-            font-size: 1rem;
-            padding: 0 20px;
-        }
+        /* ... (Estilos internos del Core Vision sin cambios) ... */
+        .core-text h3 { margin: 0 0 8px 0; font-size: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 8px; }
+        .core-text p { margin: 0; font-size: 1rem; padding: 0 20px; }
         @keyframes pulse-core {
             0% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7); }
             70% { box-shadow: 0 0 0 20px rgba(255, 102, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
         }
 
-        /* LÍNEAS CONECTORAS ELIMINADAS */
-        .line { display: none; }
+        /* LOGO ORB (Nuevo Contenedor para la imagen grande) */
+        .logo-orb {
+            width: var(--logo-size);
+            height: var(--logo-size);
+            border-radius: 50%;
+            overflow: hidden;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-orb img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain; /* Asegura que la imagen quepa sin cortarse */
+        }
+        
+        /* Posicionamiento de los Orbes de Logo (Escritorio) */
+        /* La posición se define relativa al contenedor .ecosystem-diagram */
+        .club-logo { top: 15px; right: 15px; border: 4px solid var(--color-club); }
+        .home-logo { bottom: 15px; right: 15px; border: 4px solid var(--color-home); }
+        .ice-logo-pos { bottom: 15px; left: 15px; border: 4px solid var(--color-ice); }
+        .fit-logo { top: 15px; left: 15px; border: 4px solid var(--color-fit); }
 
 
         /* Estilo de las Cajas de División */
@@ -110,42 +127,27 @@
         }
         .division-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start; /* Alineación izquierda */
             align-items: center;
             margin-bottom: 10px;
             border-bottom: 2px solid;
             padding-bottom: 5px;
         }
-        .division h4 {
+        .division h4 { /* H4 ya no necesita flex-start, pues lo hace el header */
             font-size: 1.3rem;
             margin: 0;
             display: flex;
             align-items: center;
             font-weight: bold;
         }
-        .division-logo {
-            height: 35px; /* Tamaño del logo en escritorio */
-            width: auto;
-        }
-        .division p {
-            font-size: 1rem;
-            color: #444;
-            margin: 5px 0 10px 0;
-            min-height: 45px; 
-        }
-        .division .concept {
-            font-style: italic;
-            font-size: 0.9rem;
-            display: block;
-            padding-top: 8px;
-            font-weight: 600;
-        }
-        .division .icon {
-            font-size: 1.6rem;
-            margin-right: 10px;
-        }
+        /* Eliminamos .division-logo pues la imagen está fuera */
+        
+        /* ... (Estilos internos de la división sin cambios) ... */
+        .division p { font-size: 1rem; color: #444; margin: 5px 0 10px 0; min-height: 45px; }
+        .division .concept { font-style: italic; font-size: 0.9rem; display: block; padding-top: 8px; font-weight: 600; }
+        .division .icon { font-size: 1.6rem; margin-right: 10px; }
 
-        /* Color Coding by Division (sin cambios) */
+        /* Color Coding by Division (ajuste solo en el header) */
         .club { border-left: 5px solid var(--color-club); }
         .club h4 { color: var(--color-club); }
         .club .division-header { border-color: var(--color-club); }
@@ -168,42 +170,58 @@
 
 
         /* Posicionamiento de las 4 Divisiones (Espacio Aumentado) */
-        .club { top: 50px; right: 50px; }
-        .home { bottom: 50px; right: 50px; }
-        .ice { bottom: 50px; left: 50px; }
-        .fit { top: 50px; left: 50px; }
+        /* Posiciones ajustadas para compensar los logos que sobresalen */
+        .club { top: 95px; right: 95px; }
+        .home { bottom: 95px; right: 95px; }
+        .ice { bottom: 95px; left: 95px; }
+        .fit { top: 95px; left: 95px; }
+
 
         /* --- VISTA MÓVIL (Ajustes de Diseño y Logos) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 980px; /* Altura ajustada para el apilado vertical */
+                height: 1100px; /* Aumentar altura total para acomodar logos encima */
                 max-width: 90%;
             }
             .core-vision {
-                top: 50px;
+                top: 80px; /* Bajar el núcleo para dar espacio arriba */
                 width: 180px;
                 height: 180px;
             }
+
+            /* Los logos se colocan encima y centrados en móvil */
+            .logo-orb {
+                width: 70px;
+                height: 70px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 3px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+            
+            /* Posicionamiento de los Orbes de Logo (Móvil) */
+            .club-logo { top: 250px; right: auto; }
+            .home-logo { top: 430px; right: auto; }
+            .ice-logo-pos { top: 610px; left: auto; }
+            .fit-logo { top: 790px; left: auto; }
+
 
             .division {
                 position: absolute;
                 width: 85%; 
                 left: 50%;
                 transform: translateX(-50%);
-                padding: 15px; /* Reducir padding en móvil */
+                padding: 15px;
             }
             .division:hover {
                 transform: translateX(-50%) scale(1.03);
             }
-            .division-logo {
-                height: 30px; /* Reducir tamaño del logo en móvil */
-            }
             
-            /* Apilado Vertical con espaciado ajustado */
-            .club { top: 300px; right: auto; }
-            .home { top: 480px; right: auto; }
-            .ice { top: 660px; left: auto; }
-            .fit { top: 840px; left: auto; }
+            /* Apilado Vertical de las Cajas de División (Debajo de los logos) */
+            .club { top: 340px; right: auto; }
+            .home { top: 520px; right: auto; }
+            .ice { top: 700px; left: auto; }
+            .fit { top: 880px; left: auto; }
         }
     </style>
 </head>
@@ -214,6 +232,22 @@
         <p class="ecosystem-tagline">"Productividad, salud y confianza — en cada detalle."</p>
 
         <div class="ecosystem-diagram">
+            <div class="logo-orb club-logo">
+                <img src="logo.jpg" alt="Logo CLUB">
+            </div>
+            
+            <div class="logo-orb home-logo">
+                <img src="ruta/a/logo-home.png" alt="Logo HOME">
+            </div>
+            
+            <div class="logo-orb ice-logo-pos">
+                <img src="ice-logo.png" alt="Logo ICE">
+            </div>
+            
+            <div class="logo-orb fit-logo">
+                <img src="ruta/a/logo-fit.png" alt="Logo FIT">
+            </div>
+
             <div class="core-vision">
                 <div class="core-text">
                     <h3>AutoCuidado</h3>
@@ -224,7 +258,6 @@
             <div class="division club">
                 <div class="division-header">
                     <h4><span class="icon">🚗</span> CLUB</h4>
-                    <img class="division-logo" src="logo.jpg" alt="Logo CLUB">
                 </div>
                 <p>Mantenimiento, seguridad y productividad automotriz, liberando tiempo.</p>
                 <span class="concept">Tu vehículo en buenas manos, tu vida en marcha.</span>
@@ -233,7 +266,6 @@
             <div class="division home">
                 <div class="division-header">
                     <h4><span class="icon">🏠</span> HOME (ESAL)</h4>
-                    <img class="division-logo" src="ruta/a/logo-home.png" alt="Logo HOME">
                 </div>
                 <p>Limpieza, salud y seguridad en el hogar con productos de calidad salvadoreña.</p>
                 <span class="concept">Un hogar limpio es una mente productiva.</span>
@@ -242,7 +274,6 @@
             <div class="division ice">
                 <div class="division-header">
                     <h4><span class="icon">🧊</span> ICE</h4>
-                    <img class="division-logo" src="ice-logo.png" alt="Logo ICE">
                 </div>
                 <p>Hielo purificado, con registro sanitario y entrega directa para confiar.</p>
                 <span class="concept">Pureza, calidad y confianza, en cada cubo.</span>
@@ -251,7 +282,6 @@
             <div class="division fit">
                 <div class="division-header">
                     <h4><span class="icon">💪</span> FIT</h4>
-                    <img class="division-logo" src="ruta/a/logo-fit.png" alt="Logo FIT">
                 </div>
                 <p>Autocuidado físico, nutricional y mental para potenciar el rendimiento.</p>
                 <span class="concept">Cuida tu cuerpo, impulsa tu rendimiento.</span>
