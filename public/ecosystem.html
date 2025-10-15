@@ -14,7 +14,7 @@
             --color-ice: #3498db; /* Azul Hielo */
             --color-fit: #e74c3c; /* Rojo Energía/Fuerza */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            --logo-size: 110px; /* ¡NUEVO TAMAÑO MÁS GRANDE! */
+            --logo-size: 110px; 
         }
 
         /* Estilos base */
@@ -46,8 +46,8 @@
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 900px; /* Aumentar el área para los logos más grandes */
-            height: 900px; /* Aumentar altura */
+            max-width: 900px; 
+            height: 900px; 
             margin: 0 auto;
         }
 
@@ -83,7 +83,7 @@
         .line { display: none; }
 
 
-        /* LOGO ORB (Nuevo Contenedor para la imagen grande) */
+        /* LOGO ORB (Contenedor para la imagen grande) */
         .logo-orb {
             width: var(--logo-size);
             height: var(--logo-size);
@@ -104,27 +104,35 @@
         }
         
         /* Posicionamiento de los Orbes de Logo (Escritorio) */
-        /* La posición se ajusta para el nuevo tamaño de 110px */
         .club-logo { top: -10px; right: -10px; border: 4px solid var(--color-club); }
         .home-logo { bottom: -10px; right: -10px; border: 4px solid var(--color-home); }
         .ice-logo-pos { bottom: -10px; left: -10px; border: 4px solid var(--color-ice); }
         .fit-logo { top: -10px; left: -10px; border: 4px solid var(--color-fit); }
 
 
+        /* Enlace Contenedor (para hacer toda la caja clickeable) */
+        a.division-link {
+            text-decoration: none; /* Quitar el subrayado de los enlaces */
+            color: inherit;
+            position: absolute; /* Es crucial que el enlace sea absoluto para la colocación */
+            /* Las posiciones de .division-link se establecen en el HTML para cada enlace */
+        }
+        
         /* Estilo de las Cajas de División */
         .division {
-            width: 260px; /* Un poco más anchas para compensar */
+            width: 260px; 
             padding: 20px;
             background-color: white;
             border-radius: 12px;
             box-shadow: var(--shadow);
-            position: absolute;
             text-align: left;
             z-index: 15;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
+            height: 100%; /* Asegura que el div interior llene el enlace */
         }
-        .division:hover {
+        /* El efecto hover se aplica a la división DENTRO del enlace */
+        a.division-link:hover .division {
             transform: scale(1.05);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
@@ -137,14 +145,13 @@
             padding-bottom: 5px;
         }
         .division h4 {
-            font-size: 1.4rem; /* H4 también un poco más grande */
+            font-size: 1.4rem; 
             margin: 0;
             display: flex;
             align-items: center;
             font-weight: bold;
         }
         
-        /* ... (Estilos internos de la división sin cambios) ... */
         .division p { font-size: 1rem; color: #444; margin: 5px 0 10px 0; min-height: 45px; }
         .division .concept { font-style: italic; font-size: 0.9rem; display: block; padding-top: 8px; font-weight: 600; }
         .division .icon { font-size: 1.8rem; margin-right: 10px; }
@@ -171,18 +178,17 @@
         .fit .concept { color: var(--color-fit); }
 
 
-        /* Posicionamiento de las 4 Divisiones (Espacio Aumentado) */
-        /* Posiciones ajustadas para el logo de 110px que sobresale */
-        .club { top: 120px; right: 120px; }
-        .home { bottom: 120px; right: 120px; }
-        .ice { bottom: 120px; left: 120px; }
-        .fit { top: 120px; left: 120px; }
+        /* Posicionamiento de las 4 Divisiones (Escritorio) */
+        .club-pos { top: 120px; right: 120px; }
+        .home-pos { bottom: 120px; right: 120px; }
+        .ice-pos { bottom: 120px; left: 120px; }
+        .fit-pos { top: 120px; left: 120px; }
 
 
         /* --- VISTA MÓVIL (Ajustes de Diseño y Logos) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 1150px; /* Aumentar altura total para acomodar el logo de 110px */
+                height: 1150px; 
                 max-width: 90%;
             }
             .core-vision {
@@ -193,7 +199,7 @@
 
             /* Los logos se colocan encima y centrados en móvil */
             .logo-orb {
-                width: 90px; /* Tamaño del logo en móvil ajustado */
+                width: 90px; 
                 height: 90px;
                 left: 50%;
                 transform: translateX(-50%);
@@ -202,26 +208,31 @@
             }
             
             /* Posicionamiento de los Orbes de Logo (Móvil) */
-            /* Espacio necesario para el logo de 90px + caja de división */
             .club-logo { top: 250px; right: auto; }
             .home-logo { top: 440px; right: auto; }
             .ice-logo-pos { top: 630px; left: auto; }
             .fit-logo { top: 820px; left: auto; }
 
 
-            .division {
-                position: absolute;
-                width: 85%; 
+            .division-link {
                 left: 50%;
                 transform: translateX(-50%);
+            }
+            
+            .division {
+                width: 85%; 
                 padding: 15px;
             }
             
-            /* Apilado Vertical de las Cajas de División (Debajo de los logos) */
-            .club { top: 380px; right: auto; }
-            .home { top: 570px; right: auto; }
-            .ice { top: 760px; left: auto; }
-            .fit { top: 950px; left: auto; }
+            a.division-link:hover .division {
+                transform: scale(1.03);
+            }
+            
+            /* Apilado Vertical de las Cajas de División (Móvil) */
+            .club-pos { top: 380px; right: auto; }
+            .home-pos { top: 570px; right: auto; }
+            .ice-pos { top: 760px; left: auto; }
+            .fit-pos { top: 950px; left: auto; }
         }
     </style>
 </head>
@@ -255,37 +266,45 @@
                 </div>
             </div>
 
-            <div class="division club">
-                <div class="division-header">
-                    <h4><span class="icon">🚗</span> CLUB</h4>
+            <a href="https://www.autocuidadoclub.com" class="division-link club-pos">
+                <div class="division club">
+                    <div class="division-header">
+                        <h4><span class="icon">🚗</span> CLUB</h4>
+                    </div>
+                    <p>Mantenimiento, seguridad y productividad automotriz, liberando tiempo.</p>
+                    <span class="concept">Tu vehículo en buenas manos, tu vida en marcha.</span>
                 </div>
-                <p>Mantenimiento, seguridad y productividad automotriz, liberando tiempo.</p>
-                <span class="concept">Tu vehículo en buenas manos, tu vida en marcha.</span>
-            </div>
+            </a>
 
-            <div class="division home">
-                <div class="division-header">
-                    <h4><span class="icon">🏠</span> HOME (ESAL)</h4>
+            <a href="https://www.autocuidadoclub.com/home" class="division-link home-pos">
+                <div class="division home">
+                    <div class="division-header">
+                        <h4><span class="icon">🏠</span> HOME (ESAL)</h4>
+                    </div>
+                    <p>Limpieza, salud y seguridad en el hogar con productos de calidad salvadoreña.</p>
+                    <span class="concept">Un hogar limpio es una mente productiva.</span>
                 </div>
-                <p>Limpieza, salud y seguridad en el hogar con productos de calidad salvadoreña.</p>
-                <span class="concept">Un hogar limpio es una mente productiva.</span>
-            </div>
+            </a>
 
-            <div class="division ice">
-                <div class="division-header">
-                    <h4><span class="icon">🧊</span> ICE</h4>
+            <a href="https://www.autocuidadoclub.com/ice" class="division-link ice-pos">
+                <div class="division ice">
+                    <div class="division-header">
+                        <h4><span class="icon">🧊</span> ICE</h4>
+                    </div>
+                    <p>Hielo purificado, con registro sanitario y entrega directa para confiar.</p>
+                    <span class="concept">Pureza, calidad y confianza, en cada cubo.</span>
                 </div>
-                <p>Hielo purificado, con registro sanitario y entrega directa para confiar.</p>
-                <span class="concept">Pureza, calidad y confianza, en cada cubo.</span>
-            </div>
+            </a>
 
-            <div class="division fit">
-                <div class="division-header">
-                    <h4><span class="icon">💪</span> FIT</h4>
+            <a href="https://www.autocuidadoclub.com/fit" class="division-link fit-pos">
+                <div class="division fit">
+                    <div class="division-header">
+                        <h4><span class="icon">💪</span> FIT</h4>
+                    </div>
+                    <p>Autocuidado físico, nutricional y mental para potenciar el rendimiento.</p>
+                    <span class="concept">Cuida tu cuerpo, impulsa tu rendimiento.</span>
                 </div>
-                <p>Autocuidado físico, nutricional y mental para potenciar el rendimiento.</p>
-                <span class="concept">Cuida tu cuerpo, impulsa tu rendimiento.</span>
-            </div>
+            </a>
 
         </div>
     </div>
