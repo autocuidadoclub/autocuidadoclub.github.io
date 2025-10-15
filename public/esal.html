@@ -1,96 +1,144 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AutoCuidado Home • Catálogo ESAL</title>
-  <link rel="stylesheet" href="../styles.css" />
-  <style>
-    /* Global Styles for the Page (Simplified) */
-    .catalog-container {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 1rem;
-      text-align: center;
-    }
-    .catalog-title {
-      font-size: 2rem;
-      color: #002b5c; /* your blue color */
-      margin-bottom: 1rem;
-    }
-    .catalog-description {
-      font-size: 1.1rem;
-      color: #444;
-      margin-bottom: 1.5rem;
-    }
-    .catalog-buttons {
-      margin-bottom: 2rem;
-    }
-    .catalog-buttons a {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      margin: 0 0.5rem;
-      background-color: #ff6600; /* your orange accent */
-      color: white;
-      border-radius: 4px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-    .catalog-buttons a:hover {
-      background-color: #e65c00;
-    }
-    .catalog-embed {
-      width: 100%;
-      height: 700px;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
-    }
-    /* Styles for the Order Box */
-    .box {
-      border: 1px solid #ddd;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 500px; /* Constrain the form width */
-      border-radius: 8px;
-      text-align: left;
-    }
-    .box h4 {
-        border-bottom: 1px solid #eee;
-        padding-bottom: 5px;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        color: #002b5c;
-    }
-    .box label {
-        display: block;
-        margin-top: 10px;
-        font-weight: bold;
-    }
-    .box input[type="number"], .box input[type="text"], .box select {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-    .box .btn {
-        width: 100%;
-        padding: 15px;
-        margin-top: 20px;
-        background-color: #4CAF50; /* Green WhatsApp color */
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        cursor: pointer;
-    }
-  </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AutoCuidado Home • Catálogo ESAL</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <style>
+        /* Global Styles for the Page (Simplified) */
+        .catalog-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1rem;
+            text-align: center;
+        }
+        .catalog-title {
+            font-size: 2rem;
+            color: #002b5c; /* your blue color */
+            margin-bottom: 1rem;
+        }
+        .catalog-description {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 1.5rem;
+        }
+        .catalog-buttons {
+            margin-bottom: 2rem;
+        }
+        .catalog-buttons a {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.5rem;
+            background-color: #ff6600; /* your orange accent */
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .catalog-buttons a:hover {
+            background-color: #e65c00;
+        }
+        .catalog-embed {
+            width: 100%;
+            height: 700px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        /* Styles for the Order Box */
+        .box {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px; /* Constrain the form width */
+            border-radius: 8px;
+            text-align: left;
+        }
+        .box h4 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #002b5c;
+        }
+        .box label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .box input[type="number"], .box input[type="text"], .box select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .box .btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #4CAF50; /* Green WhatsApp color */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        /* New/Updated styles for tables */
+        .order-table-container {
+            overflow-x: auto;
+            margin-bottom: 30px; 
+        }
+        .order-table-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-table-container th, .order-table-container td {
+            padding: 10px 5px; 
+            border: 1px solid #eee;
+            text-align: left;
+        }
+        .order-table-container thead th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            color: #002b5c;
+            font-size: 0.85em; 
+            vertical-align: middle;
+            text-align: center;
+        }
+        .product-group-header {
+            background-color: #e6f7ff;
+            font-weight: bold;
+            color: #002b5c;
+            text-align: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .product-qty-input {
+            width: 60px;
+            text-align: center;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.9em;
+        }
+        .matrix-scent-cell {
+            font-weight: 500;
+            color: #333;
+            width: 150px;
+            text-align: left !important;
+        }
+        .matrix-size-cell {
+            width: 90px;
+            text-align: center;
+        }
+    </style>
 
 
     <title>AutoCuidado Club - Inicio</title>
@@ -101,13 +149,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
-    <!-- Push Notification Script -->
     <script>
     (function(w, d) {
         w.PushEngage = w.PushEngage || [];
         w._peq = w._peq || [];
         PushEngage.push(['init', {
-            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'  // Replace with your PushEngage appId
+            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'
         }]);
 
         var e = d.createElement('script');
@@ -117,19 +164,17 @@
         d.head.appendChild(e);
     })(window, document);
     </script>
-    
-       
+        
 </head>
 
 <body>
-  <!-- Navigation -->
-<nav class="navbar">
+    <nav class="navbar">
     <ul class="nav-links">
         <a href="#">Divisiones</a>
-  <ul class="dropdown-menu">
-    <li><a href="/ice">🧊 AutoCuidado ICE</a></li>
-    <li><a href="index.html" target="_blank">🚗 AutoCuidado Club</a></li>
-  </ul>
+    <ul class="dropdown-menu">
+        <li><a href="/ice">🧊 AutoCuidado ICE</a></li>
+        <li><a href="index.html" target="_blank">🚗 AutoCuidado Club</a></li>
+    </ul>
 </li>
     </ul>
     <div class="logo-container">
@@ -139,7 +184,6 @@
 
     
 
-<!-- Header -->
 <header style="background: linear-gradient(135deg, #002F6C, #003B80); padding: 60px 20px; text-align: center; border-bottom: 4px solid #FF6600;">
     <div class="header-text">
         <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">Bienvenido a AutoCuidado HOME</h1>
@@ -149,26 +193,26 @@
 
 
 <body>
-  <header>
-    <nav>
-      </nav>
-  </header>
+    <header>
+        <nav>
+        </nav>
+    </header>
 
-  <div class="catalog-container">
-    <h1 class="catalog-title">Catálogo AutoCuidado Home • ESAL</h1>
-    <p class="catalog-description">
-      Descubre nuestra línea de productos de limpieza, desinfectantes, jabones, repelentes y más.
-      Todo lo que necesitas para el cuidado del hogar con la calidad ESAL.
-    </p>
-    <div class="catalog-buttons">
-      <a href="/esalcatalog.pdf" target="_blank" download>📥 Descargar PDF</a>
-      <a href="/">← Volver a AutoCuidado Club</a>
-    </div>
-    <iframe
-      src="/esalcatalog.pdf"
-      class="catalog-embed"
-      allowfullscreen
-    ></iframe>
+    <div class="catalog-container">
+        <h1 class="catalog-title">Catálogo AutoCuidado Home • ESAL</h1>
+        <p class="catalog-description">
+            Descubre nuestra línea de productos de limpieza, desinfectantes, jabones, repelentes y más.
+            Todo lo que necesitas para el cuidado del hogar con la calidad ESAL.
+        </p>
+        <div class="catalog-buttons">
+            <a href="/esalcatalog.pdf" target="_blank" download>📥 Descargar PDF</a>
+            <a href="/">← Volver a AutoCuidado Club</a>
+        </div>
+        <iframe
+            src="/esalcatalog.pdf"
+            class="catalog-embed"
+            allowfullscreen
+        ></iframe>
 
 <div class="box">
     <h2>📋 Pedido Rápido ESAL - AutoCuidado Home</h2>
@@ -205,65 +249,10 @@
 
     <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
 </div>
-  </div>
+    </div>
 
 <style>
-    /* ... (Mantener estilos de .box, .delivery-info, .summary-and-payment, etc.) ... */
-
-    .order-table-container {
-        overflow-x: auto;
-        margin-bottom: 30px; /* Más espacio entre categorías */
-    }
-    .order-table-container table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .order-table-container th, .order-table-container td {
-        padding: 10px 5px; /* Ajuste para celdas más pequeñas */
-        border: 1px solid #eee;
-        text-align: left;
-    }
-    .order-table-container thead th {
-        background-color: #f0f0f0;
-        font-weight: bold;
-        color: #002b5c;
-        font-size: 0.85em; /* Fuente más pequeña para encabezados de columna */
-        vertical-align: middle;
-        text-align: center;
-    }
-    .product-group-header {
-        background-color: #e6f7ff;
-        font-weight: bold;
-        color: #002b5c;
-        text-align: center;
-    }
-    .vertical-category-header {
-        background-color: #e6f7ff;
-        font-weight: bold;
-        color: #002b5c;
-    }
-    .text-center {
-        text-align: center;
-    }
-    .product-qty-input {
-        width: 60px;
-        text-align: center;
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        font-size: 0.9em;
-    }
-    /* Estilo para las filas de aroma en la matriz */
-    .matrix-scent-cell {
-        font-weight: 500;
-        color: #333;
-        width: 150px;
-        text-align: left !important;
-    }
-    .matrix-size-cell {
-        width: 90px;
-        text-align: center;
-    }
+    /* ... (Estilos de tablas que ya están arriba, repetidos para referencia, pero no deben estar dos veces) ... */
 </style>
     
     
@@ -271,15 +260,15 @@
     </footer>
 
 
-  <div id="cta-install-bar" style="display:none;">
-      </div>
-  
-  <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-      </div>
-  
-  <button id="reopen-cta-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; /* ... rest of your styles ... */">
-      📲 Abrir menú
-  </button>
+    <div id="cta-install-bar" style="display:none;">
+        </div>
+    
+    <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        </div>
+    
+    <button id="reopen-cta-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; /* ... rest of your styles ... */">
+        📲 Abrir menú
+    </button>
 
 <script>
     // --- DATOS DE PRODUCTOS ESAL (Completo) ---
@@ -460,7 +449,7 @@
     }
 
     // --- Función Principal de Generación ---
-    (function generateFormTable() {
+    function initializeProductForm() {
         const container = document.getElementById('product-inputs-container');
         let fullHtml = '';
 
@@ -474,7 +463,12 @@
             }
         }
         container.innerHTML = fullHtml;
-    })();
+        updateTotal(); // Asegura que el total inicial sea 0.00
+    }
+
+    // Ejecuta la función cuando el DOM se haya cargado. ESTA ES LA CORRECCIÓN CLAVE.
+    window.addEventListener('load', initializeProductForm);
+
 
     // --- Funciones de Lógica (sin cambios) ---
 
@@ -536,339 +530,272 @@
     }
 
     // Las funciones de PWA/Modal deben ir aquí si las quieres mantener:
-    // let deferredPrompt = null;
-    // window.addEventListener('beforeinstallprompt', (e) => { /* ... */ });
-    // document.getElementById('how-to-install-btn').addEventListener('click', async () => { /* ... */ });
-    // function openFeedbackModal() { /* ... */ }
-    // function closeFeedbackModal() { /* ... */ }
-    // function startVoiceInput() { /* ... */ }
-    // document.getElementById('voiceFeedbackForm').onsubmit = function (e) { /* ... */ };
-    // function closeCtaInstallBar() { /* ... */ }
-    // document.getElementById('reopen-cta-btn').addEventListener('click', () => { /* ... */ });
-</script>
+    let deferredPrompt = null;
 
+    window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('how-to-install-btn').style.display = 'inline-block';
+    });
 
-        <div style="display: flex; justify-content: center; margin: 30px 0;">
-  <div class="fb-page"
-       data-href="https://www.facebook.com/profile.php?id=61575027617474"
-       data-tabs="timeline"
-       data-width="1000"
-       data-height=""
-       data-small-header="true"
-       data-adapt-container-width="false"
-       data-hide-cover="false"
-       data-show-facepile="true"
-       style="max-width: 1000px; width: 100%;">
-    <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" class="fb-xfbml-parse-ignore">
-      <a href="https://www.facebook.com/profile.php?id=61575027617474">Autocuidado Club</a>
-    </blockquote>
-  </div>
-</div>
-    
-<div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
-  <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
-    <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
-    <div style="text-align: left; max-width: 300px;">
-      <p style="margin: 0; font-size: 18px; font-weight: bold;">
-        Esta app es más que tecnología.
-      </p>
-      <p style="margin: 5px 0 0; font-size: 16px;">
-        Es una forma distinta de cuidar lo que importa.
-      </p>
-    </div>
-  </div>
-  <p style="text-align: center; margin-top: 20px; font-size: 16px;">
-    <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
-  </p>
-</div>
-    
-     <footer>
-        <p>&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
-        <ul>
-            <li><a href="nosotros.html">Quiénes Somos</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="suscripciones.html">Suscripciones</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="login.html">Ingresa a tu cuenta</a></li>
-             <li><a href="tac.html">Términos y Condiciones</a></li>
-        </ul>
-   
-    <div class="social-container" style="text-align: center; margin-top: 20px;">
-    <p><strong>Síguenos en nuestras redes sociales</strong></p>
-    <div class="social-buttons">
-        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
-            <i class="fab fa-instagram fa-3x"></i>
-        </a>
-        <a href="https://www.facebook.com/autocareclub" target="_blank" class="social-button" style="color: #1877F2;">
-            <i class="fab fa-facebook-f fa-3x"></i>
-        </a>
-        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
-            <i class="fab fa-twitter fa-3x"></i>
-        </a>
-    </div>
-</div>
+    document.getElementById('how-to-install-btn').addEventListener('click', async () => {
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
 
-<!-- Include Font Awesome for icons -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-
-    
-    </footer>
- 
-
-      <!-- CTA Footer -->
-<div id="cta-install-bar" style="display:none;">
-    <div class="cta-message">
-  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
-</div>
-
-      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
-      <a href="contacto.html">💬 Contácta con nuestro staff</a>
-      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
-
-    </div>
-  </div>
-
-  <!-- Feedback Modal -->
-<!-- Feedback Modal -->
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-  
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
-    <button onclick="closeFeedbackModal()" style="
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #ff0000;
-      font-weight: bold;
-    ">❌</button>
-  </div>
-
-  <form id="voiceFeedbackForm">
-    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-    <div style="display:flex; justify-content:space-between;">
-      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
-      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
-    </div>
-  </form>
-
-  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-    <img src="loading.gif" alt="Cargando..." style="width:80px;">
-  </div>
-
-  </div>
-</div>
-
-
-<!-- Botón para volver a mostrar el menú -->
-<button id="reopen-cta-btn" style="
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 13px;
-  cursor: pointer;
-  z-index: 9999;
-  opacity: 0;
-  max-width: 180px;
-  width: auto;
-  white-space: nowrap;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-">
-📲 Abrir menú
-</button>
-
-
-
-
-  <script>
-     let deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Stop the browser from showing the default prompt
-  e.preventDefault();
-  deferredPrompt = e;
-
-  // Optional: you could show the button ONLY when install is available
-  document.getElementById('how-to-install-btn').style.display = 'inline-block';
-});
-
-document.getElementById('how-to-install-btn').addEventListener('click', async () => {
-  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-
-  if (deferredPrompt) {
-    // If install is supported, show browser-native prompt
-    deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
-    if (choiceResult.outcome === 'accepted') {
-      console.log('✅ User accepted the install prompt');
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const choiceResult = await deferredPrompt.userChoice;
+        if (choiceResult.outcome === 'accepted') {
+        console.log('✅ User accepted the install prompt');
+        } else {
+        console.log('❌ User dismissed the install prompt');
+        }
+        deferredPrompt = null;
+    } else if (isIos) {
+        alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+    } else if (isAndroid) {
+        alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
     } else {
-      console.log('❌ User dismissed the install prompt');
+        alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
     }
-    deferredPrompt = null;
-  } else if (isIos) {
-    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-  } else if (isAndroid) {
-    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
-  } else {
-    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
-  }
-});
+    });
 
     function openFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'flex';
-      document.getElementById('feedbackText').focus();
+        document.getElementById('feedbackModal').style.display = 'flex';
+        document.getElementById('feedbackText').focus();
     }
 
     function closeFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'none';
-      document.getElementById('voiceFeedbackForm').reset();
-      document.getElementById('feedbackLoader').style.display = 'none';
+        document.getElementById('feedbackModal').style.display = 'none';
+        document.getElementById('voiceFeedbackForm').reset();
+        document.getElementById('feedbackLoader').style.display = 'none';
     }
 
     function startVoiceInput() {
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
         alert("Tu navegador no soporta reconocimiento de voz.");
         return;
-      }
+        }
 
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'es-ES';
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'es-ES';
 
-      const feedbackText = document.getElementById('feedbackText');
-      feedbackText.placeholder = "🎙️ Escuchando...";
-      feedbackText.style.border = "2px solid orange";
+        const feedbackText = document.getElementById('feedbackText');
+        feedbackText.placeholder = "🎙️ Escuchando...";
+        feedbackText.style.border = "2px solid orange";
 
-      recognition.onresult = (event) => {
+        recognition.onresult = (event) => {
         const result = event.results[0][0].transcript;
         feedbackText.value += (feedbackText.value ? ' ' : '') + result;
         feedbackText.placeholder = "Habla o escribe tu mensaje...";
         feedbackText.style.border = "1px solid #ccc";
-      };
+        };
 
-      recognition.onerror = (event) => {
+        recognition.onerror = (event) => {
         feedbackText.placeholder = "Habla o escribe tu mensaje...";
         feedbackText.style.border = "1px solid #ccc";
         alert("Error de voz: " + event.error);
-      };
+        };
 
-      recognition.onend = () => {
+        recognition.onend = () => {
         feedbackText.placeholder = "Habla o escribe tu mensaje...";
         feedbackText.style.border = "1px solid #ccc";
-      };
+        };
 
-      recognition.start();
+        recognition.start();
     }
 
-   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
+    document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+    const ctaBar = document.getElementById('cta-install-bar');
+    const reopenBtn = document.getElementById('reopen-cta-btn');
 
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
+    ctaBar.style.display = 'block';
+    ctaBar.style.opacity = '1';
+    ctaBar.style.transform = 'translateY(0)';
+    reopenBtn.style.display = 'none';
+    });
 
-      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
-      e.preventDefault();
-      document.getElementById('feedbackLoader').style.display = 'block';
+    document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
+        e.preventDefault();
+        document.getElementById('feedbackLoader').style.display = 'block';
 
-      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         method: "POST",
         body: new FormData(this)
-      })
-      .then(res => res.json())
-      .then(data => {
+        })
+        .then(res => res.json())
+        .then(data => {
         document.getElementById('feedbackLoader').style.display = 'none';
         if (data.success) {
-          alert("¡Gracias por tu opinión!");
-          closeFeedbackModal();
+            alert("¡Gracias por tu opinión!");
+            closeFeedbackModal();
         } else {
-          alert("Error al enviar. Intenta de nuevo.");
+            alert("Error al enviar. Intenta de nuevo.");
         }
-      })
-      .catch(() => {
+        })
+        .catch(() => {
         document.getElementById('feedbackLoader').style.display = 'none';
         alert("Hubo un problema al enviar el mensaje.");
-      });
+        });
     };
 
-      function closeCtaInstallBar() {
+    function closeCtaInstallBar() {
     const ctaBar = document.getElementById('cta-install-bar');
     const reopenBtn = document.getElementById('reopen-cta-btn');
 
     // Animación suave antes de ocultarlo
-    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     ctaBar.style.opacity = '0';
-    ctaBar.style.transform = 'translateY(20px)';
-
-    setTimeout(() => {
-      ctaBar.style.display = 'none';
-
-      // Mostrar botón flotante después de 5 segundos
-      setTimeout(() => {
-        reopenBtn.style.display = 'block';
-        setTimeout(() => {
-          reopenBtn.style.opacity = '1';
-        }, 10);
-      }, 5000);
-    }, 300); // esperar a que termine la transición
-  }
-
-      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
-
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
-
-  
-document.querySelectorAll('.tab-button').forEach(button => {
-  button.addEventListener('click', () => {
-    const tabId = button.getAttribute('data-tab');
-
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(tab => {
-      tab.style.display = 'none';
-    });
-
-    // Remove 'active' class from all buttons
-    document.querySelectorAll('.tab-button').forEach(btn => {
-      btn.classList.remove('active');
-    });
-
-    // Show the selected tab
-    document.getElementById(tabId).style.display = 'block';
-
-    // Add 'active' class to the clicked button
-    button.classList.add('active');
-  });
-});
-
-// Optional: Show default tab (tab1) when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('tab1').style.display = 'block';
-});
-</script>
-      
-
+    ctaBar.style.transform = 'translateY(100%)';
     
-  </body>
+    setTimeout(() => {
+        ctaBar.style.display = 'none';
+        reopenBtn.style.display = 'block';
+        
+        // Animación de aparición para el botón de reabrir
+        setTimeout(() => {
+            reopenBtn.style.opacity = '1';
+            reopenBtn.style.transform = 'translateY(0)';
+        }, 50);
+
+    }, 300); // Coincide con la duración de la transición CSS
+    }
+</script>
+
+
+        <div style="display: flex; justify-content: center; margin: 30px 0;">
+    <div class="fb-page"
+        data-href="https://www.facebook.com/profile.php?id=61575027617474"
+        data-tabs="timeline"
+        data-width="1000"
+        data-height=""
+        data-small-header="true"
+        data-adapt-container-width="false"
+        data-hide-cover="false"
+        data-show-facepile="true"
+        style="max-width: 1000px; width: 100%;">
+        <blockquote cite="https://www.facebook.com/profile.php?id=61575027617474" class="fb-xfbml-parse-ignore">
+            <a href="https://www.facebook.com/profile.php?id=61575027617474">Autocuidado Club</a>
+        </blockquote>
+    </div>
+</div>
+        
+<div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+    <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
+        <div style="text-align: left; max-width: 300px;">
+            <p style="margin: 0; font-size: 18px; font-weight: bold;">
+                Esta app es más que tecnología.
+            </p>
+            <p style="margin: 5px 0 0; font-size: 16px;">
+                Es una forma distinta de cuidar lo que importa.
+            </p>
+        </div>
+    </div>
+    <p style="text-align: center; margin-top: 20px; font-size: 16px;">
+        <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
+    </p>
+</div>
+        
+        <footer>
+            <p>&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
+            <ul>
+                <li><a href="nosotros.html">Quiénes Somos</a></li>
+                <li><a href="servicios.html">Servicios</a></li>
+                <li><a href="suscripciones.html">Suscripciones</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="login.html">Ingresa a tu cuenta</a></li>
+                <li><a href="tac.html">Términos y Condiciones</a></li>
+            </ul>
+        
+        <div class="social-container" style="text-align: center; margin-top: 20px;">
+        <p><strong>Síguenos en nuestras redes sociales</strong></p>
+        <div class="social-buttons">
+            <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+                <i class="fab fa-instagram fa-3x"></i>
+            </a>
+            <a href="https://www.facebook.com/autocareclub" target="_blank" class="social-button" style="color: #1877F2;">
+                <i class="fab fa-facebook-f fa-3x"></i>
+            </a>
+            <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+                <i class="fab fa-twitter fa-3x"></i>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+        
+    </footer>
+
+        <div id="cta-install-bar" style="display:none;">
+        <div class="cta-message">
+    ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+    </div>
+
+        <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
+        <a href="contacto.html">💬 Contácta con nuestro staff</a>
+        <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
+        <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+
+        </div>
+    </div>
+
+    <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+        
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
+        <button onclick="closeFeedbackModal()" style="
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #ff0000;
+        font-weight: bold;
+        ">❌</button>
+    </div>
+
+    <form id="voiceFeedbackForm">
+        <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+        <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+        <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+        <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between;">
+        <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
+        <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
+        </div>
+    </form>
+
+    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+        <img src="loading.gif" alt="Cargando..." style="width:80px;">
+    </div>
+
+    </div>
+    </div>
+
+
+    <button id="reopen-cta-btn" style="
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    z-index: 9999;
+    opacity: 0;
+    max-width: 180px;
+    width: auto;
+    white-space: nowrap;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    ">
+    📲 Abrir menú
+    </button>
+</body>
 </html>
