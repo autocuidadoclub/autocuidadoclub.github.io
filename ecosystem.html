@@ -1,6 +1,25 @@
-Certainly. I will take the complete HTML and CSS for the **AutoCuidado Ecosystem Diagram** that I previously generated and wrap it into a standalone file named `ecosystem.html`.
+The current ecosystem diagram template is well-structured and uses clear CSS to create a hub-and-spoke layout.
 
-This file is ready for you to save and view directly in a web browser.
+The main area for improvement is enhancing the **visual connection** between the core and the divisions and making the design feel more modern and integrated.
+
+Here is an analysis and an adjusted CSS/HTML template that enhances the visual appeal, strengthens the connections, and improves the overall presentation.
+
+-----
+
+## Analysis and Visual Adjustments
+
+| Component | Current Status (Good) | Adjustment / Improvement |
+| :--- | :--- | :--- |
+| **Connection Lines** | Simple orange lines (`.line`). | Replace the plain lines with **directional arrows** that visually show the energy/focus flowing *out* from the core to the divisions. |
+| **Core Vision** | Strong blue circle with an orange border. | Add a subtle **pulse effect or shadow** to make the core feel like the active origin point of the ecosystem. |
+| **Division Boxes** | Standard white boxes with a gray border. | Apply **color coding** based on the division's concept (e.g., Green for FIT, Blue/Gray for CLUB) to improve visual identity and differentiation. |
+| **Mobile View** | Uses simple stacking (`@media (max-width: 650px)`). | Optimize the vertical spacing and ensure the boxes are clearly linked conceptually, even without the diagonal lines. |
+
+-----
+
+## Adjusted `ecosystem.html` Template
+
+This adjusted code replaces the previous CSS and HTML content with a more polished and visually dynamic version.
 
 ```html
 <!DOCTYPE html>
@@ -10,9 +29,20 @@ This file is ready for you to save and view directly in a web browser.
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecosistema AutoCuidado - Visión Integral</title>
     <style>
+        /* Define your custom brand colors for easy reference */
+        :root {
+            --color-core: #002b5c; /* AutoCuidado Azul Principal */
+            --color-accent: #ff6600; /* Naranja Acento */
+            --color-club: #3a4e6e; /* Azul Automotriz */
+            --color-home: #1abc9c; /* Verde Limpieza/Fresco */
+            --color-ice: #3498db; /* Azul Hielo */
+            --color-fit: #e74c3c; /* Rojo Energía/Fuerza */
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
         /* Estilos base para el Diagrama de Ecosistema */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f8f8f8;
@@ -24,14 +54,14 @@ This file is ready for you to save and view directly in a web browser.
             text-align: center;
         }
         .ecosystem-title {
-            color: #002b5c; /* Azul Principal */
-            font-size: 2.2rem;
+            color: var(--color-core);
+            font-size: 2.5rem;
             margin-bottom: 0.5rem;
         }
         .ecosystem-tagline {
-            color: #ff6600; /* Naranja Acento */
-            font-size: 1.2rem;
-            font-style: italic;
+            color: var(--color-accent);
+            font-size: 1.3rem;
+            font-weight: 600;
             margin-bottom: 3rem;
         }
 
@@ -39,16 +69,16 @@ This file is ready for you to save and view directly in a web browser.
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 600px; /* Tamaño máximo del área del diagrama */
-            height: 600px;
+            max-width: 650px; /* Tamaño ligeramente más grande */
+            height: 650px;
             margin: 0 auto;
         }
 
         /* Círculo Central (Core Vision) */
         .core-vision {
-            width: 200px;
-            height: 200px;
-            background-color: #002b5c; /* Azul Principal */
+            width: 220px;
+            height: 220px;
+            background-color: var(--color-core);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -59,123 +89,159 @@ This file is ready for you to save and view directly in a web browser.
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             z-index: 10;
-            border: 5px solid #ff6600; /* Borde naranja */
+            border: 6px solid var(--color-accent);
+            /* Animación de Pulso Suave */
+            box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7);
+            animation: pulse-core 2s infinite;
         }
         .core-text h3 {
             margin: 0 0 5px 0;
-            font-size: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 1.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
             padding-bottom: 5px;
         }
         .core-text p {
             margin: 0;
-            font-size: 0.9rem;
-            padding: 0 10px;
+            font-size: 0.95rem;
+            padding: 0 15px;
+        }
+        @keyframes pulse-core {
+            0% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 102, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
         }
 
-        /* Líneas Conectoras (del centro a las divisiones) */
+        /* Líneas Conectoras (con flechas) */
         .line {
             position: absolute;
-            width: 130px; /* Longitud del brazo */
-            height: 2px;
-            background-color: #ff6600; /* Naranja Acento */
+            width: 150px; /* Longitud del brazo */
+            height: 4px;
+            background-color: var(--color-accent);
             transform-origin: left center;
             top: 50%;
             left: 50%;
             z-index: 5;
         }
 
+        /* Flecha/Triángulo al final de la línea */
+        .line::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -8px; /* Posicionado para que la punta toque la caja de división */
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 8px solid var(--color-accent);
+            transform: translateY(-50%);
+        }
+
         /* Posicionamiento y rotación de las 4 líneas */
-        .line-1 { transform: rotate(45deg) translate(0, -1px); }
-        .line-2 { transform: rotate(135deg) translate(0, -1px); }
-        .line-3 { transform: rotate(225deg) translate(0, -1px); }
-        .line-4 { transform: rotate(315deg) translate(0, -1px); }
+        .line-1 { transform: rotate(45deg) translate(0, -2px); }
+        .line-2 { transform: rotate(135deg) translate(0, -2px); }
+        .line-3 { transform: rotate(225deg) translate(0, -2px); }
+        .line-4 { transform: rotate(315deg) translate(0, -2px); }
 
         /* Estilo de las Cajas de División */
         .division {
-            width: 180px;
-            padding: 15px;
+            width: 200px;
+            padding: 18px;
             background-color: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
             position: absolute;
             text-align: left;
             z-index: 15;
             transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
         }
         .division:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
         .division h4 {
-            font-size: 1.1rem;
-            color: #002b5c;
+            font-size: 1.2rem;
             margin: 0 0 5px 0;
             display: flex;
             align-items: center;
             font-weight: bold;
+            border-bottom: 2px solid;
+            padding-bottom: 5px;
         }
         .division p {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #444;
-            margin: 0 0 10px 0;
-            min-height: 40px; /* Altura consistente para alineación */
+            margin: 5px 0 10px 0;
+            min-height: 40px; 
         }
         .division .concept {
             font-style: italic;
-            color: #ff6600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             display: block;
-            border-top: 1px dashed #eee;
-            padding-top: 5px;
+            padding-top: 8px;
+            font-weight: 600;
         }
         .division .icon {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             margin-right: 8px;
         }
 
-        /* Posicionamiento de las 4 Divisiones */
-        .club { top: 100px; right: 100px; }
-        .home { bottom: 100px; right: 100px; }
-        .ice { bottom: 100px; left: 100px; }
-        .fit { top: 100px; left: 100px; }
+        /* Color Coding by Division */
+        .club { border-left: 5px solid var(--color-club); }
+        .club h4 { color: var(--color-club); border-color: var(--color-club); }
+        .club .concept { color: var(--color-club); }
+        .home { border-left: 5px solid var(--color-home); }
+        .home h4 { color: var(--color-home); border-color: var(--color-home); }
+        .home .concept { color: var(--color-home); }
+        .ice { border-left: 5px solid var(--color-ice); }
+        .ice h4 { color: var(--color-ice); border-color: var(--color-ice); }
+        .ice .concept { color: var(--color-ice); }
+        .fit { border-left: 5px solid var(--color-fit); }
+        .fit h4 { color: var(--color-fit); border-color: var(--color-fit); }
+        .fit .concept { color: var(--color-fit); }
+
+
+        /* Posicionamiento de las 4 Divisiones (Ligeramente más separadas) */
+        .club { top: 75px; right: 75px; }
+        .home { bottom: 75px; right: 75px; }
+        .ice { bottom: 75px; left: 75px; }
+        .fit { top: 75px; left: 75px; }
 
         /* Media Query para hacerlo Responsivo en Móviles */
-        @media (max-width: 650px) {
+        @media (max-width: 680px) {
             .ecosystem-diagram {
-                height: 800px; /* Aumenta la altura para apilar mejor */
-                max-width: 400px;
+                height: 900px;
+                max-width: 90%;
             }
             .core-vision {
-                top: 50px; /* Mueve el núcleo hacia arriba */
+                top: 50px;
                 left: 50%;
-                width: 160px;
-                height: 160px;
+                width: 180px;
+                height: 180px;
             }
+            .core-text p { padding: 0 10px; }
 
-            /* Ocultar las líneas para simplificar el diseño en móviles */
+            /* Ocultar las líneas de conexión en móvil */
             .line { display: none; }
-
+            
             /* Posicionamiento de las Divisiones en columna */
             .division {
                 position: absolute;
-                width: 80%; /* Ancho completo */
+                width: 85%; 
                 left: 50%;
                 transform: translateX(-50%);
             }
-            
-            /* Apilado Vertical con espaciado */
-            .club { top: 250px; right: auto; }
-            .home { top: 400px; right: auto; }
-            .ice { top: 550px; left: auto; }
-            .fit { top: 700px; left: auto; }
-
             .division:hover {
-                transform: translateX(-50%) scale(1.03); /* Ajustar el hover en móvil */
+                transform: translateX(-50%) scale(1.03);
             }
+            
+            /* Apilado Vertical */
+            .club { top: 280px; right: auto; }
+            .home { top: 440px; right: auto; }
+            .ice { top: 600px; left: auto; }
+            .fit { top: 760px; left: auto; }
         }
     </style>
 </head>
@@ -183,7 +249,7 @@ This file is ready for you to save and view directly in a web browser.
 
     <div class="ecosystem-container">
         <h2 class="ecosystem-title">El Ecosistema AutoCuidado</h2>
-        <p class="ecosystem-tagline">"Cuidarte a ti, tu entorno y tu tiempo."</p>
+        <p class="ecosystem-tagline">"Productividad, salud y confianza — en cada detalle."</p>
 
         <div class="ecosystem-diagram">
             <div class="core-vision">
