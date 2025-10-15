@@ -112,7 +112,7 @@
       allowfullscreen
     ></iframe>
 
-  <div class="box">
+<div class="box">
     <h2>📋 Pedido Rápido ESAL - AutoCuidado Home</h2>
     <p class="catalog-description">Selecciona la cantidad de cada producto y presentación para calcular tu total al instante.</p>
 
@@ -120,7 +120,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Producto y Presentación</th>
+                    <th>Producto y Presentación (Aroma/Concentración)</th>
                     <th class="text-center">Precio Unitario</th>
                     <th class="text-center">Cantidad</th>
                 </tr>
@@ -129,7 +129,7 @@
                 </tbody>
         </table>
     </div>
-    
+
     <div class="summary-and-payment">
         <h3>Total: $<span id="totalAmount">0.00</span></h3>
         <p id="promoMessage" style="color: green; font-weight: bold;"></p>
@@ -200,6 +200,12 @@
         border-top: 1px dashed #ccc;
     }
     .delivery-info input, .summary-and-payment select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
         margin-bottom: 15px;
     }
 </style>
@@ -218,47 +224,101 @@
   </button>
 
 <script>
-    // --- ESAL PRODUCT DATA (Sourced from the catalog) ---
-    // (Ensure you paste your complete ESAL_PRODUCTS object here)
+    // --- DATOS DE PRODUCTOS ESAL (Completo y Organizado) ---
     const ESAL_PRODUCTS = {
         "Alcohol Gel": [
+            // GALON ($13.50) - 5 Aromas
             { id: "ag_galon_mango", size: "Galón", scent: "Mango", price: 13.50 },
+            { id: "ag_galon_manzana", size: "Galón", scent: "Manzana Verde", price: 13.50 },
+            { id: "ag_galon_maracuya", size: "Galón", scent: "Maracuyá", price: 13.50 },
+            { id: "ag_galon_sandia", size: "Galón", scent: "Sandía", price: 13.50 },
+            { id: "ag_galon_sinfrag", size: "Galón", scent: "Sin Fragancia", price: 13.50 },
+            // 500 mL ($4.50) - 5 Aromas
+            { id: "ag_500ml_mango", size: "500 mL", scent: "Mango", price: 4.50 },
+            { id: "ag_500ml_manzana", size: "500 mL", scent: "Manzana Verde", price: 4.50 },
+            { id: "ag_500ml_maracuya", size: "500 mL", scent: "Maracuyá", price: 4.50 },
+            { id: "ag_500ml_sandia", size: "500 mL", scent: "Sandía", price: 4.50 },
             { id: "ag_500ml_sinfrag", size: "500 mL", scent: "Sin Fragancia", price: 4.50 },
-            { id: "ag_30ml_sandia", size: "30 mL", scent: "Sandía", price: 1.00 }
-            // ... all other Alcohol Gel presentations
+            // 120 mL ($1.75) - 5 Aromas
+            { id: "ag_120ml_mango", size: "120 mL", scent: "Mango", price: 1.75 },
+            { id: "ag_120ml_manzana", size: "120 mL", scent: "Manzana Verde", price: 1.75 },
+            { id: "ag_120ml_maracuya", size: "120 mL", scent: "Maracuyá", price: 1.75 },
+            { id: "ag_120ml_sandia", size: "120 mL", scent: "Sandía", price: 1.75 },
+            { id: "ag_120ml_sinfrag", size: "120 mL", scent: "Sin Fragancia", price: 1.75 },
+            // 30 mL ($1.00) - 5 Aromas + 1 Sin Silicón
+            { id: "ag_30ml_mango", size: "30 mL", scent: "Mango", price: 1.00 },
+            { id: "ag_30ml_manzana", size: "30 mL", scent: "Manzana Verde", price: 1.00 },
+            { id: "ag_30ml_maracuya", size: "30 mL", scent: "Maracuyá", price: 1.00 },
+            { id: "ag_30ml_sandia", size: "30 mL", scent: "Sandía", price: 1.00 },
+            { id: "ag_30ml_sinfrag", size: "30 mL", scent: "Sin Fragancia", price: 1.00 },
+            { id: "ag_30ml_silicon_sin", size: "30 mL", scent: "Sin Fragancia (Sin Silicón)", price: 1.00 }
         ],
-        "Desinfectante": [
-            { id: "dd_galon_verde", size: "Galón (Uso Directo)", scent: "Manzana Verde", price: 3.25 },
-            { id: "dc_galon_lavanda", size: "Galón (Concentrado)", scent: "Lavanda", price: 4.00 }
-            // ... all other Desinfectante presentations
+        "Alcohol Líquido": [
+            { id: "al_galon_90", size: "Galón", scent: "90%", price: 12.00 },
+            { id: "al_galon_70", size: "Galón", scent: "70%", price: 10.50 },
+            { id: "al_spray_70", size: "120 mL Spray", scent: "70%", price: 1.75 }
         ],
-        "Jabón Líquido": [
+        "Desinfectante Uso Directo (Piso)": [
+            // GALON ($3.25) - 6 Aromas
+            { id: "dd_galon_verde", size: "Galón", scent: "Manzana Verde", price: 3.25 },
+            { id: "dd_galon_sin", size: "Galón", scent: "Sin Fragancia", price: 3.25 },
+            { id: "dd_galon_lavanda", size: "Galón", scent: "Lavanda", price: 3.25 },
+            { id: "dd_galon_maracuya", size: "Galón", scent: "Maracuyá", price: 3.25 },
+            { id: "dd_galon_limon", size: "Galón", scent: "Limón", price: 3.25 },
+            { id: "dd_galon_citronela", size: "Galón", scent: "Citronela", price: 3.25 }
+        ],
+        "Desinfectante Concentrado (Piso)": [
+            // GALON ($4.00) - 6 Aromas
+            { id: "dc_galon_verde", size: "Galón", scent: "Manzana Verde", price: 4.00 },
+            { id: "dc_galon_sin", size: "Galón", scent: "Sin Fragancia", price: 4.00 },
+            { id: "dc_galon_lavanda", size: "Galón", scent: "Lavanda", price: 4.00 },
+            { id: "dc_galon_maracuya", size: "Galón", scent: "Maracuyá", price: 4.00 },
+            { id: "dc_galon_limon", size: "Galón", scent: "Limón", price: 4.00 },
+            { id: "dc_galon_citronela", size: "Galón", scent: "Citronela", price: 4.00 }
+        ],
+        "Lejía": [
+            // GALON
+            { id: "lejia_4", size: "Galón", scent: "4%", price: 2.50 },
+            { id: "lejia_6", size: "Galón", scent: "6%", price: 3.00 }
+        ],
+        "Jabón Líquido para Manos": [
+            // GALON ($4.00) - 5 Fragancias
+            { id: "jl_galon_verde", size: "Galón", scent: "Manzana Verde", price: 4.00 },
+            { id: "jl_galon_cereza", size: "Galón", scent: "Cereza", price: 4.00 },
+            { id: "jl_galon_fresa", size: "Galón", scent: "Fresa", price: 4.00 },
+            { id: "jl_galon_durazno", size: "Galón", scent: "Durazno", price: 4.00 },
             { id: "jl_galon_chicle", size: "Galón", scent: "Chicle", price: 4.00 },
-            { id: "jl_500ml_cereza", size: "500 mL", scent: "Cereza", price: 1.75 }
-            // ... all other Jabón Líquido presentations
+            // 500 mL ($1.75) - 5 Fragancias
+            { id: "jl_500ml_verde", size: "500 mL", scent: "Manzana Verde", price: 1.75 },
+            { id: "jl_500ml_cereza", size: "500 mL", scent: "Cereza", price: 1.75 },
+            { id: "jl_500ml_fresa", size: "500 mL", scent: "Fresa", price: 1.75 },
+            { id: "jl_500ml_durazno", size: "500 mL", scent: "Durazno", price: 1.75 },
+            { id: "jl_500ml_chicle", size: "500 mL", scent: "Chicle", price: 1.75 }
         ],
-        "Lejía y Otros": [
-            { id: "lejia_6", size: "Lejía 6% Galón", scent: "N/A", price: 3.00 },
-            { id: "repelente_120ml", size: "Repelente 120 mL", scent: "Citronela", price: 3.00 }
+        "Repelente de Insectos": [
+            { id: "repelente_120ml", size: "120 mL Spray", scent: "Citronela", price: 3.00 }
         ]
     };
-    
+
     // --- Dynamic Form Generation ---
     (function generateFormTable() {
         const container = document.getElementById('product-inputs-container');
         let html = '';
 
         for (const category in ESAL_PRODUCTS) {
-            // 1. Category Header Row
+            // 1. Fila de Encabezado de Categoría
             html += `<tr class="product-group-header">
-                        <td colspan="3">${category}</td>
+                        <td colspan="3">🧴 ${category}</td>
                      </tr>`;
 
-            // 2. Product Rows
+            // 2. Filas de Productos
             ESAL_PRODUCTS[category].forEach(product => {
-                const scentDisplay = product.scent === 'N/A' ? '' : ` (${product.scent})`;
-                const labelText = `${product.size}${scentDisplay}`;
-                
+                // Combina Tamaño y Aroma/Concentración para la visualización en tabla
+                let scentDisplay = (category === "Lejía" || category === "Alcohol Líquido") ? `${product.scent}` : `(${product.scent})`;
+                if (product.scent === 'N/A' || product.scent === 'Citronela') scentDisplay = ''; // Evita (N/A)
+
+                const labelText = `${product.size} ${scentDisplay}`.trim();
+
                 html += `<tr>
                             <td>${labelText}</td>
                             <td class="text-center">$${product.price.toFixed(2)}</td>
@@ -283,7 +343,6 @@
     // --- Dynamic Total Calculation Function ---
     function updateTotal() {
         let total = 0;
-        // Select only the input fields within the table body
         const inputs = document.querySelectorAll('#product-inputs-container input[type="number"]');
 
         inputs.forEach(input => {
@@ -318,14 +377,14 @@
         const name = document.getElementById("name").value.trim();
         const paymentMethod = document.getElementById("paymentMethod").value;
         const total = document.getElementById("totalAmount").textContent;
-        const whatsappNumber = "50375704428"; // Use your actual WhatsApp number
+        const whatsappNumber = "50375704428"; // Número de WhatsApp
 
-        // Basic validation
+        // Validación
         if (totalQty === 0) {
             alert("⚠️ Por favor, selecciona al menos un producto.");
             return;
         }
-        if (!location || !municipality || !name || !paymentMethod) {
+        if (!location || !municipality || !name || paymentMethod === "") {
             alert("⚠️ Por favor, completa todos los campos de entrega y selecciona un Método de Pago.");
             return;
         }
