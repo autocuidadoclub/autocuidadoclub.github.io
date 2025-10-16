@@ -16,6 +16,9 @@
             --color-pro: #8e44ad; /* ESSERVYO (PRO) */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             --logo-size: 110px; 
+            /* AUMENTO DE LA DISTANCIA RADIAL */
+            --radial-offset: 160px; /* Distancia horizontal/vertical base para boxes */
+            --logo-radial-offset: 260px; /* Distancia horizontal/vertical base para logos */
         }
 
         /* Estilos base */
@@ -48,7 +51,7 @@
             position: relative;
             width: 100%;
             max-width: 1000px; 
-            height: 1000px; /* Increased height for better spread */
+            height: 1000px; 
             margin: 0 auto;
         }
 
@@ -113,13 +116,12 @@
             object-fit: contain;
         }
         
-        /* Posicionamiento y color del borde de los Orbes de Logo (Desktop - Pentagonal) */
-        /* Coordenadas relativas al centro del diagrama: 500px, 500px */
+        /* Posicionamiento y color del borde de los Orbes de Logo (Desktop - ESPACIO AUMENTADO) */
         .pro-logo-link { top: 0px; left: 50%; transform: translateX(-50%); border: 4px solid var(--color-pro); } /* Top Center */
-        .club-logo-link { top: 200px; right: 80px; border: 4px solid var(--color-club); } /* Top Right */
-        .home-logo-link { bottom: 80px; right: 120px; border: 4px solid var(--color-home); } /* Bottom Right */
-        .ice-logo-link { bottom: 80px; left: 120px; border: 4px solid var(--color-ice); } /* Bottom Left */
-        .fit-logo-link { top: 200px; left: 80px; border: 4px solid var(--color-fit); } /* Top Left */
+        .club-logo-link { top: 150px; right: 80px; border: 4px solid var(--color-club); } /* Top Right */
+        .home-logo-link { bottom: 80px; right: 100px; border: 4px solid var(--color-home); } /* Bottom Right */
+        .ice-logo-link { bottom: 80px; left: 100px; border: 4px solid var(--color-ice); } /* Bottom Left */
+        .fit-logo-link { top: 150px; left: 80px; border: 4px solid var(--color-fit); } /* Top Left */
 
 
         /* Enlace Contenedor (a.division-link) */
@@ -176,19 +178,20 @@
         .pro h4, .pro .division-header, .pro .concept { color: var(--color-pro); border-color: var(--color-pro); }
 
 
-        /* Posicionamiento de las 5 Divisiones (Desktop - Pentagonal) */
-        /* Coordenadas relativas al centro del diagrama: 500px, 500px */
-        .pro-pos { top: 120px; left: 50%; transform: translateX(-50%); } /* Top Center */
-        .club-pos { top: 280px; right: 100px; } /* Top Right */
-        .home-pos { bottom: 150px; right: 100px; } /* Bottom Right */
-        .ice-pos { bottom: 150px; left: 100px; } /* Bottom Left */
-        .fit-pos { top: 280px; left: 100px; } /* Top Left */
+        /* Posicionamiento de las 5 Divisiones (Desktop - ESPACIO AUMENTADO) */
+        /* Adjusted positioning based on new radial offset */
+        .pro-pos { top: 180px; left: 50%; transform: translateX(-50%); } 
+        .club-pos { top: 340px; right: 50px; } 
+        .home-pos { bottom: 80px; right: 180px; } 
+        .ice-pos { bottom: 80px; left: 180px; } 
+        .fit-pos { top: 340px; left: 50px; } 
 
 
         /* --- VISTA MÓVIL (Stacking) --- */
         @media (max-width: 768px) {
+            /* Aumento del espacio total y entre elementos para móvil */
             .ecosystem-diagram {
-                height: 1500px; /* Adjusted height for 5 stacked items + core */
+                height: 1600px; /* Increased height for better vertical spacing */
                 max-width: 90%;
             }
             .core-vision { top: 80px; width: 180px; height: 180px; }
@@ -201,12 +204,12 @@
                 transform: translateX(-50%);
             }
 
-            /* Positioning for logos (relative to the top of the 1500px diagram) */
+            /* Positioning for logos (Vertical Stacking - Increased Gap) */
             .pro-logo-link { top: 280px; } 
-            .club-logo-link { top: 500px; }
-            .home-logo-link { top: 720px; }
-            .ice-logo-link { top: 940px; }
-            .fit-logo-link { top: 1160px; }
+            .club-logo-link { top: 520px; }
+            .home-logo-link { top: 760px; }
+            .ice-logo-link { top: 1000px; }
+            .fit-logo-link { top: 1240px; }
             
             /* Mobile Division Boxes - Stacked vertically */
             .division-link {
@@ -219,35 +222,14 @@
                 padding: 15px;
             }
             
-            /* Positioning for boxes (relative to the top of the 1500px diagram) */
+            /* Positioning for boxes (Vertical Stacking - Increased Gap) */
             .pro-pos { top: 410px; } 
-            .club-pos { top: 630px; }
-            .home-pos { top: 850px; } 
-            .ice-pos { top: 1070px; } 
-            .fit-pos { top: 1290px; } 
+            .club-pos { top: 650px; }
+            .home-pos { top: 890px; } 
+            .ice-pos { top: 1130px; } 
+            .fit-pos { top: 1370px; } 
         }
     </style>
-
-    <nav class="navbar">
-    <ul class="nav-links">
-        <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
-        <li><a href="suscripciones.html">Suscripciones</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
-        <li><a href="login.html">Ingresa a tu cuenta</a></li>
-        <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
-        <li><a href="tac.html">Términos y Condiciones</a></li>
-        <li class="has-dropdown">
-            <a href="/ecosystem" class="divisiones-badge">NUESTRAS DIVISIONES</a>
-            <ul class="dropdown-menu">
-                <li><a href="ice.html">🧊 AutoCuidado ICE</a></li>
-                <li><a href="esal.html" target="_blank">🏠 AutoCuidado HOME</a></li>
-                <li><a href="eservyo.html" target="_blank">Seguridad y Salud Ocupacional</a></li>
-                <li><a href="fit.html" target="_blank">🏠 AutoCuidado FIT</a></li>
-                </ul>
-        </li>
-    </ul>
-   </nav>
 </head>
 <body>
 
