@@ -13,8 +13,7 @@
             --color-home: #1abc9c; 
             --color-ice: #3498db; 
             --color-fit: #e74c3c; 
-            /* NUEVO COLOR PARA ESSERVYO (PRO) - Seguridad y Consultoría */
-            --color-pro: #8e44ad; 
+            --color-pro: #8e44ad; /* ESSERVYO (PRO) */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             --logo-size: 110px; 
         }
@@ -44,12 +43,12 @@
             margin-bottom: 5rem;
         }
 
-        /* Contenedor del Diagrama AJUSTADO */
+        /* Contenedor del Diagrama - Aumentado para 5 elementos en un pentágono */
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 1000px; /* Ancho ajustado para 5 elementos */
-            height: 950px; /* Altura ajustada */
+            max-width: 1000px; 
+            height: 1000px; /* Increased height for better spread */
             margin: 0 auto;
         }
 
@@ -81,12 +80,8 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
         }
 
-        /* LÍNEAS CONECTORAS ELIMINADAS */
-        .line { display: none; }
 
-
-        /* LOGO ORB (Contenedor para la imagen grande) */
-        /* Hacemos el enlace (a) el elemento posicionado */
+        /* Logo Orbs (a.logo-link) */
         a.logo-link {
             text-decoration: none;
             position: absolute; 
@@ -97,7 +92,6 @@
             transition: transform 0.3s;
         }
 
-        /* Efecto hover al hacer clic en el logo */
         a.logo-link:hover {
             transform: scale(1.1);
         }
@@ -119,22 +113,23 @@
             object-fit: contain;
         }
         
-        /* Posicionamiento y color del borde de los Orbes de Logo (Escritorio) - Ajustado para 5 */
-        .pro-logo-link { top: 0px; left: 50%; transform: translateX(-50%); border: 4px solid var(--color-pro); } /* TOP CENTER */
-        .club-logo-link { top: 120px; right: 80px; border: 4px solid var(--color-club); } /* TOP RIGHT */
-        .home-logo-link { bottom: 120px; right: 80px; border: 4px solid var(--color-home); } /* BOTTOM RIGHT */
-        .ice-logo-link { bottom: 120px; left: 80px; border: 4px solid var(--color-ice); } /* BOTTOM LEFT */
-        .fit-logo-link { top: 120px; left: 80px; border: 4px solid var(--color-fit); } /* TOP LEFT */
+        /* Posicionamiento y color del borde de los Orbes de Logo (Desktop - Pentagonal) */
+        /* Coordenadas relativas al centro del diagrama: 500px, 500px */
+        .pro-logo-link { top: 0px; left: 50%; transform: translateX(-50%); border: 4px solid var(--color-pro); } /* Top Center */
+        .club-logo-link { top: 200px; right: 80px; border: 4px solid var(--color-club); } /* Top Right */
+        .home-logo-link { bottom: 80px; right: 120px; border: 4px solid var(--color-home); } /* Bottom Right */
+        .ice-logo-link { bottom: 80px; left: 120px; border: 4px solid var(--color-ice); } /* Bottom Left */
+        .fit-logo-link { top: 200px; left: 80px; border: 4px solid var(--color-fit); } /* Top Left */
 
 
-        /* Enlace Contenedor (para hacer toda la caja clickeable) */
+        /* Enlace Contenedor (a.division-link) */
         a.division-link {
             text-decoration: none; 
             color: inherit;
             position: absolute; 
         }
         
-        /* Estilo de las Cajas de División (sin cambios en la apariencia) */
+        /* Estilo de las Cajas de División */
         .division {
             width: 260px; 
             padding: 20px;
@@ -147,7 +142,6 @@
             cursor: pointer;
             height: 100%; 
         }
-        /* El efecto hover se aplica a la división DENTRO del enlace */
         a.division-link:hover .division {
             transform: scale(1.05);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
@@ -165,51 +159,41 @@
         .division .concept { font-style: italic; font-size: 0.9rem; display: block; padding-top: 8px; font-weight: 600; }
         .division .icon { font-size: 1.8rem; margin-right: 10px; }
 
-        /* Color Coding (existente) */
+        /* Color Coding */
         .club { border-left: 5px solid var(--color-club); }
-        .club h4 { color: var(--color-club); }
-        .club .division-header { border-color: var(--color-club); }
-        .club .concept { color: var(--color-club); }
+        .club h4, .club .division-header, .club .concept { color: var(--color-club); border-color: var(--color-club); }
         
         .home { border-left: 5px solid var(--color-home); }
-        .home h4 { color: var(--color-home); }
-        .home .division-header { border-color: var(--color-home); }
-        .home .concept { color: var(--color-home); }
+        .home h4, .home .division-header, .home .concept { color: var(--color-home); border-color: var(--color-home); }
         
         .ice { border-left: 5px solid var(--color-ice); }
-        .ice h4 { color: var(--color-ice); }
-        .ice .division-header { border-color: var(--color-ice); }
-        .ice .concept { color: var(--color-ice); }
+        .ice h4, .ice .division-header, .ice .concept { color: var(--color-ice); border-color: var(--color-ice); }
         
         .fit { border-left: 5px solid var(--color-fit); }
-        .fit h4 { color: var(--color-fit); }
-        .fit .division-header { border-color: var(--color-fit); }
-        .fit .concept { color: var(--color-fit); }
+        .fit h4, .fit .division-header, .fit .concept { color: var(--color-fit); border-color: var(--color-fit); }
 
-        /* Color Coding (NUEVO PRO/ESSERVYO) */
         .pro { border-left: 5px solid var(--color-pro); }
-        .pro h4 { color: var(--color-pro); }
-        .pro .division-header { border-color: var(--color-pro); }
-        .pro .concept { color: var(--color-pro); }
+        .pro h4, .pro .division-header, .pro .concept { color: var(--color-pro); border-color: var(--color-pro); }
 
 
-        /* Posicionamiento de las 5 Divisiones (Escritorio) - Ajustado */
-        .pro-pos { top: 200px; left: 50%; transform: translateX(-50%); } /* TOP CENTER */
-        .club-pos { top: 350px; right: 50px; } /* MID RIGHT */
-        .home-pos { bottom: 50px; right: 180px; } /* BOTTOM RIGHT-ISH */
-        .ice-pos { bottom: 50px; left: 180px; } /* BOTTOM LEFT-ISH */
-        .fit-pos { top: 350px; left: 50px; } /* MID LEFT */
+        /* Posicionamiento de las 5 Divisiones (Desktop - Pentagonal) */
+        /* Coordenadas relativas al centro del diagrama: 500px, 500px */
+        .pro-pos { top: 120px; left: 50%; transform: translateX(-50%); } /* Top Center */
+        .club-pos { top: 280px; right: 100px; } /* Top Right */
+        .home-pos { bottom: 150px; right: 100px; } /* Bottom Right */
+        .ice-pos { bottom: 150px; left: 100px; } /* Bottom Left */
+        .fit-pos { top: 280px; left: 100px; } /* Top Left */
 
 
-        /* --- VISTA MÓVIL (Ajustes de Diseño y Logos) --- */
+        /* --- VISTA MÓVIL (Stacking) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 1350px; /* Altura ajustada para 5 divisiones en móvil */
+                height: 1500px; /* Adjusted height for 5 stacked items + core */
                 max-width: 90%;
             }
             .core-vision { top: 80px; width: 180px; height: 180px; }
 
-            /* Posicionamiento de los Orbes de Logo (Móvil) */
+            /* Mobile Logo Orbs - Stacked vertically */
             a.logo-link {
                 width: 90px; 
                 height: 90px;
@@ -217,12 +201,14 @@
                 transform: translateX(-50%);
             }
 
-            .pro-logo-link { top: 250px; } /* NUEVO */
-            .club-logo-link { top: 440px; }
-            .home-logo-link { top: 630px; }
-            .ice-logo-link { top: 820px; }
-            .fit-logo-link { top: 1010px; }
+            /* Positioning for logos (relative to the top of the 1500px diagram) */
+            .pro-logo-link { top: 280px; } 
+            .club-logo-link { top: 500px; }
+            .home-logo-link { top: 720px; }
+            .ice-logo-link { top: 940px; }
+            .fit-logo-link { top: 1160px; }
             
+            /* Mobile Division Boxes - Stacked vertically */
             .division-link {
                 left: 50%;
                 transform: translateX(-50%);
@@ -233,12 +219,12 @@
                 padding: 15px;
             }
             
-            /* Apilado Vertical de las Cajas de División (Móvil) - Ajustado */
-            .pro-pos { top: 380px; right: auto; left: 50%; transform: translateX(-50%); } /* NUEVO */
-            .club-pos { top: 570px; right: auto; left: 50%; transform: translateX(-50%); }
-            .home-pos { top: 760px; right: auto; left: 50%; transform: translateX(-50%); }
-            .ice-pos { top: 950px; left: auto; left: 50%; transform: translateX(-50%); }
-            .fit-pos { top: 1140px; left: auto; left: 50%; transform: translateX(-50%); }
+            /* Positioning for boxes (relative to the top of the 1500px diagram) */
+            .pro-pos { top: 410px; } 
+            .club-pos { top: 630px; }
+            .home-pos { top: 850px; } 
+            .ice-pos { top: 1070px; } 
+            .fit-pos { top: 1290px; } 
         }
     </style>
 </head>
