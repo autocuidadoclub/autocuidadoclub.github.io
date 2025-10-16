@@ -13,6 +13,8 @@
             --color-home: #1abc9c; 
             --color-ice: #3498db; 
             --color-fit: #e74c3c; 
+            /* NUEVO COLOR PARA ESSERVYO (PRO) - Seguridad y Consultoría */
+            --color-pro: #8e44ad; 
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             --logo-size: 110px; 
         }
@@ -42,12 +44,12 @@
             margin-bottom: 5rem;
         }
 
-        /* Contenedor del Diagrama */
+        /* Contenedor del Diagrama AJUSTADO */
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 900px; 
-            height: 900px; 
+            max-width: 1000px; /* Ancho ajustado para 5 elementos */
+            height: 950px; /* Altura ajustada */
             margin: 0 auto;
         }
 
@@ -117,11 +119,12 @@
             object-fit: contain;
         }
         
-        /* Posicionamiento y color del borde de los Orbes de Logo (Escritorio) */
-        .club-logo-link { top: -10px; right: -10px; border: 4px solid var(--color-club); }
-        .home-logo-link { bottom: -10px; right: -10px; border: 4px solid var(--color-home); }
-        .ice-logo-link { bottom: -10px; left: -10px; border: 4px solid var(--color-ice); }
-        .fit-logo-link { top: -10px; left: -10px; border: 4px solid var(--color-fit); }
+        /* Posicionamiento y color del borde de los Orbes de Logo (Escritorio) - Ajustado para 5 */
+        .pro-logo-link { top: 0px; left: 50%; transform: translateX(-50%); border: 4px solid var(--color-pro); } /* TOP CENTER */
+        .club-logo-link { top: 120px; right: 80px; border: 4px solid var(--color-club); } /* TOP RIGHT */
+        .home-logo-link { bottom: 120px; right: 80px; border: 4px solid var(--color-home); } /* BOTTOM RIGHT */
+        .ice-logo-link { bottom: 120px; left: 80px; border: 4px solid var(--color-ice); } /* BOTTOM LEFT */
+        .fit-logo-link { top: 120px; left: 80px; border: 4px solid var(--color-fit); } /* TOP LEFT */
 
 
         /* Enlace Contenedor (para hacer toda la caja clickeable) */
@@ -162,7 +165,7 @@
         .division .concept { font-style: italic; font-size: 0.9rem; display: block; padding-top: 8px; font-weight: 600; }
         .division .icon { font-size: 1.8rem; margin-right: 10px; }
 
-        /* Color Coding (sin cambios) */
+        /* Color Coding (existente) */
         .club { border-left: 5px solid var(--color-club); }
         .club h4 { color: var(--color-club); }
         .club .division-header { border-color: var(--color-club); }
@@ -183,18 +186,25 @@
         .fit .division-header { border-color: var(--color-fit); }
         .fit .concept { color: var(--color-fit); }
 
+        /* Color Coding (NUEVO PRO/ESSERVYO) */
+        .pro { border-left: 5px solid var(--color-pro); }
+        .pro h4 { color: var(--color-pro); }
+        .pro .division-header { border-color: var(--color-pro); }
+        .pro .concept { color: var(--color-pro); }
 
-        /* Posicionamiento de las 4 Divisiones (Escritorio) */
-        .club-pos { top: 120px; right: 120px; }
-        .home-pos { bottom: 120px; right: 120px; }
-        .ice-pos { bottom: 120px; left: 120px; }
-        .fit-pos { top: 120px; left: 120px; }
+
+        /* Posicionamiento de las 5 Divisiones (Escritorio) - Ajustado */
+        .pro-pos { top: 200px; left: 50%; transform: translateX(-50%); } /* TOP CENTER */
+        .club-pos { top: 350px; right: 50px; } /* MID RIGHT */
+        .home-pos { bottom: 50px; right: 180px; } /* BOTTOM RIGHT-ISH */
+        .ice-pos { bottom: 50px; left: 180px; } /* BOTTOM LEFT-ISH */
+        .fit-pos { top: 350px; left: 50px; } /* MID LEFT */
 
 
         /* --- VISTA MÓVIL (Ajustes de Diseño y Logos) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 1150px; 
+                height: 1350px; /* Altura ajustada para 5 divisiones en móvil */
                 max-width: 90%;
             }
             .core-vision { top: 80px; width: 180px; height: 180px; }
@@ -207,11 +217,12 @@
                 transform: translateX(-50%);
             }
 
-            .club-logo-link { top: 250px; right: auto; }
-            .home-logo-link { top: 440px; right: auto; }
-            .ice-logo-link { top: 630px; left: auto; }
-            .fit-logo-link { top: 820px; left: auto; }
-
+            .pro-logo-link { top: 250px; } /* NUEVO */
+            .club-logo-link { top: 440px; }
+            .home-logo-link { top: 630px; }
+            .ice-logo-link { top: 820px; }
+            .fit-logo-link { top: 1010px; }
+            
             .division-link {
                 left: 50%;
                 transform: translateX(-50%);
@@ -222,11 +233,12 @@
                 padding: 15px;
             }
             
-            /* Apilado Vertical de las Cajas de División (Móvil) */
-            .club-pos { top: 380px; right: auto; }
-            .home-pos { top: 570px; right: auto; }
-            .ice-pos { top: 760px; left: auto; }
-            .fit-pos { top: 950px; left: auto; }
+            /* Apilado Vertical de las Cajas de División (Móvil) - Ajustado */
+            .pro-pos { top: 380px; right: auto; left: 50%; transform: translateX(-50%); } /* NUEVO */
+            .club-pos { top: 570px; right: auto; left: 50%; transform: translateX(-50%); }
+            .home-pos { top: 760px; right: auto; left: 50%; transform: translateX(-50%); }
+            .ice-pos { top: 950px; left: auto; left: 50%; transform: translateX(-50%); }
+            .fit-pos { top: 1140px; left: auto; left: 50%; transform: translateX(-50%); }
         }
     </style>
 </head>
@@ -237,6 +249,12 @@
         <p class="ecosystem-tagline">"Productividad, salud y confianza — en cada detalle."</p>
 
         <div class="ecosystem-diagram">
+            
+            <a href="https://www.autocuidadoclub.com/pro" class="logo-link pro-logo-link">
+                <div class="logo-orb">
+                    <img src="ruta/a/logo-esservyo.png" alt="Logo PRO">
+                </div>
+            </a>
             
             <a href="https://www.autocuidadoclub.com" class="logo-link club-logo-link">
                 <div class="logo-orb">
@@ -269,6 +287,16 @@
                 </div>
             </div>
 
+            <a href="https://www.autocuidadoclub.com/pro" class="division-link pro-pos">
+                <div class="division pro">
+                    <div class="division-header">
+                        <h4><span class="icon">🛡️</span> PRO (ESSERVYO)</h4>
+                    </div>
+                    <p>Consultoría, seguridad y salud ocupacional para empresas y espacios.</p>
+                    <span class="concept">Garantizando un entorno seguro para el autocuidado integral.</span>
+                </div>
+            </a>
+            
             <a href="https://www.autocuidadoclub.com" class="division-link club-pos">
                 <div class="division club">
                     <div class="division-header">
