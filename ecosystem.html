@@ -14,7 +14,7 @@
             --color-ice: #3498db; 
             --color-fit: #e74c3c; 
             --color-pro: #8e44ad; 
-            --shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Increased, softer shadow */
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger, professional shadow */
             --logo-size: 80px; 
             --box-width: 280px;
             --box-height: 120px; 
@@ -45,16 +45,16 @@
             margin-bottom: 3rem;
         }
 
-        /* Contenedor del Diagrama - Ajustado para la estructura limpia */
+        /* Contenedor del Diagrama - AUMENTADO PARA MÁXIMO ESPACIO Y CLARIDAD */
         .ecosystem-diagram {
             position: relative;
             width: 100%;
-            max-width: 900px; 
-            height: 950px; /* Adjusted height for cleaner vertical separation */
+            max-width: 1000px; 
+            height: 1200px; /* Significantly increased height for separation */
             margin: 0 auto;
         }
 
-        /* Círculo Central (Core Vision) - Posicionado para dividir los grupos */
+        /* Círculo Central (Core Vision) - Perfectly centered in the 1200px space */
         .core-vision {
             width: 250px;
             height: 250px;
@@ -100,31 +100,32 @@
         }
         .logo-orb img { width: 85%; height: 85%; object-fit: contain; }
         
-        /* Posicionamiento de Orbes de Logo (Desktop - Above the Boxes) */
-        .pro-logo-link { top: 120px; left: 50%; transform: translateX(-50%); border: 3px solid var(--color-pro); } 
-        .club-logo-link { top: 320px; right: 80px; border: 3px solid var(--color-club); } 
-        .home-logo-link { bottom: 100px; right: 100px; border: 3px solid var(--color-home); } 
-        .ice-logo-link { bottom: 100px; left: 100px; border: 3px solid var(--color-ice); } 
-        .fit-logo-link { top: 320px; left: 80px; border: 3px solid var(--color-fit); } 
+        /* POSICIONAMIENTO DE LOGOS (Desktop - Symmetrical) */
+        /* Logos are placed just above their respective boxes */
+        .pro-logo-link { top: 80px; left: 50%; transform: translateX(-50%); border: 3px solid var(--color-pro); } 
+        .club-logo-link { top: 220px; right: 80px; border: 3px solid var(--color-club); } 
+        .home-logo-link { bottom: 180px; right: 100px; border: 3px solid var(--color-home); } 
+        .ice-logo-link { bottom: 180px; left: 100px; border: 3px solid var(--color-ice); } 
+        .fit-logo-link { top: 220px; left: 80px; border: 3px solid var(--color-fit); } 
 
 
         /* Enlace Contenedor (a.division-link) */
         a.division-link { text-decoration: none; color: inherit; position: absolute; }
         
-        /* Estilo de las Cajas de División - MEJORADO */
+        /* Estilo de las Cajas de División */
         .division {
             width: var(--box-width); 
             height: var(--box-height);
             padding: 20px;
             background-color: white;
-            border-radius: 12px; /* Smoother, modern corners */
-            box-shadow: var(--shadow); /* Softer, floating shadow */
+            border-radius: 12px;
+            box-shadow: var(--shadow); 
             text-align: left;
             z-index: 15;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
         }
-        a.division-link:hover .division { transform: scale(1.05); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+        a.division-link:hover .division { transform: scale(1.05); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
         .division-header {
             display: flex; justify-content: flex-start; align-items: center; margin-bottom: 5px;
             border-bottom: 2px solid; padding-bottom: 5px;
@@ -134,7 +135,7 @@
         .division .concept { font-style: italic; font-size: 0.85rem; display: block; padding-top: 5px; font-weight: 600; }
         .division .icon { font-size: 1.6rem; margin-right: 8px; }
 
-        /* Color Coding (Border and text color) */
+        /* Color Coding */
         .club { border: 2px solid var(--color-club); } .club h4, .club .division-header, .club .concept { color: var(--color-club); border-color: var(--color-club); }
         .home { border: 2px solid var(--color-home); } .home h4, .home .division-header, .home .concept { color: var(--color-home); border-color: var(--color-home); }
         .ice { border: 2px solid var(--color-ice); } .ice h4, .ice .division-header, .ice .concept { color: var(--color-ice); border-color: var(--color-ice); }
@@ -142,43 +143,40 @@
         .pro { border: 2px solid var(--color-pro); } .pro h4, .pro .division-header, .pro .concept { color: var(--color-pro); border-color: var(--color-pro); }
 
 
-        /* Posicionamiento de las 5 Divisiones (Desktop - Layered Structure) */
-        /* Top Layer */
-        .pro-pos { top: 220px; left: 50%; transform: translateX(-50%); } 
-        /* Middle Layer */
-        .club-pos { top: 410px; right: 50px; } 
-        .fit-pos { top: 410px; left: 50px; } 
-        /* Bottom Layer */
-        .home-pos { bottom: 200px; right: 150px; } 
-        .ice-pos { bottom: 200px; left: 150px; } 
+        /* POSICIONAMIENTO DE CAJAS (Desktop - Symmetrical) */
+        /* All boxes are placed far from the center (600px / 2 = 300px from center line) */
+        .pro-pos { top: 170px; left: 50%; transform: translateX(-50%); } 
+        .club-pos { top: 310px; right: 50px; } 
+        .fit-pos { top: 310px; left: 50px; } 
+        .home-pos { bottom: 270px; right: 150px; } 
+        .ice-pos { bottom: 270px; left: 150px; } 
 
 
         /* --- VISTA MÓVIL (Stacking) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 1600px; 
+                height: 1800px; /* Adjusted for maximum vertical separation */
                 max-width: 90%;
             }
-            .core-vision { top: 50px; width: 160px; height: 160px; } 
+            .core-vision { top: 80px; width: 180px; height: 180px; } 
 
-            /* Posición de Logos en Móvil (Closer to boxes) */
+            /* Logos and Boxes stacked vertically with clean, consistent gaps */
             a.logo-link { width: 70px; height: 70px; left: 50%; transform: translateX(-50%); }
 
-            .pro-logo-link { top: 250px; } 
-            .fit-logo-link { top: 460px; } 
-            .club-logo-link { top: 670px; }
-            .ice-logo-link { top: 880px; } 
-            .home-logo-link { top: 1090px; } 
+            .pro-logo-link { top: 320px; } 
+            .fit-logo-link { top: 560px; } 
+            .club-logo-link { top: 800px; }
+            .ice-logo-link { top: 1040px; } 
+            .home-logo-link { top: 1280px; } 
             
-            /* Posición de Cajas en Móvil */
             .division-link { left: 50%; transform: translateX(-50%); }
             .division { width: 95%; padding: 15px; }
             
-            .pro-pos { top: 330px; } 
-            .fit-pos { top: 540px; } 
-            .club-pos { top: 750px; } 
-            .ice-pos { top: 960px; } 
-            .home-pos { top: 1170px; } 
+            .pro-pos { top: 410px; } 
+            .fit-pos { top: 650px; } 
+            .club-pos { top: 890px; } 
+            .ice-pos { top: 1130px; } 
+            .home-pos { top: 1370px; } 
         }
     </style>
 </head>
