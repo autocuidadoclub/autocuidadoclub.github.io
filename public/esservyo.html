@@ -3,162 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESSERVYO: Consultoría Profesional en Salud y Seguridad</title>
+    <title>ESSERVYO PRO - Consultoría Profesional</title>
     <style>
+        /* --- BRAND COLORS AND FONTS --- */
+        :root {
+            --brand-blue: #004a8f; /* Deep Blue from AutoCuidado Header */
+            --brand-orange: #ff6600; /* Vibrant Orange from buttons/highlights */
+            --light-bg: #f5f5f5;
+            --text-color: #333;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif; /* Common web font, similar to the image */
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-color);
         }
         .container {
             background-color: #fff;
-            padding: 30px;
             max-width: 900px;
-            margin: 0 auto;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            margin: 30px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
+        
+        /* --- HEADER & TITLES --- */
         header {
-            text-align: center;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-            background-color: #007bff;
+            background-color: var(--brand-blue);
             color: #fff;
-            padding: 20px 0;
-            border-radius: 8px 8px 0 0;
+            text-align: center;
+            padding: 30px 20px;
         }
         header h1 {
-            font-size: 2.5em;
-            margin-bottom: 5px;
+            font-size: 2.8em;
+            margin: 0;
+            font-weight: 700;
         }
         header h2 {
-            font-size: 1.2em;
-            font-weight: normal;
+            font-size: 1.4em;
+            font-weight: 300;
+            margin-top: 5px;
+        }
+        .content-section {
+            padding: 20px 40px;
         }
         .section-title {
-            color: #007bff;
-            border-left: 5px solid #ffc107;
-            padding-left: 15px;
+            color: var(--brand-blue);
+            font-size: 1.8em;
+            border-bottom: 2px solid var(--brand-orange);
+            padding-bottom: 5px;
             margin-top: 35px;
             margin-bottom: 20px;
         }
-        .mission blockquote {
-            background-color: #e9ecef;
-            border-left: 5px solid #007bff;
-            margin: 15px 0;
-            padding: 15px 20px;
-            font-style: italic;
-            font-size: 1.1em;
-        }
-        .key-differentiator {
-            background-color: #d1ecf1;
-            border: 1px solid #bee5eb;
-            padding: 20px;
+        
+        /* --- CORE MISSION/VALUE PROP --- */
+        .value-prop {
+            background-color: #f7faff;
+            border: 1px solid var(--brand-blue);
+            padding: 25px;
             margin: 20px 0;
-            border-radius: 8px;
-            font-size: 1.1em;
-            color: #0c5460;
+            border-radius: 5px;
         }
+        .value-prop h4 {
+            color: var(--brand-orange);
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+        .value-prop ul {
+            list-style: none;
+            padding: 0;
+        }
+        .value-prop ul li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .value-prop ul li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+            color: var(--brand-orange);
+        }
+
+        /* --- EXPERIENCE GRID (Visual Reading Proof) --- */
         .experience-grid {
             display: flex;
             justify-content: space-around;
             text-align: center;
             margin-top: 20px;
+            margin-bottom: 30px;
         }
         .experience-item {
             flex: 1;
-            padding: 10px;
-            margin: 0 10px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 0 15px;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
         .experience-item h4 {
-            color: #28a745;
-            font-size: 2em;
+            color: var(--brand-blue);
+            font-size: 2.2em;
             margin: 0;
+            font-weight: 700;
         }
-        .logistics-note {
-            background-color: #fce8e8;
-            border-left: 5px solid #dc3545;
-            padding: 10px;
-            margin: 15px 0;
+        .experience-item p {
+            font-weight: bold;
+            color: var(--text-color);
+            margin-top: 5px;
         }
+        
+        /* --- LOGISTICS / NOTES --- */
+        .note-box {
+            background-color: #fff3e0; /* Light orange warning */
+            border-left: 5px solid var(--brand-orange);
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        /* --- FOOTER --- */
         footer {
+            background-color: var(--brand-blue);
+            color: #fff;
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ccc;
+            padding: 20px 0;
             font-size: 1em;
-            color: #6c757d;
+            border-radius: 0 0 10px 10px;
+            margin-top: 30px;
+        }
+        footer p {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>ESSERVYO: LA SOLUCIÓN EN SEGURIDAD Y SALUD</h1>
+            <h1>ESSERVYO: LA SOLUCIÓN EN SAFETY Y SALUD</h1>
             <h2>Consultoría Profesional en Salud y Seguridad Ocupacional (División PRO)</h2>
         </header>
 
-        <h3 class="section-title">Nuestra Propuesta de Valor Central</h3>
-        <div class="key-differentiator">
+        <div class="content-section">
+            
+            <h3 class="section-title">¿Quiénes Somos?</h3>
             <p>
-                Somos la **solución integral** en seguridad y salud para cualquier organización o negocio. Nuestra experiencia nos permite **invertir nuestras horas de soporte** con total confianza, sabiendo que nuestros **clientes satisfechos** respaldan nuestro trabajo. Nos enfocamos en transformar la cultura interna para un cambio duradero.
+                **ESSERVYO** (Empresa Salvadoreña De Servicios Y Otros) es la **División PRO** enfocada en el capital humano y la seguridad industrial. Nacemos con el objetivo claro de cambiar la **cultura de Safety** en las empresas del país y fortalecer la **prevención de accidentes de trabajo** en El Salvador.
             </p>
-        </div>
-
-        <h3 class="section-title">Trayectoria y Confianza</h3>
-        <div class="experience-grid">
-            <div class="experience-item">
-                <h4>+12 Años</h4>
-                <p>De experiencia probada en el sector.</p>
+            
+            <div class="value-prop">
+                <h4>Nuestra Promesa (César Cañas)</h4>
+                <p>
+                    "FACILITAMOS SOLUCIONES EN **SALUD Y SEGURIDAD OCUPACIONAL** GARANTIZANDO UN CAMBIO DE **CULTURA ORGANIZACIONAL EN TEMAS DE SAFETY**"
+                </p>
             </div>
-            <div class="experience-item">
-                <h4>Cultura</h4>
-                <p>Parte del ecosistema de **Autocuidado**.</p>
-            </div>
-            <div class="experience-item">
-                <h4>Clientes</h4>
-                <p>Historial comprobado de **clientes satisfechos**.</p>
-            </div>
-        </div>
 
-        <h3 class="section-title">ESSERVYO: ¿Quiénes somos?</h3>
-        <p>
-            [cite_start]**ESSERVYO** (Empresa Salvadoreña De Servicios Y Otros) nace al identificar la necesidad de cambiar la **cultura de Safety** en las empresas del país y fortalecer la prevención de accidentes de trabajo en El Salvador[cite: 4].
-        </p>
-        <div class="mission">
-            <h4 class="section-title" style="border-left-color: #6c757d;">Nuestra Promesa</h4>
-            <blockquote>
-                "FACILITAMOS SOLUCIONES EN **SALUD Y SEGURIDAD OCUPACIONAL** GARANTIZANDO UN CAMBIO DE **CULTURA ORGANIZACIONAL EN TEMAS DE SAFETY**"
-            </blockquote>
-        </div>
+            <h3 class="section-title">Experiencia y Enfoque Integral</h3>
+            
+            <div class="experience-grid">
+                <div class="experience-item">
+                    <h4>12 Años+</h4>
+                    <p>Trayectoria probada en el sector.</p>
+                </div>
+                <div class="experience-item">
+                    <h4>Cultura</h4>
+                    <p>Parte activa del ecosistema de **Autocuidado**.</p>
+                </div>
+                <div class="experience-item">
+                    <h4>Satisfacción</h4>
+                    <p>Clientes satisfechos avalan nuestro trabajo.</p>
+                </div>
+            </div>
 
-        <h3 class="section-title">Capacidades y Formación</h3>
-        <p>
-            Nuestros servicios profesionales de consultoría se centran en el **despliegue de capacidades** y el **cambio de mentalidad**. Utilizamos metodologías probadas para generar **formación** efectiva en su personal.
-        </p>
-        
-        <h4>Metodología y Logística de Soporte (Virtual)</h4>
-        <div class="logistics-note">
-            ⚠️ **Metodología:** La implementación se ejecuta acorde a los lineamientos del GOES y COVID-19. La modalidad y logística pueden modificarse según la evolución de la emergencia en El Salvador.
+            <h3 class="section-title">Los 4 Pilares de Nuestro Servicio Profesional</h3>
+            <div class="value-prop">
+                <p>Nuestra consultoría no es solo un servicio; es una **inversión de horas de soporte** dedicada a generar un cambio duradero en su organización:</p>
+                <ul>
+                    <li>**Cambio de Mentalidad (Mindset Shift):** Impulsamos la cultura preventiva y el cambio organizacional.</li>
+                    <li>**Formación de Alto Nivel:** Entregamos formación especializada para desplegar nuevas **capacidades** en su personal.</li>
+                    <li>**Soluciones Integrales:** Somos la solución completa en safety para cualquier negocio.</li>
+                    <li>**Enfoque de Autocuidado:** Integramos la filosofía de que "¡Todos cuidamos de todos porque en tu casa te esperan!"</li>
+                </ul>
+            </div>
+
+            <h3 class="section-title">Metodología de Soporte y Logística</h3>
+            
+            <div class="note-box">
+                **Modalidad de Soporte:** Dada la contingencia, la implementación se ajusta a los lineamientos del GOES y protocolos COVID-19.
+            </div>
+            
+            <ul>
+                <li>**Formación Asincrónica:** Materiales de entrenamiento y documentación legal se envían **virtualmente** al representante de la empresa.</li>
+                <li>**Soporte Dirigido:** Se incluyen **3 sesiones virtuales** de 1 hora para resolver dudas con los representantes.</li>
+                <li>**Despliegue Interno:** La empresa garantiza la distribución oportuna de materiales a todo el personal.</li>
+            </ul>
+
         </div>
-        
-        <ul>
-            <li>**Soporte Virtual:** Se desarrollan **3 sesiones virtuales** de 1 hora para abordar dudas con los representantes.</li>
-            <li>**Entrega de Material:** Materiales de entrenamiento y documentación legal se envían **virtualmente** al representante de la empresa.</li>
-            <li>**Compromiso del Cliente:** La empresa garantiza la distribución oportuna de materiales a todo el personal.</li>
-        </ul>
-        
-        <p style="text-align: center; margin-top: 30px;">
-            *Podemos ofrecer videos y material específico para complementar la capacidad formativa de su equipo.*
-        </p>
 
         <footer>
-            <p>Promesa respaldada por **CÉSAR CAÑAS**</p>
-            <p>¡Todos cuidamos de todos porque en tu casa te esperan!</p>
+            <p>ESSERVYO - La División PRO del ecosistema de Autocuidado.</p>
+            <p>Estamos donde nos necesita. | ¡Todos cuidamos de todos porque en tu casa te esperan!</p>
         </footer>
     </div>
 </body>
