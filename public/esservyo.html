@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESSERVYO PRO - Consultoría en Seguridad y Cultura</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         /* --- BRAND COLORS AND FONTS --- */
         :root {
-            --brand-blue: #004a8f; /* Deep Corporate Blue */
-            --brand-orange: #ff6600; /* Vibrant Orange for action/highlights */
+            --brand-blue: #004a8f; /* Deep Corporate Blue (Header, Titles) */
+            --brand-orange: #ff6600; /* Vibrant Orange (Highlights, Buttons) */
             --light-bg: #f5f5f5;
             --text-color: #333;
-            --secondary-blue: #007bff; /* Secondary contrast blue */
+            --secondary-blue: #007bff;
         }
         body {
             font-family: 'Arial', sans-serif;
@@ -26,7 +28,7 @@
             max-width: 950px;
             margin: 30px auto;
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             overflow: hidden;
         }
         
@@ -41,14 +43,12 @@
         header h1 {
             font-size: 3em;
             margin: 0;
-            font-weight: 900; /* Extra bold */
-            letter-spacing: 1px;
+            font-weight: 900;
         }
         header h2 {
             font-size: 1.5em;
             font-weight: 400;
             margin-top: 10px;
-            opacity: 0.9;
         }
         .content-section {
             padding: 30px 50px;
@@ -70,12 +70,6 @@
             padding: 30px;
             margin: 20px 0;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        .value-prop-main p {
-            font-size: 1.15em;
-            color: var(--brand-blue);
-            font-weight: 500;
         }
         
         /* --- INTERACTIVE EXPERIENCE GRID --- */
@@ -93,6 +87,7 @@
             border: 1px solid #ddd;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: default;
+            text-align: center;
         }
         .experience-item:hover {
             transform: translateY(-5px);
@@ -132,27 +127,63 @@
         .capabilities-list li:hover {
             background-color: #dbeaff;
         }
-
-        /* --- PROMISE BLOCKQUOTE --- */
-        .mission blockquote {
-            background-color: #e9ecef;
-            border-left: 6px solid var(--brand-orange);
-            margin: 20px 0;
-            padding: 20px 30px;
-            font-style: italic;
-            font-size: 1.2em;
-            color: var(--brand-blue);
-        }
         
-        /* --- LOGISTICS / NOTES --- */
-        .note-box {
-            background-color: #fffde7;
-            border-left: 5px solid #ffcc00;
-            padding: 15px;
-            margin: 25px 0;
+        /* --- CONTACT FORM STYLES (Adapted from AutoCuidado) --- */
+        .contact-form-container {
+            max-width: 650px; /* Wider for B2B fields */
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border: 2px solid var(--brand-blue);
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        .contact-form-container h3 {
+            text-align: center;
+            color: var(--brand-orange);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        .contact-form-container label {
             font-weight: bold;
+            color: var(--text-color);
+            margin-top: 10px;
+            display: block;
         }
-        
+        .contact-form-container input[type="text"],
+        .contact-form-container input[type="email"],
+        .contact-form-container textarea,
+        .contact-form-container select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .contact-form-container button[type="submit"] {
+            background-color: var(--brand-blue);
+            color: #fff;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .contact-form-container button[type="submit"]:hover {
+            background-color: var(--brand-orange);
+        }
+        #loader {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
         /* --- FOOTER --- */
         footer {
             background-color: var(--brand-blue);
@@ -165,7 +196,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <script src="env.js"></script> <div class="container">
         <header>
             <h1>ESSERVYO: LA SOLUCIÓN EN SAFETY Y SALUD</h1>
             <h2>La División PRO de Consultoría que Impulsa el Cambio Cultural Diario</h2>
@@ -173,22 +204,22 @@
 
         <div class="content-section">
             
-            <h3 class="section-title">El Safety: Ventaja Competitiva y Derecho Fundamental</h3>
+            <h3 class="section-title">El Safety: Ventaja Competitiva y Derecho Fundamental 🌐</h3>
             <div class="value-prop-main">
                 <p>
-                    En ESSERVYO, entendemos la seguridad como una **ventaja competitiva** y un pilar ético. Nuestro enfoque es transformar el **Safety** en un **fenómeno cultural** en su empresa, alineado con el principio de la **OIT** sobre un entorno de trabajo seguro y saludable como **derecho fundamental**.
+                    En ESSERVYO, vemos la seguridad como una **ventaja competitiva** y un pilar ético, alineado con el principio de la **OIT** sobre un entorno de trabajo seguro como **derecho fundamental**.
                 </p>
                 <p>
-                    Somos la **solución integral para CUALQUIER TIPO DE NEGOCIO**, sin restricciones de industria o actividad. Nuestro objetivo es forjar **alianzas sólidas** que invierten en horas de soporte para garantizar un trabajo hecho de forma segura.
+                    Somos la **solución integral para CUALQUIER TIPO DE NEGOCIO**, creando alianzas sólidas que garantizan el trabajo se realice de forma segura, mediante un **cambio cultural** profundo.
                 </p>
             </div>
 
-            <h3 class="section-title">Trayectoria, Expertise y Alcance Regional</h3>
+            <h3 class="section-title">Trayectoria, Expertise y Alcance Regional ✅</h3>
             
             <div class="experience-grid">
                 <div class="experience-item">
                     <h4>12 Años+</h4>
-                    <p>Experiencia probada y resultados con clientes satisfechos.</p>
+                    <p>Experiencia probada y clientes satisfechos.</p>
                 </div>
                 <div class="experience-item">
                     <h4>Alcance PRO</h4>
@@ -200,38 +231,68 @@
                 </div>
             </div>
 
-            <h3 class="section-title">Capacidades y Servicios Profesionales Clave</h3>
+            <h3 class="section-title">Capacidades y Servicios Profesionales Clave 🛠️</h3>
             <p>
-                Nuestra experiencia abarca sectores como **Manufactura**, **Farmacéuticas**, **Mantenimiento Eléctrico** y **Marketing**. Proveemos servicios especializados para:
+                Nuestra experiencia abarca **Manufactura**, **Farmacéuticas**, **Mantenimiento Eléctrico** y más. Proveemos servicios especializados para:
             </p>
             <ul class="capabilities-list">
-                <li>**Formación Dinámica:** Entrenamiento práctico (ej. uso de extintores y primeros auxilios).</li>
+                <li>**Formación Dinámica:** Entrenamiento práctico y despliegue de capacidades.</li>
                 <li>**Ingeniería de Seguridad:** Estudios de sistemas de alarma de emergencia.</li>
-                <li>**Salud Ocupacional:** Cálculo y mejora de **Ergonomía** en puestos de trabajo.</li>
-                <li>**Gestión de Riesgos:** Implementación de planes de **reducción de tasas de accidentes**.</li>
-                <li>**Cumplimiento Legal:** Soporte en documentación oficial y sistemas de gestión de seguridad.</li>
-                <li>**Despliegue de Habilidades:** Material audiovisual y formación para el *despliegue de capacidades* en su personal.</li>
+                <li>**Salud Ocupacional:** Mejora de **Ergonomía** en puestos de trabajo.</li>
+                <li>**Gestión de Riesgos:** Planes de **reducción de tasas de accidentes**.</li>
+                <li>**Despliegue de Habilidades:** Material audiovisual y consultoría profesional.</li>
+                <li>**Alianza:** Nos enfocamos en hacer de la seguridad una **ventaja competitiva, no un costo**.</li>
             </ul>
 
-            <h3 class="section-title">Misión ESSERVYO: El Motor del Cambio</h3>
+            <h3 class="section-title">Misión ESSERVYO</h3>
             <div class="mission">
-                <p>
-                    **ESSERVYO** (Empresa Salvadoreña De Servicios Y Otros) existe para identificar y generar un **cambio de cultura de Safety** y fortalecer la prevención de accidentes en El Salvador.
-                </p>
-                <blockquote>
+                <blockquote class="blockquote">
                     "FACILITAMOS SOLUCIONES EN **SALUD Y SEGURIDAD OCUPACIONAL** GARANTIZANDO UN CAMBIO DE **CULTURA ORGANIZACIONAL EN TEMAS DE SAFETY**" - **CÉSAR CAÑAS**
                 </blockquote>
             </div>
+            
+            <h3 class="section-title" id="contact">Inicie su Transformación Cultural Hoy 📧</h3>
 
-            <h3 class="section-title">Modalidad de Consultoría y Soporte</h3>
-            <div class="note-box">
-                **Modalidad de Soporte:** Nuestro modelo actual se enfoca en el soporte virtual eficiente, cumpliendo con los lineamientos oficiales y utilizando 3 sesiones de seguimiento para garantizar el entendimiento y el despliegue de los materiales.
+            <div class="contact-form-container">
+                <h3>Solicite una Consulta con la División PRO</h3>
+                <form id="esservyoContactForm">
+                    <label for="subject">Asunto</label>
+                    <input type="text" id="subject" name="_subject" value="Consulta Profesional - ESSERVYO PRO" readonly>
+
+                    <label for="name">Nombre del Contacto</label>
+                    <input type="text" id="name" name="Nombre" required>
+
+                    <label for="company">Nombre de la Empresa</label>
+                    <input type="text" id="company" name="Empresa" required>
+
+                    <label for="email">Correo Electrónico Corporativo</label>
+                    <input type="email" id="email" name="Email" required>
+
+                    <label for="phone">Número de WhatsApp</label>
+                    <input type="text" id="phone" name="WhatsApp" required>
+                    
+                    <label for="interest">Interés Principal</label>
+                    <select id="interest" name="Interes Principal" required>
+                        <option value="" disabled selected>Seleccione el área de interés</option>
+                        <option value="Cultura de Safety y Mindset">Cambio de Cultura de Safety y Mindset</option>
+                        <option value="Formacion y Capacitacion">Formación y Capacitación de Personal</option>
+                        <option value="Cumplimiento Legal y Documentacion">Cumplimiento Legal y Documentación</option>
+                        <option value="Reduccion Accidentes/Riesgos">Reducción de Accidentes y Evaluación de Riesgos</option>
+                        <option value="Proyectos Regionales">Consultoría para Proyectos Regionales (Honduras/Panamá)</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+
+                    <label for="message">Mensaje / Detalle de la Consulta</label>
+                    <textarea id="message" name="Mensaje" rows="4" placeholder="Describa brevemente lo que su empresa necesita..." required></textarea>
+
+                    <button type="submit">Enviar Solicitud de Consultoría</button>
+                </form>
+
+                <div id="esservyoLoader" style="display:none; text-align:center;">
+                    <img src="loading.gif" alt="Cargando..." style="width: 80px; margin-top: 15px;">
+                </div>
             </div>
 
-            <p style="text-align: center; font-size: 1.2em; margin-top: 40px; font-weight: bold;">
-                **¿Listo para convertir la seguridad en una inversión?** <br>
-                Contáctenos para iniciar la transformación cultural y profesional de su empresa.
-            </p>
         </div>
 
         <footer>
@@ -239,5 +300,35 @@
             <p>Socio del **Autocuidado Club** | ¡Todos cuidamos de todos porque en tu casa te esperan!</p>
         </footer>
     </div>
+    
+    <script>
+        document.getElementById('esservyoContactForm').onsubmit = function(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            const loader = document.getElementById('esservyoLoader');
+            loader.style.display = 'block'; // Show loader
+
+            // You must replace 'info@autocuidadoclub.com' with the actual ESSERVYO contact email if it is different.
+            fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+                method: 'POST',
+                body: new FormData(document.getElementById('esservyoContactForm'))
+            })
+            .then(response => response.json())
+            .then(data => {
+                loader.style.display = 'none'; // Hide loader
+                if (data.success) {
+                    alert('✅ ¡Gracias! Su solicitud de consultoría ha sido enviada con éxito. Pronto nos pondremos en contacto con usted.');
+                    document.getElementById('esservyoContactForm').reset();
+                } else {
+                    alert('❌ Hubo un error al enviar su solicitud. Por favor, inténtelo nuevamente o envíe un correo directo.');
+                }
+            })
+            .catch(error => {
+                loader.style.display = 'none'; // Hide loader
+                console.error('Error:', error);
+                alert('Hubo un error de conexión al enviar su mensaje. Verifique su conexión.');
+            });
+        };
+    </script>
 </body>
 </html>
