@@ -16,7 +16,7 @@
             --color-pro: #8e44ad; 
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger, professional shadow */
             --logo-size: 80px; 
-            --box-width: 280px;
+            --box-width: 280px; 
             --box-height: 120px; 
         }
 
@@ -50,7 +50,7 @@
             position: relative;
             width: 100%;
             max-width: 1000px; 
-            height: 1200px; /* Significantly increased height for separation */
+            height: 1200px; /* Provides vertical space for separation */
             margin: 0 auto;
         }
 
@@ -118,7 +118,7 @@
             height: var(--box-height);
             padding: 20px;
             background-color: white;
-            border-radius: 12px;
+            border-radius: 12px; /* Smooth corners */
             box-shadow: var(--shadow); 
             text-align: left;
             z-index: 15;
@@ -144,7 +144,7 @@
 
 
         /* POSICIONAMIENTO DE CAJAS (Desktop - Symmetrical) */
-        /* All boxes are placed far from the center (600px / 2 = 300px from center line) */
+        /* All boxes are placed far from the center (approx. 300px from center) */
         .pro-pos { top: 170px; left: 50%; transform: translateX(-50%); } 
         .club-pos { top: 310px; right: 50px; } 
         .fit-pos { top: 310px; left: 50px; } 
@@ -155,7 +155,7 @@
         /* --- VISTA MÓVIL (Stacking) --- */
         @media (max-width: 768px) {
             .ecosystem-diagram {
-                height: 1800px; /* Adjusted for maximum vertical separation */
+                height: 1800px; 
                 max-width: 90%;
             }
             .core-vision { top: 80px; width: 180px; height: 180px; } 
