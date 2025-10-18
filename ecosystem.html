@@ -1,9 +1,33 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecosistema AutoCuidado - Visión Integral</title>
+    <meta name="description" content="AutoCuidado Club - Tu servicio experto de mantenimiento personalizado para vehículos en El Salvador. Sin talleres. Sin filas. Sin excusas.">
+
+    <title>AutoCuidado Club - Inicio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <script>
+    (function(w, d) {
+        w.PushEngage = w.PushEngage || [];
+        w._peq = w._peq || [];
+        PushEngage.push(['init', {
+            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'  // Replace with your PushEngage appId
+        }]);
+
+        var e = d.createElement('script');
+        e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
+        e.async = true;
+        e.type = 'text/javascript';
+        d.head.appendChild(e);
+    })(window, document);
+    </script>
+        
     <style>
         /* Define tus colores de marca para fácil referencia */
         :root {
@@ -16,124 +40,44 @@
             --color-pro: #8e44ad; 
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.15); 
             --logo-size: 80px; 
-            --box-width: 180px; /* Smaller width for 5 boxes in a row */
-            --box-height: 140px; /* Taller height to compensate */
+            --box-width: 180px; 
+            --box-height: 140px; 
         }
 
-        /* Estilos base */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
+        /* Contenedor principal del diagrama */
+        .ecosystem-section {
+            padding: 40px 20px;
             background-color: #f8f8f8;
-        }
-        .ecosystem-container {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 20px;
             text-align: center;
         }
-        .ecosystem-title {
-            color: var(--color-core);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .ecosystem-tagline {
-            color: var(--color-accent);
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 3rem;
-        }
 
-        /* Contenedor del Diagrama - Ajustado para la disposición en fila */
-        .ecosystem-diagram {
-            position: relative;
-            width: 100%;
-            max-width: 1000px; /* Allows for 5 boxes + spacing */
-            height: 600px; /* Optimized height for this layout */
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column; /* Core at top, then row */
-            align-items: center;
-            justify-content: flex-start; /* Start from the top */
-        }
-
-        /* Círculo Central (Core Vision) - Aligned to top center */
-        .core-vision {
-            width: 220px;
-            height: 220px;
-            background-color: var(--color-core);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            z-index: 10;
-            border: 8px solid var(--color-accent);
-            box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7);
-            animation: pulse-core 2s infinite;
-            margin-bottom: 50px; /* Space before the row of boxes */
-        }
-        .core-text h3 { margin: 0 0 8px 0; font-size: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 8px; }
-        .core-text p { margin: 0; font-size: 1rem; padding: 0 20px; }
-        @keyframes pulse-core {
-            0% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(255, 102, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
-        }
-
-        /* Contenedor para las 5 divisiones en fila */
+        /* Contenedor de la fila de divisiones */
         .divisions-row {
             display: flex;
-            justify-content: space-around; /* Distribute evenly */
-            align-items: flex-start; /* Align tops of boxes */
+            justify-content: space-around;
+            align-items: flex-start;
             width: 100%;
             max-width: 1000px; /* Control max width */
-            gap: 20px; /* Space between boxes */
-            position: relative; /* For lines */
-            z-index: 10;
-        }
-        /* Make space for the lines */
-        .divisions-row::before {
-            content: '';
-            position: absolute;
-            top: -50px; /* Position above boxes */
-            left: 50%;
-            width: calc(100% - 100px); /* Span the width of the boxes */
-            height: 2px;
-            background-color: #ccc;
-            transform: translateX(-50%);
-            z-index: -1; /* Behind other elements */
+            margin: 40px auto 0 auto; /* Spacing below the header */
+            gap: 20px;
         }
 
-        /* Connector Lines from core to row (Vertical drop from central line) */
-        .line-to-box {
-            position: absolute;
-            width: 2px;
-            height: 50px; /* Length of vertical drop */
-            background-color: #ccc;
-            top: -50px; /* Connects to the main horizontal line */
-            z-index: 5;
-            transform: translateX(-50%); /* Center the line relative to its box */
+        /* Logo Orbs */
+        .division-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
-        /* Specific positioning for each line, relative to its box */
-        .pro-line { left: calc(20% - (var(--box-width) / 2) + 10%); } /* Example calculation, adjust */
-        .fit-line { left: calc(40% - (var(--box-width) / 2) + 10%); }
-        .club-line { left: calc(60% - (var(--box-width) / 2) + 10%); }
-        .ice-line { left: calc(80% - (var(--box-width) / 2) + 10%); }
-        .home-line { left: calc(100% - (var(--box-width) / 2) + 10%); }
 
-
-        /* Logo Orbs (a.logo-link) - Above boxes, relative to the box */
         a.logo-link {
             text-decoration: none;
             width: var(--logo-size);
             height: var(--logo-size);
-            z-index: 20;
             border-radius: 50%;
             transition: transform 0.3s;
-            position: absolute; /* Relative to ecosystem-diagram, then adjusted */
+            margin-bottom: 10px; /* Space between logo and box */
+            display: block;
         }
         a.logo-link:hover { transform: scale(1.1); }
 
@@ -143,30 +87,20 @@
         }
         .logo-orb img { width: 85%; height: 85%; object-fit: contain; }
         
-        /* Positioning of Logos (Desktop - Above the Boxes) */
-        /* These will be absolute positions relative to .ecosystem-diagram */
-        .pro-logo-link { top: 280px; left: 80px; border: 3px solid var(--color-pro); } 
-        .fit-logo-link { top: 280px; left: 260px; border: 3px solid var(--color-fit); } 
-        .club-logo-link { top: 280px; left: 440px; border: 3px solid var(--color-club); } 
-        .ice-logo-link { top: 280px; left: 620px; border: 3px solid var(--color-ice); } 
-        .home-logo-link { top: 280px; left: 800px; border: 3px solid var(--color-home); } 
-
-
         /* Enlace Contenedor (a.division-link) */
         a.division-link { 
             text-decoration: none; 
             color: inherit; 
-            width: var(--box-width); /* Important for flex item sizing */
-            flex-shrink: 0; /* Prevent shrinking in flex container */
-            display: block; /* To apply width/height correctly */
-            z-index: 15;
+            width: var(--box-width); 
+            flex-shrink: 0;
+            display: block;
         }
         
         /* Estilo de las Cajas de División */
         .division {
-            width: 100%; /* Fill parent link width */
+            width: 100%; 
             height: var(--box-height);
-            padding: 15px; /* Slightly less padding due to smaller width */
+            padding: 15px; 
             background-color: white;
             border-radius: 12px;
             box-shadow: var(--shadow); 
@@ -185,74 +119,68 @@
         .division .icon { font-size: 1.5rem; margin-right: 8px; }
 
         /* Color Coding */
-        .club { border: 2px solid var(--color-club); } .club h4, .club .division-header, .club .concept { color: var(--color-club); border-color: var(--color-club); }
-        .home { border: 2px solid var(--color-home); } .home h4, .home .division-header, .home .concept { color: var(--color-home); border-color: var(--color-home); }
-        .ice { border: 2px solid var(--color-ice); } .ice h4, .ice .division-header, .ice .concept { color: var(--color-ice); border-color: var(--color-ice); }
-        .fit { border: 2px solid var(--color-fit); } .fit h4, .fit .division-header, .fit .concept { color: var(--color-fit); border-color: var(--color-fit); }
         .pro { border: 2px solid var(--color-pro); } .pro h4, .pro .division-header, .pro .concept { color: var(--color-pro); border-color: var(--color-pro); }
-
-
-        /* POSICIONAMIENTO DE CAJAS (Desktop) - Managed by flexbox in .divisions-row */
-        .pro-pos { } 
-        .fit-pos { } 
-        .club-pos { } 
-        .ice-pos { } 
-        .home-pos { } 
+        .fit { border: 2px solid var(--color-fit); } .fit h4, .fit .division-header, .fit .concept { color: var(--color-fit); border-color: var(--color-fit); }
+        .club { border: 2px solid var(--color-club); } .club h4, .club .division-header, .club .concept { color: var(--color-club); border-color: var(--color-club); }
+        .ice { border: 2px solid var(--color-ice); } .ice h4, .ice .division-header, .ice .concept { color: var(--color-ice); border-color: var(--color-ice); }
+        .home { border: 2px solid var(--color-home); } .home h4, .home .division-header, .home .concept { color: var(--color-home); border-color: var(--color-home); }
 
 
         /* --- VISTA MÓVIL (Stacking) --- */
         @media (max-width: 768px) {
-            .ecosystem-diagram {
-                height: auto; /* Allow height to adjust for stacked content */
-                max-width: 90%;
-            }
-            .core-vision { top: auto; left: auto; transform: none; margin-bottom: 40px; } /* Reset core positioning */
-            
             .divisions-row {
                 flex-direction: column; /* Stack boxes vertically */
                 align-items: center; /* Center horizontally */
-                gap: 40px; /* More space between stacked boxes */
+                gap: 30px; /* Space between stacked groups */
             }
-            .divisions-row::before { display: none; } /* Hide horizontal line on mobile */
-            .line-to-box { display: none; } /* Hide vertical lines on mobile */
-
-            a.logo-link {
-                position: static; /* Remove absolute positioning */
-                transform: none;
-                margin-bottom: 10px; /* Space between logo and its box */
-            }
-
-            a.division-link { width: 95%; } /* Make boxes wider for mobile */
-            .division { height: auto; min-height: var(--box-height); padding: 15px; } /* Auto height */
-            .division p { min-height: 0; }
-            .division h4 { font-size: 1.1rem; }
-            .division .icon { font-size: 1.4rem; }
+            a.division-link { width: 90%; }
         }
     </style>
 </head>
+
 <body>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+            <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
+            <li><a href="tac.html">Términos y Condiciones</a></li>
+            <li class="has-dropdown">
+                <a href="/ecosystem" class="divisiones-badge">NUESTRAS DIVISIONES</a>
+                <ul class="dropdown-menu">
+                    <li><a href="ice.html">🧊 AutoCuidado ICE</a></li>
+                    <li><a href="esal.html" target="_blank">🏠 AutoCuidado HOME</a></li>
+                    <li><a href="eservyo.html" target="_blank">Seguridad y Salud Ocupacional</a></li>
+                    <li><a href="fit.html" target="_blank">🏠 AutoCuidado FIT</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+        </div>
+    </nav>
 
-    <div class="ecosystem-container">
-        <h2 class="ecosystem-title">El Ecosistema AutoCuidado</h2>
-        <p class="ecosystem-tagline">"Productividad, salud y confianza — en cada detalle."</p>
+    <header style="background: linear-gradient(to bottom, #002F6C, #003366); padding: 60px 20px; text-align: center;">
+        <div class="header-text">
+            <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">El Ecosistema AutoCuidado</h1>
+            <p style="color: white; font-size: 1.2em; max-width: 800px; margin: 0 auto;">
+                Cuidarte es nuestra misión. Empoderamos a las personas para vivir con más productividad, salud y bienestar.
+            </p>
+        </div>
+    </header>
 
-        <div class="ecosystem-diagram">
+    <section class="ecosystem-section">
+
+        <h2 style="color: var(--color-accent); font-size: 1.8rem; margin-bottom: 30px; font-weight: 600;">"Productividad, salud y confianza — en cada detalle."</h2>
+
+
+        <div class="divisions-row">
             
-            <div class="core-vision">
-                <div class="core-text">
-                    <h3>AutoCuidado</h3>
-                    <p>Cuidarte es nuestra misión. Empoderamos a las personas para vivir con más productividad, salud y bienestar.</p>
-                </div>
-            </div>
-
-            <div class="divisions-row">
-                <div class="line line-to-box pro-line"></div>
-                <div class="line line-to-box fit-line"></div>
-                <div class="line line-to-box club-line"></div>
-                <div class="line line-to-box ice-line"></div>
-                <div class="line line-to-box home-line"></div>
-
-                <a href="https://www.autocuidadoclub.com/pro" class="logo-link pro-logo-link">
+            <div class="division-group">
+                <a href="https://www.autocuidadoclub.com/pro" class="logo-link" style="border: 3px solid var(--color-pro);">
                     <div class="logo-orb"><img src="ruta/a/logo-esservyo.png" alt="Logo PRO"></div>
                 </a>
                 <a href="https://www.autocuidadoclub.com/pro" class="division-link pro-pos">
@@ -262,8 +190,10 @@
                         <span class="concept">Garantizando un entorno seguro para el autocuidado integral.</span>
                     </div>
                 </a>
-                
-                <a href="https://www.autocuidadoclub.com/fit" class="logo-link fit-logo-link">
+            </div>
+            
+            <div class="division-group">
+                <a href="https://www.autocuidadoclub.com/fit" class="logo-link" style="border: 3px solid var(--color-fit);">
                     <div class="logo-orb"><img src="ruta/a/logo-fit.png" alt="Logo FIT"></div>
                 </a>
                 <a href="https://www.autocuidadoclub.com/fit" class="division-link fit-pos">
@@ -273,8 +203,10 @@
                         <span class="concept">Cuida tu cuerpo, impulsa tu rendimiento.</span>
                     </div>
                 </a>
-                
-                <a href="https://www.autocuidadoclub.com" class="logo-link club-logo-link">
+            </div>
+            
+            <div class="division-group">
+                <a href="https://www.autocuidadoclub.com" class="logo-link" style="border: 3px solid var(--color-club);">
                     <div class="logo-orb"><img src="logo.jpg" alt="Logo CLUB"></div>
                 </a>
                 <a href="https://www.autocuidadoclub.com" class="division-link club-pos">
@@ -284,8 +216,10 @@
                         <span class="concept">Tu vehículo en buenas manos, tu vida en marcha.</span>
                     </div>
                 </a>
+            </div>
 
-                <a href="https://www.autocuidadoclub.com/ice" class="logo-link ice-logo-link">
+            <div class="division-group">
+                <a href="https://www.autocuidadoclub.com/ice" class="logo-link" style="border: 3px solid var(--color-ice);">
                     <div class="logo-orb"><img src="ice-logo.png" alt="Logo ICE"></div>
                 </a>
                 <a href="https://www.autocuidadoclub.com/ice" class="division-link ice-pos">
@@ -295,8 +229,10 @@
                         <span class="concept">Pureza, calidad y confianza, en cada cubo.</span>
                     </div>
                 </a>
+            </div>
 
-                <a href="https://www.autocuidadoclub.com/home" class="logo-link home-logo-link">
+            <div class="division-group">
+                <a href="https://www.autocuidadoclub.com/home" class="logo-link" style="border: 3px solid var(--color-home);">
                     <div class="logo-orb"><img src="ruta/a/logo-home.png" alt="Logo HOME"></div>
                 </a>
                 <a href="https://www.autocuidadoclub.com/home" class="division-link home-pos">
@@ -306,10 +242,9 @@
                         <span class="concept">Un hogar limpio es una mente productiva.</span>
                     </div>
                 </a>
-
             </div>
-        </div>
-    </div>
 
+        </div>
+    </section>
 </body>
 </html>
