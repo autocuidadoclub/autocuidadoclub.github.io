@@ -75,7 +75,7 @@
 
             document.getElementById("registerForm").addEventListener("submit", registerUser);
 
-         function registerUser(event) {
+function registerUser(event) {
   event.preventDefault();
   const loader = document.getElementById("loader");
   loader.style.display = "flex";
@@ -86,6 +86,7 @@
     return;
   }
 
+  // 🔹 Basic form fields
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const phone = document.getElementById("phone").value.trim();
@@ -94,8 +95,18 @@
   const municipality = document.getElementById("municipality").value;
   const selectedDay = document.getElementById("selectedDay").value;
   const selectedTime = document.getElementById("selectedTime").value;
-  const referredBy = document.getElementById("referredBy") ? document.getElementById("referredBy").value.trim() : "";
+  const referredBy = document.getElementById("referredBy")
+    ? document.getElementById("referredBy").value.trim()
+    : "";
 
+  // 🔹 Validate fields
+  if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
+    alert("❌ Todos los campos son obligatorios.");
+    loader.style.display = "none";
+    return;
+  }
+
+  // 🔹 Build vehicles (inspectionDates empty for staff)
   const vehicles = [];
   document.querySelectorAll(".vehicle-entry").forEach(entry => {
     vehicles.push({
@@ -103,18 +114,13 @@
       model: entry.querySelector(".model").value || "",
       brand: entry.querySelector(".brand").value || "",
       year: entry.querySelector(".year").value || "",
-      inspectionDates: []
+      inspectionDates: [] // ← staff will later add {date, note}
     });
   });
 
-  if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
-    alert("❌ Todos los campos son obligatorios.");
-    loader.style.display = "none";
-    return;
-  }
-
-  const stripeLinks = {
-      prueba: "https://u.wompi.sv/539830hfH",
+  // 🔹 Define Wompi payment links
+  const wompiLinks = {
+    prueba: "https://u.wompi.sv/539830hfH",
     basic3m: "https://u.wompi.sv/379910xeV",
     basic6m: "https://u.wompi.sv/380639rcA",
     basic12m: "https://u.wompi.sv/3806769qs",
@@ -127,17 +133,20 @@
     plus3mfull: "https://u.wompi.sv/387439i_2",
     plus6mfull: "https://u.wompi.sv/387445Beb",
     plus12mfull: "https://u.wompi.sv/387447ZDj"
-
   };
-  const checkoutLink = stripeLinks[selectedPlanType] || "";
+  const checkoutLink = wompiLinks[selectedPlanType] || "";
 
+  // 🔹 Create user in Firebase Auth
   auth.createUserWithEmailAndPassword(email, password)
     .then(userCredential => {
       const userId = userCredential.user.uid;
-      const paymentDate = new Date();
-      const nextPaymentDate = new Date();
+      const now = new Date();
+
+      const paymentDate = now;
+      const nextPaymentDate = new Date(now);
       nextPaymentDate.setMonth(paymentDate.getMonth() + 1);
 
+      // 🔹 Prepare user data for Firestore
       const userData = {
         uid: userId,
         name,
@@ -157,7 +166,7 @@
         paymentStatus: "Pending",
         subscriptionStatus: "active",
         monthsPaid: 0,
-        vehicles,
+        vehicles, // ✅ staff template expects this array
         freeRescheduleClaimed: false,
         loyaltyCycle: 0,
         lastLoyaltyReset: firebase.firestore.Timestamp.now(),
@@ -170,64 +179,41 @@
         CustomerId: "",
         referredBy,
         checkoutLink,
-          customerAwareOfPaymentVerification: false,
-customerAwareTimestamp: null,
-
+        customerAwareOfPaymentVerification: false,
+        customerAwareTimestamp: null
       };
 
+      // 🔹 Save new user document
       return db.collection("users").doc(userId).set(userData).then(() => userId);
     })
     .then(userId => {
+      // 🔹 Send notification to info@autocuidadoclub.com
       return fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
         method: "POST",
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
           email,
           phone,
-          subject: "new register in the platafform",
-          message: `Nuevo usuario registrado:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}`
+          subject: "Nuevo registro en AutoCuidado Club",
+          message: `Nuevo usuario:\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nPlan: ${selectedPlanType}`
         })
       }).then(() => userId);
     })
     .then(userId => {
       loader.style.display = "none";
-document.getElementById("successOverlay").style.display = "flex";
+      document.getElementById("successOverlay").style.display = "flex";
 
-// 🆕 After redirect or overlay close, restore scroll
-setTimeout(() => {
-  document.getElementById("successOverlay").style.display = "none";
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  window.location.href = "login.html"; // or checkout
-}, 2500);
+      setTimeout(() => {
+        document.getElementById("successOverlay").style.display = "none";
+        window.scrollTo({ top: 0, behavior: "smooth" });
 
-      // Get checkout link from Firestore or predefined
-const stripeLinks = {
-    prueba: "https://u.wompi.sv/539830hfH",
-   basic3m: "https://u.wompi.sv/379910xeV",
-    basic6m: "https://u.wompi.sv/380639rcA",
-    basic12m: "https://u.wompi.sv/3806769qs",
-    plus3m: "https://u.wompi.sv/380690Gbx",
-    plus6m: "https://u.wompi.sv/380695_Np",
-    plus12m: "https://u.wompi.sv/380702xQa",
-    basic3mfull: "https://u.wompi.sv/478091RVm",
-    basic6mfull: "https://u.wompi.sv/387432nHU",
-    basic12mfull: "https://u.wompi.sv/387433i2m",
-    plus3mfull: "https://u.wompi.sv/387439i_2",
-    plus6mfull: "https://u.wompi.sv/387445Beb",
-    plus12mfull: "https://u.wompi.sv/387447ZDj"
-};
+        // Open Wompi checkout in a new tab
+        if (checkoutLink) window.open(checkoutLink, "_blank");
 
-const checkoutLink = stripeLinks[selectedPlanType] || "";
-
-// 🆕 Open Stripe checkout in a new tab
-if (checkoutLink) {
-  window.open(checkoutLink, "_blank");
-}
-
-// ✅ Redirect current page to login.html
-window.location.href = "login.html";
-
+        // Redirect to login
+        window.location.href = "login.html";
+      }, 2500);
     })
     .catch(error => {
       console.error("❌ Error en el registro:", error.message);
@@ -235,9 +221,6 @@ window.location.href = "login.html";
       loader.style.display = "none";
     });
 }
-
-
-
             
            window.selectScheduleBox = function (cell) {
     const cells = document.querySelectorAll(".schedule-table tbody td");
