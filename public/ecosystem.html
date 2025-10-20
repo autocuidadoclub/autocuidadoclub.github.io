@@ -39,10 +39,10 @@
             --color-fit: #e74c3c;  
             --color-pro: #8e44ad;  
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);  
-            --logo-size: 80px;  
-            /* --- MODIFICACIONES CLAVE PARA AGRANDAR LAS CAJAS --- */
-            --box-width: 200px;  /* Aumentado de 180px a 200px */
-            --box-height: 180px; /* Aumentado de 140px a 180px para más espacio vertical */
+            /* --- TAMAÑOS AUMENTADOS --- */
+            --logo-size: 95px;  /* Aumentado de 80px a 95px */
+            --box-width: 220px; /* Aumentado de 200px a 220px */
+            --box-height: 200px;/* Aumentado de 180px a 200px */
         }
 
         /* Contenedor principal del diagrama */
@@ -55,11 +55,11 @@
         /* Contenedor de la fila de divisiones */
         .divisions-row {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between; /* Usar space-between para distribuir uniformemente */
             align-items: flex-start;
             width: 100%;
-            max-width: 1200px; /* Aumentar el max-width para dar más espacio horizontal */
-            margin: 40px auto 0 auto; /* Spacing below the header */
+            max-width: 1300px; /* Aumentado de 1200px a 1300px */
+            margin: 40px auto 0 auto; 
             gap: 20px;
         }
 
@@ -69,6 +69,8 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            flex-grow: 1; /* Permite que los grupos se expandan */
+            padding: 0 10px; /* Añade un poco de relleno entre grupos */
         }
 
         a.logo-link {
@@ -77,7 +79,7 @@
             height: var(--logo-size);
             border-radius: 50%;
             transition: transform 0.3s;
-            margin-bottom: 10px; /* Space between logo and box */
+            margin-bottom: 15px; /* Más espacio entre logo y caja */
             display: block;
         }
         a.logo-link:hover { transform: scale(1.1); }
@@ -100,36 +102,40 @@
         /* Estilo de las Cajas de División */
         .division {
             width: 100%;  
-            height: var(--box-height); /* Se adapta al nuevo tamaño */
-            padding: 15px;  
+            height: var(--box-height); 
+            padding: 18px;  /* Aumentar padding interno */
             background-color: white;
             border-radius: 12px;
             box-shadow: var(--shadow);  
             text-align: left;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
-            display: flex; /* Usar flexbox para asegurar que el contenido use todo el espacio */
+            display: flex; 
             flex-direction: column;
-            justify-content: space-between; /* Distribuye el espacio entre los elementos */
+            justify-content: space-between; 
         }
         a.division-link:hover .division { transform: scale(1.05); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
         .division-header {
             display: flex; justify-content: flex-start; align-items: center; 
-            margin-bottom: 5px;
+            margin-bottom: 8px; /* Más espacio */
             border-bottom: 2px solid; padding-bottom: 5px;
         }
-        .division h4 { font-size: 1.2rem; margin: 0; display: flex; align-items: center; font-weight: bold; }
+        .division h4 { font-size: 1.3rem; margin: 0; display: flex; align-items: center; font-weight: bold; }
         .division p { 
-            font-size: 1.0rem; /* Ligeramente más grande para llenar mejor el espacio */
+            font-size: 1.1rem; /* Más grande para el texto principal */
             color: #444; 
-            margin: 5px 0 10px 0; 
-            /* Se ha eliminado min-height: 35px; para permitir que el texto use más espacio vertical */
-            flex-grow: 1; /* Permite que el párrafo de descripción ocupe el espacio restante */
+            margin: 8px 0 12px 0; /* Más margen */
+            flex-grow: 1; 
+            line-height: 1.4; /* Mejora la legibilidad */
         }
         .division .concept { 
-            font-style: italic; font-size: 0.8rem; display: block; padding-top: 5px; font-weight: 600; 
+            font-style: italic; 
+            font-size: 0.9rem; /* Ligeramente más grande */
+            display: block; 
+            padding-top: 5px; 
+            font-weight: 600; 
         }
-        .division .icon { font-size: 1.5rem; margin-right: 8px; }
+        .division .icon { font-size: 1.6rem; margin-right: 10px; }
 
         /* Color Coding */
         .pro { border: 2px solid var(--color-pro); } .pro h4, .pro .division-header, .pro .concept { color: var(--color-pro); border-color: var(--color-pro); }
@@ -142,15 +148,14 @@
         /* --- VISTA MÓVIL (Stacking) --- */
         @media (max-width: 768px) {
             .divisions-row {
-                flex-direction: column; /* Stack boxes vertically */
-                align-items: center; /* Center horizontally */
-                gap: 30px; /* Space between stacked groups */
+                flex-direction: column; 
+                align-items: center; 
+                gap: 30px; 
             }
             a.division-link { 
                 width: 90%; 
-                max-width: var(--box-width); /* Limitar el ancho en móvil si es necesario */
+                max-width: var(--box-width); 
             }
-            /* En móvil, permite que la altura sea automática para que todo el texto quepa */
             .division {
                 height: auto; 
             }
@@ -169,14 +174,14 @@
         <div class="header-text">
             <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">El Ecosistema AutoCuidado</h1>
             <p style="color: white; font-size: 1.2em; max-width: 800px; margin: 0 auto;">
-                Cuidarte es nuestra misión. Empoderamos a las personas para vivir con más productividad, salud y bienestar.
+                Cuidarte es nuestra misión. **Empoderamos** a las personas para vivir con más **productividad, salud y bienestar.**
             </p>
         </div>
     </header>
 
     <section class="ecosystem-section">
 
-        <h2 style="color: var(--color-accent); font-size: 1.8rem; margin-bottom: 30px; font-weight: 600;">"Productividad, salud y confianza — en cada detalle."</h2>
+        <h2 style="color: var(--color-accent); font-size: 1.8rem; margin-bottom: 40px; font-weight: 600;">"Productividad, salud y confianza — en cada detalle."</h2>
 
 
         <div class="divisions-row">
@@ -188,7 +193,7 @@
                 <a href="https://www.autocuidadoclub.com/esservyo" class="division-link pro-pos">
                     <div class="division pro">
                         <div class="division-header"><h4><span class="icon">🛡️</span> PRO (ESSERVYO)</h4></div>
-                        <p>Consultoría, seguridad y salud ocupacional para empresas y espacios.</p>
+                        <p>Consultoría, **seguridad y salud ocupacional** para empresas y espacios.</p>
                         <span class="concept">Garantizando un entorno seguro para el autocuidado integral.</span>
                     </div>
                 </a>
@@ -201,7 +206,7 @@
                 <a href="https://www.autocuidadoclub.com/fit" class="division-link fit-pos">
                     <div class="division fit">
                         <div class="division-header"><h4><span class="icon">💪</span> FIT</h4></div>
-                        <p>Autocuidado físico, nutricional y mental para potenciar el rendimiento.</p>
+                        <p>**Autocuidado físico, nutricional y mental** para potenciar el rendimiento.</p>
                         <span class="concept">Cuida tu cuerpo, impulsa tu rendimiento.</span>
                     </div>
                 </a>
@@ -214,7 +219,7 @@
                 <a href="https://www.autocuidadoclub.com" class="division-link club-pos">
                     <div class="division club">
                         <div class="division-header"><h4><span class="icon">🚗</span> CLUB</h4></div>
-                        <p>Mantenimiento, seguridad y productividad automotriz, liberando tiempo.</p>
+                        <p>Mantenimiento, **seguridad y productividad automotriz**, liberando tiempo.</p>
                         <span class="concept">Tu vehículo en buenas manos, tu vida en marcha.</span>
                     </div>
                 </a>
@@ -227,7 +232,7 @@
                 <a href="https://www.autocuidadoclub.com/ice" class="division-link ice-pos">
                     <div class="division ice">
                         <div class="division-header"><h4><span class="icon">🧊</span> ICE</h4></div>
-                        <p>Hielo purificado, con registro sanitario y entrega directa para confiar.</p>
+                        <p>**Hielo purificado**, con registro sanitario y entrega directa para confiar.</p>
                         <span class="concept">Pureza, calidad y confianza, en cada cubo.</span>
                     </div>
                 </a>
@@ -240,7 +245,7 @@
                 <a href="https://www.autocuidadoclub.com/home" class="division-link home-pos">
                     <div class="division home">
                         <div class="division-header"><h4><span class="icon">🏠</span> HOME (ESAL)</h4></div>
-                        <p>Limpieza, salud y seguridad en el hogar con productos de calidad salvadoreña.</p>
+                        <p>**Limpieza, salud y seguridad** en el hogar con productos de calidad salvadoreña.</p>
                         <span class="concept">Un hogar limpio es una mente productiva.</span>
                     </div>
                 </a>
