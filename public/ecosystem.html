@@ -31,17 +31,18 @@
     <style>
         /* Define tus colores de marca para fácil referencia */
         :root {
-            --color-core: #002b5c; 
-            --color-accent: #ff6600; 
-            --color-club: #3a4e6e; 
-            --color-home: #1abc9c; 
-            --color-ice: #3498db; 
-            --color-fit: #e74c3c; 
-            --color-pro: #8e44ad; 
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15); 
-            --logo-size: 80px; 
-            --box-width: 180px; 
-            --box-height: 140px; 
+            --color-core: #002b5c;  
+            --color-accent: #ff6600;  
+            --color-club: #3a4e6e;  
+            --color-home: #1abc9c;  
+            --color-ice: #3498db;  
+            --color-fit: #e74c3c;  
+            --color-pro: #8e44ad;  
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);  
+            --logo-size: 80px;  
+            /* --- MODIFICACIONES CLAVE PARA AGRANDAR LAS CAJAS --- */
+            --box-width: 200px;  /* Aumentado de 180px a 200px */
+            --box-height: 180px; /* Aumentado de 140px a 180px para más espacio vertical */
         }
 
         /* Contenedor principal del diagrama */
@@ -57,7 +58,7 @@
             justify-content: space-around;
             align-items: flex-start;
             width: 100%;
-            max-width: 1000px; /* Control max width */
+            max-width: 1200px; /* Aumentar el max-width para dar más espacio horizontal */
             margin: 40px auto 0 auto; /* Spacing below the header */
             gap: 20px;
         }
@@ -98,24 +99,36 @@
         
         /* Estilo de las Cajas de División */
         .division {
-            width: 100%; 
-            height: var(--box-height);
-            padding: 15px; 
+            width: 100%;  
+            height: var(--box-height); /* Se adapta al nuevo tamaño */
+            padding: 15px;  
             background-color: white;
             border-radius: 12px;
-            box-shadow: var(--shadow); 
+            box-shadow: var(--shadow);  
             text-align: left;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
+            display: flex; /* Usar flexbox para asegurar que el contenido use todo el espacio */
+            flex-direction: column;
+            justify-content: space-between; /* Distribuye el espacio entre los elementos */
         }
         a.division-link:hover .division { transform: scale(1.05); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
         .division-header {
-            display: flex; justify-content: flex-start; align-items: center; margin-bottom: 5px;
+            display: flex; justify-content: flex-start; align-items: center; 
+            margin-bottom: 5px;
             border-bottom: 2px solid; padding-bottom: 5px;
         }
         .division h4 { font-size: 1.2rem; margin: 0; display: flex; align-items: center; font-weight: bold; }
-        .division p { font-size: 0.9rem; color: #444; margin: 5px 0 10px 0; min-height: 35px; }
-        .division .concept { font-style: italic; font-size: 0.8rem; display: block; padding-top: 5px; font-weight: 600; }
+        .division p { 
+            font-size: 1.0rem; /* Ligeramente más grande para llenar mejor el espacio */
+            color: #444; 
+            margin: 5px 0 10px 0; 
+            /* Se ha eliminado min-height: 35px; para permitir que el texto use más espacio vertical */
+            flex-grow: 1; /* Permite que el párrafo de descripción ocupe el espacio restante */
+        }
+        .division .concept { 
+            font-style: italic; font-size: 0.8rem; display: block; padding-top: 5px; font-weight: 600; 
+        }
         .division .icon { font-size: 1.5rem; margin-right: 8px; }
 
         /* Color Coding */
@@ -133,7 +146,14 @@
                 align-items: center; /* Center horizontally */
                 gap: 30px; /* Space between stacked groups */
             }
-            a.division-link { width: 90%; }
+            a.division-link { 
+                width: 90%; 
+                max-width: var(--box-width); /* Limitar el ancho en móvil si es necesario */
+            }
+            /* En móvil, permite que la altura sea automática para que todo el texto quepa */
+            .division {
+                height: auto; 
+            }
         }
     </style>
 </head>
