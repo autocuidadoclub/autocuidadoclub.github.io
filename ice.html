@@ -1,379 +1,336 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Autocuidado ICE - Compra tu Hielo Aquí</title>
-  <link rel="icon" href="ice-logo.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background-color: #C5E4EB;
-      color: #003344;
-    }
-
-    /* --- NEW NAVIGATION BAR STYLES --- */
-    .nav-bar {
-        background-color: #007799; /* Deep blue color for the box */
-        padding: 10px 20px;
-        color: white;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autocuidado ICE - Compra tu Hielo Aquí</title>
+  <link rel="icon" href="ice-logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    .nav-bar .divisiones-badge {
-        font-weight: 700;
-        font-size: 1rem;
-        display: block; /* Ensures it takes full width for padding/margin */
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #C5E4EB;
+      color: #003344;
+    }
+
+    header {
+      background-color: #003344;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      color: #fff;
+      font-size: 2rem;
+    }
+
+    header .highlight {
+      color: #FF6600;
+    }
+
+    .main-container {
+      display: flex;
+      justify-content: center;
+      /* Adjusted gap for better spacing */
+      gap: 40px; 
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /*
+    Removed fixed logo and combined the two columns for content. 
+    The logo will now be part of the right column's flow.
+    */
+    .left-column, .right-column {
+      flex: 1;
+      /* Adjusted min-width to ensure they stack on smaller screens */
+      min-width: 350px; 
+      /* Equalize the column widths for a nice 50/50 split on desktop */
+      max-width: 500px;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .box h2 {
+      color: #007799;
+      margin-top: 0;
+    }
+
+    .highlight {
+      color: #FF6600;
+    }
+
+    .btn {
+      background-color: #FF6600;
+      color: #fff;
+      padding: 12px 20px;
+      text-decoration: none;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      display: block; /* Make the button full width */
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .price-tag {
+      background: #FF6600;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 10px 0;
+    }
+
+    .price-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .price-list li {
+      background: #003344;
+      color: #fff;
+      margin: 8px 0;
+      padding: 12px 20px;
+      border-radius: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-family: 'Montserrat';
+      font-size: 1rem;
+    }
+    
+    label {
+        display: block;
         margin-bottom: 5px;
-        color: #C5E4EB; /* Lighter color for the title */
-        text-decoration: none;
+        font-weight: 700;
     }
 
-    .nav-bar .dropdown-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: none;
+      border-radius: 12px;
     }
 
-    .nav-bar .dropdown-menu li {
-        margin: 5px 0;
+    footer {
+      text-align: center;
+      color: #555;
+      padding: 40px 10px 20px;
+      clear: both; /* Ensures footer is below both columns */
     }
 
-    .nav-bar .dropdown-menu li a {
-        color: #ffffff;
-        text-decoration: none;
-        font-weight: 400;
-        transition: color 0.2s;
+    /* Styling for the logo within the column flow */
+    .logo-side {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    .nav-bar .dropdown-menu li a:hover {
-        color: #FF6600; /* Orange highlight on hover */
+    .logo-side img {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 12px;
     }
-    /* --- END NEW NAVIGATION BAR STYLES --- */
-
-    header {
-      background-color: #003344;
-      padding: 20px;
-      text-align: center;
-    }
-
-    header h1 {
-      color: #fff;
-      font-size: 2rem;
-    }
-
-    header .highlight {
-      color: #FF6600;
-    }
-
-    .main-container {
-      display: flex;
-      justify-content: center;
-      /* Adjusted gap for better spacing */
-      gap: 40px; 
-      flex-wrap: wrap;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    /*
-    Removed fixed logo and combined the two columns for content. 
-    The logo will now be part of the right column's flow.
-    */
-    .left-column, .right-column {
-      flex: 1;
-      /* Adjusted min-width to ensure they stack on smaller screens */
-      min-width: 350px; 
-      /* Equalize the column widths for a nice 50/50 split on desktop */
-      max-width: 500px;
-    }
-
-    .box {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-    }
-
-    .box h2 {
-      color: #007799;
-      margin-top: 0;
-    }
-
-    .highlight {
-      color: #FF6600;
-    }
-
-    .btn {
-      background-color: #FF6600;
-      color: #fff;
-      padding: 12px 20px;
-      text-decoration: none;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      display: block; /* Make the button full width */
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .price-tag {
-      background: #FF6600;
-      color: #fff;
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border-radius: 8px;
-      display: inline-block;
-      margin: 10px 0;
-    }
-
-    .price-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .price-list li {
-      background: #003344;
-      color: #fff;
-      margin: 8px 0;
-      padding: 12px 20px;
-      border-radius: 8px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0 15px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-family: 'Montserrat';
-      font-size: 1rem;
-    }
-    
-    label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 700;
-    }
-
-    iframe {
-      width: 100%;
-      height: 400px;
-      border: none;
-      border-radius: 12px;
-    }
-
-    footer {
-      text-align: center;
-      color: #555;
-      padding: 40px 10px 20px;
-      clear: both; /* Ensures footer is below both columns */
-    }
-
-    /* Styling for the logo within the column flow */
-    .logo-side {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .logo-side img {
-      width: 100%;
-      max-width: 250px;
-      border-radius: 12px;
-    }
-    
-    /* Remove fixed positioning for simplicity and better two-column flow */
-    @media (min-width: 768px) {
-        .logo-side {
-            margin-top: 0;
-        }
-    }
-  </style>
+    
+    /* Remove fixed positioning for simplicity and better two-column flow */
+    @media (min-width: 768px) {
+        .logo-side {
+            margin-top: 0;
+        }
+    }
+  </style>
 
 </head>
-  
-  <body>
-    <div class="nav-bar">
-        <a href="/ecosystem" class="divisiones-badge">CONOCE NUESTRAS DIVISIONES</a>
-        <ul class="dropdown-menu">
-            <li><a href="ice.html">🧊 AutoCuidado ICE</a></li>
-            <li><a href="esal.html">🏠 AutoCuidado HOME</a></li>
-            <li><a href="esservyo.html">Seguridad y Salud Ocupacional</a></li>
-            <li><a>🏠 AutoCuidado FIT</a></li>
+  
+  <body>
+  <header>
+    <h1>Autocuidado <span class="highlight">ICE</span></h1>
+  </header>
+
+  <div class="main-container">
+    <div class="left-column">
+      <div class="box">
+        <h2>Hielo Potable - 5 lb</h2>
+        <p>¡Hielo para tomar! <span class="highlight">Registro Sanitario</span>. Calidad pura, ideal para bebidas, bolsas selladas.</p>
+        <span class="price-tag">$2.00 c/u</span>
+      </div>
+
+      <div class="box">
+        <h2>Hielo para helar Bebidas o Neveras.</h2>
+        <ul class="price-list">
+          <li>$10.00 - 50 lb</li>
+          <li>$20.00 - 100 lb</li>
         </ul>
+      </div>
+
+      <div style="background: linear-gradient(90deg, #0077cc, #00bfff); color: white; padding: 14px 18px; text-align: center; border-radius: 12px; font-weight: 600; font-size: 1rem; margin-bottom: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  🚚 <strong>Entrega GRATIS en pedidos de hielo a partir de los $10.00</strong> 🧊<br>
+  <button style="margin-top: 6px; background-color: #ff6600; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+    ¡Pide Ahora!
+  </button>
+</div>
+
+      
+      <div class="box">
+        <h2>Opciones de Pago</h2>
+        <p>💳 Tarjeta de crédito y débito</p>
+        <p>₿ Bitcoin</p>
+        <p>🏦 Transferencia bancaria</p>
+        <p>💵 Efectivo contra entrega</p>
+        <p>✔️ Tasa Cero Banco Agrícola (desde $50)</p>
+        </div>
+      
+       <div class="box">
+        <h2>Mapa de Cobertura y Encuentros ICE</h2>
+        <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F"></iframe>
+      </div>
     </div>
-      <header>
-    <h1>Autocuidado <span class="highlight">ICE</span></h1>
-  </header>
 
-  <div class="main-container">
-    <div class="left-column">
-      <div class="box">
-        <h2>Hielo Potable - 5 lb</h2>
-        <p>¡Hielo para tomar! <span class="highlight">Registro Sanitario</span>. Calidad pura, ideal para bebidas, bolsas selladas.</p>
-        <span class="price-tag">$2.00 c/u</span>
-      </div>
+    <div class="right-column">
+      <div class="logo-side">
+        <img src="ice-logo.png" alt="Autocuidado ICE Logo">
+      </div>
+      
+      <div class="box">
+        <h2>Ordena tu Hielo</h2>
+        <label for="potableQty">Hielo Potable 5 lb:</label>
+        <input type="number" id="potableQty" min="0" value="0" oninput="updateTotal()">
 
-      <div class="box">
-        <h2>Hielo para helar Bebidas o Neveras.</h2>
-        <ul class="price-list">
-          <li>$10.00 - 50 lb</li>
-          <li>$20.00 - 100 lb</li>
-        </ul>
-      </div>
+        <label for="hielo50Qty">Hielo 50 lb:</label>
+        <input type="number" id="hielo50Qty" min="0" value="0" oninput="updateTotal()">
 
-      <div style="background: linear-gradient(90deg, #0077cc, #00bfff); color: white; padding: 14px 18px; text-align: center; border-radius: 12px; font-weight: 600; font-size: 1rem; margin-bottom: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-  🚚 <strong>Entrega GRATIS en pedidos de hielo a partir de los $10.00</strong> 🧊<br>
-  <button style="margin-top: 6px; background-color: #ff6600; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-    ¡Pide Ahora!
-  </button>
-</div>
+        <label for="hielo100Qty">Hielo 100 lb:</label>
+        <input type="number" id="hielo100Qty" min="0" value="0" oninput="updateTotal()">
 
-      
-      <div class="box">
-        <h2>Opciones de Pago</h2>
-        <p>💳 Tarjeta de crédito y débito</p>
-        <p>₿ Bitcoin</p>
-        <p>🏦 Transferencia bancaria</p>
-        <p>💵 Efectivo contra entrega</p>
-        <p>✔️ Tasa Cero Banco Agrícola (desde $50)</p>
-        </div>
-      
-       <div class="box">
-        <h2>Mapa de Cobertura y Encuentros ICE</h2>
-        <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F"></iframe>
-      </div>
-    </div>
+        <label for="location">Ubicación para entrega:</label>
+        <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje">
 
-    <div class="right-column">
-      <div class="logo-side">
-        <img src="ice-logo.png" alt="Autocuidado ICE Logo">
-      </div>
-      
-      <div class="box">
-        <h2>Ordena tu Hielo</h2>
-        <label for="potableQty">Hielo Potable 5 lb:</label>
-        <input type="number" id="potableQty" min="0" value="0" oninput="updateTotal()">
+        <label for="municipality">Municipio:</label>
+        <input type="text" id="municipality" placeholder="Ej: Anamoros, San Vicente">
 
-        <label for="hielo50Qty">Hielo 50 lb:</label>
-        <input type="number" id="hielo50Qty" min="0" value="0" oninput="updateTotal()">
+        <label for="name">Nombre de quien recibe:</label>
+        <input type="text" id="name">
 
-        <label for="hielo100Qty">Hielo 100 lb:</label>
-        <input type="number" id="hielo100Qty" min="0" value="0" oninput="updateTotal()">
+        <h3>Total: $<span id="totalAmount">0.00</span></h3>
+        <p id="promoMessage" style="color: green; font-weight: bold;"></p>
 
-        <label for="location">Ubicación para entrega:</label>
-        <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje">
+        <label for="paymentMethod">Método de Pago:</label>
+        <select id="paymentMethod">
+          <option value="Efectivo contra entrega">Efectivo contra entrega</option>
+          <option value="Tarjeta">Tarjeta</option>
+          <option value="Bitcoin">Bitcoin</option>
+          <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero (desde $50)</option>
+        </select>
 
-        <label for="municipality">Municipio:</label>
-        <input type="text" id="municipality" placeholder="Ej: Anamoros, San Vicente">
+        <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
+      </div>
+      
+      <div class="box">
+        <h2>¿También te interesan los Autos?</h2>
+        <p>Conoce nuestro servicio de mantenimiento de vehículos.</p>
+        <a href="https://autocuidadoclub.com/ecosystem.html" class="btn" target="_blank">Conoce nuestro ecosistema del AutoCuidado</a>
+      </div>
+    </div>
+  </div>
 
-        <label for="name">Nombre de quien recibe:</label>
-        <input type="text" id="name">
-
-        <h3>Total: $<span id="totalAmount">0.00</span></h3>
-        <p id="promoMessage" style="color: green; font-weight: bold;"></p>
-
-        <label for="paymentMethod">Método de Pago:</label>
-        <select id="paymentMethod">
-          <option value="Efectivo contra entrega">Efectivo contra entrega</option>
-          <option value="Tarjeta">Tarjeta</option>
-          <option value="Bitcoin">Bitcoin</option>
-          <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero (desde $50)</option>
-        </select>
-
-        <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
-      </div>
-      
-      <div class="box">
-        <h2>¿También te interesan los Autos?</h2>
-        <p>Conoce nuestro servicio de mantenimiento de vehículos.</p>
-        <a href="https://autocuidadoclub.com" class="btn" target="_blank">Ir a Autocuidado Club</a>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    Powered by AutocuidadoClub.com
-  </footer>
+  <footer>
+    Powered by AutocuidadoClub.com
+  </footer>
 
 
+<!-- CTA Footer -->
 <div id="cta-install-bar" style="display:none;">
-     <div class="cta-message">
-  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+     <div class="cta-message">
+  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
 </div>
 
-      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
-      <a href="contacto.html">💬 Contácta con nuestro staff</a>
-      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
+      <a href="contacto.html">💬 Contácta con nuestro staff</a>
+      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
+    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
 
-    </div>
-  </div>
+    </div>
+  </div>
 
-  <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-  
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
-    <button onclick="closeFeedbackModal()" style="
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #ff0000;
-      font-weight: bold;
-    ">❌</button>
-  </div>
+  <!-- Feedback Modal -->
+<!-- Feedback Modal -->
+<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
+    <button onclick="closeFeedbackModal()" style="
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #ff0000;
+      font-weight: bold;
+    ">❌</button>
+  </div>
 
-  <form id="voiceFeedbackForm">
-    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-    <div style="display:flex; justify-content:space-between;">
-      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
-      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
-    </div>
-  </form>
+  <form id="voiceFeedbackForm">
+    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between;">
+      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
+      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
+    </div>
+  </form>
 
-  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-    <img src="loading.gif" alt="Cargando..." style="width:80px;">
-  </div>
+  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+    <img src="loading.gif" alt="Cargando..." style="width:80px;">
+  </div>
 
-  </div>
+  </div>
 </div>
 
 
+<!-- Botón para volver a mostrar el menú -->
 <button id="reopen-cta-btn" style="
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 13px;
-  cursor: pointer;
-  z-index: 9999;
-  opacity: 0;
-  max-width: 180px;
-  width: auto;
-  white-space: nowrap;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 9999;
+  opacity: 0;
+  max-width: 180px;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 ">
 📲 Abrir menú
 </button>
@@ -381,210 +338,210 @@
 
 
 
-  <script>
-     let deferredPrompt = null;
+  <script>
+     let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Stop the browser from showing the default prompt
-  e.preventDefault();
-  deferredPrompt = e;
+  // Stop the browser from showing the default prompt
+  e.preventDefault();
+  deferredPrompt = e;
 
-  // Optional: you could show the button ONLY when install is available
-  document.getElementById('how-to-install-btn').style.display = 'inline-block';
+  // Optional: you could show the button ONLY when install is available
+  document.getElementById('how-to-install-btn').style.display = 'inline-block';
 });
 
 document.getElementById('how-to-install-btn').addEventListener('click', async () => {
-  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
 
-  if (deferredPrompt) {
-    // If install is supported, show browser-native prompt
-    deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
-    if (choiceResult.outcome === 'accepted') {
-      console.log('✅ User accepted the install prompt');
-    } else {
-      console.log('❌ User dismissed the install prompt');
-    }
-    deferredPrompt = null;
-  } else if (isIos) {
-    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-  } else if (isAndroid) {
-    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
-  } else {
-    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
-  }
+  if (deferredPrompt) {
+    // If install is supported, show browser-native prompt
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === 'accepted') {
+      console.log('✅ User accepted the install prompt');
+    } else {
+      console.log('❌ User dismissed the install prompt');
+    }
+    deferredPrompt = null;
+  } else if (isIos) {
+    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+  } else if (isAndroid) {
+    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
+  } else {
+    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
+  }
 });
-    function openFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'flex';
-      document.getElementById('feedbackText').focus();
-    }
+    function openFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'flex';
+      document.getElementById('feedbackText').focus();
+    }
 
-    function closeFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'none';
-      document.getElementById('voiceFeedbackForm').reset();
-      document.getElementById('feedbackLoader').style.display = 'none';
-    }
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'none';
+      document.getElementById('voiceFeedbackForm').reset();
+      document.getElementById('feedbackLoader').style.display = 'none';
+    }
 
-    function startVoiceInput() {
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        alert("Tu navegador no soporta reconocimiento de voz.");
-        return;
-      }
+    function startVoiceInput() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz.");
+        return;
+      }
 
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'es-ES';
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'es-ES';
 
-      const feedbackText = document.getElementById('feedbackText');
-      feedbackText.placeholder = "🎙️ Escuchando...";
-      feedbackText.style.border = "2px solid orange";
+      const feedbackText = document.getElementById('feedbackText');
+      feedbackText.placeholder = "🎙️ Escuchando...";
+      feedbackText.style.border = "2px solid orange";
 
-      recognition.onresult = (event) => {
-        const result = event.results[0][0].transcript;
-        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-      };
+      recognition.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
 
-      recognition.onerror = (event) => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-        alert("Error de voz: " + event.error);
-      };
+      recognition.onerror = (event) => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+        alert("Error de voz: " + event.error);
+      };
 
-      recognition.onend = () => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-      };
+      recognition.onend = () => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
 
-      recognition.start();
-    }
+      recognition.start();
+    }
 
-   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
+   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
 
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
-
-      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
-      e.preventDefault();
-      document.getElementById('feedbackLoader').style.display = 'block';
-
-      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: "POST",
-        body: new FormData(this)
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        if (data.success) {
-          alert("¡Gracias por tu opinión!");
-          closeFeedbackModal();
-        } else {
-          alert("Error al enviar. Intenta de nuevo.");
-        }
-      })
-      .catch(() => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        alert("Hubo un problema al enviar el mensaje.");
-      });
-    };
-
-      function closeCtaInstallBar() {
-    const ctaBar = document.getElementById('cta-install-bar');
-    const reopenBtn = document.getElementById('reopen-cta-btn');
-
-    // Animación suave antes de ocultarlo
-    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-    ctaBar.style.opacity = '0';
-    ctaBar.style.transform = 'translateY(20px)';
-
-    setTimeout(() => {
-      ctaBar.style.display = 'none';
-
-      // Mostrar botón flotante después de 5 segundos
-      setTimeout(() => {
-        reopenBtn.style.display = 'block';
-        setTimeout(() => {
-          reopenBtn.style.opacity = '1';
-        }, 10);
-      }, 5000);
-    }, 300); // esperar a que termine la transición
-  }
-
-      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
-
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
 });
 
-  </script>
+      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
+      e.preventDefault();
+      document.getElementById('feedbackLoader').style.display = 'block';
 
-  
-  <script>
-    function updateTotal() {
-      const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
-      const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
-      const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
+      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        body: new FormData(this)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        if (data.success) {
+          alert("¡Gracias por tu opinión!");
+          closeFeedbackModal();
+        } else {
+          alert("Error al enviar. Intenta de nuevo.");
+        }
+      })
+      .catch(() => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        alert("Hubo un problema al enviar el mensaje.");
+      });
+    };
 
-      // Prices: 5lb @ 2.00, 50lb @ 10, 100lb @ 20
-      const total = (potableQty * 2.0) + (hielo50Qty * 10) + (hielo100Qty * 20);
-      document.getElementById("totalAmount").textContent = total.toFixed(2);
+      function closeCtaInstallBar() {
+    const ctaBar = document.getElementById('cta-install-bar');
+    const reopenBtn = document.getElementById('reopen-cta-btn');
 
-      const promo = document.getElementById("promoMessage");
-      promo.textContent = total >= 50 ? "¡Aplica para Tasa Cero Banco Agrícola!" : "";
-    }
+    // Animación suave antes de ocultarlo
+    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    ctaBar.style.opacity = '0';
+    ctaBar.style.transform = 'translateY(20px)';
 
-    function sendOrder() {
-      const potableQty = document.getElementById("potableQty").value;
-      const hielo50Qty = document.getElementById("hielo50Qty").value;
-      const hielo100Qty = document.getElementById("hielo100Qty").value;
-      const location = document.getElementById("location").value.trim();
-      const municipality = document.getElementById("municipality").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const paymentMethod = document.getElementById("paymentMethod").value;
-      const total = document.getElementById("totalAmount").textContent;
-      
-      // WhatsApp number (example from original code: +503 7570 4428)
-      const whatsappNumber = "50375704428"; 
+    setTimeout(() => {
+      ctaBar.style.display = 'none';
 
-      if ((!potableQty && !hielo50Qty && !hielo100Qty) || !location || !name) {
-        alert("Por favor, completa la cantidad de al menos un producto, la ubicación, y tu nombre.");
-        return;
-      }
+      // Mostrar botón flotante después de 5 segundos
+      setTimeout(() => {
+        reopenBtn.style.display = 'block';
+        setTimeout(() => {
+          reopenBtn.style.opacity = '1';
+        }, 10);
+      }, 5000);
+    }, 300); // esperar a que termine la transición
+  }
 
-      let message = `*ORDEN DE HIELO*\n\n`;
-      message += `*Productos:*\n`;
-      if (potableQty > 0) message += `🧊 ${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
-      if (hielo50Qty > 0) message += `🧊 ${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
-      if (hielo100Qty > 0) message += `🧊 ${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
-      message += `\n*Total Estimado: $${total}*\n`;
-      message += `*Método de pago:* ${paymentMethod}\n`;
-      message += `\n*Detalles de Entrega:*\n`;
-      message += `*Nombre:* ${name}\n`;
-      message += `*Municipio:* ${municipality}\n`;
-      message += `*Ubicación:* ${location}\n`;
+      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
+  </script>
+
+  
+  <script>
+    function updateTotal() {
+      const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
+      const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
+      const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
+
+      // Prices: 5lb @ 2.00, 50lb @ 10, 100lb @ 20
+      const total = (potableQty * 2.0) + (hielo50Qty * 10) + (hielo100Qty * 20);
+      document.getElementById("totalAmount").textContent = total.toFixed(2);
+
+      const promo = document.getElementById("promoMessage");
+      promo.textContent = total >= 50 ? "¡Aplica para Tasa Cero Banco Agrícola!" : "";
+    }
+
+    function sendOrder() {
+      const potableQty = document.getElementById("potableQty").value;
+      const hielo50Qty = document.getElementById("hielo50Qty").value;
+      const hielo100Qty = document.getElementById("hielo100Qty").value;
+      const location = document.getElementById("location").value.trim();
+      const municipality = document.getElementById("municipality").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const paymentMethod = document.getElementById("paymentMethod").value;
+      const total = document.getElementById("totalAmount").textContent;
+      
+      // WhatsApp number (example from original code: +503 7570 4428)
+      const whatsappNumber = "50375704428"; 
+
+      if ((!potableQty && !hielo50Qty && !hielo100Qty) || !location || !name) {
+        alert("Por favor, completa la cantidad de al menos un producto, la ubicación, y tu nombre.");
+        return;
+      }
+
+      let message = `*ORDEN DE HIELO*\n\n`;
+      message += `*Productos:*\n`;
+      if (potableQty > 0) message += `🧊 ${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
+      if (hielo50Qty > 0) message += `🧊 ${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
+      if (hielo100Qty > 0) message += `🧊 ${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
+      message += `\n*Total Estimado: $${total}*\n`;
+      message += `*Método de pago:* ${paymentMethod}\n`;
+      message += `\n*Detalles de Entrega:*\n`;
+      message += `*Nombre:* ${name}\n`;
+      message += `*Municipio:* ${municipality}\n`;
+      message += `*Ubicación:* ${location}\n`;
 
 
-      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    }
+      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    }
 
-    // Removing the scroll event for the now-static logo.
-    // The previous scroll function is not needed if the logo is static.
-    /*
-    document.addEventListener('scroll', function () {
-      //...
-    });
-    */
+    // Removing the scroll event for the now-static logo.
+    // The previous scroll function is not needed if the logo is static.
+    /*
+    document.addEventListener('scroll', function () {
+      //...
+    });
+    */
 
-  </script>
+  </script>
 </body>
 </html>
