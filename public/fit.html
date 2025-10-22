@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCuidado FIT - Cuidá tu cuerpo, cuidá tu carro</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons for aesthetic use -->
+    <script type="module">
+        import lucide from 'https://cdn.jsdelivr.net/npm/lucide-esm@latest/umd/lucide.js';
+        lucide.createIcons();
+    </script>
+    <!-- Load Firebase Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Firestore and Auth Setup (Mandatory for real-world apps)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth, userId = null;
+
+        const initFirebase = async () => {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.warn("Firebase config is empty. Running in mock mode.");
+                    document.getElementById('auth-status').textContent = 'Estado: No conectado (Config faltante)';
+                    return;
+                }
+
+                setLogLevel('Debug');
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                const statusEl = document.getElementById('auth-status');
+                
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        statusEl.textContent = `Estado: Conectado | User ID: ${userId.substring(0, 8)}...`;
+                        console.log("User authenticated:", userId);
+
+                        // Example Firestore Listener (Private Data)
+                        const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/metadata`, 'fit-profile');
+                        onSnapshot(userDocRef, (docSnap) => {
+                            const userStatusEl = document.getElementById('user-profile-status');
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                userStatusEl.textContent = data.isRegistered ? '✅ Registrado FIT' : '❌ No Registrado';
+                            } else {
+                                userStatusEl.textContent = '❌ No Registrado';
+                                // Initialize profile if it doesn't exist (optional)
+                                setDoc(userDocRef, { isRegistered: false, joinedAt: new Date().toISOString() }, { merge: true }).catch(console.error);
+                            }
+                        }, (error) => {
+                            console.error("Error listening to user profile:", error);
+                        });
+
+                    } else {
+                        userId = 'anonymous';
+                        statusEl.textContent = 'Estado: Anónimo';
+                        console.log("User signed out or is anonymous.");
+                    }
+                });
+
+                // Sign in using the custom token or anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                document.getElementById('auth-status').textContent = `Error: ${error.message}`;
+            }
+        };
+
+        window.onload = initFirebase;
+        window.signOutUser = () => {
+            if (auth) signOut(auth).catch(e => console.error("Sign out error:", e));
+        };
+    </script>
+    <style>
+        /* Custom Colors based on the brief */
+        :root {
+            --color-primary: #002F6C;
+            --color-secondary-fit: #00A86B; /* Fresh green for health & vitality */
+            --color-accent: #F6C90E; /* Energy yellow */
+            --color-background: #F9FAFB;
+            --color-text: #1A1A1A;
+        }
+        /* Custom Tailwind Configuration (Optional, but useful for applying colors easily) */
+        .bg-primary { background-color: var(--color-primary); }
+        .text-primary { color: var(--color-primary); }
+        .bg-secondary-fit { background-color: var(--color-secondary-fit); }
+        .text-secondary-fit { color: var(--color-secondary-fit); }
+        .bg-accent { background-color: var(--color-accent); }
+        .text-accent { color: var(--color-accent); }
+
+        .btn-primary {
+            background-color: var(--color-secondary-fit);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 168, 107, 0.4);
+        }
+        .btn-primary:hover {
+            background-color: #008f58; /* Darker green */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 168, 107, 0.6);
+        }
+
+        .fit-gradient-header {
+            /* Gradient: linear-gradient(to right, #002F6C, #00A86B) */
+            background: linear-gradient(to right, var(--color-primary), var(--color-secondary-fit));
+        }
+
+        .fit-shadow {
+            box-shadow: 0 10px 20px -5px rgba(0, 47, 108, 0.1);
+        }
+
+        /* Set default font to Inter for clean aesthetics */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text);
+            background-color: var(--color-background);
+        }
+
+        /* Animation for the hero text */
+        @keyframes fadeInMoveUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-hero-text {
+            animation: fadeInMoveUp 1s ease-out forwards;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- 🏁 Header Section -->
+    <header class="fit-gradient-header shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between">
+            <!-- Logo/Brand -->
+            <a href="#" class="flex items-center space-x-2 text-white font-bold text-2xl">
+                <span class="text-accent">AutoCuidado</span> <span class="text-white">FIT</span>
+            </a>
+            
+            <!-- Tagline for Mobile/Desktop -->
+            <p class="text-white text-sm md:text-base font-light italic mt-2 md:mt-0 order-3 md:order-2 w-full md:w-auto text-center md:text-left">
+                “Cuidá tu cuerpo, mientras cuidamos tu carro.”
+            </p>
+
+            <!-- Buttons -->
+            <div class="flex space-x-3 order-2 md:order-3">
+                <button class="bg-white text-primary px-4 py-2 text-sm font-semibold rounded-full hover:bg-gray-100 transition duration-300">
+                    Ver Gimnasios Aliados
+                </button>
+                <button class="bg-accent text-primary px-4 py-2 text-sm font-bold rounded-full hover:bg-yellow-400 transition duration-300">
+                    Unirme a AutoCuidado FIT
+                </button>
+            </div>
+        </div>
+        <!-- Auth Status for Developer Context -->
+        <div class="fit-gradient-header text-xs text-white text-center py-1">
+            <span id="auth-status">Estado: Inicializando...</span> | 
+            <span id="user-profile-status">Perfil: Cargando...</span>
+            <button onclick="signOutUser()" class="underline ml-2 text-red-300 hover:text-red-500">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 💪 Hero Section -->
+        <section class="relative h-[60vh] md:h-[80vh] bg-gray-900 overflow-hidden">
+            <!-- Background Image/Illustration Placeholder -->
+            <div class="absolute inset-0">
+                <!-- Placeholder Image (replace with actual hero image) -->
+                <img src="https://placehold.co/1920x1080/00A86B/002F6C?text=Entrena+mientras+cuidamos+tu+carro" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/00A86B/002F6C?text=AutoCuidado+FIT'"
+                     alt="Persona entrenando mientras su coche es atendido" class="w-full h-full object-cover opacity-70 transition duration-500 hover:opacity-80">
+            </div>
+            <!-- Overlay Text -->
+            <div class="absolute inset-0 bg-primary bg-opacity-60 flex items-center justify-center p-8">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-tight animate-hero-text">
+                        Tu tiempo vale oro.
+                    </h1>
+                    <p class="text-xl sm:text-3xl lg:text-4xl mt-4 font-light animate-hero-text" style="animation-delay: 0.3s;">
+                        Mientras entrenás, nosotros cuidamos tu vehículo.
+                    </p>
+                    <a href="#register-cta" class="inline-block btn-primary mt-8 text-lg font-bold">
+                        Quiero mis beneficios FIT
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🧠 Section: Qué es AutoCuidado FIT -->
+        <section class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-extrabold text-primary text-center mb-4">
+                    ¿Qué es AutoCuidado <span class="text-secondary-fit">FIT</span>?
+                </h2>
+                <p class="max-w-3xl mx-auto text-center text-lg text-gray-600 mb-12">
+                    AutoCuidado FIT es la división de wellness que integra el mantenimiento de tu vehículo en tu rutina activa. Simplemente dejás tu carro en el centro de servicio cercano a tu gimnasio y al terminar tu entrenamiento, estará listo.
+                </p>
+
+                <!-- Icons Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
+                    <!-- Gym Icon -->
+                    <div class="text-center p-6 rounded-xl bg-secondary-fit/10 hover:bg-secondary-fit/20 transition duration-300 fit-shadow">
+                        <i data-lucide="dumbbell" class="mx-auto h-12 w-12 text-secondary-fit mb-3"></i>
+                        <h3 class="text-xl font-semibold text-primary">Gimnasio</h3>
+                        <p class="text-sm text-gray-700 mt-1">Entrena sin preocuparte por tu carro.</p>
+                    </div>
+                    <!-- Nutrition Icon -->
+                    <div class="text-center p-6 rounded-xl bg-secondary-fit/10 hover:bg-secondary-fit/20 transition duration-300 fit-shadow">
+                        <i data-lucide="carrot" class="mx-auto h-12 w-12 text-secondary-fit mb-3"></i>
+                        <h3 class="text-xl font-semibold text-primary">Nutrición</h3>
+                        <p class="text-sm text-gray-700 mt-1">Descuentos en comidas saludables.</p>
+                    </div>
+                    <!-- Wellness Icon -->
+                    <div class="text-center p-6 rounded-xl bg-secondary-fit/10 hover:bg-secondary-fit/20 transition duration-300 fit-shadow">
+                        <i data-lucide="heart" class="mx-auto h-12 w-12 text-secondary-fit mb-3"></i>
+                        <h3 class="text-xl font-semibold text-primary">Bienestar</h3>
+                        <p class="text-sm text-gray-700 mt-1">Acceso a clases y eventos exclusivos.</p>
+                    </div>
+                    <!-- Maintenance Icon -->
+                    <div class="text-center p-6 rounded-xl bg-secondary-fit/10 hover:bg-secondary-fit/20 transition duration-300 fit-shadow">
+                        <i data-lucide="wrench" class="mx-auto h-12 w-12 text-primary mb-3"></i>
+                        <h3 class="text-xl font-semibold text-primary">Mantenimiento</h3>
+                        <p class="text-sm text-gray-700 mt-1">Servicio premium y rápido garantizado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🧠 Section: Beneficios Exclusivos -->
+        <section class="py-16 md:py-24 bg-primary/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-extrabold text-primary text-center mb-12">
+                    Beneficios <span class="text-secondary-fit">Exclusivos</span>
+                </h2>
+                <!-- Cards showing perks -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-secondary-fit hover:shadow-xl transition duration-300">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <i data-lucide="percent" class="h-8 w-8 text-secondary-fit"></i>
+                            <h3 class="text-2xl font-bold text-primary">20% OFF</h3>
+                        </div>
+                        <p class="text-gray-700">Descuentos fijos en todos los servicios de mantenimiento y repuestos AutoCuidado al presentar tu membresía FIT.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-xl transition duration-300">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <i data-lucide="car-washing" class="h-8 w-8 text-accent"></i>
+                            <h3 class="text-2xl font-bold text-primary">Lavado Premium GRATIS</h3>
+                        </div>
+                        <p class="text-gray-700">Recibí un lavado exterior de cortesía con cada servicio de cambio de aceite o revisión completa en nuestros puntos de atención.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary hover:shadow-xl transition duration-300">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <i data-lucide="trophy" class="h-8 w-8 text-primary"></i>
+                            <h3 class="text-2xl font-bold text-primary">Eventos FIT VIP</h3>
+                        </div>
+                        <p class="text-gray-700">Acceso prioritario a eventos de wellness, charlas de nutrición y clases magistrales con expertos en nuestros gimnasios aliados.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 🧠 Section: Aliados FIT -->
+        <section class="py-16 md:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-extrabold text-primary mb-12">
+                    Nuestros Aliados <span class="text-secondary-fit">FIT</span>
+                </h2>
+                <p class="max-w-4xl mx-auto text-lg text-gray-600 mb-10">
+                    Trabajamos con los mejores centros de entrenamiento y marcas de bienestar para garantizar que tu tiempo sea productivo, tanto para tu cuerpo como para tu carro.
+                </p>
+
+                <!-- Grid with partner logos (Placeholders) -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 items-center justify-center opacity-70">
+                    <img src="https://placehold.co/150x60/F6C90E/002F6C?text=GYM+LOGO+A" alt="Partner Logo A" class="h-10 sm:h-12 w-full object-contain filter grayscale hover:grayscale-0 transition duration-300 cursor-pointer">
+                    <img src="https://placehold.co/150x60/F6C90E/002F6C?text=JUICE+BAR+B" alt="Partner Logo B" class="h-10 sm:h-12 w-full object-contain filter grayscale hover:grayscale-0 transition duration-300 cursor-pointer">
+                    <img src="https://placehold.co/150x60/F6C90E/002F6C?text=MEAL+PREP+C" alt="Partner Logo C" class="h-10 sm:h-12 w-full object-contain filter grayscale hover:grayscale-0 transition duration-300 cursor-pointer">
+                    <img src="https://placehold.co/150x60/F6C90E/002F6C?text=WELLNESS+D" alt="Partner Logo D" class="h-10 sm:h-12 w-full object-contain filter grayscale hover:grayscale-0 transition duration-300 cursor-pointer">
+                    <img src="https://placehold.co/150x60/F6C90E/002F6C?text=SPORT+TECH+E" alt="Partner Logo E" class="h-10 sm:h-12 w-full object-contain filter grayscale hover:grayscale-0 transition duration-300 cursor-pointer">
+                    <img src="https://placehold.co/150x60/F6C90E/002F6C?text=STUDIO+F" alt="Partner Logo F" class="h-10 sm:h-12 w-full object-contain filter grayscale hover:grayscale-0 transition duration-300 cursor-pointer">
+                </div>
+            </div>
+        </section>
+
+        <!-- 🧠 Section: Comunidad FIT -->
+        <section class="py-16 md:py-24 bg-primary/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-extrabold text-primary text-center mb-4">
+                    Comunidad <span class="text-secondary-fit">FIT</span>
+                </h2>
+                <p class="max-w-3xl mx-auto text-center text-lg text-gray-600 mb-12">
+                    Únete a la conversación. Sigue nuestra actividad en redes y comparte tu progreso.
+                </p>
+
+                <!-- Instagram Feed/Gallery Placeholder -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative group">
+                        <img src="https://placehold.co/500x500/002F6C/F6C90E?text=#EntrenaYCuidá" alt="Post 1" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><i data-lucide="instagram" class="h-8 w-8 text-white"></i></div>
+                    </div>
+                    <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative group">
+                        <img src="https://placehold.co/500x500/00A86B/F6C90E?text=#AutoCuidadoFIT" alt="Post 2" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><i data-lucide="instagram" class="h-8 w-8 text-white"></i></div>
+                    </div>
+                    <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative group">
+                        <img src="https://placehold.co/500x500/F6C90E/002F6C?text=Gym+Time" alt="Post 3" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><i data-lucide="instagram" class="h-8 w-8 text-white"></i></div>
+                    </div>
+                    <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative group">
+                        <img src="https://placehold.co/500x500/002F6C/00A86B?text=Car+Ready" alt="Post 4" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><i data-lucide="instagram" class="h-8 w-8 text-white"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA / Registro Section -->
+        <section id="register-cta" class="py-16 md:py-20 bg-secondary-fit">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="bg-white p-8 md:p-12 rounded-xl shadow-2xl">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-primary mb-4">
+                        ¿Sos parte de un gimnasio aliado?
+                    </h2>
+                    <p class="text-xl text-gray-700 mb-8">
+                        ¡Registrate y obtené tus beneficios <span class="font-bold text-secondary-fit">FIT</span>!
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-primary text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-primary/90 transition duration-300 shadow-md">
+                            Registrarme Ahora
+                        </button>
+                        <button class="bg-accent text-primary font-bold py-3 px-8 rounded-full text-lg hover:bg-yellow-400 transition duration-300 shadow-md">
+                            Ver Gimnasios
+                        </button>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-500 italic">
+                        Si ya tenés una cuenta AutoCuidado, solo tenés que validar tu membresía.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ⚡ Footer -->
+    <footer class="bg-primary text-white pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 border-b border-white/20 pb-8">
+                
+                <!-- Brand Info -->
+                <div class="col-span-2 md:col-span-1">
+                    <h4 class="text-xl font-bold text-accent mb-3">AutoCuidado FIT</h4>
+                    <p class="text-sm text-gray-300">
+                        La forma más inteligente de cuidar tu cuerpo y tu vehículo.
+                    </p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h5 class="font-semibold mb-3 text-secondary-fit">Nuestras Divisiones</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-accent transition duration-300">Home</a></li>
+                        <li><a href="#" class="hover:text-accent transition duration-300">Club</a></li>
+                        <li><a href="#" class="hover:text-accent transition duration-300">ICE</a></li>
+                        <li><a href="#" class="hover:text-accent transition duration-300">FIT</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal Links -->
+                <div>
+                    <h5 class="font-semibold mb-3 text-secondary-fit">Soporte</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-accent transition duration-300">Contacto</a></li>
+                        <li><a href="#" class="hover:text-accent transition duration-300">FAQ</a></li>
+                        <li><a href="#" class="hover:text-accent transition duration-300">Términos y Condiciones</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Social Media -->
+                <div class="col-span-2 md:col-span-1">
+                    <h5 class="font-semibold mb-3 text-secondary-fit">Síguenos</h5>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-accent transition duration-300"><i data-lucide="instagram" class="h-6 w-6"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-accent transition duration-300"><i data-lucide="facebook" class="h-6 w-6"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-accent transition duration-300"><i data-lucide="twitter" class="h-6 w-6"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="pt-6 text-center text-sm text-gray-400">
+                &copy; 2025 AutoCuidado. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
