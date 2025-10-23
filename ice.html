@@ -174,7 +174,7 @@
       <div class="box">
         <h2>Hielo Potable - 5 lb</h2>
         <p>¡Hielo para tomar! <span class="highlight">Registro Sanitario</span>. Calidad pura, ideal para bebidas, bolsas selladas.</p>
-        <span class="price-tag">$2.00 c/u</span>
+        <span class="price-tag">$1.50 c/u</span>
       </div>
 
       <div class="box">
@@ -492,8 +492,8 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
       const hielo50Qty = parseInt(document.getElementById("hielo50Qty").value) || 0;
       const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
 
-      // Prices: 5lb @ 2.00, 50lb @ 10, 100lb @ 20
-      const total = (potableQty * 2.0) + (hielo50Qty * 10) + (hielo100Qty * 20);
+      // Prices: 5lb @ 1.50, 50lb @ 10, 100lb @ 20
+      const total = (potableQty * 1.50) + (hielo50Qty * 10) + (hielo100Qty * 20);
       document.getElementById("totalAmount").textContent = total.toFixed(2);
 
       const promo = document.getElementById("promoMessage");
