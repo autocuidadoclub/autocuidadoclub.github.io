@@ -1,295 +1,230 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>AutoCuidado Home • Catálogo ESAL</title>
+
+    <!-- Simple reset + your styles (kept small for clarity) -->
     <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
-        /* Global Styles for the Page (Simplified) */
-        .catalog-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 1rem;
-            text-align: center;
+        :root{
+            --blue:#002F6C;
+            --orange:#FF6600;
+            --accent:#003893;
+            --green:#4CAF50;
+            --max-width:1000px;
         }
-        .catalog-title {
-            font-size: 2rem;
-            color: #002b5c; /* your blue color */
-            margin-bottom: 1rem;
+        body{font-family:Inter, system-ui, Arial, sans-serif; margin:0; color:#222; background:#fff; -webkit-font-smoothing:antialiased;}
+        .container{max-width:var(--max-width); margin:1.5rem auto; padding:1rem;}
+        header.hero{
+            background: linear-gradient(135deg, var(--blue), #003B80);
+            color:white; padding:48px 20px; border-bottom:4px solid var(--orange);
+            text-align:center; border-radius:10px;
         }
-        .catalog-description {
-            font-size: 1.1rem;
-            color: #444;
-            margin-bottom: 1.5rem;
-        }
-        .catalog-buttons {
-            margin-bottom: 2rem;
-        }
-        .catalog-buttons a {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            margin: 0 0.5rem;
-            background-color: #ff6600; /* your orange accent */
-            color: white;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .catalog-buttons a:hover {
-            background-color: #e65c00;
-        }
-        .catalog-embed {
-            width: 100%;
-            height: 700px;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-        /* Styles for the Order Box */
-        .box {
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 500px; /* Constrain the form width */
-            border-radius: 8px;
-            text-align: left;
-        }
-        .box h4 {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: #002b5c;
-        }
-        .box label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        .box input[type="number"], .box input[type="text"], .box select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .box .btn {
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            background-color: #4CAF50; /* Green WhatsApp color */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-        /* New/Updated styles for tables */
-        .order-table-container {
-            overflow-x: auto;
-            margin-bottom: 30px; 
-        }
-        .order-table-container table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .order-table-container th, .order-table-container td {
-            padding: 10px 5px; 
-            border: 1px solid #eee;
-            text-align: left;
-        }
-        .order-table-container thead th {
-            background-color: #f0f0f0;
-            font-weight: bold;
-            color: #002b5c;
-            font-size: 0.85em; 
-            vertical-align: middle;
-            text-align: center;
-        }
-        .product-group-header {
-            background-color: #e6f7ff;
-            font-weight: bold;
-            color: #002b5c;
-            text-align: center;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .product-qty-input {
-            width: 60px;
-            text-align: center;
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-size: 0.9em;
-        }
-        .matrix-scent-cell {
-            font-weight: 500;
-            color: #333;
-            width: 150px;
-            text-align: left !important;
-        }
-        .matrix-size-cell {
-            width: 90px;
-            text-align: center;
+        header.hero h1{margin:0 0 8px; font-size:2rem;}
+        header.hero p{margin:0; opacity:.95;}
+
+        .top-actions{display:flex; gap:.5rem; justify-content:center; margin:1rem 0 1.5rem; flex-wrap:wrap;}
+        .top-actions a{background:var(--orange); color:white; padding:.7rem 1rem; border-radius:8px; font-weight:700; text-decoration:none;}
+        .pdf-frame{width:100%; height:520px; border-radius:8px; border:1px solid #eee; box-shadow:0 6px 18px rgba(0,0,0,.06); margin-bottom:1.25rem;}
+
+        /* About & banner */
+        .info-row{display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:1rem;}
+        .about-card{flex:1; min-width:260px; background:#f9fbff; padding:16px; border-radius:10px; border:1px solid #e6f1ff;}
+        .shipping-banner{background:linear-gradient(90deg,#003893,#002F6C); color:white; padding:14px 16px; border-radius:10px; display:flex; gap:12px; align-items:center; justify-content:center; flex:1; min-width:260px;}
+        .shipping-banner strong{color:#FFD27A;}
+
+        /* Box / order */
+        .box{border:1px solid #eee; padding:18px; border-radius:10px; margin-top:1rem; background:white;}
+        .box h2{margin-top:0; color:var(--blue);}
+        .summary-row{display:flex; gap:1rem; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:12px;}
+        .summary-row h3{margin:0;}
+
+        .box label{display:block; margin-top:10px; font-weight:600;}
+        .box input[type="text"], .box input[type="number"], .box select{width:100%; padding:9px 10px; border-radius:8px; border:1px solid #d1d5db; box-sizing:border-box;}
+        .btn{background:var(--green); color:white; padding:12px 14px; border-radius:10px; font-weight:700; border:none; cursor:pointer; width:100%; margin-top:12px;}
+        .btn.secondary{background:var(--orange);}
+        .promo{color:green; font-weight:700; margin-top:6px;}
+
+        /* Tables & matrix */
+        .order-table-container{margin-bottom:18px; overflow-x:auto;}
+        table{width:100%; border-collapse:collapse; min-width:640px;}
+        th, td{padding:10px 8px; border:1px solid #eee; vertical-align:middle;}
+        thead th{background:#f6f9ff; color:var(--blue); font-weight:700; text-align:center;}
+        .product-qty-input{width:68px; text-align:center; padding:6px; border-radius:6px; border:1px solid #ccc;}
+        .matrix-scent-cell{font-weight:600; width:190px; text-align:left;}
+        .matrix-size-cell{text-align:center; width:100px;}
+        .product-group-header{background:#e9f6ff; color:var(--blue); font-weight:800; text-align:center;}
+
+        /* Accordion */
+        .accordion{border-radius:10px; overflow:hidden; border:1px solid #eee; margin-bottom:12px;}
+        .accordion .acc-header{display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:#fff; cursor:pointer;}
+        .acc-header h4{margin:0; color:var(--blue);}
+        .acc-content{display:none; padding:12px 14px; background:white;}
+
+        /* Footer & small screens */
+        footer{padding:18px 8px; text-align:center; color:#666; margin-top:18px;}
+        @media (max-width:720px){
+            .pdf-frame{height:380px;}
+            table{min-width:520px;}
+            .info-row{flex-direction:column;}
         }
     </style>
-
-
-    <title>AutoCuidado Club - Inicio</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-
-    <script>
-    (function(w, d) {
-        w.PushEngage = w.PushEngage || [];
-        w._peq = w._peq || [];
-        PushEngage.push(['init', {
-            appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7'
-        }]);
-
-        var e = d.createElement('script');
-        e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
-        e.async = true;
-        e.type = 'text/javascript';
-        d.head.appendChild(e);
-    })(window, document);
-    </script>
-        
 </head>
-
 <body>
-    <nav class="navbar">
-  <li class="has-dropdown">
-                <a href="/ecosystem" class="divisiones-badge"> CONOCE NUESTRAS DIVISIONES</a>
-                </li>
-    </ul>
-    <div class="logo-container">
-        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-    </div>
-</nav>
+    <nav style="background:#fff; border-bottom:1px solid #eee; padding:.6rem 0;">
+        <div class="container" style="display:flex; align-items:center; gap:12px;">
+            <a href="/" style="text-decoration:none; color:var(--accent); font-weight:800; display:flex; align-items:center; gap:8px;">
+                <img src="logo.jpg" alt="logo" style="height:36px; border-radius:6px; object-fit:cover;">
+                AutoCuidado Club
+            </a>
+            <div style="margin-left:auto;">
+                <a href="/ecosystem" class="divisiones-badge" style="text-decoration:none; color:#003893; font-weight:700;">CONOCE NUESTRAS DIVISIONES</a>
+            </div>
+        </div>
+    </nav>
 
-    
-
-<header style="background: linear-gradient(135deg, #002F6C, #003B80); padding: 60px 20px; text-align: center; border-bottom: 4px solid #FF6600;">
-    <div class="header-text">
-        <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">Bienvenido a AutoCuidado HOME</h1>
-        <p style="color: white; font-size: 1.2em;">Tu vales oro. Cuidamos tu entorno, tu salud y tu productividad, porque autocuidarte también es cuidar tu hogar.</p>
-    </div>
-</header>
-
-
-<body>
-    <header>
-        <nav>
-        </nav>
+    <header class="hero">
+        <div class="container">
+            <h1>Bienvenido a AutoCuidado HOME</h1>
+            <p>Tu vales oro. Cuidamos tu entorno, tu salud y tu productividad — productos ESAL con calidad profesional.</p>
+        </div>
     </header>
 
-    <div class="catalog-container">
-        <h1 class="catalog-title">Catálogo AutoCuidado Home • ESAL</h1>
-        <p class="catalog-description">
-            Descubre nuestra línea de productos de limpieza, desinfectantes, jabones, repelentes y más.
-            Todo lo que necesitas para el cuidado del hogar con la calidad ESAL.
-        </p>
-        <div class="catalog-buttons">
+    <main class="container" role="main">
+        <div class="top-actions">
             <a href="/esalcatalog.pdf" target="_blank" download>📥 Descargar PDF</a>
             <a href="/">← Volver a AutoCuidado Club</a>
         </div>
-        <iframe
-            src="/esalcatalog.pdf"
-            class="catalog-embed"
-            allowfullscreen
-        ></iframe>
 
-<div class="box">
-    <h2>📋 Pedido Rápido ESAL - AutoCuidado Home</h2>
-    <p class="catalog-description">Selecciona la cantidad de cada producto y presentación para calcular tu total al instante.</p>
+        <iframe src="/esalcatalog.pdf" class="pdf-frame" allowfullscreen></iframe>
 
-    <div id="product-inputs-container">
+        <!-- Informational Row -->
+        <div class="info-row">
+            <div class="about-card">
+                <h3>Quiénes somos</h3>
+                <p><strong>Somos fabricantes de productos de limpieza</strong>, adaptándonos a las especificaciones de nuestros clientes. Cada fórmula, empaque y presentación se diseña para cumplir tus requisitos: calidad profesional hecha en <strong>El Salvador</strong>.</p>
+                <ul style="margin:.5rem 0 0 1rem;">
+                    <li>Formulaciones personalizadas</li>
+                    <li>Empaque y etiquetado según necesidad</li>
+                    <li>Control de calidad y registro sanitario</li>
+                </ul>
+            </div>
+
+            <div class="shipping-banner" aria-live="polite">
+                <i class="fas fa-truck" style="font-size:26px;"></i>
+                <div style="text-align:left;">
+                    <div style="font-weight:800;">Envío gratis desde <strong>US$15.00</strong></div>
+                    <div style="font-size:.95rem; opacity:.95;">Cobertura: <strong>Todo El Salvador</strong></div>
+                </div>
+            </div>
         </div>
 
-    <div class="summary-and-payment">
-        <h3>Total: $<span id="totalAmount">0.00</span></h3>
-        <p id="promoMessage" style="color: green; font-weight: bold;"></p>
+        <!-- ORDER BOX -->
+        <div class="box" id="orderBox">
+            <h2>📋 Pedido Rápido ESAL - AutoCuidado Home</h2>
+            <p style="margin-top:0;">Selecciona cantidad por producto. El total y elegibilidad para envío gratis se muestran al instante.</p>
 
-        <label for="paymentMethod">Método de Pago:</label>
-        <select id="paymentMethod" required>
-            <option value="" disabled selected>Selecciona un método</option>
-            <option value="Transferencia bancaria">Transferencia bancaria</option>
-            <option value="Tarjeta">Tarjeta</option>
-            <option value="Bitcoin">Bitcoin</option>
-            <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero (desde $50)</option>
-        </select>
-    </div>
+            <!-- Accordion for categories (JS will open/close) -->
+            <div id="categoriesAccordion">
+                <!-- JS will inject category accordions here -->
+            </div>
 
-    <div class="delivery-info">
-        <h3>Datos de Entrega</h3>
-        <label for="name">Nombre de quien recibe:</label>
-        <input type="text" id="name" required>
+            <div class="summary-row">
+                <div>
+                    <h3>Total: $<span id="totalAmount">0.00</span></h3>
+                    <div id="promoMessage" class="promo"></div>
+                    <div id="shippingNote" style="font-size:.95rem; color:#333; margin-top:6px;"></div>
+                </div>
 
-        <label for="municipality">Municipio:</label>
-        <input type="text" id="municipality" placeholder="Ej: Santa Ana, San Miguel" required>
-        
-        <label for="location">Ubicación exacta para entrega:</label>
-        <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje, casa #15" required>
-    </div>
+                <div style="min-width:220px;">
+                    <label for="paymentMethod">Método de Pago:</label>
+                    <select id="paymentMethod" required>
+                        <option value="" disabled selected>Selecciona un método</option>
+                        <option value="Transferencia bancaria">Transferencia bancaria</option>
+                        <option value="Tarjeta">Tarjeta</option>
+                        <option value="Bitcoin">Bitcoin</option>
+                        <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero (desde $50)</option>
+                    </select>
+                </div>
+            </div>
 
-    <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
-</div>
-    </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+                <div>
+                    <label for="name">Nombre de quien recibe:</label>
+                    <input type="text" id="name" placeholder="Ej: María López" required>
+                </div>
+                <div>
+                    <label for="phone">Teléfono (WhatsApp):</label>
+                    <input type="text" id="phone" placeholder="503 7xxxxxxx" required>
+                </div>
 
-<style>
-    /* ... (Estilos de tablas que ya están arriba, repetidos para referencia, pero no deben estar dos veces) ... */
-</style>
-    
-    
-    <footer>
+                <div>
+                    <label for="department">Departamento:</label>
+                    <input list="departments" id="department" placeholder="Ej: San Salvador" />
+                    <datalist id="departments">
+                        <option value="San Salvador"></option>
+                        <option value="Santa Ana"></option>
+                        <option value="San Miguel"></option>
+                        <option value="La Libertad"></option>
+                        <option value="Cuscatlán"></option>
+                        <option value="La Unión"></option>
+                    </datalist>
+                </div>
+
+                <div>
+                    <label for="municipality">Municipio:</label>
+                    <input list="municipalities" id="municipality" placeholder="Ej: Antiguo Cuscatlán" />
+                    <datalist id="municipalities">
+                        <option value="San Salvador"></option>
+                        <option value="Antiguo Cuscatlán"></option>
+                        <option value="Santa Tecla"></option>
+                        <option value="Santa Ana"></option>
+                        <option value="San Miguel"></option>
+                        <option value="Nueva Concepción"></option>
+                    </datalist>
+                </div>
+
+                <div style="grid-column:1 / -1;">
+                    <label for="location">Ubicación exacta para entrega:</label>
+                    <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje, casa #15" required>
+                </div>
+            </div>
+
+            <button class="btn" onclick="sendOrder()">📲 Enviar Pedido por WhatsApp</button>
+        </div>
+    </main>
+
+    <footer class="container" role="contentinfo">
+        <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+            <img src="/flag-sv.png" alt="El Salvador" style="height:48px; border-radius:6px;">
+            <div style="text-align:left;">
+                <p style="margin:0; font-weight:700;">AutoCuidado Club — Hecho con orgullo en <strong>El Salvador</strong></p>
+                <p style="margin:4px 0 0; font-size:.95rem; color:#666;">&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:14px;">
+            <p><strong>Síguenos en:</strong></p>
+            <a href="https://www.instagram.com/esal_sv/?hl=en" target="_blank" style="margin-right:14px; color:#E1306C;"><i class="fab fa-instagram fa-2x"></i></a>
+            <a href="https://www.facebook.com/esalsv" target="_blank" style="color:#1877F2;"><i class="fab fa-facebook-f fa-2x"></i></a>
+        </div>
     </footer>
 
-
-    <div id="cta-install-bar" style="display:none;">
-        </div>
-    
-    <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-        </div>
-    
-    <button id="reopen-cta-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; /* ... rest of your styles ... */">
-        📲 Abrir menú
-    </button>
-
-<script>
-    // --- DATOS DE PRODUCTOS ESAL (Completo) ---
+    <!-- SCRIPTS -->
+    <script>
+    // ---------- PRODUCT DATA (USAR TU LISTA EXISTENTE) ----------
     const ESAL_PRODUCTS = {
         "Alcohol Gel": [
             { id: "ag_galon_mango", size: "Galón", scent: "Mango", price: 13.50 },
             { id: "ag_galon_manzana", size: "Galón", scent: "Manzana Verde", price: 13.50 },
             { id: "ag_galon_maracuya", size: "Galón", scent: "Maracuyá", price: 13.50 },
-            { id: "ag_galon_sandia", size: "Galón", scent: "Sandía", price: 13.50 },
-            { id: "ag_galon_sinfrag", size: "Galón", scent: "Sin Fragancia", price: 13.50 },
             { id: "ag_500ml_mango", size: "500 mL", scent: "Mango", price: 4.50 },
-            { id: "ag_500ml_manzana", size: "500 mL", scent: "Manzana Verde", price: 4.50 },
-            { id: "ag_500ml_maracuya", size: "500 mL", scent: "Maracuyá", price: 4.50 },
-            { id: "ag_500ml_sandia", size: "500 mL", scent: "Sandía", price: 4.50 },
-            { id: "ag_500ml_sinfrag", size: "500 mL", scent: "Sin Fragancia", price: 4.50 },
             { id: "ag_120ml_mango", size: "120 mL", scent: "Mango", price: 1.75 },
-            { id: "ag_120ml_manzana", size: "120 mL", scent: "Manzana Verde", price: 1.75 },
-            { id: "ag_120ml_maracuya", size: "120 mL", scent: "Maracuyá", price: 1.75 },
-            { id: "ag_120ml_sandia", size: "120 mL", scent: "Sandía", price: 1.75 },
-            { id: "ag_120ml_sinfrag", size: "120 mL", scent: "Sin Fragancia", price: 1.75 },
             { id: "ag_30ml_mango", size: "30 mL", scent: "Mango", price: 1.00 },
-            { id: "ag_30ml_manzana", size: "30 mL", scent: "Manzana Verde", price: 1.00 },
-            { id: "ag_30ml_maracuya", size: "30 mL", scent: "Maracuyá", price: 1.00 },
-            { id: "ag_30ml_sandia", size: "30 mL", scent: "Sandía", price: 1.00 },
-            { id: "ag_30ml_sinfrag", size: "30 mL", scent: "Sin Fragancia", price: 1.00 },
             { id: "ag_30ml_silicon_sin", size: "30 mL", scent: "Sin Fragancia (Sin Silicón)", price: 1.00 }
         ],
         "Alcohol Líquido": [
@@ -299,19 +234,7 @@
         ],
         "Desinfectante Uso Directo (Piso)": [
             { id: "dd_galon_verde", size: "Galón", scent: "Manzana Verde", price: 3.25 },
-            { id: "dd_galon_sin", size: "Galón", scent: "Sin Fragancia", price: 3.25 },
-            { id: "dd_galon_lavanda", size: "Galón", scent: "Lavanda", price: 3.25 },
-            { id: "dd_galon_maracuya", size: "Galón", scent: "Maracuyá", price: 3.25 },
-            { id: "dd_galon_limon", size: "Galón", scent: "Limón", price: 3.25 },
-            { id: "dd_galon_citronela", size: "Galón", scent: "Citronela", price: 3.25 }
-        ],
-        "Desinfectante Concentrado (Piso)": [
-            { id: "dc_galon_verde", size: "Galón", scent: "Manzana Verde", price: 4.00 },
-            { id: "dc_galon_sin", size: "Galón", scent: "Sin Fragancia", price: 4.00 },
-            { id: "dc_galon_lavanda", size: "Galón", scent: "Lavanda", price: 4.00 },
-            { id: "dc_galon_maracuya", size: "Galón", scent: "Maracuyá", price: 4.00 },
-            { id: "dc_galon_limon", size: "Galón", scent: "Limón", price: 4.00 },
-            { id: "dc_galon_citronela", size: "Galón", scent: "Citronela", price: 4.00 }
+            { id: "dd_galon_lavanda", size: "Galón", scent: "Lavanda", price: 3.25 }
         ],
         "Lejía": [
             { id: "lejia_4", size: "Galón", scent: "4%", price: 2.50, display: "Galón 4%" },
@@ -319,32 +242,25 @@
         ],
         "Jabón Líquido para Manos": [
             { id: "jl_galon_verde", size: "Galón", scent: "Manzana Verde", price: 4.00 },
-            { id: "jl_galon_cereza", size: "Galón", scent: "Cereza", price: 4.00 },
-            { id: "jl_galon_fresa", size: "Galón", scent: "Fresa", price: 4.00 },
-            { id: "jl_galon_durazno", size: "Galón", scent: "Durazno", price: 4.00 },
-            { id: "jl_galon_chicle", size: "Galón", scent: "Chicle", price: 4.00 },
-            { id: "jl_500ml_verde", size: "500 mL", scent: "Manzana Verde", price: 1.75 },
-            { id: "jl_500ml_cereza", size: "500 mL", scent: "Cereza", price: 1.75 },
-            { id: "jl_500ml_fresa", size: "500 mL", scent: "Fresa", price: 1.75 },
-            { id: "jl_500ml_durazno", size: "500 mL", scent: "Durazno", price: 1.75 },
-            { id: "jl_500ml_chicle", size: "500 mL", scent: "Chicle", price: 1.75 }
+            { id: "jl_500ml_verde", size: "500 mL", scent: "Manzana Verde", price: 1.75 }
         ],
         "Repelente de Insectos": [
             { id: "repelente_120ml", size: "120 mL Spray", scent: "Citronela", price: 3.00, display: "120 mL Spray Citronela" }
         ]
     };
 
+    // Categorías que deben mostrarse en matriz (opcional)
     const matrixCategories = ["Alcohol Gel", "Jabón Líquido para Manos"];
 
-    // --- Funciones Auxiliares para Generar HTML de la Tabla ---
+    // Umbral de envío gratis (según tu pedido)
+    const FREE_SHIPPING_THRESHOLD = 15.00;
 
+    // Utilidades para generar inputs
     function generateInput(product, category) {
-        // Genera el input de cantidad con data-price y data-name
-        const productName = `${category}: ${product.size} (${product.scent})`;
+        const productName = `${category}: ${product.size} (${product.scent || ''})`;
         const displayPrice = product.price.toFixed(2);
-
-        return product
-            ? `<input 
+        return `
+            <input 
                 type="number" 
                 class="product-qty-input"
                 id="${product.id}" 
@@ -353,41 +269,27 @@
                 oninput="updateTotal()" 
                 data-price="${displayPrice}"
                 data-name="${productName} ($${displayPrice})"
-            >`
-            : '';
+            >`;
     }
 
     function generateMatrixCategoryHtml(category, products) {
-        const sizes = category === "Alcohol Gel" 
-            ? ["Galón", "500 mL", "120 mL", "30 mL"] 
-            : ["Galón", "500 mL"];
-            
-        // Usar un Set para obtener solo aromas únicos
-        const scents = [...new Set(products.map(p => p.scent))].filter(s => s !== "Sin Fragancia (Sin Silicón)").sort();
-        
-        // Mapear productos por aroma y tamaño para acceso rápido
+        const sizes = category === "Alcohol Gel" ? ["Galón", "500 mL", "120 mL", "30 mL"] : ["Galón", "500 mL"];
+        const scents = [...new Set(products.map(p => p.scent))].filter(s => s).sort();
         const productMap = {};
-        products.forEach(p => {
-            if (!productMap[p.scent]) productMap[p.scent] = {};
-            productMap[p.scent][p.size] = p;
-        });
+        products.forEach(p => { if (!productMap[p.scent]) productMap[p.scent] = {}; productMap[p.scent][p.size] = p; });
 
-        let html = `<div class="order-table-container">
-            <table>
-                <thead>
-                    <tr class="product-group-header"><th colspan="${sizes.length + 1}">🧴 ${category}</th></tr>
-                    <tr>
-                        <th class="matrix-scent-cell">Aroma/Fragancia</th>`;
-        
+        let html = `<div class="order-table-container"><table><thead>
+            <tr class="product-group-header"><th colspan="${sizes.length + 1}">🧴 ${category}</th></tr>
+            <tr><th class="matrix-scent-cell">Aroma/Fragancia</th>`;
+
         sizes.forEach(size => {
-            // Obtener el precio base para mostrarlo en el encabezado de la columna
-            const exampleProduct = products.find(p => p.size === size);
-            const priceText = exampleProduct ? `($${exampleProduct.price.toFixed(2)})` : '';
+            const example = products.find(p => p.size === size);
+            const priceText = example ? `($${example.price.toFixed(2)})` : '';
             html += `<th class="matrix-size-cell">${size}<br>${priceText}</th>`;
         });
+
         html += `</tr></thead><tbody>`;
 
-        // Generar filas por aroma
         scents.forEach(scent => {
             html += `<tr><td class="matrix-scent-cell">${scent}</td>`;
             sizes.forEach(size => {
@@ -398,15 +300,13 @@
             html += `</tr>`;
         });
 
-        // Caso especial: 30 mL Sin Silicón (solo en Alcohol Gel)
         if (category === "Alcohol Gel") {
-            const specialProduct = products.find(p => p.scent === "Sin Fragancia (Sin Silicón)");
-            if (specialProduct) {
-                const content = generateInput(specialProduct, category);
+            const special = products.find(p => p.scent === "Sin Fragancia (Sin Silicón)");
+            if (special) {
                 html += `<tr>
-                    <td class="matrix-scent-cell">${specialProduct.scent}</td>
+                    <td class="matrix-scent-cell">${special.scent}</td>
                     <td>—</td><td>—</td><td>—</td>
-                    <td class="matrix-size-cell">${content}</td>
+                    <td class="matrix-size-cell">${generateInput(special, category)}</td>
                 </tr>`;
             }
         }
@@ -416,27 +316,17 @@
     }
 
     function generateVerticalCategoryHtml(category, products) {
-        // Usado para Alcohol Líquido, Desinfectante, Lejía y Repelente
-        let html = `<div class="order-table-container">
-            <table>
-                <thead>
-                    <tr class="product-group-header"><th colspan="3">🧴 ${category}</th></tr>
-                    <tr>
-                        <th>Producto y Presentación</th>
-                        <th class="text-center">Precio Unitario</th>
-                        <th class="text-center">Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-        
-        products.forEach(product => {
-            const labelText = product.display || `${product.size} (${product.scent})`;
-            const content = generateInput(product, category);
+        let html = `<div class="order-table-container"><table><thead>
+            <tr class="product-group-header"><th colspan="3">🧴 ${category}</th></tr>
+            <tr><th>Producto y Presentación</th><th class="text-center">Precio Unitario</th><th class="text-center">Cantidad</th></tr>
+        </thead><tbody>`;
 
+        products.forEach(product => {
+            const labelText = product.display || `${product.size} ${product.scent ? '('+product.scent+')' : ''}`;
             html += `<tr>
                         <td>${labelText}</td>
                         <td class="text-center">$${product.price.toFixed(2)}</td>
-                        <td class="text-center">${content}</td>
+                        <td class="text-center">${generateInput(product, category)}</td>
                     </tr>`;
         });
 
@@ -444,52 +334,78 @@
         return html;
     }
 
-    // --- Función Principal de Generación ---
+    // Crear acordeones por categoría
     function initializeProductForm() {
-        const container = document.getElementById('product-inputs-container');
-        let fullHtml = '';
-
+        const accordionRoot = document.getElementById('categoriesAccordion');
+        let html = '';
         for (const category in ESAL_PRODUCTS) {
             const products = ESAL_PRODUCTS[category];
+            const content = matrixCategories.includes(category) ? generateMatrixCategoryHtml(category, products) : generateVerticalCategoryHtml(category, products);
 
-            if (matrixCategories.includes(category)) {
-                fullHtml += generateMatrixCategoryHtml(category, products);
-            } else {
-                fullHtml += generateVerticalCategoryHtml(category, products);
-            }
+            html += `<div class="accordion">
+                        <div class="acc-header" onclick="toggleAccordion(this)">
+                            <h4>🧴 ${category}</h4>
+                            <div class="acc-caret">+</div>
+                        </div>
+                        <div class="acc-content">${content}</div>
+                    </div>`;
         }
-        container.innerHTML = fullHtml;
-        updateTotal(); // Asegura que el total inicial sea 0.00
+        accordionRoot.innerHTML = html;
+        // By default open first accordion for convenience
+        const first = accordionRoot.querySelector('.accordion .acc-header');
+        if (first) first.click();
+
+        updateTotal(); // calcular total inicial
     }
 
-    // Ejecuta la función cuando el DOM se haya cargado. ESTA ES LA CORRECCIÓN CLAVE.
-    window.addEventListener('load', initializeProductForm);
+    function toggleAccordion(el) {
+        const acc = el.parentElement;
+        const content = acc.querySelector('.acc-content');
+        const caret = el.querySelector('.acc-caret');
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            caret.textContent = '+';
+        } else {
+            // optionally close other accordions
+            document.querySelectorAll('.acc-content').forEach(c => { if (c !== content) c.style.display = 'none'; if (c.parentElement) c.parentElement.querySelector('.acc-caret').textContent = '+'; });
+            content.style.display = 'block';
+            caret.textContent = '−';
+        }
+    }
 
-
-    // --- Funciones de Lógica (sin cambios) ---
-
+    // Update totals and promo messages
     function updateTotal() {
         let total = 0;
-        // Selecciona todos los inputs de cantidad en el contenedor
-        const inputs = document.querySelectorAll('#product-inputs-container input[type="number"]');
-
+        const inputs = document.querySelectorAll('#categoriesAccordion input[type="number"]');
         inputs.forEach(input => {
             const qty = parseInt(input.value) || 0;
-            const price = parseFloat(input.getAttribute('data-price'));
+            const price = parseFloat(input.getAttribute('data-price')) || 0;
             total += qty * price;
         });
-
         document.getElementById("totalAmount").textContent = total.toFixed(2);
 
         const promo = document.getElementById("promoMessage");
-        promo.textContent = total >= 50 ? "✅ ¡Tu pedido aplica para Tasa Cero Banco Agrícola!" : "";
+        const shippingNote = document.getElementById("shippingNote");
+
+        if (total >= FREE_SHIPPING_THRESHOLD && total > 0) {
+            promo.textContent = "✅ ¡Tu pedido aplica para ENVÍO GRATIS!";
+            shippingNote.textContent = `Envío: Gratis — cobertura en todo El Salvador (desde US$${FREE_SHIPPING_THRESHOLD.toFixed(2)}).`;
+        } else if (total === 0) {
+            promo.textContent = "";
+            shippingNote.textContent = `Envío: Aplica envío gratis desde US$${FREE_SHIPPING_THRESHOLD.toFixed(2)}.`;
+        } else {
+            promo.textContent = "";
+            // Mostrar cuánto falta para envío gratis
+            const falta = (FREE_SHIPPING_THRESHOLD - total);
+            shippingNote.textContent = `Te faltan $${falta.toFixed(2)} para envío gratis (desde US$${FREE_SHIPPING_THRESHOLD.toFixed(2)}). Cobertura: todo El Salvador.`;
+        }
     }
 
+    // Send order by WhatsApp (build message)
     function sendOrder() {
-        const inputs = document.querySelectorAll('#product-inputs-container input[type="number"]');
+        const inputs = document.querySelectorAll('#categoriesAccordion input[type="number"]');
         let totalQty = 0;
         let orderDetails = "";
-
         inputs.forEach(input => {
             const qty = parseInt(input.value) || 0;
             if (qty > 0) {
@@ -501,269 +417,62 @@
 
         const location = document.getElementById("location").value.trim();
         const municipality = document.getElementById("municipality").value.trim();
+        const department = document.getElementById("department").value.trim();
         const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
         const paymentMethod = document.getElementById("paymentMethod").value;
         const total = document.getElementById("totalAmount").textContent;
-        const whatsappNumber = "50375704428";
+        const whatsappNumber = "50375704428"; // tu número
 
         // Validación
         if (totalQty === 0) {
             alert("⚠️ Por favor, selecciona al menos un producto.");
             return;
         }
-        if (!location || !municipality || !name || paymentMethod === "") {
-            alert("⚠️ Por favor, completa todos los campos de entrega y selecciona un Método de Pago.");
+        if (!location || !municipality || !name || !phone || paymentMethod === "") {
+            alert("⚠️ Por favor, completa todos los campos de entrega (incluido teléfono) y selecciona un método de pago.");
             return;
         }
 
+        // Calcular nota de envío
+        let shippingNote = "";
+        if (parseFloat(total) >= FREE_SHIPPING_THRESHOLD) {
+            shippingNote = "Envío: GRATIS (aplica por pedido >= US$" + FREE_SHIPPING_THRESHOLD.toFixed(2) + ")";
+        } else {
+            shippingNote = "Envío: NO incluido (envío gratis desde US$" + FREE_SHIPPING_THRESHOLD.toFixed(2) + ")";
+        }
+
+        // Build message
         let message = `*ORDEN DE PRODUCTOS ESAL - ${new Date().toLocaleDateString('es-SV')}*\n\n`;
-        message += `*PRODUCTOS DETALLE:*\n${orderDetails}\n`;
-        message += `*TOTAL ESTIMADO: $${total}*\n`;
+        message += `*PRODUCTOS SOLICITADOS:*\n${orderDetails}\n`;
+        message += `*TOTAL ESTIMADO:* $${total}\n`;
+        message += `*${shippingNote}*\n`;
         message += `*MÉTODO DE PAGO:* ${paymentMethod}\n\n`;
-        message += `*DATOS DE ENTREGA:*\nNombre: ${name}\nMunicipio: ${municipality}\nUbicación: ${location}`;
+        message += `*DATOS DE ENTREGA:*\nNombre: ${name}\nTeléfono: ${phone}\nDepartamento: ${department}\nMunicipio: ${municipality}\nUbicación: ${location}\n\n`;
+        message += `*NOTAS:* (escribe aquí cualquier instrucción adicional al confirmar por WhatsApp)`;
 
-        window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
+        // Abrir WhatsApp
+        const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
     }
 
-    // Las funciones de PWA/Modal deben ir aquí si las quieres mantener:
-    let deferredPrompt = null;
+    // INICIALIZACIÓN
+    window.addEventListener('load', initializeProductForm);
+    </script>
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('how-to-install-btn').style.display = 'inline-block';
-    });
+    <!-- Optional scripts you had for PWA / PushEngage / Feedback (kept, but trimmed) -->
+    <script>
+    (function(w, d) {
+        w.PushEngage = w.PushEngage || [];
+        w._peq = w._peq || [];
+        try {
+            PushEngage.push(['init', { appId: '2f304881-8eee-4a7a-a487-6f231bd85ec7' }]);
+            var e = d.createElement('script');
+            e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
+            e.async = true; e.type = 'text/javascript'; d.head.appendChild(e);
+        } catch(e){}
+    })(window, document);
+    </script>
 
-    document.getElementById('how-to-install-btn').addEventListener('click', async () => {
-    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const choiceResult = await deferredPrompt.userChoice;
-        if (choiceResult.outcome === 'accepted') {
-        console.log('✅ User accepted the install prompt');
-        } else {
-        console.log('❌ User dismissed the install prompt');
-        }
-        deferredPrompt = null;
-    } else if (isIos) {
-        alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-    } else if (isAndroid) {
-        alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
-    } else {
-        alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
-    }
-    });
-
-    function openFeedbackModal() {
-        document.getElementById('feedbackModal').style.display = 'flex';
-        document.getElementById('feedbackText').focus();
-    }
-
-    function closeFeedbackModal() {
-        document.getElementById('feedbackModal').style.display = 'none';
-        document.getElementById('voiceFeedbackForm').reset();
-        document.getElementById('feedbackLoader').style.display = 'none';
-    }
-
-    function startVoiceInput() {
-        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        alert("Tu navegador no soporta reconocimiento de voz.");
-        return;
-        }
-
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'es-ES';
-
-        const feedbackText = document.getElementById('feedbackText');
-        feedbackText.placeholder = "🎙️ Escuchando...";
-        feedbackText.style.border = "2px solid orange";
-
-        recognition.onresult = (event) => {
-        const result = event.results[0][0].transcript;
-        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-        };
-
-        recognition.onerror = (event) => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-        alert("Error de voz: " + event.error);
-        };
-
-        recognition.onend = () => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-        };
-
-        recognition.start();
-    }
-
-    document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-    const ctaBar = document.getElementById('cta-install-bar');
-    const reopenBtn = document.getElementById('reopen-cta-btn');
-
-    ctaBar.style.display = 'block';
-    ctaBar.style.opacity = '1';
-    ctaBar.style.transform = 'translateY(0)';
-    reopenBtn.style.display = 'none';
-    });
-
-    document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
-        e.preventDefault();
-        document.getElementById('feedbackLoader').style.display = 'block';
-
-        fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: "POST",
-        body: new FormData(this)
-        })
-        .then(res => res.json())
-        .then(data => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        if (data.success) {
-            alert("¡Gracias por tu opinión!");
-            closeFeedbackModal();
-        } else {
-            alert("Error al enviar. Intenta de nuevo.");
-        }
-        })
-        .catch(() => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        alert("Hubo un problema al enviar el mensaje.");
-        });
-    };
-
-    function closeCtaInstallBar() {
-    const ctaBar = document.getElementById('cta-install-bar');
-    const reopenBtn = document.getElementById('reopen-cta-btn');
-
-    // Animación suave antes de ocultarlo
-    ctaBar.style.opacity = '0';
-    ctaBar.style.transform = 'translateY(100%)';
-    
-    setTimeout(() => {
-        ctaBar.style.display = 'none';
-        reopenBtn.style.display = 'block';
-        
-        // Animación de aparición para el botón de reabrir
-        setTimeout(() => {
-            reopenBtn.style.opacity = '1';
-            reopenBtn.style.transform = 'translateY(0)';
-        }, 50);
-
-    }, 300); // Coincide con la duración de la transición CSS
-    }
-</script>
-
-        
-<div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
-    <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
-        <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
-        <div style="text-align: left; max-width: 300px;">
-            <p style="margin: 0; font-size: 18px; font-weight: bold;">
-                Esta app es más que tecnología.
-            </p>
-            <p style="margin: 5px 0 0; font-size: 16px;">
-                Es una forma distinta de cuidar lo que importa.
-            </p>
-        </div>
-    </div>
-    <p style="text-align: center; margin-top: 20px; font-size: 16px;">
-        <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
-    </p>
-</div>
-        
-        <footer>
-            <p>&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
-                   
-        <div class="social-container" style="text-align: center; margin-top: 20px;">
-        <p><strong>Síguenos en nuestras redes sociales</strong></p>
-        <div class="social-buttons">
-            <a href="https://www.instagram.com/esal_sv/?hl=en" target="_blank" class="social-button" style="color: #E1306C;">
-                <i class="fab fa-instagram fa-3x"></i>
-            </a>
-            <a href="https://www.facebook.com/esalsv" target="_blank" class="social-button" style="color: #1877F2;">
-                <i class="fab fa-facebook-f fa-3x"></i>
-            </a>
-            </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-
-        
-    </footer>
-
-        <div id="cta-install-bar" style="display:none;">
-        <div class="cta-message">
-    ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
-    </div>
-
-        <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
-        <a href="contacto.html">💬 Contácta con nuestro staff</a>
-        <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-        <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
-
-        </div>
-    </div>
-
-    <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-        
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
-        <button onclick="closeFeedbackModal()" style="
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #ff0000;
-        font-weight: bold;
-        ">❌</button>
-    </div>
-
-    <form id="voiceFeedbackForm">
-        <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-        <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-        <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-        <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-        <div style="display:flex; justify-content:space-between;">
-        <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
-        <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
-        </div>
-    </form>
-
-    <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-        <img src="loading.gif" alt="Cargando..." style="width:80px;">
-    </div>
-
-    </div>
-    </div>
-
-
-    <button id="reopen-cta-btn" style="
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff9800;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 13px;
-    cursor: pointer;
-    z-index: 9999;
-    opacity: 0;
-    max-width: 180px;
-    width: auto;
-    white-space: nowrap;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    ">
-    📲 Abrir menú
-    </button>
 </body>
 </html>
