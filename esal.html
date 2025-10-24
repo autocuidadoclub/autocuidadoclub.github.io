@@ -94,7 +94,7 @@
         /* New/Updated styles for tables */
         .order-table-container {
             overflow-x: auto;
-            margin-bottom: 30px; 
+            margin-bottom: 0; /* Adjusted for accordion padding */
         }
         .order-table-container table {
             width: 100%;
@@ -141,6 +141,48 @@
             text-align: center;
         }
         
+        /* --- ACCORDION STYLES (Restored) --- */
+        .category-accordion {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            background-color: white;
+        }
+        .accordion-header {
+            background-color: #f8f8f8;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #002b5c;
+            border-bottom: 1px solid #eee;
+        }
+        .accordion-header:hover {
+            background-color: #f0f0f0;
+        }
+        .accordion-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+        }
+        .accordion-content.active {
+            max-height: 2000px; /* Large enough to hold all table content */
+            padding: 15px;
+        }
+        .accordion-header .icon {
+            transition: transform 0.4s ease;
+            font-size: 1.2rem;
+        }
+        .accordion-header .icon.rotated {
+            transform: rotate(180deg);
+        }
+        /* --- END ACCORDION STYLES --- */
+
         /* --- NEW STYLES FOR INFO ROW --- */
         .info-row {
             display: flex;
@@ -197,15 +239,6 @@
             }
         }
         /* --- END NEW STYLES --- */
-        
-        /* Other existing styles... */
-        .product-group-header {
-            background-color: #e6f7ff;
-            font-weight: bold;
-            color: #002b5c;
-            text-align: center;
-        }
-        /* ... (rest of your existing styles) ... */
     </style>
 
 
@@ -456,13 +489,19 @@
             productMap[p.scent][p.size] = p;
         });
         
-        // **START ACCORDION WRAPPER (This is still using the non-accordion style from the file) **
-        let html = `<div class="order-table-container">
-            <table>
-                <thead>
-                    <tr class="product-group-header"><th colspan="${sizes.length + 1}">🧴 ${category}</th></tr>
-                    <tr>
-                        <th class="matrix-scent-cell">Aroma/Fragancia</th>`;
+        // **START ACCORDION WRAPPER (Restored) **
+        let html = `<div class="category-accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>🧴 ${category}</span>
+                <i class="fas fa-chevron-down icon"></i>
+            </div>
+            <div class="accordion-content">
+                <div class="order-table-container">
+                    <table>
+                        <thead>
+                            <tr class="product-group-header"><th colspan="${sizes.length + 1}">${category}</th></tr>
+                            <tr>
+                                <th class="matrix-scent-cell">Aroma/Fragancia</th>`;
         // **END ACCORDION WRAPPER**
         
         sizes.forEach(size => {
@@ -496,23 +535,32 @@
             }
         }
 
-        html += `</tbody></table></div>`; 
+        html += `</tbody></table></div></div></div>`; // **CLOSE ACCORDION WRAPPER (Restored) **
         return html;
     }
 
     function generateVerticalCategoryHtml(category, products) {
         // Usado para Alcohol Líquido, Desinfectante, Lejía y Repelente
-        let html = `<div class="order-table-container">
-            <table>
-                <thead>
-                    <tr class="product-group-header"><th colspan="3">🧴 ${category}</th></tr>
-                    <tr>
-                        <th>Producto y Presentación</th>
-                        <th class="text-center">Precio Unitario</th>
-                        <th class="text-center">Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+        
+        // **START ACCORDION WRAPPER (Restored) **
+        let html = `<div class="category-accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>🧴 ${category}</span>
+                <i class="fas fa-chevron-down icon"></i>
+            </div>
+            <div class="accordion-content">
+                <div class="order-table-container">
+                    <table>
+                        <thead>
+                            <tr class="product-group-header"><th colspan="3">${category}</th></tr>
+                            <tr>
+                                <th>Producto y Presentación</th>
+                                <th class="text-center">Precio Unitario</th>
+                                <th class="text-center">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+        // **END ACCORDION WRAPPER**
         
         products.forEach(product => {
             const labelText = product.display || `${product.size} (${product.scent})`;
@@ -524,9 +572,37 @@
                         <td class="text-center">${content}</td>
                     </tr>`;
         });
-        html += `</tbody></table></div>`;
+        html += `</tbody></table></div></div></div>`; // **CLOSE ACCORDION WRAPPER (Restored) **
         return html;
     }
+
+    // --- NEW ACCORDION LOGIC (Restored) ---
+    function toggleAccordion(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.icon');
+        
+        // Toggle the active state
+        if (content.classList.contains('active')) {
+            content.classList.remove('active');
+            icon.classList.remove('rotated');
+        } else {
+            // Close other open accordions (optional, but good for single-open view)
+            const activeContents = document.querySelectorAll('.accordion-content.active');
+            activeContents.forEach(c => {
+                c.classList.remove('active');
+                const prevHeader = c.previousElementSibling;
+                if (prevHeader) {
+                    const prevIcon = prevHeader.querySelector('.icon');
+                    if (prevIcon) prevIcon.classList.remove('rotated');
+                }
+            });
+
+            // Open the clicked one
+            content.classList.add('active');
+            icon.classList.add('rotated');
+        }
+    }
+
 
     // --- Función Principal de Generación ---
     function initializeProductForm() {
@@ -550,7 +626,7 @@
     window.addEventListener('load', initializeProductForm);
 
 
-    // --- Funciones de Lógica (ACTUALIZADA LA LÓGICA DE PROMOCIONES) ---
+    // --- Funciones de Lógica (Free delivery at $15.00) ---
 
     function updateTotal() {
         let total = 0;
