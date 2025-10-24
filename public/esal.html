@@ -545,7 +545,7 @@
     window.addEventListener('load', initializeProductForm);
 
 
-    // --- Funciones de Lógica (sin cambios) ---
+    // --- Funciones de Lógica (ACTUALIZADA LA LÓGICA DE PROMOCIONES) ---
 
     function updateTotal() {
         let total = 0;
@@ -559,8 +559,20 @@
         document.getElementById("totalAmount").textContent = total.toFixed(2);
 
         const promo = document.getElementById("promoMessage");
-        promo.textContent = total >= 50 ?
-        "✅ ¡Tu pedido aplica para Tasa Cero Banco Agrícola!" : "";
+        promo.textContent = ""; // Clear existing messages
+
+        // Free shipping message if total >= $15 and less than $50
+        if (total >= 15.00 && total < 50.00) {
+            promo.innerHTML = "🚚 <strong>¡Envío gratis en este pedido!</strong>";
+        }
+
+        // Both messages if total >= $50
+        if (total >= 50.00) {
+            promo.innerHTML = `
+                ✅ <strong>¡Aplica para Tasa Cero Banco Agrícola!</strong><br>
+                🚚 <strong>¡Envío gratis en este pedido!</strong>
+            `;
+        }
     }
 
     function sendOrder() {
