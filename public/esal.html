@@ -464,7 +464,7 @@
     };
     const matrixCategories = ["Alcohol Gel", "Jabón Líquido para Manos"];
 
-    // --- NUEVO OBJETO DE LOCACIONES (El Salvador) ---
+    // --- OBJETO DE LOCACIONES (El Salvador) - CORREGIDO (La Paz añadida) ---
     const locations = {
         "Ahuachapán": ["Ahuachapán", "Apaneca", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Tacuba", "Turín"],
         "Santa Ana": ["Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Masahuat", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Ana", "Santa Rosa Guachipilín", "Texistepeque"],
@@ -473,16 +473,19 @@
         "Cuscatlán": ["Candelaria", "Cojutepeque", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Pedro Perulapán", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo"],
         "San Salvador": ["Aguilares", "Apopa", "Ayutuxtepeque", "Ciudad Delgado", "Cuscatancingo", "El Paisnal", "Guazapa", "Ilopango", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "San Salvador", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque"],
         "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "San Juan Opico", "Quezaltepeque", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
-        "La Paz": [Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Pedro Masahuat", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Miguel Tepezontes", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalguaca"],
         "San Vicente": ["Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "San Vicente", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
         "Cabañas": ["Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Sensuntepeque", "Tejutepeque", "Victoria"],
+        "La Paz": ["San Pedro Masahuat", "Zacatecoluca", "San Juan Talpa", "Santiago Nonualco", "San Luis La Herradura", "San Rafael Obrajuelo", "San Antonio Masahuat", "Cuyultitán", "San Juan Nonualco", "Jerusalén", "Mercedes La Ceiba", "Olocuilta"], // <-- DEPARTAMENTO AÑADIDO
         "Usulután": ["Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"],
         "San Miguel": ["Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "El Tránsito", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Miguel", "San Rafael Oriente", "Sesori", "Uluazapa"],
         "Morazán": ["Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Lolotiquillo", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Francisco Gotera", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
         "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "Conchagua", "El Carmen", "El Sauce", "Intipucá", "La Unión", "Lislique", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín"]
     };
 
+
     // --- Funciones Auxiliares para Generar HTML de la Tabla ---
+    // ... (generateInput, generateMatrixCategoryHtml, generateVerticalCategoryHtml, toggleAccordion functions here) ...
+    // Note: These functions remain unchanged from the previous version.
 
     function generateInput(product, category) {
         // Genera el input de cantidad con data-price y data-name
@@ -508,16 +511,13 @@
         const sizes = category === "Alcohol Gel" 
             ? ["Galón", "500 mL", "120 mL", "30 mL"] 
             : ["Galón", "500 mL"];
-        // Usar un Set para obtener solo aromas únicos
         const scents = [...new Set(products.map(p => p.scent))].filter(s => s !== "Sin Fragancia (Sin Silicón)").sort();
-        // Mapear productos por aroma y tamaño para acceso rápido
         const productMap = {};
         products.forEach(p => {
             if (!productMap[p.scent]) productMap[p.scent] = {};
             productMap[p.scent][p.size] = p;
         });
         
-        // **START ACCORDION WRAPPER (Restored) **
         let html = `<div class="category-accordion">
             <div class="accordion-header" onclick="toggleAccordion(this)">
                 <span>🧴 ${category}</span>
@@ -530,17 +530,14 @@
                             <tr class="product-group-header"><th colspan="${sizes.length + 1}">${category}</th></tr>
                             <tr>
                                 <th class="matrix-scent-cell">Aroma/Fragancia</th>`;
-        // **END ACCORDION WRAPPER**
         
         sizes.forEach(size => {
-            // Obtener el precio base para mostrarlo en el encabezado de la columna
             const exampleProduct = products.find(p => p.size === size);
             const priceText = exampleProduct ? `($${exampleProduct.price.toFixed(2)})` : '';
             html += `<th class="matrix-size-cell">${size}<br>${priceText}</th>`;
         });
         html += `</tr></thead><tbody>`;
 
-        // Generar filas por aroma
         scents.forEach(scent => {
             html += `<tr><td class="matrix-scent-cell">${scent}</td>`;
             sizes.forEach(size => {
@@ -550,7 +547,6 @@
             });
             html += `</tr>`;
         });
-        // Caso especial: 30 mL Sin Silicón (solo en Alcohol Gel)
         if (category === "Alcohol Gel") {
             const specialProduct = products.find(p => p.scent === "Sin Fragancia (Sin Silicón)");
             if (specialProduct) {
@@ -563,14 +559,11 @@
             }
         }
 
-        html += `</tbody></table></div></div></div>`; // **CLOSE ACCORDION WRAPPER (Restored) **
+        html += `</tbody></table></div></div></div>`;
         return html;
     }
 
     function generateVerticalCategoryHtml(category, products) {
-        // Usado para Alcohol Líquido, Desinfectante, Lejía y Repelente
-        
-        // **START ACCORDION WRAPPER (Restored) **
         let html = `<div class="category-accordion">
             <div class="accordion-header" onclick="toggleAccordion(this)">
                 <span>🧴 ${category}</span>
@@ -588,7 +581,6 @@
                             </tr>
                         </thead>
                         <tbody>`;
-        // **END ACCORDION WRAPPER**
         
         products.forEach(product => {
             const labelText = product.display || `${product.size} (${product.scent})`;
@@ -600,21 +592,18 @@
                         <td class="text-center">${content}</td>
                     </tr>`;
         });
-        html += `</tbody></table></div></div></div>`; // **CLOSE ACCORDION WRAPPER (Restored) **
+        html += `</tbody></table></div></div></div>`;
         return html;
     }
-
-    // --- NEW ACCORDION LOGIC (Restored) ---
+    
     function toggleAccordion(header) {
         const content = header.nextElementSibling;
         const icon = header.querySelector('.icon');
         
-        // Toggle the active state
         if (content.classList.contains('active')) {
             content.classList.remove('active');
             icon.classList.remove('rotated');
         } else {
-            // Close other open accordions (optional, but good for single-open view)
             const activeContents = document.querySelectorAll('.accordion-content.active');
             activeContents.forEach(c => {
                 c.classList.remove('active');
@@ -625,7 +614,6 @@
                 }
             });
 
-            // Open the clicked one
             content.classList.add('active');
             icon.classList.add('rotated');
         }
@@ -694,8 +682,6 @@
 
     // EJECUCIÓN: Se asegura que se inicialice todo al cargar la página
     window.addEventListener('load', initializeProductForm);
-    // Ejecuta la función cuando el DOM se haya cargado.
-    window.addEventListener('load', initializeProductForm);
 
 
     // --- Funciones de Lógica (Free delivery at $15.00) ---
@@ -741,20 +727,22 @@
                 totalQty += qty;
             }
         });
-        const location = document.getElementById("location").value.trim();
-        const municipality = document.getElementById("municipality").value.trim();
+        
+        const department = document.getElementById("department").value;
+        const municipality = document.getElementById("municipality").value;
         const name = document.getElementById("name").value.trim();
+        const location = document.getElementById("location").value.trim();
         const paymentMethod = document.getElementById("paymentMethod").value;
         const total = document.getElementById("totalAmount").textContent;
         const whatsappNumber = "50375704428";
 
-        // Validación
+        // Validación (actualizada para incluir departamento)
         if (totalQty === 0) {
             alert("⚠️ Por favor, selecciona al menos un producto.");
             return;
         }
-        if (!location || !municipality || !name || paymentMethod === "") {
-            alert("⚠️ Por favor, completa todos los campos de entrega y selecciona un Método de Pago.");
+        if (department === "" || municipality === "" || !location || !name || paymentMethod === "") {
+            alert("⚠️ Por favor, completa todos los campos de entrega (Departamento, Municipio, Nombre, Ubicación) y selecciona un Método de Pago.");
             return;
         }
 
@@ -762,12 +750,13 @@
         message += `*PRODUCTOS DETALLE:*\n${orderDetails}\n`;
         message += `*TOTAL ESTIMADO: $${total}*\n`;
         message += `*MÉTODO DE PAGO:* ${paymentMethod}\n\n`;
-        message += `*DATOS DE ENTREGA:*\nNombre: ${name}\nMunicipio: ${municipality}\nUbicación: ${location}`;
+        // Mensaje de entrega actualizado
+        message += `*DATOS DE ENTREGA:*\nNombre: ${name}\nDepartamento: ${department}\nMunicipio/Distrito: ${municipality}\nUbicación: ${location}`;
 
         window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
     }
 
-    // Las funciones de PWA/Modal deben ir aquí si las quieres mantener:
+    // PWA and auxiliary functions (left for completeness)
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
