@@ -646,9 +646,53 @@
         }
         container.innerHTML = fullHtml;
         updateTotal();
-        // Asegura que el total inicial sea 0.00
+        populateLocations(); // Llama a la función para llenar el desplegable de departamentos
+    }
+    
+    // --- FUNCIONES DE LOCACIÓN (Departamento/Municipio) ---
+    function populateLocations() {
+        const departmentSelect = document.getElementById('department');
+        
+        // Clear existing options
+        departmentSelect.innerHTML = '<option value="" disabled selected>Selecciona un departamento</option>';
+
+        // Populate departments, sorted alphabetically
+        Object.keys(locations).sort().forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept;
+            option.textContent = dept;
+            departmentSelect.appendChild(option);
+        });
+
+        // Initial setup for municipality
+        updateMunicipalities();
     }
 
+    function updateMunicipalities() {
+        const departmentSelect = document.getElementById('department');
+        const municipalitySelect = document.getElementById('municipality');
+        const selectedDepartment = departmentSelect.value;
+        
+        // Reset municipality select
+        municipalitySelect.innerHTML = '<option value="" disabled selected>Selecciona un municipio/distrito</option>';
+
+        if (selectedDepartment && locations[selectedDepartment]) {
+            // Populate municipalities, sorted alphabetically
+            locations[selectedDepartment].sort().forEach(mun => {
+                const option = document.createElement('option');
+                option.value = mun;
+                option.textContent = mun;
+                municipalitySelect.appendChild(option);
+            });
+            municipalitySelect.disabled = false;
+        } else {
+            municipalitySelect.disabled = true;
+        }
+    }
+
+
+    // EJECUCIÓN: Se asegura que se inicialice todo al cargar la página
+    window.addEventListener('load', initializeProductForm);
     // Ejecuta la función cuando el DOM se haya cargado.
     window.addEventListener('load', initializeProductForm);
 
