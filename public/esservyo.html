@@ -167,49 +167,54 @@
     </div>
   </section>
 
-  <!-- Contact Form Section -->
-<section class="contact-form-container">
-  <h2>Contáctanos</h2>
+<section id="contacto" style="padding: 60px 0; background: #f8faff;">
+  <div style="max-width: 900px; margin: auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 40px;">
+    
+    <h2 style="text-align:center; color:#003366; margin-bottom: 10px;">Contáctanos</h2>
+    <p style="text-align:center; color:#555; margin-bottom: 30px;">
+      Cuéntanos tus necesidades o solicita una cotización personalizada. Nuestro equipo de seguridad industrial te responderá pronto.
+    </p>
 
-  <form id="contactForm" method="POST">
-    <input type="hidden" name="_subject" value="Formulario para contactar al staff de AutoCuidado Club">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_template" value="table">
+    <form action="https://formsubmit.co/info@autocuidadoclub.com" method="POST" style="display: grid; gap: 20px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <div style="flex: 1; min-width: 250px;">
+          <label for="nombre" style="font-weight:600;">Nombre completo</label>
+          <input type="text" name="nombre" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;">
+        </div>
 
-    <label for="name">Nombre</label>
-    <input type="text" id="name" name="name" required>
+        <div style="flex: 1; min-width: 250px;">
+          <label for="correo" style="font-weight:600;">Correo electrónico</label>
+          <input type="email" name="correo" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;">
+        </div>
+      </div>
 
-    <label for="email">Correo Electrónico</label>
-    <input type="email" id="email" name="email" required>
+      <div>
+        <label for="whatsapp" style="font-weight:600;">Número de WhatsApp</label>
+        <input type="text" name="whatsapp" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;">
+      </div>
 
-    <label for="phone">Número de WhatsApp</label>
-    <input type="text" id="phone" name="phone" required>
+      <div>
+        <label for="mensaje" style="font-weight:600;">Mensaje</label>
+        <textarea name="mensaje" rows="5" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;"></textarea>
+      </div>
 
-    <label for="message">Mensaje</label>
-    <textarea id="message" name="message" rows="4" required></textarea>
-
-    <button type="submit">Enviar</button>
-  </form>
-
-  <!-- Loader -->
-  <div id="loader" style="display:none; justify-content:center; margin-top:1rem;">
-    <img src="loading.gif" alt="Cargando...">
-  </div>
-
-  <div class="contact-info">
-    <h3>Teléfono: +503 7570-4428</h3>
-    <h3>
-      <a href="https://wa.me/+50375704428" target="_blank" class="whatsapp-button">
-        Contáctanos en WhatsApp
-      </a>
-    </h3>
-    <a href="mailto:info@autocuidadoclub.com?subject=Formulario%20para%20contactar%20al%20staff%20de%20AutoCuidado%20Club">
-      <button style="background-color:#007bff; color:white; border:none; padding:10px 20px; border-radius:5px; font-size:16px; cursor:pointer;">
-        Contáctanos al correo: info@autocuidadoclub.com
+      <button type="submit" style="background:#003366; color:white; padding:14px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:0.3s;">
+        Enviar Mensaje
       </button>
-    </a>
+    </form>
+
+    <div style="text-align:center; margin-top:30px;">
+      <p style="color:#333; margin-bottom:10px;">O contáctanos directamente:</p>
+      <a href="https://wa.me/50375704428" target="_blank" style="background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600; display:inline-block; margin-right:10px;">
+        <i class="fa fa-whatsapp"></i> WhatsApp
+      </a>
+      <a href="mailto:info@autocuidadoclub.com" style="background:#0066ff; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600; display:inline-block;">
+        <i class="fa fa-envelope"></i> Email
+      </a>
+    </div>
   </div>
 </section>
+
 
 <!-- JavaScript for AJAX Form Submission -->
 <script>
