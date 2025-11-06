@@ -106,17 +106,25 @@ function registerUser(event) {
     return;
   }
 
-  // 🔹 Build vehicles (inspectionDates empty for staff)
-  const vehicles = [];
-  document.querySelectorAll(".vehicle-entry").forEach(entry => {
-    vehicles.push({
-      plate: entry.querySelector(".plate").value || "",
-      model: entry.querySelector(".model").value || "",
-      brand: entry.querySelector(".brand").value || "",
-      year: entry.querySelector(".year").value || "",
-      inspectionDates: [] // ← staff will later add {date, note}
-    });
-  });
+// 🔹 Build vehicles (inspectionDates empty for staff)
+const vehicles = [];
+document.querySelectorAll(".vehicle-entry").forEach(entry => {
+  const brand = entry.querySelector(".brand").value || "";
+  const model = entry.querySelector(".model").value || "";
+  const plate = entry.querySelector(".plate").value || "";
+  const year = entry.querySelector(".year").value || "";
+
+  // ✅ Create object in exact order desired
+  const vehicleData = {};
+  vehicleData.brand = brand;
+  vehicleData.model = model;
+  vehicleData.plate = plate;
+  vehicleData.year = year;
+  vehicleData.inspectionDates = []; // staff later adds { date, note }
+
+  vehicles.push(vehicleData);
+});
+
 
   // 🔹 Define Wompi payment links
   const wompiLinks = {
@@ -1372,15 +1380,23 @@ document.addEventListener("DOMContentLoaded", function () {
          const referralCode = document.getElementById("referralCode").value.trim();
 
         const vehicles = [];
-        document.querySelectorAll(".vehicle-entry").forEach(entry => {
-            vehicles.push({
-                plate: entry.querySelector(".plate").value || "",
-                model: entry.querySelector(".model").value || "",
-                brand: entry.querySelector(".brand").value || "",
-                year: entry.querySelector(".year").value || "",
-                inspectionDates: []  // ✅ Inicializa campo vacío
-            });
-        });
+document.querySelectorAll(".vehicle-entry").forEach(entry => {
+  const brand = entry.querySelector(".brand").value || "";
+  const model = entry.querySelector(".model").value || "";
+  const plate = entry.querySelector(".plate").value || "";
+  const year = entry.querySelector(".year").value || "";
+
+  // ✅ Explicitly build object in the exact desired order
+  const vehicleData = {};
+  vehicleData.brand = brand;
+  vehicleData.model = model;
+  vehicleData.plate = plate;
+  vehicleData.year = year;
+  vehicleData.inspectionDates = [];
+
+  vehicles.push(vehicleData);
+});
+
 
 
         if (!name || !email || !phone || !password || !department || !municipality || !selectedDay || !selectedTime) {
