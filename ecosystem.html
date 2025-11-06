@@ -160,6 +160,89 @@
                 height: auto; 
             }
         }
+
+        /* --- Misión y Visión --- */
+.mission-vision {
+  background: linear-gradient(to bottom right, #ffffff, #f4f8fb);
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.mv-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.mv-title {
+  color: #007799;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mv-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.mv-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  padding: 30px 25px;
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.mv-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.mv-card h3 {
+  font-size: 1.4rem;
+  color: #003d66;
+  margin-bottom: 10px;
+}
+
+.mv-card p {
+  font-size: 1.05rem;
+  color: #333;
+  line-height: 1.6;
+}
+
+.mv-summary {
+  margin-top: 20px;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #444;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Color accents */
+.mission h3 { color: #007799; }
+.vision h3 { color: #ff6600; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mv-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .mv-card {
+    max-width: 90%;
+  }
+}
+
     </style>
 </head>
 
@@ -180,29 +263,43 @@
 
     </header>
 
-            <!-- Misión y Visión -->
-<div class="main-container">
-  <div class="box" style="max-width: 1000px; margin: 0 auto; text-align: center;">
-    <h2 style="color: #007799;">Nuestra Misión y Visión</h2>
-        <p style="font-size: 1.1rem; line-height: 1.6;">
-      Nuestra misión es promover una cultura de <strong>autocuidado integral</strong> que proteja a las personas, los espacios y los recursos, 
-      contribuyendo al desarrollo sostenible de las comunidades donde operamos.  
-    </p>
-     <p style="font-size: 1.1rem; line-height: 1.6;">
-      En <strong>AutoCuidado</strong>, creemos que el bienestar comienza con los pequeños hábitos de cuidado. 
-      Por eso, impulsamos soluciones que mejoran la <strong>productividad, la salud y la seguridad</strong> en cada entorno: 
-      desde el mantenimiento responsable de los vehículos con <strong>AutoCuidado Club</strong>, 
-      la limpieza y prevención en el hogar con <strong>AutoCuidado Home</strong>, 
-      el consumo responsable de hielo purificado con <strong>AutoCuidado ICE</strong>, 
-      hasta la consultoría profesional en seguridad y salud ocupacional con <strong>AutoCuidado Pro</strong>. ❄️🚗🏠👷‍♂️
-    </p>
-    <p style="font-size: 1.1rem; line-height: 1.6;">
-      Nuestra visión es consolidar el <strong>ecosistema AutoCuidado</strong> como un referente en 
-      innovación, confianza y compromiso social en El Salvador y Centroamérica, 
-      garantizando productos y servicios que fortalezcan la salud, la seguridad y la productividad de cada persona y empresa. 💧
-    </p>
-   </div>
-</div>
+            <!-- Misión y Visión Mejorada -->
+<section class="mission-vision">
+  <div class="mv-container">
+    <h2 class="mv-title">Nuestra Misión y Visión</h2>
+
+    <div class="mv-cards">
+      <div class="mv-card mission">
+        <h3>🚀 Nuestra Misión</h3>
+        <p>
+          Promover una cultura de <strong>autocuidado integral</strong> que proteja a las personas, los espacios y los recursos,
+          contribuyendo al desarrollo sostenible de las comunidades donde operamos.
+        </p>
+      </div>
+
+      <div class="mv-card vision">
+        <h3>🌎 Nuestra Visión</h3>
+        <p>
+          Consolidar el <strong>ecosistema AutoCuidado</strong> como referente de innovación, confianza y compromiso social
+          en El Salvador y Centroamérica, garantizando productos y servicios que fortalezcan la salud,
+          la seguridad y la productividad de cada persona y empresa.
+        </p>
+      </div>
+    </div>
+
+    <div class="mv-summary">
+      <p>
+        En <strong>AutoCuidado</strong>, creemos que el bienestar comienza con los pequeños hábitos de cuidado.
+        Por eso, impulsamos soluciones que mejoran la <strong>productividad, la salud y la seguridad</strong>:
+        desde el mantenimiento responsable de los vehículos con <strong>AutoCuidado Club</strong>,
+        la limpieza y prevención en el hogar con <strong>AutoCuidado Home</strong>,
+        el consumo responsable de hielo purificado con <strong>AutoCuidado ICE</strong>,
+        hasta la consultoría profesional en seguridad y salud ocupacional con <strong>AutoCuidado Pro</strong>. ❄️🚗🏠👷‍♂️
+      </p>
+    </div>
+  </div>
+</section>
+
     
     <section class="ecosystem-section">
 
