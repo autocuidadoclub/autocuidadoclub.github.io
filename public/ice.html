@@ -532,7 +532,7 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
     const hielo100Qty = parseInt(document.getElementById("hielo100Qty").value) || 0;
 
     // Prices: 5lb @ 2.00, 50lb @ 10, 100lb @ 20
-    const total = (potableQty * 1.50) + (hielo50Qty * 10) + (hielo100Qty * 20);
+    const total = (potableQty * 2.00) + (hielo50Qty * 10) + (hielo100Qty * 20);
     document.getElementById("totalAmount").textContent = total.toFixed(2);
 
     const promo = document.getElementById("promoMessage");
