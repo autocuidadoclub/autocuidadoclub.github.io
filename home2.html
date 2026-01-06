@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoCuidado Club - Inicio</title>
+
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- PushEngage -->
+<script>
+(function(w,d){
+w.PushEngage=w.PushEngage||[];
+PushEngage.push(['init',{appId:'2f304881-8eee-4a7a-a487-6f231bd85ec7'}]);
+var e=d.createElement('script');
+e.src='https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
+e.async=true;
+d.head.appendChild(e);
+})(window,document);
+</script>
+</head>
+
+<body>
+
+<!-- Floating Contact -->
+<button class="floating-contact-button" onclick="window.open('contacto.html','_blank')">
+<i class="fas fa-headset"></i> Contactar Staff
+</button>
+
+<!-- NAV -->
+<nav class="navbar">
+<ul class="nav-links">
+<li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+<li><a href="servicios.html">Servicios</a></li>
+<li><a href="suscripciones.html">Suscripciones</a></li>
+<li><a href="contacto.html">Contacto</a></li>
+<li><a href="login.html">Ingresa</a></li>
+</ul>
+<div class="logo-container">
+<img src="logo.jpg" class="logo" alt="AutoCuidado Club">
+</div>
+</nav>
+
+<!-- HERO -->
+<header>
+<div class="header-container">
+<div class="header-text">
+<h1>Un solo pago. Visitas mensuales. Tú decides cómo usarlas.</h1>
+<p>
+Pago AutoCuidado → Tengo visitas →  
+<strong>Las uso donde más lo necesito ese mes.</strong>
+</p>
+</div>
+</div>
+
+<section class="info-section">
+<div class="container">
+<h2>AutoCuidado es mantenimiento preventivo para tu vida</h2>
+<p>
+Usa tus visitas en tu <strong>carro</strong>, tu <strong>hogar</strong> o tu <strong>bienestar</strong>.
+Sin contratos complicados, sin estrés y sin perder tiempo.
+</p>
+</div>
+</section>
+</header>
+
+<!-- HOW IT WORKS -->
+<section id="intro">
+<h2>¿Cómo funciona AutoCuidado?</h2>
+<ul class="styled-list">
+<li><strong>Pagas tu membresía.</strong></li>
+<li><strong>Recibes 1 o 2 visitas al mes.</strong></li>
+<li><strong>Cada mes decides dónde usarlas.</strong></li>
+</ul>
+<p><em>No eliges servicios fijos. Eliges tranquilidad.</em></p>
+</section>
+
+<!-- WHY DIFFERENT -->
+<section class="why-different-section">
+<h2>¿Por qué AutoCuidado es diferente?</h2>
+<p>
+No vendemos reparaciones.  
+<strong>Vendemos prevención, control y paz mental.</strong>
+</p>
+<p>
+Cada visita está diseñada para resolver tareas reales en
+<strong>60 minutos operativos</strong>, cuidando tus activos y tu tiempo.
+</p>
+</section>
+
+<!-- DIVISIONS (MERGED) -->
+<section class="transform-culture-section">
+<h2>¿Dónde puedes usar tus visitas?</h2>
+
+<div class="tabs-container">
+<div class="tabs">
+<button class="tab-button active" data-tab="auto">🚗 Auto</button>
+<button class="tab-button" data-tab="home">🏠 Hogar</button>
+<button class="tab-button" data-tab="fit">🧠 Bienestar</button>
+</div>
+
+<div class="tab-content" id="auto">
+<ul class="styled-list">
+<li>Mantenimiento preventivo</li>
+<li>Revisiones generales</li>
+<li>Diagnóstico y control</li>
+<li>Preparación de vehículos</li>
+</ul>
+</div>
+
+<div class="tab-content" id="home" style="display:none">
+<ul class="styled-list">
+<li>AC y ventilación</li>
+<li>Cambio de llaves y grifos</li>
+<li>Mantenimiento ligero</li>
+<li>Control de propiedades vacías</li>
+</ul>
+</div>
+
+<div class="tab-content" id="fit" style="display:none">
+<ul class="styled-list">
+<li>Orientación psicológica</li>
+<li>Nutrición y hábitos</li>
+<li>Asistencia personal</li>
+<li>Soporte familiar</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- PLANS -->
+<section class="subscription-section">
+<h2>Planes simples, sin confusión</h2>
+
+<div class="subscription-cards">
+
+<div class="subscription-card basic-plan">
+<h3>Básico</h3>
+<p><strong>1 visita mensual</strong></p>
+<ul>
+<li>Usable en 1 activo por mes</li>
+<li>Auto, hogar o persona</li>
+<li>Programa de lealtad</li>
+</ul>
+</div>
+
+<div class="subscription-card plus-plan">
+<h3>Premium</h3>
+<p><strong>2 visitas mensuales</strong></p>
+<ul>
+<li>Combina activos libremente</li>
+<li>2 carros / hogar / personas</li>
+<li>Mayor flexibilidad</li>
+<li>Programa de lealtad avanzado</li>
+</ul>
+</div>
+
+</div>
+
+<p class="cta-text">
+AutoCuidado no te ata a un servicio.  
+<strong>Te da control.</strong>
+</p>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+<h2>Empieza hoy</h2>
+<button class="cta-button" onclick="window.location.href='suscripciones.html'">
+Ver Suscripciones
+</button>
+<button class="cta-button" onclick="window.location.href='contacto.html'">
+Hablar con un asesor
+</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<p>&copy; 2024 AutoCuidado Club</p>
+<ul>
+<li><a href="tac.html">Términos</a></li>
+</ul>
+</footer>
+
+<!-- Tabs JS -->
+<script>
+const tabs=document.querySelectorAll(".tab-button");
+const contents=document.querySelectorAll(".tab-content");
+tabs.forEach(tab=>{
+tab.addEventListener("click",()=>{
+tabs.forEach(b=>b.classList.remove("active"));
+contents.forEach(c=>c.style.display="none");
+tab.classList.add("active");
+document.getElementById(tab.dataset.tab).style.display="block";
+});
+});
+</script>
+
+</body>
+</html>
