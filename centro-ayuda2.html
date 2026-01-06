@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AutoCuidado Club - Un solo pago, visitas mensuales que usas donde más lo necesitas: auto, hogar o bienestar.">
+
+  <title>Centro de Ayuda | AutoCuidado Club</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7fa;
+      color: #333;
+      margin: 0;
+    }
+    header {
+      margin: 0;
+      padding-top: 60px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+    }
+    nav {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #1c3d5a;
+      font-weight: bold;
+    }
+    .search-bar {
+      margin: 20px 0;
+      text-align: center;
+    }
+    .search-bar input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    section {
+      margin-bottom: 40px;
+    }
+    section h2 {
+      color: #1c3d5a;
+      border-bottom: 2px solid #1c3d5a;
+      padding-bottom: 5px;
+    }
+    .faq {
+      margin-top: 15px;
+    }
+    .faq h3 {
+      color: #ff6600;
+      cursor: pointer;
+      margin-bottom: 5px;
+    }
+    .faq p {
+      display: none;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<script src="env.js"></script>
+
+<nav class="navbar">
+  <ul class="nav-links">
+    <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="servicios.html">Servicios</a></li>
+    <li><a href="suscripciones.html">Suscripciones</a></li>
+    <li><a href="contacto.html">Contáctanos</a></li>
+    <li><a href="login.html">Ingresa a tu cuenta</a></li>
+    <li><a href="tac.html">Términos y Condiciones</a></li>
+    <li class="has-dropdown">
+      <a href="/ecosystem" class="divisiones-badge">CONOCE NUESTRAS DIVISIONES</a>
+    </li>
+  </ul>
+  <div class="logo-container">
+    <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+  </div>
+</nav>
+
+<header style="background: linear-gradient(to bottom, #002F6C, #003366); padding: 60px 20px; text-align: center;">
+  <div class="header-text">
+    <h1 style="color: white; font-size: 2.5em;">Centro de Ayuda</h1>
+    <p style="color: white; font-size: 1.2em;">
+      Pago AutoCuidado → Tengo visitas → Las uso donde más lo necesito
+    </p>
+  </div>
+</header>
+
+<div class="container">
+
+<nav>
+  <a href="#planes">Planes</a>
+  <a href="#pagos">Pagos</a>
+  <a href="#visitas">Visitas</a>
+  <a href="#recompensas">Recompensas</a>
+  <a href="#faq">FAQs</a>
+</nav>
+
+<div class="search-bar">
+  <input type="text" placeholder="Buscar en el Centro de Ayuda..." />
+</div>
+
+<section id="planes">
+  <h2>Planes y Suscripciones</h2>
+
+  <div class="faq">
+    <h3>¿Cómo funciona AutoCuidado Club?</h3>
+    <p>
+      AutoCuidado Club es un ecosistema de mantenimiento preventivo por suscripción.
+      Un solo pago mensual te da acceso a <strong>visitas</strong> que puedes usar en tu
+      carro, tu hogar o tu bienestar personal.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>¿Qué es una visita?</h3>
+    <p>
+      Una visita es una sesión operativa de hasta <strong>60 minutos</strong>
+      enfocada en mantenimiento ligero, revisión, control o asistencia preventiva.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>¿Cuántas visitas incluye cada plan?</h3>
+    <p>
+      El Plan Básico incluye <strong>1 visita mensual</strong>.
+      El Plan Premium incluye <strong>2 visitas mensuales</strong>,
+      combinables entre divisiones.
+    </p>
+  </div>
+</section>
+
+<section id="pagos">
+  <h2>Pagos y Facturación</h2>
+
+  <div class="faq">
+    <h3>¿Pago por servicio o por visitas?</h3>
+    <p>
+      Pagas por visitas, no por servicios individuales.
+      Tú decides cada mes dónde usarlas.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>¿Hay servicios con costo adicional?</h3>
+    <p>
+      Sí. Trabajos mayores, materiales o servicios fuera del mantenimiento preventivo
+      se cotizan por separado con tarifas preferenciales.
+    </p>
+  </div>
+</section>
+
+<section id="visitas">
+  <h2>Uso y Programación de Visitas</h2>
+
+  <div class="faq">
+    <h3>¿Cómo agendo una visita?</h3>
+    <p>
+      Desde tu panel o contactando a nuestro staff.
+      Coordinamos el tipo de visita y el horario ideal.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>¿Puedo usar visitas en diferentes activos?</h3>
+    <p>
+      Sí. Según tu plan, puedes usar tus visitas en distintos carros,
+      personas o propiedades registradas.
+    </p>
+  </div>
+</section>
+
+<section id="recompensas">
+  <h2>Recompensas y Beneficios</h2>
+
+  <div class="faq">
+    <h3>¿Cómo funcionan las recompensas?</h3>
+    <p>
+      Cada mes activo acumulas progreso.
+      Puedes desbloquear visitas extra o beneficios especiales
+      en cualquier división.
+    </p>
+  </div>
+</section>
+
+<section id="faq">
+  <h2>Preguntas Frecuentes</h2>
+
+  <div class="faq">
+    <h3>¿Qué NO cubre la suscripción?</h3>
+    <p>
+      No cubre remodelaciones, construcciones, trabajos estructurales,
+      limpieza industrial ni servicios especializados extensos.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>¿AutoCuidado reemplaza talleres o empresas?</h3>
+    <p>
+      No. AutoCuidado es un sistema preventivo y de control.
+      Te ayudamos a coordinar trabajos mayores cuando se necesitan.
+    </p>
+  </div>
+</section>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const questions = document.querySelectorAll('.faq h3');
+  questions.forEach(q => {
+    q.addEventListener('click', () => {
+      const p = q.nextElementSibling;
+      document.querySelectorAll('.faq p').forEach(x => x.style.display = 'none');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    });
+  });
+});
+</script>
+
+</body>
+</html>
