@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AutoCuidado Club - Un ecosistema de cuidado para tu carro, tu hogar y tu bienestar. Un pago, visitas mensuales, múltiples soluciones.">
+
+    <title>AutoCuidado Club - Contacto</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+        .contact-form-container {
+            max-width: 520px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-form-container h2 {
+            text-align: center;
+            color: #003366;
+        }
+
+        .contact-form-container p {
+            text-align: center;
+            font-size: 0.95em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .contact-form-container label {
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .contact-form-container input,
+        .contact-form-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .contact-form-container button {
+            background-color: #003366;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+        }
+
+        .contact-form-container button:hover {
+            background-color: #ff6600;
+        }
+
+        .contact-info {
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #loader {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loader img {
+            width: 80px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<script src="env.js"></script>
+
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+        <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
+        <li><a href="tac.html">Términos y Condiciones</a></li>
+        <li class="has-dropdown">
+            <a href="/ecosystem" class="divisiones-badge">CONOCE NUESTRAS DIVISIONES</a>
+        </li>
+    </ul>
+    <div class="logo-container">
+        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+    </div>
+</nav>
+
+<header style="background: linear-gradient(to bottom, #002F6C, #003366); padding: 60px 20px; text-align: center;">
+    <h1 style="color:white;font-size:2.5em;">Hablemos</h1>
+    <p style="color:white;font-size:1.2em;">
+        Un solo contacto para cuidar tu carro, tu hogar y tu vida diaria.
+    </p>
+</header>
+
+<section class="contact-form-container">
+    <h2>Contacto AutoCuidado Club</h2>
+    <p>
+        ¿Tenés preguntas, querés explorar una división, o necesitás ayuda para usar tus visitas?
+        Nuestro equipo te guía.
+    </p>
+
+    <form id="contactForm">
+        <label for="subject">Asunto</label>
+        <input type="text" id="subject" name="subject"
+               value="Contacto general – Ecosistema AutoCuidado Club" readonly>
+
+        <label for="name">Nombre</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="phone">Número de WhatsApp</label>
+        <input type="text" id="phone" name="phone" required>
+
+        <label for="message">¿En qué te podemos ayudar?</label>
+        <textarea id="message" name="message" rows="4" placeholder="Ej: uso de visitas, cambio de registro, servicios de hogar, carros, personas…" required></textarea>
+
+        <button type="submit">Enviar mensaje</button>
+    </form>
+
+    <div id="loader">
+        <img src="loading.gif" alt="Cargando...">
+    </div>
+
+    <div class="contact-info">
+        <h3>📞 +503 7570-4428</h3>
+        <h3>
+            <a href="https://wa.me/+50375704428" target="_blank">Escribinos por WhatsApp</a>
+        </h3>
+        <a href="mailto:info@autocuidadoclub.com">
+            <button style="background-color:#007bff;">Enviar correo</button>
+        </a>
+    </div>
+</section>
+
+<script>
+document.getElementById('contactForm').onsubmit = function(e) {
+    e.preventDefault();
+    const loader = document.getElementById('loader');
+    loader.style.display = 'flex';
+
+    fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: 'POST',
+        body: new FormData(this)
+    })
+    .then(r => r.json())
+    .then(data => {
+        loader.style.display = 'none';
+        if (data.success) {
+            alert('Gracias. Nuestro equipo te contactará pronto.');
+            this.reset();
+        } else {
+            alert('Error al enviar. Intenta nuevamente.');
+        }
+    })
+    .catch(() => {
+        loader.style.display = 'none';
+        alert('Error de conexión.');
+    });
+};
+</script>
+
+<footer>
+    <p>&copy; 2025 AutoCuidado Club — Hecho con visión en El Salvador.</p>
+</footer>
+
+</body>
+</html>
