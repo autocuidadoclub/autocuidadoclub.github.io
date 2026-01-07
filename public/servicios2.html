@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AutoCuidado Club - Un sistema de visitas para cuidar tu vida, tus bienes y tu tiempo.">
+
+  <title>Servicios | AutoCuidado Club</title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <ul class="nav-links">
+    <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="suscripciones.html">Suscripciones</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+    <li><a href="login.html">Ingresa a tu cuenta</a></li>
+    <li><a href="centro-ayuda.html">Centro de Ayuda</a></li>
+    <li><a href="tac.html">Términos y Condiciones</a></li>
+    <li class="has-dropdown">
+      <a href="/ecosystem" class="divisiones-badge">CONOCE NUESTRAS DIVISIONES</a>
+    </li>
+  </ul>
+  <div class="logo-container">
+    <img src="logo.jpg" alt="AutoCuidado Club" class="logo">
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="header-container">
+  <div class="header-text">
+    <h1>No vendemos servicios.</h1>
+    <p>Vendemos la capacidad de resolver lo que más necesitas, cuando lo necesitas.</p>
+  </div>
+</header>
+
+<!-- QUE HACEMOS -->
+<section class="section-container">
+  <h2 class="section-title">¿Qué hace AutoCuidado Club?</h2>
+  <p>
+    AutoCuidado Club es un <strong>sistema de visitas</strong>.
+    Cada mes recibes visitas incluidas en tu plan y decides dónde usarlas:
+    en tu carro, tu hogar, tus propiedades o en tareas de control y mantenimiento.
+  </p>
+
+  <p style="font-weight:bold; text-align:center; margin-top:20px;">
+    Pago AutoCuidado → Tengo visitas → Las uso donde más lo necesito ese mes
+  </p>
+</section>
+
+<!-- CAPACIDADES -->
+<section class="section-container">
+  <h2 class="section-title">Capacidades que cubrimos hoy</h2>
+
+  <div class="propuesta-container">
+    <div class="propuesta-item">
+      <i class="fas fa-car fa-2x"></i>
+      <h3>Vehículos</h3>
+      <p>Inspección, diagnóstico, prevención y acompañamiento técnico.</p>
+    </div>
+
+    <div class="propuesta-item">
+      <i class="fas fa-home fa-2x"></i>
+      <h3>Hogar</h3>
+      <p>Revisiones, ventilación, filtros, AC, presencia y control.</p>
+    </div>
+
+    <div class="propuesta-item">
+      <i class="fas fa-building fa-2x"></i>
+      <h3>Propiedades</h3>
+      <p>Supervisión periódica para propiedades desocupadas o en renta.</p>
+    </div>
+
+    <div class="propuesta-item">
+      <i class="fas fa-user-shield fa-2x"></i>
+      <h3>Asistencia</h3>
+      <p>Gestión local para personas fuera del país.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INSPECCIÓN VEHICULAR (SE MANTIENE) -->
+<section id="explore-checks" class="section-container">
+  <h2 class="section-title">Cuando usas una visita en tu vehículo</h2>
+  <p>Aplicamos nuestro protocolo técnico profesional.</p>
+
+  <div class="inspection-container">
+    <div class="inspection-tabs">
+      <button onclick="showInspection('motor')">Motor</button>
+      <button onclick="showInspection('interior')">Interior</button>
+      <button onclick="showInspection('exterior')">Exterior</button>
+    </div>
+
+    <div id="inspection-content">
+      <h3>Revisiones del Motor</h3>
+      <ul id="inspection-list">
+        <li>Análisis del rendimiento de lubricantes.</li>
+        <li>Inspección del sistema de combustión.</li>
+        <li>Monitoreo de frenos, AC, refrigeración y computadoras.</li>
+        <li>Diagnóstico del sistema eléctrico.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- LEALTAD (SIN CAMBIO DE LÓGICA) -->
+<section class="section-container">
+  <h2 class="section-title">⭐ Programa de Lealtad</h2>
+  <p>Mantené tu suscripción activa y desbloqueá beneficios reales.</p>
+
+  <ul>
+    <li>✔ Recompensas por constancia</li>
+    <li>✔ Visitas adicionales</li>
+    <li>✔ Beneficios aplicables al ecosistema</li>
+  </ul>
+</section>
+
+<!-- REFERIDOS -->
+<section class="section-container">
+  <h2 class="section-title">🎉 Programa de Referidos</h2>
+  <p>Recomendá AutoCuidado Club y convertí confianza en beneficios.</p>
+
+  <ul>
+    <li>📩 Enviás el contacto</li>
+    <li>💸 Se suscribe</li>
+    <li>🏆 Vos ganás</li>
+  </ul>
+
+  <div style="text-align:center;margin-top:20px;">
+    <a href="suscripciones.html" class="cta-button">Ver planes</a>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="section-container">
+  <h2 class="section-title">Esto no es mantenimiento.</h2>
+  <p>Es una nueva forma de delegar tu vida sin perder control.</p>
+
+  <div style="text-align:center;">
+    <button class="cta-button" onclick="location.href='suscripciones.html'">
+      Elegir mi plan
+    </button>
+  </div>
+</section>
+
+<!-- FOOTER BANDERA -->
+<div style="background:#003893;color:white;padding:20px;text-align:center;">
+  <img src="/flag-sv.png" style="height:50px;border-radius:6px;">
+  <p style="margin-top:10px;">
+    Hecho con visión. Hecho con orgullo en <strong>El Salvador</strong>.
+  </p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2025 AutoCuidado Club</p>
+</footer>
+
+<script>
+function showInspection(section) {
+  const titles = {
+    motor: "Revisiones del Motor",
+    interior: "Revisiones del Interior",
+    exterior: "Revisiones del Exterior"
+  };
+
+  const items = {
+    motor: `
+      <li>Análisis de lubricantes</li>
+      <li>Sistema de combustión</li>
+      <li>Frenos, AC, refrigeración</li>
+      <li>Diagnóstico eléctrico</li>`,
+    interior: `
+      <li>Sistemas de seguridad</li>
+      <li>Comfort y módulos</li>
+      <li>Multimedia</li>`,
+    exterior: `
+      <li>Neumáticos</li>
+      <li>Frenos</li>
+      <li>Iluminación</li>`
+  };
+
+  document.querySelector("#inspection-content h3").innerText = titles[section];
+  document.getElementById("inspection-list").innerHTML = items[section];
+}
+</script>
+
+</body>
+</html>
