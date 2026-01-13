@@ -572,38 +572,45 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
 }
 
     function sendOrder() {
-      const potableQty = document.getElementById("potableQty").value;
-      const hielo50Qty = document.getElementById("hielo50Qty").value;
-      const hielo100Qty = document.getElementById("hielo100Qty").value;
-      const location = document.getElementById("location").value.trim();
-      const municipality = document.getElementById("municipality").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const paymentMethod = document.getElementById("paymentMethod").value;
-      const total = document.getElementById("totalAmount").textContent;
-      
-      // WhatsApp number (example from original code: +503 7570 4428)
-      const whatsappNumber = "50375704428"; 
+  const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
+  const icePounds = parseInt(document.getElementById("icePounds").value) || 0;
+  const location = document.getElementById("location").value.trim();
+  const municipality = document.getElementById("municipality").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const paymentMethod = document.getElementById("paymentMethod").value;
+  const total = document.getElementById("totalAmount").textContent;
 
-      if ((!potableQty && !hielo50Qty && !hielo100Qty) || !location || !name) {
-        alert("Por favor, completa la cantidad de al menos un producto, la ubicación, y tu nombre.");
-        return;
-      }
+  const whatsappNumber = "50375704428";
 
-      let message = `*ORDEN DE HIELO*\n\n`;
-      message += `*Productos:*\n`;
-      if (potableQty > 0) message += `🧊 ${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
-      if (hielo50Qty > 0) message += `🧊 ${hielo50Qty} bolsa(s) de Hielo 50 lb\n`;
-      if (hielo100Qty > 0) message += `🧊 ${hielo100Qty} bolsa(s) de Hielo 100 lb\n`;
-      message += `\n*Total Estimado: $${total}*\n`;
-      message += `*Método de pago:* ${paymentMethod}\n`;
-      message += `\n*Detalles de Entrega:*\n`;
-      message += `*Nombre:* ${name}\n`;
-      message += `*Municipio:* ${municipality}\n`;
-      message += `*Ubicación:* ${location}\n`;
+  if ((potableQty === 0 && icePounds === 0) || !location || !name) {
+    alert("Por favor, completa la cantidad de hielo, la ubicación y tu nombre.");
+    return;
+  }
 
+  let message = `*ORDEN DE HIELO*\n\n`;
+  message += `*Productos:*\n`;
 
-      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    }
+  if (potableQty > 0) {
+    message += `🧊 ${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
+  }
+
+  if (icePounds > 0) {
+    message += `🧊 Hielo a granel: ${icePounds} lb\n`;
+  }
+
+  message += `\n*Total Estimado: $${total}*\n`;
+  message += `*Método de pago:* ${paymentMethod}\n\n`;
+  message += `*Detalles de Entrega:*\n`;
+  message += `*Nombre:* ${name}\n`;
+  message += `*Municipio:* ${municipality}\n`;
+  message += `*Ubicación:* ${location}\n`;
+
+  window.open(
+    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
+}
+
 
     // Removing the scroll event for the now-static logo.
     // The previous scroll function is not needed if the logo is static.
