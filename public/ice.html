@@ -531,6 +531,21 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
   reopenBtn.style.display = 'none';
 });
 
+    function calculateIcePrice(pounds) {
+  if (pounds === 0) return 0;
+  if (pounds === 50) return 10;
+  if (pounds === 100) return 16;
+  if (pounds === 200) return 30;
+
+  if (pounds > 200) {
+    const bags = Math.ceil(pounds / 50);
+    return bags * 7.5;
+  }
+
+  // fallback (should not happen)
+  return 0;
+}
+
   function updateTotal() {
   const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
   const icePounds = parseInt(document.getElementById("icePounds").value) || 0;
