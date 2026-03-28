@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Autocuidado ICE - Punto Comunitario del Cluster</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+  margin:0;
+  font-family:'Montserrat', sans-serif;
+  background:#C5E4EB;
+  color:#003344;
+}
+
+header {
+  background:#003344;
+  padding:20px;
+  text-align:center;
+}
+
+header h1 {
+  color:white;
+}
+
+.highlight {
+  color:#FF6600;
+}
+
+.container {
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+
+.box {
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn {
+  background:#FF6600;
+  color:white;
+  padding:14px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  width:100%;
+  margin-top:10px;
+}
+
+.price {
+  background:#FF6600;
+  color:white;
+  padding:10px 20px;
+  border-radius:8px;
+  font-weight:bold;
+  display:inline-block;
+  margin-top:10px;
+}
+
+footer {
+  text-align:center;
+  padding:30px;
+  color:#555;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>
+Autocuidado <span class="highlight">ICE</span>
+</h1>
+
+<p style="color:white;">
+🧊 Punto Comunitario del Cluster
+</p>
+
+</header>
+
+<div class="container">
+
+<div class="box">
+
+<h2>🧊 Innovación para el Cluster</h2>
+
+<p>
+Estamos implementando un nuevo sistema dentro del cluster para que los vecinos puedan
+<strong>acceder a hielo de forma rápida, segura y sin salir del residencial.</strong>
+</p>
+
+<p>
+Ahora podrás solicitar hielo cuando lo necesites para:
+</p>
+
+<ul>
+<li>🎉 Reuniones</li>
+<li>🍖 Parrilladas</li>
+<li>🥤 Bebidas frías</li>
+<li>⚡ Emergencias</li>
+<li>🏠 Uso diario</li>
+</ul>
+
+</div>
+
+<div class="box">
+
+<h2>🧊 Disponibilidad de Hielo</h2>
+
+<p><strong>Hielo Potable 5 lb</strong></p>
+
+<div class="price">
+$1.50 por bolsa
+</div>
+
+<p style="margin-top:15px;">
+También disponible en cantidades grandes:
+</p>
+
+<ul>
+
+<li>50 lb — $10.00</li>
+<li>100 lb — $16.00</li>
+<li>200 lb — $30.00</li>
+
+</ul>
+
+</div>
+
+<div class="box">
+
+<h2>📲 Cómo Ordenar</h2>
+
+<p>
+
+1️⃣ Selecciona la cantidad que necesitas  
+2️⃣ Escríbenos por WhatsApp  
+3️⃣ Recibe tu hielo dentro del cluster  
+
+</p>
+
+<button class="btn"
+onclick="sendClusterOrder()">
+
+🧊 Ordenar Hielo por WhatsApp
+
+</button>
+
+</div>
+
+<div class="box">
+
+<h2>💧 También Disponible</h2>
+
+<p>
+
+Además del hielo, contamos con:
+
+</p>
+
+<ul>
+
+<li>💧 Relleno de garrafón — <strong>$2.75</strong></li>
+<li>🧴 Garrafón nuevo — <strong>$3.50</strong></li>
+
+</ul>
+
+<p>
+
+Nuestro objetivo es que el cluster tenga
+<strong>acceso rápido a agua y hielo cuando lo necesite.</strong>
+
+</p>
+
+</div>
+
+</div>
+
+<footer>
+
+Powered by Autocuidado ICE — Cluster Innovation
+
+</footer>
+
+<script>
+
+function sendClusterOrder() {
+
+let message =
+"*PEDIDO DE HIELO - CLUSTER*%0A%0A" +
+"Hola, deseo solicitar hielo dentro del cluster.%0A" +
+"Cantidad:%0A" +
+"Ubicación dentro del cluster:%0A";
+
+window.open(
+"https://wa.me/50372907568?text=" + message,
+"_blank"
+);
+
+}
+
+</script>
+
+</body>
+
+</html>
