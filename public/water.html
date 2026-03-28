@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Autocuidado ICE - Punto Comunitario del Cluster</title>
+<title>Agua Cristal - Punto Comunitario</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
@@ -82,11 +82,11 @@ footer {
 <header>
 
 <h1>
-Autocuidado <span class="highlight">ICE</span>
+Agua <span class="highlight">Cristal</span>
 </h1>
 
 <p style="color:white;">
-🧊 Punto Comunitario del Cluster
+💧 Punto Comunitario del Cluster
 </p>
 
 </header>
@@ -95,67 +95,66 @@ Autocuidado <span class="highlight">ICE</span>
 
 <div class="box">
 
-<h2>🧊 Innovación para el Cluster</h2>
+<h2>💧 Agua Disponible Dentro del Cluster</h2>
 
 <p>
-Estamos implementando un nuevo sistema dentro del cluster para que los vecinos puedan
-<strong>acceder a hielo de forma rápida, segura y sin salir del residencial.</strong>
+
+Estamos implementando un sistema para que los vecinos puedan
+<strong>acceder a agua potable sin salir del residencial.</strong>
+
 </p>
 
 <p>
-Ahora podrás solicitar hielo cuando lo necesites para:
-</p>
 
-<ul>
-<li>🎉 Reuniones</li>
-<li>🍖 Parrilladas</li>
-<li>🥤 Bebidas frías</li>
-<li>⚡ Emergencias</li>
-<li>🏠 Uso diario</li>
-</ul>
+Cuando se les termine el agua, podrán solicitarla de forma rápida,
+segura y conveniente.
+
+</p>
 
 </div>
 
 <div class="box">
 
-<h2>🧊 Disponibilidad de Hielo</h2>
+<h2>💧 Precios Disponibles</h2>
 
-<p><strong>Hielo Potable 5 lb</strong></p>
+<p>
+
+<strong>Relleno de garrafón</strong>
+
+</p>
 
 <div class="price">
-$1.50 por bolsa
+$2.75 por garrafón
 </div>
 
 <p style="margin-top:15px;">
-También disponible en cantidades grandes:
+
+<strong>Garrafón adicional</strong>
+
 </p>
 
-<ul>
-
-<li>50 lb — $10.00</li>
-<li>100 lb — $16.00</li>
-<li>200 lb — $30.00</li>
-
-</ul>
+<div class="price">
+$3.50 por botella
+</div>
 
 </div>
 
 <div class="box">
 
-<h2>📲 Cómo Ordenar</h2>
+<h2>📲 Cómo Solicitar Agua</h2>
 
 <p>
 
-1️⃣ Selecciona la cantidad que necesitas  
-2️⃣ Escríbenos por WhatsApp  
-3️⃣ Recibe tu hielo dentro del cluster  
+1️⃣ Escribe por WhatsApp  
+2️⃣ Indica cantidad  
+3️⃣ Recibe tu agua dentro del cluster  
 
 </p>
 
 <button class="btn"
-onclick="sendClusterOrder()">
+onclick="sendWaterOrder()">
 
-🧊 Ordenar Hielo por WhatsApp
+💧 Solicitar Agua por WhatsApp
 
 </button>
 
@@ -163,27 +162,27 @@ onclick="sendClusterOrder()">
 
 <div class="box">
 
-<h2>💧 También Disponible</h2>
+<h2>🧊 También Disponible Hielo</h2>
 
 <p>
 
-Además del hielo, contamos con:
+Además del agua, también contamos con
+<strong>hielo purificado disponible dentro del cluster.</strong>
 
 </p>
-
-<ul>
-
-<li>💧 Relleno de garrafón — <strong>$2.75</strong></li>
-<li>🧴 Garrafón nuevo — <strong>$3.50</strong></li>
-
-</ul>
 
 <p>
 
-Nuestro objetivo es que el cluster tenga
-<strong>acceso rápido a agua y hielo cuando lo necesite.</strong>
+Puedes ver la disponibilidad aquí:
 
 </p>
+
+<button class="btn"
+onclick="openIcePage()">
+
+🧊 Ver Disponibilidad de Hielo
+
+</button>
 
 </div>
 
@@ -191,22 +190,31 @@ Nuestro objetivo es que el cluster tenga
 
 <footer>
 
-Powered by Autocuidado ICE — Cluster Innovation
+Powered by Autocuidado — Cluster Supply System
 
 </footer>
 
 <script>
 
-function sendClusterOrder() {
+function sendWaterOrder() {
 
 let message =
-"*PEDIDO DE HIELO - CLUSTER*%0A%0A" +
-"Hola, deseo solicitar hielo dentro del cluster.%0A" +
+"*PEDIDO DE AGUA - CLUSTER*%0A%0A" +
+"Hola, deseo solicitar agua dentro del cluster.%0A" +
 "Cantidad:%0A" +
-"Ubicación dentro del cluster:%0A";
+"Ubicación:%0A";
 
 window.open(
 "https://wa.me/50372907568?text=" + message,
+"_blank"
+);
+
+}
+
+function openIcePage() {
+
+window.open(
+"cluster-ice.html",
 "_blank"
 );
 
