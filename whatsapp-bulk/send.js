@@ -53,7 +53,12 @@ client.on('ready', async () => {
         }
 
         // Wait 60 seconds between messages
-        await delay(60000);
+        // Random delay between 8 and 20 seconds
+const randomDelay = 8000 + Math.floor(Math.random() * 12000);
+
+console.log(`Waiting ${Math.round(randomDelay / 1000)} seconds...`);
+
+await delay(randomDelay);
       }
 
       console.log('Finished sending messages.');
