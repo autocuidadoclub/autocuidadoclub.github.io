@@ -20,30 +20,44 @@ client.on('qr', qr => {
 client.on('ready', async () => {
   console.log('WhatsApp is ready.');
 
-  fs.createReadStream('clientes.csv')
+  // File to use: clientes_hielo.csv or clientes_agua.csv
+  const archivo = process.argv[2] || 'clientes_hielo.csv';
+
+  // Determine whether this is the water list
+  const esAgua = archivo.toLowerCase().includes('agua');
+
+  fs.createReadStream(archivo)
     .pipe(csv())
     .on('data', (row) => contacts.push(row))
     .on('end', async () => {
       for (const contact of contacts) {
         const number = contact.telefono + '@c.us';
-        const message =
-          `Hola ${contact.nombre}, buen día 👋\n\n` +
-          `Somos AutoCuidado ICE 🧊\n` +
-          `¿Necesitan hielo de 50 lb para esta semana?\n\n` +
-          `🚚 Entrega a domicilio\n` +
-          `💰 Precios especiales por volumen`;
+
+        // Select message based on file name
+        const message = esAgua
+          ? `Hola ${contact.nombre}, buen día 👋\n\n` +
+            `¿Necesitan agua Cristal de 5 galones para esta semana? 💧\n\n` +
+            `🚚 Entrega a domicilio\n` +
+            `Quedo atento a su pedido. ¡Gracias!`
+          : `Hola ${contact.nombre}, buen día 👋\n\n` +
+            `¿Necesitan hielo de 50 lb para esta semana? 🧊\n\n` +
+            `🚚 Entrega a domicilio\n` +
+            `Quedo atento a su pedido. ¡Gracias!`;
 
         try {
           await client.sendMessage(number, message);
           console.log(`Sent to ${contact.telefono}`);
         } catch (error) {
           console.log(`Failed to send to ${contact.telefono}`);
+          console.log(error.message);
         }
 
-        await delay(60000); // Wait 60 seconds
+        // Wait 60 seconds between messages
+        await delay(60000);
       }
 
       console.log('Finished sending messages.');
+      process.exit(0);
     });
 });
 
