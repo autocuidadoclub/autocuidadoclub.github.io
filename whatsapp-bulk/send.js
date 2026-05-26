@@ -45,17 +45,21 @@ client.on('ready', async () => {
             `Quedo atento a su pedido. ¡Gracias!`;
 
         try {
+         const chat = await client.getChatById(number);
 
-  // TEST MODE ONLY
-  console.log('--------------------------------');
-  console.log('TEST MODE');
-  console.log(`WOULD SEND TO: ${contact.telefono}`);
-  console.log(`NAME: ${contact.nombre}`);
-  console.log('MESSAGE:');
-  console.log(message);
-  console.log('--------------------------------');
+await chat.sendStateTyping();
 
-} catch (error) {
+await delay(2000 + Math.floor(Math.random() * 3000));
+
+// TEST MODE ONLY
+console.log('--------------------------------');
+console.log(`READY TO SEND TO: ${telefono}`);
+console.log(`NAME: ${contact.nombre}`);
+console.log('MESSAGE:');
+console.log(message);
+console.log('--------------------------------');
+          console.log(`Sent to ${contact.telefono}`);
+        } catch (error) {
           console.log(`Failed to send to ${contact.telefono}`);
           console.log(error.message);
         }
