@@ -8,6 +8,7 @@ const client = new Client({
 });
 
 const contacts = [];
+const processedNumbers = new Set();
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -20,59 +21,74 @@ client.on('qr', qr => {
 client.on('ready', async () => {
   console.log('WhatsApp is ready.');
 
-  // File to use: clientes_hielo.csv or clientes_agua.csv
   const archivo = process.argv[2] || 'clientes_hielo.csv';
 
-  // Determine whether this is the water list
   const esAgua = archivo.toLowerCase().includes('agua');
 
   fs.createReadStream(archivo)
     .pipe(csv())
     .on('data', (row) => contacts.push(row))
     .on('end', async () => {
+
+      console.log(`Loaded ${contacts.length} contacts`);
+
       for (const contact of contacts) {
-        const number = contact.telefono + '@c.us';
 
-        // Select message based on file name
-       const message = esAgua
-  ? `Hola ${contact.nombre}, buen día 👋\n\n` +
-    `¿Necesitan agua Cristal de 5 galones para esta semana? 💧\n\n` +
-    `🚚 Entrega a domicilio\n` +
-    `Quedo atento a su pedido. ¡Gracias!`
-  : `Hola ${contact.nombre}, buen día 👋\n\n` +
-    `Recuerden que con buen hielo sus bebidas se mantienen frías por más tiempo y mejoran la experiencia de sus clientes 🧊🍹\n\n` +
-    `¿Necesitan hielo de 50 lb para esta semana?\n\n` +
-    `🚚 Entrega a domicilio\n` +
-    `💎 Más calidad para sus bebidas y eventos\n\n` +
-    `Quedo atento a su pedido. ¡Gracias!`;
+        // Clean number
+        let telefono = String(contact.telefono || '')
+          .replace(/\D/g, '')
+          .trim();
 
-        try {
-         const chat = await client.getChatById(number);
-
-await chat.sendStateTyping();
-
-await delay(2000 + Math.floor(Math.random() * 3000));
-
-// TEST MODE ONLY
-console.log('--------------------------------');
-console.log(`READY TO SEND TO: ${telefono}`);
-console.log(`NAME: ${contact.nombre}`);
-console.log('MESSAGE:');
-console.log(message);
-console.log('--------------------------------');
-          console.log(`Sent to ${contact.telefono}`);
-        } catch (error) {
-          console.log(`Failed to send to ${contact.telefono}`);
-          console.log(error.message);
+        // Validate Salvadoran number
+        if (telefono.length !== 11 || !telefono.startsWith('503')) {
+          console.log(`Skipping invalid number: ${telefono}`);
+          continue;
         }
 
-        // Wait 60 seconds between messages
-        // Random delay between 8 and 20 seconds
-const randomDelay = 8000 + Math.floor(Math.random() * 12000);
+        // Avoid duplicates
+        if (processedNumbers.has(telefono)) {
+          console.log(`Skipping duplicate: ${telefono}`);
+          continue;
+        }
 
-console.log(`Waiting ${Math.round(randomDelay / 1000)} seconds...`);
+        processedNumbers.add(telefono);
 
-await delay(randomDelay);
+        const number = telefono + '@c.us';
+
+        const message = esAgua
+          ? `Hola ${contact.nombre}, buen día 👋\n\n` +
+            `¿Necesitan agua Cristal de 5 galones para esta semana? 💧\n\n` +
+            `🚚 Entrega a domicilio\n` +
+            `Quedo atento a su pedido. ¡Gracias!`
+
+          : `Hola ${contact.nombre}, buen día 👋\n\n` +
+            `Recuerda que con buen hielo 🧊 puedes mejorar la calidad de tus bebidas y brindar una mejor experiencia a tus clientes.\n\n` +
+            `¿Necesitan hielo de 50 lb para esta semana?\n\n` +
+            `🚚 Entrega a domicilio\n` +
+            `Quedo atento a su pedido. ¡Gracias!`;
+
+        try {
+
+          await client.sendMessage(number, message);
+
+          console.log(`✅ Sent to ${telefono}`);
+
+        } catch (error) {
+
+          console.log(`❌ Failed: ${telefono}`);
+          console.log(error.message);
+
+        }
+
+        // Random delay between 4 and 8 seconds
+        const randomDelay =
+          4000 + Math.floor(Math.random() * 4000);
+
+        console.log(
+          `Waiting ${Math.round(randomDelay / 1000)} seconds...`
+        );
+
+        await delay(randomDelay);
       }
 
       console.log('Finished sending messages.');
