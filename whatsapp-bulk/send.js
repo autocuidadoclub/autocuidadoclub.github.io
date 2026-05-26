@@ -45,7 +45,13 @@ client.on('ready', async () => {
             `Quedo atento a su pedido. ¡Gracias!`;
 
         try {
-          await client.sendMessage(number, message);
+         const chat = await client.getChatById(number);
+
+await chat.sendStateTyping();
+
+await delay(2000 + Math.floor(Math.random() * 3000));
+
+await client.sendMessage(number, message);
           console.log(`Sent to ${contact.telefono}`);
         } catch (error) {
           console.log(`Failed to send to ${contact.telefono}`);
