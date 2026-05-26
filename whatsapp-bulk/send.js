@@ -51,7 +51,13 @@ await chat.sendStateTyping();
 
 await delay(2000 + Math.floor(Math.random() * 3000));
 
-await client.sendMessage(number, message);
+// TEST MODE ONLY
+console.log('--------------------------------');
+console.log(`READY TO SEND TO: ${telefono}`);
+console.log(`NAME: ${contact.nombre}`);
+console.log('MESSAGE:');
+console.log(message);
+console.log('--------------------------------');
           console.log(`Sent to ${contact.telefono}`);
         } catch (error) {
           console.log(`Failed to send to ${contact.telefono}`);
