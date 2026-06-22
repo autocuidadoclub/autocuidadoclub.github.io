@@ -191,10 +191,11 @@
       <div class="box">
         <h2>Hielo para helar Bebidas o Neveras.</h2>
         <ul class="price-list">
-          <li>$10.00 - 50 lb</li>
-          <li>$16.00 - 100 lb</li>
-          <li>$30.00 - 200 lb</li>
-        </ul>
+  <li>$10.00 - 50 lb</li>
+  <li>$18.00 - 100 lb</li>
+  <li>$35.00 - 200 lb</li>
+  <li>$65.00 - 400 lb</li>
+</ul>
       </div>
 
       <div style="background: linear-gradient(90deg, #0077cc, #00bfff); color: white; padding: 14px 18px; text-align: center; border-radius: 12px; font-weight: 600; font-size: 1rem; margin-bottom: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
@@ -547,14 +548,38 @@ document.getElementById('how-to-install-btn').addEventListener('click', async ()
    function calculateIcePrice(pounds) {
   if (pounds === 0) return 0;
 
+  // Exact package prices
   if (pounds === 50) return 10;
-  if (pounds === 100) return 16;
-  if (pounds === 150) return 24;
-  if (pounds === 200) return 30;
+  if (pounds === 100) return 18;
+  if (pounds === 200) return 35;
+  if (pounds === 400) return 65;
 
-  if (pounds > 200) {
-    const bags = Math.ceil(pounds / 50);
-    return bags * 7.5;
+  // Intermediate quantities
+  if (pounds === 150) return 28;   // 100 + 50
+  if (pounds === 250) return 45;   // 200 + 50
+  if (pounds === 300) return 53;   // 200 + 100
+  if (pounds === 350) return 63;   // 200 + 100 + 50
+  if (pounds === 450) return 75;   // 400 + 50
+  if (pounds === 500) return 83;   // 400 + 100
+  if (pounds === 550) return 93;   // 400 + 100 + 50
+  if (pounds === 600) return 100;  // 400 + 200
+
+  // Larger quantities
+  if (pounds > 600) {
+    const sets400 = Math.floor(pounds / 400);
+    const remainder = pounds % 400;
+
+    let remainderPrice = 0;
+
+    if (remainder === 50) remainderPrice = 10;
+    else if (remainder === 100) remainderPrice = 18;
+    else if (remainder === 150) remainderPrice = 28;
+    else if (remainder === 200) remainderPrice = 35;
+    else if (remainder === 250) remainderPrice = 45;
+    else if (remainder === 300) remainderPrice = 53;
+    else if (remainder === 350) remainderPrice = 63;
+
+    return sets400 * 65 + remainderPrice;
   }
 
   return 0;
