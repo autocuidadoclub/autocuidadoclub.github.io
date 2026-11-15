@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="AutoCuidado Club - Un ecosistema de visitas mensuales para cuidar tu carro, tu hogar y tu bienestar en El Salvador.">
+  <meta name="description" content="AutoCuidado Club - Tu servicio experto de mantenimiento personalizado para vehículos en El Salvador. Sin talleres. Sin filas. Sin excusas.">
 
   <title>Centro de Ayuda | AutoCuidado Club</title>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="manifest" href="/site.webmanifest">
-
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+  
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -26,8 +26,13 @@
       padding: 20px;
       text-align: center;
       color: white;
+    }
+    header {
+  margin: 0;
+  padding-top: 60px; /* keep your nice padding */
+}
+    header h1 {
       margin: 0;
-      padding-top: 60px;
     }
     .container {
       max-width: 1000px;
@@ -76,184 +81,469 @@
       display: none;
       margin-top: 5px;
     }
+   
   </style>
+<link rel="stylesheet" href="/ac-design.css"><script defer src="/ac-design.js"></script>
 </head>
-
 <body>
+<div class="ac-global-rail" role="navigation" aria-label="Navegación del ecosistema"><div class="ac-global-inner"><a class="ac-global-brand" href="/">✦ AutoCuidado <strong>· Ecosistema</strong></a><button type="button" data-ac-rail-toggle aria-controls="ac-rail-menu" aria-expanded="false" aria-label="Abrir navegación">☰</button><div class="ac-global-menu" id="ac-rail-menu" data-ac-rail-menu><a href="/club.html">🚘 CLUB</a><a href="/ice.html">🧊 ICE</a><a href="/esal.html">🏡 HOME</a><a href="/esservyo.html">🦺 PRO</a><a href="/fit.html">💙 FIT</a><a href="/contacto.html">Contacto</a></div><a class="ac-global-login" href="/login.html">Mi cuenta ↗</a></div></div>
 
+
+  <!-- Load Environment Variables -->
+<script src="env.js"></script>
+    
+<!-- Navigation -->
 <nav class="navbar">
-  <ul class="nav-links">
-    <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
-    <li><a href="index.html">Inicio</a></li>
-    <li><a href="servicios.html">Servicios</a></li>
-    <li><a href="suscripciones.html">Suscripciones</a></li>
-    <li><a href="contacto.html">Contáctanos</a></li>
-    <li><a href="login.html">Ingresa a tu cuenta</a></li>
-    <li><a href="tac.html">Términos y Condiciones</a></li>
-    <li class="has-dropdown">
-      <a href="/ecosystem" class="divisiones-badge">CONOCE NUESTRAS DIVISIONES</a>
-    </li>
-  </ul>
-  <div class="logo-container">
-    <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
-  </div>
+    <ul class="nav-links">
+        <li><a href="nosotros.html">¿Quiénes Somos?</a></li>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="suscripciones.html">Suscripciones</a></li>
+       <li><a href="contacto.html">Contáctanos</a></li>
+        <li><a href="login.html">Ingresa a tu cuenta</a></li>
+      <li><a href="tac.html">Términos y Condiciones</a></li>
+        <li class="has-dropdown">
+                <a href="/ecosystem" class="divisiones-badge"> CONOCE NUESTRAS DIVISIONES</a>
+                </li>
+    </ul>
+    <div class="logo-container">
+        <img src="logo.jpg" alt="AutoCuidado Club Logo" class="logo">
+    </div>
 </nav>
 
+<!-- Header -->
 <header style="background: linear-gradient(to bottom, #002F6C, #003366); padding: 60px 20px; text-align: center;">
-  <h1 style="color:white;font-size:2.5em;">Centro de Ayuda</h1>
-  <p style="color:white;font-size:1.2em;">
-    Pago AutoCuidado → Tengo visitas → Las uso donde más lo necesito ese mes
-  </p>
+    <div class="header-text">
+        <h1 style="color: white; font-size: 2.5em; margin-bottom: 15px;">Centro de Ayuda</h1>
+        <p style="color: white; font-size: 1.2em;">¿Tienes dudas? Aquí encuentras todas las respuestas.</p>
+    </div>
 </header>
 
-<div class="container">
 
-  <nav>
-    <a href="#planes">Planes y Visitas</a>
-    <a href="#uso">Uso de Visitas</a>
-    <a href="#registro">Registros</a>
-    <a href="#alcance">Alcances</a>
-    <a href="#faq">FAQs</a>
-  </nav>
+  <div class="container">
 
-  <div class="search-bar">
-    <input type="text" placeholder="Buscar en el Centro de Ayuda..." />
+    <nav>
+      <a href="#planes">Planes y Suscripciones</a>
+      <a href="#pagos">Pagos y Facturación</a>
+      <a href="#inspecciones">Reprogramar Inspecciones</a>
+      <a href="#recompensas">Recompensas</a>
+      <a href="#referidos">Referidos</a>
+      <a href="#faq">FAQs</a>
+    </nav>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar en el Centro de Ayuda..." />
+    </div>
+
+    <section id="planes">
+      <h2>Planes y Suscripciones</h2>
+
+      <div class="faq">
+        <h3>¿Cómo funciona AutoCuidado Club?</h3>
+        <p>AutoCuidado Club es un servicio de mantenimiento preventivo por suscripción. Nuestros expertos llegan hasta donde tú estés para asegurarte que tu vehículo esté siempre al día, sin estrés ni citas en el taller.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cuál es la diferencia entre Plan Básico, Plan Plus y Plan Flexible?</h3>
+        <p>El <strong>Plan Básico</strong> incluye inspecciones mensuales para un solo vehículo. El <strong>Plan Plus</strong> permite registrar más vehículos, acceder a recompensas premium y beneficios adicionales. El <strong>Plan Flexible</strong> ofrece 3 inspecciones para ser utilizadas libremente en un plazo de 6 meses.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Qué es el Plan Flexible?</h3>
+        <p>Es un plan de pago único que te da derecho a 3 inspecciones durante los próximos 6 meses. Tú eliges el mes y el horario. Ideal para personas con agenda cambiante o que viajan frecuentemente.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cómo puedo mejorar mi plan?</h3>
+        <p>Desde tu panel de control puedes elegir un plan superior según tus necesidades. Solo asegúrate de haber cumplido el tiempo mínimo para cambiar nuevamente.</p>
+      </div>
+    </section>
+
+    <section id="pagos">
+      <h2>Pagos y Facturación</h2>
+
+      <div class="faq">
+        <h3>¿Qué métodos de pago aceptan?</h3>
+        <p>Aceptamos tarjetas de crédito/débito, transferencias, y próximamente Pagadito. También ofrecemos pago recurrente automático.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cómo actualizo mi método de pago?</h3>
+        <p>Desde tu panel, sección “Método de Pago”, puedes ingresar una nueva tarjeta o forma de pago.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cuándo se realizan los cobros?</h3>
+        <p>Para planes mensuales, los cobros se efectúan en la última semana de cada mes. En el Plan Flexible, el pago es único y anticipado.</p>
+      </div>
+    </section>
+
+    <section id="inspecciones">
+      <h2>Reprogramar Inspecciones</h2>
+
+      <div class="faq">
+        <h3>¿Cómo reagendo una inspección?</h3>
+        <p>Desde tu panel, sección “Reagendar”, puedes seleccionar otra fecha disponible. Esto también aplica para usuarios del Plan Flexible.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Qué pasa si no puedo estar presente?</h3>
+        <p>Avísanos con anticipación para reprogramar sin costo. Siempre buscamos adaptarnos a tu rutina.</p>
+      </div>
+    </section>
+
+    <section id="recompensas">
+      <h2>Recompensas y Beneficios</h2>
+
+      <div class="faq">
+        <h3>¿Cómo funciona la tarjeta de recompensas?</h3>
+        <p>Cada mes que pagas y completas tu inspección, avanzas un paso. Al completar 6 u 8 pasos (según el plan), puedes redimir premios como recarga de A/C o revisión extra. Los pasos se reinician al redimir un premio.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Qué beneficios obtengo con el Plan Plus?</h3>
+        <p>Acceso a recompensas premium, posibilidad de registrar más vehículos, prioridad en agenda, y mejores condiciones en referidos.</p>
+      </div>
+    </section>
+
+    <section id="referidos">
+      <h2>Programa de Referidos</h2>
+
+      <div class="faq">
+        <h3>¿Cómo funciona el programa de referidos?</h3>
+        <p>Invita a tus amigos desde tu panel. Cuando se registran y completan su primera suscripción, tú ganas recompensas automáticas. ¡Ambos ganan!</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cuántos referidos necesito para obtener premios?</h3>
+        <p>Con 1 referido activo puedes obtener beneficios si tienes Plan Básico. Si eres cliente Plus, puedes desbloquear más recompensas al tener 3 referidos completados.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Dónde veo mi progreso?</h3>
+        <p>Desde tu panel de usuario puedes seguir tu progreso, ver el estado de cada referido y canjear tus recompensas cuando se activen.</p>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>Preguntas Frecuentes (FAQs)</h2>
+
+      <div class="faq">
+        <h3>¿Puedo cancelar mi suscripción en cualquier momento?</h3>
+        <p>Sí. Puedes cancelar antes de tu próximo ciclo de pago sin penalización. El Plan Flexible no es reembolsable una vez iniciado.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Qué cubre el mantenimiento preventivo?</h3>
+        <p>Revisión de fluidos, diagnóstico visual, revisión de frenos, batería, luces, y asesoría en repuestos. También coordinamos servicios complementarios si los necesitas.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Cómo añado más vehículos?</h3>
+        <p>Actualizando a Plan Plus puedes registrar hasta 3 vehículos desde tu panel.</p>
+      </div>
+
+      <div class="faq">
+        <h3>¿Puedo cambiar mi municipio o zona de servicio?</h3>
+        <p>Sí. Puedes hacerlo desde tu panel una vez al mes. Así aseguramos que siempre podamos atenderte donde estés.</p>
+      </div>
+    </section>
   </div>
 
-  <section id="planes">
-    <h2>Planes y Visitas</h2>
 
-    <div class="faq">
-      <h3>¿Cómo funciona AutoCuidado Club ahora?</h3>
-      <p>
-        AutoCuidado Club funciona por <strong>visitas mensuales</strong>.
-        Pagas una suscripción y obtienes visitas que puedes usar en el ecosistema:
-        Auto (carros), Home (hogar) y People (bienestar).
+    
+
+<div style="background-color: #003893; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+  <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
+    <img src="/flag-sv.png" alt="Bandera El Salvador" style="height: 60px; margin-right: 20px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.3);">
+    <div style="text-align: left; max-width: 300px;">
+      <p style="margin: 0; font-size: 18px; font-weight: bold;">
+        Esta app es más que tecnología.
+      </p>
+      <p style="margin: 5px 0 0; font-size: 16px;">
+        Es una forma distinta de cuidar lo que importa.
       </p>
     </div>
-
-    <div class="faq">
-      <h3>¿Qué es una visita?</h3>
-      <p>
-        Una visita equivale a <strong>hasta 60 minutos de trabajo profesional</strong>.
-        Está diseñada para mantenimiento preventivo, ajustes, limpieza técnica,
-        revisiones y acompañamiento experto.
-      </p>
-    </div>
-
-    <div class="faq">
-      <h3>¿Cuántas visitas incluye cada plan?</h3>
-      <p>
-        El <strong>Plan Básico</strong> incluye 1 visita mensual.
-        El <strong>Plan Premium</strong> incluye 2 visitas mensuales
-        y mayor capacidad de registro.
-      </p>
-    </div>
-  </section>
-
-  <section id="uso">
-    <h2>Uso de Visitas</h2>
-
-    <div class="faq">
-      <h3>¿Puedo usar mis visitas en distintas divisiones?</h3>
-      <p>
-        Sí. Cada mes decides dónde usar tus visitas:
-        carro, casa o bienestar personal, según lo que más necesites.
-      </p>
-    </div>
-
-    <div class="faq">
-      <h3>¿Puedo usar dos visitas en el mismo lugar?</h3>
-      <p>
-        Sí. Por ejemplo, dos visitas en un mismo hogar o dos servicios en el mismo vehículo,
-        siempre que estén dentro del alcance permitido.
-      </p>
-    </div>
-  </section>
-
-  <section id="registro">
-    <h2>Registros (muy importante)</h2>
-
-    <div class="faq">
-      <h3>¿Qué debo registrar?</h3>
-      <p>
-        Para operar correctamente, AutoCuidado requiere registros previos:
-        <strong>vehículos, propiedades y personas</strong>.
-        Esto nos permite planificar, asignar técnicos correctos y mantener control.
-      </p>
-    </div>
-
-    <div class="faq">
-      <h3>Registros por plan</h3>
-      <p>
-        • Plan Básico: 1 carro, 1 persona o 1 propiedad activa.<br>
-        • Plan Premium: hasta 2 carros, 2 personas y 1 propiedad activa.
-      </p>
-    </div>
-
-    <div class="faq">
-      <h3>¿Puedo cambiar lo registrado?</h3>
-      <p>
-        Sí, pero <strong>solo entre meses</strong>.
-        No se permiten cambios dentro del mismo mes para mantener costos y calidad.
-      </p>
-    </div>
-  </section>
-
-  <section id="alcance">
-    <h2>Alcances y Límites</h2>
-
-    <div class="faq">
-      <h3>¿Qué sí cubre la suscripción?</h3>
-      <p>
-        Mantenimiento preventivo, limpieza técnica, ajustes,
-        instalación básica, asesoría profesional y control general.
-      </p>
-    </div>
-
-    <div class="faq">
-      <h3>¿Qué no está incluido?</h3>
-      <p>
-        Reparaciones mayores, remodelaciones, obras estructurales,
-        servicios especializados de alto costo.
-        Estos pueden cotizarse fuera de la suscripción.
-      </p>
-    </div>
-  </section>
-
-  <section id="faq">
-    <h2>Preguntas Frecuentes</h2>
-
-    <div class="faq">
-      <h3>¿AutoCuidado reemplaza a un proveedor tradicional?</h3>
-      <p>
-        No. AutoCuidado es un sistema de prevención,
-        control y acompañamiento que evita problemas grandes y costosos.
-      </p>
-    </div>
-
-    <div class="faq">
-      <h3>¿Puedo cancelar?</h3>
-      <p>
-        Sí. Puedes cancelar antes del siguiente ciclo de cobro sin penalización.
-      </p>
-    </div>
-  </section>
-
+  </div>
+  <p style="text-align: center; margin-top: 20px; font-size: 16px;">
+    <span style="color: #FFA500; font-weight: bold;">AutoCuidado Club</span> — Hecha con visión. Hecha con orgullo en <strong>El Salvador.</strong>
+  </p>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const questions = document.querySelectorAll('.faq h3');
-  questions.forEach(q => {
-    q.addEventListener('click', () => {
-      const p = q.nextElementSibling;
-      document.querySelectorAll('.faq p').forEach(x => x.style.display = 'none');
-      p.style.display = 'block';
+    
+     <footer>
+        <p>&copy; 2025 AutoCuidado Club - Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="nosotros.html">Quiénes Somos</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="suscripciones.html">Suscripciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="login.html">Ingresa a tu cuenta</a></li>
+             <li><a href="tac.html">Términos y Condiciones</a></li>
+        </ul>
+   
+    <div class="social-container" style="text-align: center; margin-top: 20px;">
+    <p><strong>Síguenos en nuestras redes sociales</strong></p>
+    <div class="social-buttons">
+        <a href="https://www.instagram.com/autocuidadoclub" target="_blank" class="social-button" style="color: #E1306C;">
+            <i class="fab fa-instagram fa-3x"></i>
+        </a>
+        <a href="https://www.facebook.com/autocareclub" target="_blank" class="social-button" style="color: #1877F2;">
+            <i class="fab fa-facebook-f fa-3x"></i>
+        </a>
+        <a href="https://x.com/AutoCuidadoClub" target="_blank" class="social-button" style="color: #1DA1F2;">
+            <i class="fab fa-twitter fa-3x"></i>
+        </a>
+    </div>
+</div>
+
+</footer>
+
+         <!-- CTA Footer -->
+<div id="cta-install-bar" style="display:none;">
+  <div class="cta-message">
+  ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+</div>
+
+      <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
+      <a href="contacto.html">💬 Contácta con nuestro staff</a>
+      <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
+    <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
+
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+<!-- Feedback Modal -->
+<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
+    <button onclick="closeFeedbackModal()" style="
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #ff0000;
+      font-weight: bold;
+    ">❌</button>
+  </div>
+
+  <form id="voiceFeedbackForm">
+    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
+    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
+    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
+    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between;">
+      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
+      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
+    </div>
+  </form>
+
+  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
+    <img src="loading.gif" alt="Cargando..." style="width:80px;">
+  </div>
+
+  </div>
+</div>
+
+
+<!-- Botón para volver a mostrar el menú -->
+<button id="reopen-cta-btn" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 9999;
+  opacity: 0;
+  max-width: 180px;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+">
+📲 Abrir menú
+</button>
+
+
+
+
+  <script>
+    let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Stop the browser from showing the default prompt
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Optional: you could show the button ONLY when install is available
+  document.getElementById('how-to-install-btn').style.display = 'inline-block';
+});
+
+document.getElementById('how-to-install-btn').addEventListener('click', async () => {
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+
+  if (deferredPrompt) {
+    // If install is supported, show browser-native prompt
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === 'accepted') {
+      console.log('✅ User accepted the install prompt');
+    } else {
+      console.log('❌ User dismissed the install prompt');
+    }
+    deferredPrompt = null;
+  } else if (isIos) {
+    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
+  } else if (isAndroid) {
+    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
+  } else {
+    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
+  }
+});
+    function openFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'flex';
+      document.getElementById('feedbackText').focus();
+    }
+
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'none';
+      document.getElementById('voiceFeedbackForm').reset();
+      document.getElementById('feedbackLoader').style.display = 'none';
+    }
+
+    function startVoiceInput() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz.");
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'es-ES';
+
+      const feedbackText = document.getElementById('feedbackText');
+      feedbackText.placeholder = "🎙️ Escuchando...";
+      feedbackText.style.border = "2px solid orange";
+
+      recognition.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.onerror = (event) => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+        alert("Error de voz: " + event.error);
+      };
+
+      recognition.onend = () => {
+        feedbackText.placeholder = "Habla o escribe tu mensaje...";
+        feedbackText.style.border = "1px solid #ccc";
+      };
+
+      recognition.start();
+    }
+
+   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
+      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
+      e.preventDefault();
+      document.getElementById('feedbackLoader').style.display = 'block';
+
+      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
+        method: "POST",
+        body: new FormData(this)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        if (data.success) {
+          alert("¡Gracias por tu opinión!");
+          closeFeedbackModal();
+        } else {
+          alert("Error al enviar. Intenta de nuevo.");
+        }
+      })
+      .catch(() => {
+        document.getElementById('feedbackLoader').style.display = 'none';
+        alert("Hubo un problema al enviar el mensaje.");
+      });
+    };
+
+      function closeCtaInstallBar() {
+    const ctaBar = document.getElementById('cta-install-bar');
+    const reopenBtn = document.getElementById('reopen-cta-btn');
+
+    // Animación suave antes de ocultarlo
+    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    ctaBar.style.opacity = '0';
+    ctaBar.style.transform = 'translateY(20px)';
+
+    setTimeout(() => {
+      ctaBar.style.display = 'none';
+
+      // Mostrar botón flotante después de 5 segundos
+      setTimeout(() => {
+        reopenBtn.style.display = 'block';
+        setTimeout(() => {
+          reopenBtn.style.opacity = '1';
+        }, 10);
+      }, 5000);
+    }, 300); // esperar a que termine la transición
+  }
+
+      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
+  const ctaBar = document.getElementById('cta-install-bar');
+  const reopenBtn = document.getElementById('reopen-cta-btn');
+
+  ctaBar.style.display = 'block';
+  ctaBar.style.opacity = '1';
+  ctaBar.style.transform = 'translateY(0)';
+  reopenBtn.style.display = 'none';
+});
+
+    
+  document.addEventListener('DOMContentLoaded', function () {
+    const questions = document.querySelectorAll('.faq h3');
+
+    questions.forEach(question => {
+      question.addEventListener('click', function () {
+        const answer = this.nextElementSibling;
+
+        if (answer.style.display === 'block') {
+          answer.style.display = 'none';
+        } else {
+          // Opcional: cerrar otros abiertos antes
+          document.querySelectorAll('.faq p').forEach(p => p.style.display = 'none');
+
+          answer.style.display = 'block';
+        }
+      });
     });
   });
-});
-</script>
 
+  </script>
+
+    
 </body>
 </html>
