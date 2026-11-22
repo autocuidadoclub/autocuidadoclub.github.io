@@ -1,101 +1,116 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Autocuidado ICE - Compra tu Hielo Aquí</title>
+  <meta name="theme-color" content="#003344">
+  <title>AutoCuidado ICE | Hielo y Alquiler de Hieleras</title>
   <link rel="icon" href="ice-logo.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --navy: #003344;
+      --blue: #007799;
+      --light: #C5E4EB;
+      --orange: #FF6600;
+      --white: #ffffff;
+      --muted: #496672;
     }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       font-family: 'Montserrat', sans-serif;
-      background-color: #C5E4EB;
-      color: #003344;
+      background: var(--light);
+      color: var(--navy);
+      line-height: 1.6;
     }
 
     header {
-      background-color: #003344;
-      padding: 20px;
+      background: var(--navy);
+      padding: 25px 20px;
       text-align: center;
+      color: white;
     }
 
     header h1 {
-      color: #fff;
+      margin: 0;
       font-size: 2rem;
     }
 
-    header .highlight {
-      color: #FF6600;
-    }
+    .highlight { color: var(--orange); }
 
-    .main-container {
-      display: flex;
-      justify-content: center;
-      /* Adjusted gap for better spacing */
-      gap: 40px; 
-      flex-wrap: wrap;
-      max-width: 1200px;
-      margin: 0 auto;
+    .mission {
+      background: white;
+      color: var(--navy);
+      border-radius: 12px;
+      max-width: 950px;
+      margin: 20px auto 0;
       padding: 20px;
     }
 
-    /*
-    Removed fixed logo and combined the two columns for content. 
-    The logo will now be part of the right column's flow.
-    */
-    .left-column, .right-column {
-      flex: 1;
-      /* Adjusted min-width to ensure they stack on smaller screens */
-      min-width: 350px; 
-      /* Equalize the column widths for a nice 50/50 split on desktop */
-      max-width: 500px;
+    .mission h2 { color: var(--blue); margin-top: 0; }
+
+    .main-container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 25px 20px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px;
+      align-items: start;
     }
+
+    .column { min-width: 0; }
 
     .box {
       background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+      margin-bottom: 22px;
     }
 
     .box h2 {
-      color: #007799;
-      margin-top: 0;
-    }
-
-    .highlight {
-      color: #FF6600;
+      color: var(--blue);
+      margin: 0 0 12px;
     }
 
     .btn {
-      background-color: #FF6600;
-      color: #fff;
-      padding: 12px 20px;
-      text-decoration: none;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
+      display: block;
+      width: 100%;
+      background: var(--orange);
+      border: 0;
+      color: white;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font: 700 1rem 'Montserrat', sans-serif;
       cursor: pointer;
-      display: block; /* Make the button full width */
+      text-decoration: none;
       text-align: center;
       margin-top: 15px;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .btn:hover {
+      opacity: .92;
+      transform: translateY(-1px);
     }
 
     .price-tag {
-      background: #FF6600;
-      color: #fff;
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border-radius: 8px;
       display: inline-block;
-      margin: 10px 0;
+      background: var(--orange);
+      color: white;
+      font-weight: 800;
+      font-size: 1.25rem;
+      padding: 10px 20px;
+      border-radius: 8px;
     }
 
     .price-list {
@@ -105,567 +120,1081 @@
     }
 
     .price-list li {
-      background: #003344;
-      color: #fff;
-      margin: 8px 0;
-      padding: 12px 20px;
+      background: var(--navy);
+      color: white;
+      padding: 13px 18px;
+      margin: 9px 0;
       border-radius: 8px;
+      font-weight: 600;
     }
 
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0 15px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-family: 'Montserrat';
-      font-size: 1rem;
-    }
-    
     label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 700;
+      display: block;
+      font-weight: 700;
+      margin: 14px 0 5px;
+    }
+
+    input, select, textarea {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #bdced5;
+      border-radius: 8px;
+      font: 500 1rem 'Montserrat', sans-serif;
+      background: white;
+      color: var(--navy);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--blue);
+      outline-offset: 1px;
     }
 
     iframe {
       width: 100%;
       height: 400px;
-      border: none;
+      border: 0;
+      border-radius: 10px;
+    }
+
+    .logo-side {
+      text-align: center;
+      margin: 5px 0 25px;
+    }
+
+    .logo-side img {
+      max-width: 250px;
+      width: 100%;
+      height: auto;
+    }
+
+    .cooler-card {
+      background: linear-gradient(145deg, white, #eef9fc);
+      border: 1px solid #b6dbe8;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .cooler-price {
+      color: var(--navy);
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+
+    .cooler-price small {
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 500;
+    }
+
+    .cooler-facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin: 16px 0;
+    }
+
+    .cooler-facts span {
+      background: #dff3fa;
+      color: var(--navy);
+      padding: 8px 11px;
+      border-radius: 8px;
+      font-size: .83rem;
+      font-weight: 700;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.6;
+    }
+
+    .rental-fields {
+      margin-top: 20px;
+      padding: 18px;
+      background: #f4fbfd;
+      border: 1px solid #d5e7ec;
       border-radius: 12px;
+    }
+
+    .rental-fields h3 {
+      color: var(--blue);
+      margin: 0 0 10px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .summary-box {
+      margin-top: 22px;
+      background: #eff8fa;
+      border-radius: 12px;
+      padding: 17px;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 9px 0;
+    }
+
+    .summary-total {
+      border-top: 1px solid #b7d6e0;
+      padding-top: 13px;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .promo-box {
+      background: linear-gradient(90deg, #0077cc, #00bfff);
+      color: white;
+      border-radius: 12px;
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 22px;
+    }
+
+    .facebook-section {
+      background: #f8faff;
+      padding: 35px 20px;
+      text-align: center;
+    }
+
+    .facebook-content {
+      max-width: 1000px;
+      margin: auto;
     }
 
     footer {
       text-align: center;
-      color: #555;
-      padding: 40px 10px 20px;
-      clear: both; /* Ensures footer is below both columns */
+      padding: 30px 15px;
+      color: #456574;
     }
 
-    /* Styling for the logo within the column flow */
-    .logo-side {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .logo-side img {
-      width: 100%;
-      max-width: 250px;
+    #cta-install-bar {
+      display: none;
+      position: fixed;
+      left: 15px;
+      right: 15px;
+      bottom: 15px;
+      max-width: 750px;
+      margin: auto;
+      z-index: 1000;
+      background: var(--navy);
+      color: white;
+      padding: 15px;
       border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0,0,0,.25);
     }
-    
-    /* Remove fixed positioning for simplicity and better two-column flow */
-    @media (min-width: 768px) {
-        .logo-side {
-            margin-top: 0;
-        }
+
+    .cta-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .cta-actions button, .cta-actions a {
+      background: var(--orange);
+      border: 0;
+      color: white;
+      padding: 10px;
+      border-radius: 7px;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #reopen-cta-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 999;
+      background: var(--orange);
+      color: white;
+      border: 0;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 420px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 22px;
+      background: white;
+      border-radius: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        padding: 15px;
+      }
+
+      .box { padding: 20px; }
+
+      header h1 { font-size: 1.7rem; }
+
+      .field-grid { grid-template-columns: 1fr; }
     }
   </style>
-
 </head>
-  
-  <body>
-  <header>
-    <h1>Autocuidado <span class="highlight">ICE</span></h1>
-    <!-- Misión y Visión -->
-<div class="main-container">
-  <div class="box" style="max-width: 1000px; margin: 0 auto; text-align: center;">
-    <h2 style="color: #007799;">Nuestra Misión</h2>
-        <p style="font-size: 1.1rem; line-height: 1.6;">
-      Nuestra misión es promover una cultura de <strong>autocuidado integral</strong> que proteja a las personas, los espacios y los recursos, 
-      contribuyendo al desarrollo sostenible de las comunidades donde operamos.  
+
+<body>
+
+<header>
+  <h1>AutoCuidado <span class="highlight">ICE</span></h1>
+  <div class="mission">
+    <h2>Nuestra Misión</h2>
+    <p>
+      Nuestra misión es promover una cultura de
+      <strong>autocuidado integral</strong> que proteja
+      a las personas, los espacios y los recursos,
+      contribuyendo al desarrollo sostenible de las
+      comunidades donde operamos.
     </p>
-   </div>
-</div>
+  </div>
+</header>
 
-  </header>
+<main class="main-container">
 
-  <div class="main-container">
-    <div class="left-column">
-      <div class="box">
-        <h2>Hielo Potable - 5 lb</h2>
-        <p>¡Hielo para tomar! <span class="highlight">Registro Sanitario</span>. Calidad pura, ideal para bebidas, bolsas selladas.</p>
-        <span class="price-tag">$1.50 c/u</span>
+  <div class="column">
+
+    <section class="box">
+      <h2>Hielo Potable - 5 lb</h2>
+      <p>
+        ¡Hielo para tomar!
+        <span class="highlight">Registro Sanitario</span>.
+        Calidad pura, ideal para bebidas.
+        Bolsas selladas.
+      </p>
+      <span class="price-tag">$1.50 c/u</span>
+    </section>
+
+    <section class="box">
+      <h2>Hielo para bebidas y neveras</h2>
+      <ul class="price-list">
+        <li>$10.00 - 50 lb</li>
+        <li>$18.00 - 100 lb</li>
+        <li>$35.00 - 200 lb</li>
+        <li>$65.00 - 400 lb</li>
+      </ul>
+    </section>
+
+    <section class="box cooler-card" id="alquiler-hieleras">
+      <span class="eyebrow">
+        Para fiestas, reuniones y eventos
+      </span>
+
+      <h2>🧊 Alquiler de hieleras</h2>
+
+      <p class="cooler-price">
+        $20.00 <small>/ día por hielera</small>
+      </p>
+
+      <div class="cooler-facts">
+        <span>125 cuartos (≈ 118 L)</span>
+        <span>Conserva hielo hasta 5 días*</span>
+        <span>4 hieleras disponibles</span>
       </div>
 
-      <div class="box">
-        <h2>Hielo para helar Bebidas o Neveras.</h2>
-        <ul class="price-list">
-  <li>$10.00 - 50 lb</li>
-  <li>$18.00 - 100 lb</li>
-  <li>$35.00 - 200 lb</li>
-  <li>$65.00 - 400 lb</li>
-</ul>
-      </div>
+      <p>
+        Mantén tus bebidas frías durante tu evento.
+        Puedes alquilar una o varias hieleras y
+        agregar hielo a tu pedido.
+      </p>
 
-      <div style="background: linear-gradient(90deg, #0077cc, #00bfff); color: white; padding: 14px 18px; text-align: center; border-radius: 12px; font-weight: 600; font-size: 1rem; margin-bottom: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-  🚚 <strong>Entrega GRATIS en pedidos de hielo a partir de los $10.00</strong> 🧊<br>
-  <button style="margin-top: 6px; background-color: #ff6600; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-    ¡Pide Ahora!
-  </button>
-</div>
+      <p class="small-note">
+        *La duración de conservación depende de las
+        condiciones climáticas, la cantidad de hielo
+        y la frecuencia de apertura.
+        El hielo se vende por separado.
+        Alquiler sujeto a disponibilidad.
+        Entrega y recogida por confirmar según zona.
+      </p>
 
-      
-      <div class="box">
-        <h2>Opciones de Pago</h2>
-        <p>💳 Tarjeta de crédito y débito</p>
-        <p>₿ Bitcoin</p>
-        <p>🏦 Transferencia bancaria</p>
-        <p>💵 Efectivo contra entrega</p>
-        <p>✔️ Tasa Cero Banco Agrícola (desde $50)</p>
-        </div>
-      
-       <div class="box">
-        <h2>Mapa de Cobertura y Encuentros ICE</h2>
-        <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F"></iframe>
-      </div>
+      <a class="btn" href="#rentalFields">
+        Cotizar alquiler de hieleras
+      </a>
+    </section>
+
+    <section class="promo-box">
+      🚚 <strong>Entrega GRATIS en pedidos de hielo
+      a partir de $10.00</strong> 🧊
+      <button class="btn" type="button"
+        onclick="document.getElementById('orderForm').scrollIntoView({behavior:'smooth'})">
+        ¡Pide ahora!
+      </button>
+      <p style="font-size:.8rem;margin-bottom:0">
+        Promoción para pedidos de hielo según cobertura.
+        El transporte de hieleras se confirma aparte.
+      </p>
+    </section>
+
+    <section class="box">
+      <h2>Opciones de Pago</h2>
+      <p>💳 Tarjeta de crédito y débito</p>
+      <p>₿ Bitcoin</p>
+      <p>🏦 Transferencia bancaria</p>
+      <p>💵 Efectivo contra entrega</p>
+      <p>✔️ Tasa Cero Banco Agrícola (desde $50)</p>
+    </section>
+
+    <section class="box">
+      <h2>Mapa de Cobertura y Encuentros ICE</h2>
+      <iframe
+        title="Mapa de cobertura AutoCuidado ICE"
+        loading="lazy"
+        src="https://www.google.com/maps/d/u/0/embed?mid=1eMlnjh5qXFulgjZyLW5meBNJ11obPDk&ehbc=2E312F">
+      </iframe>
+    </section>
+
+  </div>
+
+  <div class="column">
+
+    <div class="logo-side">
+      <img src="ice-logo.png" alt="AutoCuidado ICE Logo">
     </div>
 
-    <div class="right-column">
-      <div class="logo-side">
-        <img src="ice-logo.png" alt="Autocuidado ICE Logo">
-      </div>
-      
-      <div class="box">
-        <h2>Ordena tu Hielo</h2>
-        <label for="potableQty">Bolsas de hielo Potable 5 lb:</label>
-        <input type="number" id="potableQty" min="0" value="0" oninput="updateTotal()">
+    <section class="box" id="orderForm">
+      <h2>Ordena tu hielo y alquila hieleras</h2>
 
-        <label for="icePounds">Cantidades grandes de Hielo (lb):</label>
-<select id="icePounds" onchange="updateTotal()">
-  <option value="0">Selecciona cantidad</option>
-  <option value="50">50 lb</option>
-<option value="100">100 lb</option>
-<option value="150">150 lb</option>
-<option value="200">200 lb</option>
-<option value="250">250 lb</option>
-<option value="300">300 lb</option>
-<option value="350">350 lb</option>
-<option value="400">400 lb</option>
-<option value="450">450 lb</option>
-<option value="500">500 lb</option>
-<option value="550">550 lb</option>
-<option value="600">600 lb</option>
-<option value="650">650 lb</option>
-<option value="700">700 lb</option>
-<option value="750">750 lb</option>
-<option value="800">800 lb</option>
-<option value="850">850 lb</option>
-<option value="900">900 lb</option>
-<option value="950">950 lb</option>
-<option value="1000">1000 lb</option>
+      <label for="potableQty">
+        Bolsas de hielo potable 5 lb
+      </label>
+      <input
+        type="number"
+        id="potableQty"
+        min="0"
+        step="1"
+        value="0"
+        oninput="updateTotal()">
 
-</select>
+      <label for="icePounds">
+        Cantidades grandes de hielo (lb)
+      </label>
+      <select id="icePounds" onchange="updateTotal()">
+        <option value="0">Selecciona cantidad</option>
+        <option value="50">50 lb</option>
+        <option value="100">100 lb</option>
+        <option value="150">150 lb</option>
+        <option value="200">200 lb</option>
+        <option value="250">250 lb</option>
+        <option value="300">300 lb</option>
+        <option value="350">350 lb</option>
+        <option value="400">400 lb</option>
+        <option value="450">450 lb</option>
+        <option value="500">500 lb</option>
+        <option value="550">550 lb</option>
+        <option value="600">600 lb</option>
+        <option value="650">650 lb</option>
+        <option value="700">700 lb</option>
+        <option value="750">750 lb</option>
+        <option value="800">800 lb</option>
+        <option value="850">850 lb</option>
+        <option value="900">900 lb</option>
+        <option value="950">950 lb</option>
+        <option value="1000">1000 lb</option>
+      </select>
 
-        
+      <div class="rental-fields" id="rentalFields">
+        <h3>Alquiler de hieleras (opcional)</h3>
 
-        <label for="location">Ubicación para entrega:</label>
-        <input type="text" id="location" placeholder="Ej: Calle Principal, pasaje">
-
-        <label for="municipality">Municipio:</label>
-        <input type="text" id="municipality" placeholder="Ej: Anamoros, San Vicente">
-
-        <label for="name">Nombre de quien recibe:</label>
-        <input type="text" id="name">
-
-        <h3>Total: $<span id="totalAmount">0.00</span></h3>
-        <p id="promoMessage" style="color: green; font-weight: bold;"></p>
-
-        <label for="paymentMethod">Método de Pago:</label>
-        <select id="paymentMethod">
-          <option value="Efectivo contra entrega">Efectivo contra entrega</option>
-          <option value="Tarjeta">Tarjeta</option>
-          <option value="Bitcoin">Bitcoin</option>
-          <option value="Banco Agrícola Tasa Cero">Banco Agrícola Tasa Cero (desde $50)</option>
+        <label for="coolerQty">
+          Cantidad de hieleras
+        </label>
+        <select id="coolerQty" onchange="updateTotal()">
+          <option value="0">No necesito hieleras</option>
+          <option value="1">1 hielera</option>
+          <option value="2">2 hieleras</option>
+          <option value="3">3 hieleras</option>
+          <option value="4">4 hieleras</option>
         </select>
 
-        <button class="btn" onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
-      </div>
-      
-      <div class="box">
-        <h2>¿También te interesan los Autos?</h2>
-        <p>Conoce nuestro servicio de mantenimiento de vehículos.</p>
-        <a href="https://autocuidadoclub.com/ecosystem.html" class="btn" target="_blank">Conoce nuestro ecosistema del AutoCuidado</a>
-      </div>
-    </div>
-  
+        <div class="field-grid">
+          <div>
+            <label for="rentalStart">Fecha de inicio</label>
+            <input
+              type="date"
+              id="rentalStart"
+              onchange="updateTotal()">
+          </div>
 
-    <!-- Facebook Page Plugin -->
-<section style="padding: 40px 0; background: #f8faff;">
-  <div style="max-width: 1000px; margin: auto; text-align: center;">
-    <h2 style="color:#003366; margin-bottom: 10px;">Síguenos en Facebook</h2>
-    <p style="color:#555; margin-bottom: 25px;">Mantente al día con nuestras iniciativas de seguridad y bienestar laboral.</p>
+          <div>
+            <label for="rentalDays">
+              Días de alquiler
+            </label>
+            <input
+              type="number"
+              id="rentalDays"
+              min="1"
+              max="30"
+              step="1"
+              value="1"
+              oninput="updateTotal()">
+          </div>
+        </div>
 
-    <div style="display: flex; justify-content: center;">
-      <div class="fb-page"
-           data-href="https://www.facebook.com/profile.php?id=61582866189757"
-           data-tabs="timeline"
-           data-width="1000"
-           data-height="500"
-           data-small-header="true"
-           data-adapt-container-width="true"
-           data-hide-cover="false"
-           data-show-facepile="true"
-           style="max-width: 1000px; width: 100%;">
-        <blockquote cite="https://www.facebook.com/profile.php?id=61582866189757" class="fb-xfbml-parse-ignore">
-          <a href="https://www.facebook.com/profile.php?id=61582866189757">AutoCuidado ICE</a>
-        </blockquote>
+        <p id="rentalReturn" class="small-note"></p>
+
+        <p class="small-note">
+          $20 por hielera por día.
+          El hielo no está incluido.
+          Reservación sujeta a confirmación por WhatsApp.
+        </p>
       </div>
+
+      <label for="location">Ubicación para entrega</label>
+      <input
+        type="text"
+        id="location"
+        placeholder="Ej: Calle Principal, pasaje">
+
+      <label for="municipality">Municipio</label>
+      <input
+        type="text"
+        id="municipality"
+        placeholder="Ej: Anamorós, San Vicente">
+
+      <label for="name">Nombre de quien recibe</label>
+      <input type="text" id="name" placeholder="Nombre completo">
+
+      <div class="summary-box" aria-live="polite">
+        <div class="summary-line">
+          <span>Hielo</span>
+          <strong>$<span id="iceSubtotal">0.00</span></strong>
+        </div>
+
+        <div class="summary-line">
+          <span>Alquiler de hieleras</span>
+          <strong>$<span id="rentalSubtotal">0.00</span></strong>
+        </div>
+
+        <div class="summary-line summary-total">
+          <span>Total estimado</span>
+          <strong>$<span id="totalAmount">0.00</span></strong>
+        </div>
+
+        <p class="small-note">
+          Total sujeto a disponibilidad y posibles
+          cargos de transporte según la zona.
+        </p>
+      </div>
+
+      <p id="promoMessage"
+        style="color:#087643;font-weight:700">
+      </p>
+
+      <label for="paymentMethod">Método de Pago</label>
+      <select id="paymentMethod">
+        <option value="Efectivo contra entrega">
+          Efectivo contra entrega
+        </option>
+        <option value="Tarjeta">Tarjeta</option>
+        <option value="Bitcoin">Bitcoin</option>
+        <option value="Transferencia bancaria">
+          Transferencia bancaria
+        </option>
+        <option value="Banco Agrícola Tasa Cero">
+          Banco Agrícola Tasa Cero (desde $50)
+        </option>
+      </select>
+
+      <button class="btn" type="button" onclick="sendOrder()">
+        Enviar pedido por WhatsApp
+      </button>
+    </section>
+
+    <section class="box">
+      <h2>¿También te interesan los Autos?</h2>
+      <p>
+        Conoce nuestro servicio de mantenimiento
+        preventivo de vehículos.
+      </p>
+      <a
+        href="https://autocuidadoclub.com/ecosystem.html"
+        class="btn"
+        target="_blank"
+        rel="noopener noreferrer">
+        Conoce nuestro ecosistema de AutoCuidado
+      </a>
+    </section>
+
+  </div>
+</main>
+
+<section class="facebook-section">
+  <div class="facebook-content">
+    <h2>Síguenos en Facebook</h2>
+    <p>
+      Mantente al día con nuestras promociones,
+      servicios y novedades de AutoCuidado ICE.
+    </p>
+
+    <div id="fb-root"></div>
+    <div
+      class="fb-page"
+      data-href="https://www.facebook.com/profile.php?id=61582866189757"
+      data-tabs="timeline"
+      data-width="500"
+      data-height="500"
+      data-small-header="true"
+      data-adapt-container-width="true"
+      data-hide-cover="false"
+      data-show-facepile="true">
+      <blockquote
+        cite="https://www.facebook.com/profile.php?id=61582866189757"
+        class="fb-xfbml-parse-ignore">
+        <a href="https://www.facebook.com/profile.php?id=61582866189757">
+          AutoCuidado ICE
+        </a>
+      </blockquote>
     </div>
   </div>
 </section>
 
-<!-- Load Facebook SDK -->
-<div id="fb-root"></div>
-<script async defer crossorigin="anonymous"
-  src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v19.0"
-  nonce="ESSERVYO"></script>
-</div>
+<script
+  async
+  defer
+  crossorigin="anonymous"
+  src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v19.0">
+</script>
 
-
-<div id="cta-install-bar" style="display:none;">
-  <div class="cta-message">
-    ¿Querés contactarnos, dejarnos tu opinión o instalar la app? <strong>Todo lo tenés aquí.</strong>
+<div id="cta-install-bar">
+  <div>
+    ¿Querés contactarnos, dejarnos tu opinión o
+    instalar la app?
+    <strong>Todo lo tenés aquí.</strong>
   </div>
 
-  <button onclick="openFeedbackModal()">📝 Déjanos tu opinión</button>
-  <a href="contacto.html">💬 Contácta con nuestro staff</a>
-  <button id="how-to-install-btn">📲 Instalá nuestra APP</button>
-  <button onclick="closeCtaInstallBar()" class="close-btn">❌ Cerrar</button>
-</div>
-
-
-
-  <!-- Feedback Modal -->
-<!-- Feedback Modal -->
-<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
-  
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h3 style="margin: 0;">Tu opinión sobre AutoCuidado Club</h3>
-    <button onclick="closeFeedbackModal()" style="
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #ff0000;
-      font-weight: bold;
-    ">❌</button>
-  </div>
-
-  <form id="voiceFeedbackForm">
-    <input type="hidden" name="_subject" value="Feedback (Fase Family & Friends) - AutoCuidado Club">
-    <input type="hidden" name="_cc" value="info@autocuidadoclub.com">
-    <textarea id="feedbackText" name="message" rows="5" placeholder="Habla o escribe tu mensaje..." style="width:100%; margin-bottom:10px; resize:vertical;" required></textarea>
-    <input type="email" name="email" placeholder="Tu correo (opcional)" style="width:100%; margin-bottom:10px;">
-    <div style="display:flex; justify-content:space-between;">
-      <button type="button" onclick="startVoiceInput()" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🎤 Hablar</button>
-      <button type="submit" style="background-color: #003893; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Enviar</button>
-    </div>
-  </form>
-
-  <div id="feedbackLoader" style="display:none; margin-top:10px; text-align:center;">
-    <img src="loading.gif" alt="Cargando..." style="width:80px;">
-  </div>
-
+  <div class="cta-actions">
+    <button type="button" onclick="openFeedbackModal()">
+      📝 Déjanos tu opinión
+    </button>
+    <a href="contacto.html">💬 Contáctanos</a>
+    <button type="button" id="how-to-install-btn">
+      📲 Instalá nuestra APP
+    </button>
+    <button type="button" onclick="closeCtaInstallBar()">
+      ❌ Cerrar
+    </button>
   </div>
 </div>
 
-
-<!-- Botón para volver a mostrar el menú -->
-<button id="reopen-cta-btn" style="
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 13px;
-  cursor: pointer;
-  z-index: 9999;
-  opacity: 0;
-  max-width: 180px;
-  width: auto;
-  white-space: nowrap;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-">
-📲 Abrir menú
+<button type="button" id="reopen-cta-btn">
+  📲 Abrir menú
 </button>
 
+<div id="feedbackModal" class="modal-overlay">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Tu opinión sobre AutoCuidado</h3>
+      <button type="button" onclick="closeFeedbackModal()"
+        style="border:0;background:none;font-size:24px;cursor:pointer">
+        ✕
+      </button>
+    </div>
 
+    <form id="voiceFeedbackForm">
+      <input
+        type="hidden"
+        name="_subject"
+        value="Feedback - AutoCuidado ICE">
 
+      <label for="feedbackText">Tu mensaje</label>
+      <textarea
+        id="feedbackText"
+        name="message"
+        rows="5"
+        placeholder="Habla o escribe tu mensaje..."
+        required></textarea>
 
-  <script>
-     let deferredPrompt = null;
+      <label for="feedbackEmail">Correo (opcional)</label>
+      <input
+        type="email"
+        id="feedbackEmail"
+        name="email"
+        placeholder="correo@ejemplo.com">
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Stop the browser from showing the default prompt
-  e.preventDefault();
-  deferredPrompt = e;
+      <div class="cta-actions">
+        <button type="button" onclick="startVoiceInput()">
+          🎤 Hablar
+        </button>
+        <button type="submit">
+          Enviar
+        </button>
+      </div>
 
-  // Optional: you could show the button ONLY when install is available
-  document.getElementById('how-to-install-btn').style.display = 'inline-block';
-});
+      <p id="feedbackLoader" style="display:none">
+        Enviando...
+      </p>
+    </form>
+  </div>
+</div>
 
-document.getElementById('how-to-install-btn').addEventListener('click', async () => {
-  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+<footer>
+  Powered by AutoCuidadoClub.com
+</footer>
 
-  if (deferredPrompt) {
-    // If install is supported, show browser-native prompt
-    deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
-    if (choiceResult.outcome === 'accepted') {
-      console.log('✅ User accepted the install prompt');
-    } else {
-      console.log('❌ User dismissed the install prompt');
-    }
-    deferredPrompt = null;
-  } else if (isIos) {
-    alert("📲 En iPhone, toca el botón de compartir en Safari y selecciona 'Agregar a pantalla de inicio'.");
-  } else if (isAndroid) {
-    alert("📲 En Android, abrí el menú de Chrome (⋮) y seleccioná 'Agregar a pantalla de inicio'.");
-  } else {
-    alert("⚠️ Instalación no disponible automáticamente en este dispositivo. Podés usar Chrome o Edge para instalar.");
-  }
-});
-    function openFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'flex';
-      document.getElementById('feedbackText').focus();
-    }
+<script>
+  // ========================================
+  // AUTOCUIDADO ICE - CONFIGURACIÓN
+  // ========================================
 
-    function closeFeedbackModal() {
-      document.getElementById('feedbackModal').style.display = 'none';
-      document.getElementById('voiceFeedbackForm').reset();
-      document.getElementById('feedbackLoader').style.display = 'none';
-    }
+  const WHATSAPP_NUMBER = "50372907568";
+  const POTABLE_PRICE = 1.50;
+  const COOLER_DAILY_PRICE = 20;
+  const MAX_COOLERS = 4;
 
-    function startVoiceInput() {
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        alert("Tu navegador no soporta reconocimiento de voz.");
-        return;
-      }
+  // ========================================
+  // PRECIOS DE HIELO
+  // ========================================
 
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'es-ES';
-
-      const feedbackText = document.getElementById('feedbackText');
-      feedbackText.placeholder = "🎙️ Escuchando...";
-      feedbackText.style.border = "2px solid orange";
-
-      recognition.onresult = (event) => {
-        const result = event.results[0][0].transcript;
-        feedbackText.value += (feedbackText.value ? ' ' : '') + result;
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-      };
-
-      recognition.onerror = (event) => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-        alert("Error de voz: " + event.error);
-      };
-
-      recognition.onend = () => {
-        feedbackText.placeholder = "Habla o escribe tu mensaje...";
-        feedbackText.style.border = "1px solid #ccc";
-      };
-
-      recognition.start();
-    }
-
-   document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
-
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
-
-      document.getElementById('voiceFeedbackForm').onsubmit = function (e) {
-      e.preventDefault();
-      document.getElementById('feedbackLoader').style.display = 'block';
-
-      fetch("https://formsubmit.co/ajax/info@autocuidadoclub.com", {
-        method: "POST",
-        body: new FormData(this)
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        if (data.success) {
-          alert("¡Gracias por tu opinión!");
-          closeFeedbackModal();
-        } else {
-          alert("Error al enviar. Intenta de nuevo.");
-        }
-      })
-      .catch(() => {
-        document.getElementById('feedbackLoader').style.display = 'none';
-        alert("Hubo un problema al enviar el mensaje.");
-      });
+  function calculateIcePrice(pounds) {
+    const prices = {
+      0: 0,
+      50: 10,
+      100: 18,
+      150: 28,
+      200: 35,
+      250: 45,
+      300: 53,
+      350: 63,
+      400: 65,
+      450: 75,
+      500: 83,
+      550: 93,
+      600: 100
     };
 
-      function closeCtaInstallBar() {
-    const ctaBar = document.getElementById('cta-install-bar');
-    const reopenBtn = document.getElementById('reopen-cta-btn');
+    if (Object.prototype.hasOwnProperty.call(prices, pounds)) {
+      return prices[pounds];
+    }
 
-    // Animación suave antes de ocultarlo
-    ctaBar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-    ctaBar.style.opacity = '0';
-    ctaBar.style.transform = 'translateY(20px)';
+    if (pounds > 600 && pounds % 50 === 0) {
+      const sets400 = Math.floor(pounds / 400);
+      const remainder = pounds % 400;
+      return sets400 * 65 + prices[remainder];
+    }
 
-    setTimeout(() => {
-      ctaBar.style.display = 'none';
-
-      // Mostrar botón flotante después de 5 segundos
-      setTimeout(() => {
-        reopenBtn.style.display = 'block';
-        setTimeout(() => {
-          reopenBtn.style.opacity = '1';
-        }, 10);
-      }, 5000);
-    }, 300); // esperar a que termine la transición
+    return 0;
   }
 
-      document.getElementById('reopen-cta-btn').addEventListener('click', () => {
-  const ctaBar = document.getElementById('cta-install-bar');
-  const reopenBtn = document.getElementById('reopen-cta-btn');
+  // ========================================
+  // CÁLCULO DEL PEDIDO
+  // ========================================
 
-  ctaBar.style.display = 'block';
-  ctaBar.style.opacity = '1';
-  ctaBar.style.transform = 'translateY(0)';
-  reopenBtn.style.display = 'none';
-});
+  function getOrderTotals() {
+    const potableRaw = Number(
+      document.getElementById("potableQty").value
+    );
 
-   function calculateIcePrice(pounds) {
-  if (pounds === 0) return 0;
+    const potableQty = Number.isInteger(potableRaw) && potableRaw >= 0
+      ? potableRaw : 0;
 
-  // Exact package prices
-  if (pounds === 50) return 10;
-  if (pounds === 100) return 18;
-  if (pounds === 200) return 35;
-  if (pounds === 400) return 65;
+    const icePounds = Number(
+      document.getElementById("icePounds").value
+    ) || 0;
 
-  // Intermediate quantities
-  if (pounds === 150) return 28;   // 100 + 50
-  if (pounds === 250) return 45;   // 200 + 50
-  if (pounds === 300) return 53;   // 200 + 100
-  if (pounds === 350) return 63;   // 200 + 100 + 50
-  if (pounds === 450) return 75;   // 400 + 50
-  if (pounds === 500) return 83;   // 400 + 100
-  if (pounds === 550) return 93;   // 400 + 100 + 50
-  if (pounds === 600) return 100;  // 400 + 200
+    const coolerQty = Number(
+      document.getElementById("coolerQty").value
+    ) || 0;
 
-  // Larger quantities
-  if (pounds > 600) {
-    const sets400 = Math.floor(pounds / 400);
-    const remainder = pounds % 400;
+    const daysRaw = Number(
+      document.getElementById("rentalDays").value
+    );
 
-    let remainderPrice = 0;
+    const rentalDays = Number.isInteger(daysRaw) &&
+      daysRaw >= 1 && daysRaw <= 30 ? daysRaw : 0;
 
-    if (remainder === 50) remainderPrice = 10;
-    else if (remainder === 100) remainderPrice = 18;
-    else if (remainder === 150) remainderPrice = 28;
-    else if (remainder === 200) remainderPrice = 35;
-    else if (remainder === 250) remainderPrice = 45;
-    else if (remainder === 300) remainderPrice = 53;
-    else if (remainder === 350) remainderPrice = 63;
+    const iceTotal =
+      potableQty * POTABLE_PRICE +
+      calculateIcePrice(icePounds);
 
-    return sets400 * 65 + remainderPrice;
+    const rentalTotal =
+      coolerQty > 0 &&
+      coolerQty <= MAX_COOLERS &&
+      rentalDays > 0
+        ? coolerQty * rentalDays * COOLER_DAILY_PRICE
+        : 0;
+
+    return {
+      potableQty,
+      icePounds,
+      coolerQty,
+      rentalDays,
+      iceTotal,
+      rentalTotal,
+      total: iceTotal + rentalTotal
+    };
   }
 
-  return 0;
-}
+  // ========================================
+  // FECHAS DE ALQUILER
+  // ========================================
 
+  function localToday() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function getReturnDate(startDate, days) {
+    const date = new Date(`${startDate}T12:00:00Z`);
+
+    if (!Number.isFinite(date.getTime())) {
+      return "";
+    }
+
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+  }
+
+  // ========================================
+  // ACTUALIZAR TOTAL
+  // ========================================
 
   function updateTotal() {
-  const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
-  const icePounds = parseInt(document.getElementById("icePounds").value) || 0;
+    const order = getOrderTotals();
 
-  const potableTotal = potableQty * 1.5;
-  const iceTotal = calculateIcePrice(icePounds);
+    document.getElementById("iceSubtotal").textContent =
+      order.iceTotal.toFixed(2);
 
-  const total = potableTotal + iceTotal;
-  document.getElementById("totalAmount").textContent = total.toFixed(2);
+    document.getElementById("rentalSubtotal").textContent =
+      order.rentalTotal.toFixed(2);
 
-  const promo = document.getElementById("promoMessage");
-  promo.innerHTML = "";
+    document.getElementById("totalAmount").textContent =
+      order.total.toFixed(2);
 
-  if (total >= 10 && total < 50) {
-    promo.innerHTML = "🚚 <strong>¡Envío gratis en este pedido!</strong>";
+    const start = document.getElementById("rentalStart").value;
+
+    const returnElement =
+      document.getElementById("rentalReturn");
+
+    if (order.coolerQty > 0 && start && order.rentalDays) {
+      returnElement.textContent =
+        "Devolución estimada: " +
+        getReturnDate(start, order.rentalDays) +
+        " (horario por confirmar).";
+    } else {
+      returnElement.textContent = "";
+    }
+
+    const messages = [];
+
+    if (order.iceTotal >= 10) {
+      messages.push(
+        "🚚 Entrega gratis para el hielo según cobertura."
+      );
+    }
+
+    if (order.total >= 50) {
+      messages.push(
+        "✅ Consultar disponibilidad de Tasa Cero Banco Agrícola."
+      );
+    }
+
+    document.getElementById("promoMessage").textContent =
+      messages.join(" ");
   }
 
-  if (total >= 50) {
-    promo.innerHTML = `
-      ✅ <strong>¡Aplica para Tasa Cero Banco Agrícola!</strong><br>
-      🚚 <strong>¡Envío gratis en este pedido!</strong>
-    `;
+  // ========================================
+  // WHATSAPP CHECKOUT
+  // ========================================
+
+  function sendOrder() {
+    const order = getOrderTotals();
+
+    const location =
+      document.getElementById("location").value.trim();
+
+    const municipality =
+      document.getElementById("municipality").value.trim();
+
+    const name =
+      document.getElementById("name").value.trim();
+
+    const paymentMethod =
+      document.getElementById("paymentMethod").value;
+
+    const rentalStart =
+      document.getElementById("rentalStart").value;
+
+    const potableInput =
+      document.getElementById("potableQty").value;
+
+    const daysInput =
+      document.getElementById("rentalDays").value;
+
+    if (
+      potableInput.trim() !== "" &&
+      (!Number.isInteger(Number(potableInput)) ||
+       Number(potableInput) < 0)
+    ) {
+      alert("Introduce una cantidad válida de bolsas.");
+      return;
+    }
+
+    if (
+      order.potableQty === 0 &&
+      order.icePounds === 0 &&
+      order.coolerQty === 0
+    ) {
+      alert("Selecciona hielo, hieleras o ambos.");
+      return;
+    }
+
+    if (!name || !municipality || !location) {
+      alert(
+        "Completa tu nombre, municipio y ubicación de entrega."
+      );
+      return;
+    }
+
+    if (order.coolerQty > 0) {
+      if (
+        !rentalStart ||
+        rentalStart < localToday() ||
+        !order.rentalDays ||
+        daysInput.trim() === ""
+      ) {
+        alert(
+          "Selecciona una fecha válida y entre 1 y 30 días de alquiler."
+        );
+        return;
+      }
+    }
+
+    let message = "*SOLICITUD AUTOCUIDADO ICE*\n\n";
+    message += "*Productos y servicios:*\n";
+
+    if (order.potableQty > 0) {
+      message +=
+        `🧊 ${order.potableQty} bolsa(s) de hielo potable 5 lb\n`;
+    }
+
+    if (order.icePounds > 0) {
+      message +=
+        `🧊 Hielo para bebidas/neveras: ${order.icePounds} lb\n`;
+    }
+
+    if (order.coolerQty > 0) {
+      message +=
+        `🧊 Alquiler: ${order.coolerQty} hielera(s) de 125 cuartos\n`;
+
+      message +=
+        `📅 Inicio: ${rentalStart}\n`;
+
+      message +=
+        `📅 Duración: ${order.rentalDays} día(s)\n`;
+
+      message +=
+        `📅 Devolución estimada: ${getReturnDate(rentalStart, order.rentalDays)}\n`;
+
+      message +=
+        `💵 Alquiler: $${order.rentalTotal.toFixed(2)}\n`;
+    }
+
+    if (order.iceTotal > 0) {
+      message +=
+        `💵 Subtotal hielo: $${order.iceTotal.toFixed(2)}\n`;
+    }
+
+    message +=
+      `\n*Total estimado: $${order.total.toFixed(2)}*\n`;
+
+    message +=
+      `*Método de pago:* ${paymentMethod}\n\n`;
+
+    message += "*Datos de entrega:*\n";
+    message += `*Nombre:* ${name}\n`;
+    message += `*Municipio:* ${municipality}\n`;
+    message += `*Ubicación:* ${location}\n`;
+
+    message +=
+      "\nPor favor confirmar disponibilidad, entrega/recogida y cargos de transporte si aplican.";
+
+    const whatsappURL =
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
+    window.open(
+      whatsappURL,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
-}
 
-    function sendOrder() {
-  const potableQty = parseInt(document.getElementById("potableQty").value) || 0;
-  const icePounds = parseInt(document.getElementById("icePounds").value) || 0;
-  const location = document.getElementById("location").value.trim();
-  const municipality = document.getElementById("municipality").value.trim();
-  const name = document.getElementById("name").value.trim();
-  const paymentMethod = document.getElementById("paymentMethod").value;
-  const total = document.getElementById("totalAmount").textContent;
+  // ========================================
+  // FEEDBACK
+  // ========================================
 
-  const whatsappNumber = "50372907568";
-
-  if ((potableQty === 0 && icePounds === 0) || !location || !name) {
-    alert("Por favor, completa la cantidad de hielo, la ubicación y tu nombre.");
-    return;
+  function openFeedbackModal() {
+    document.getElementById("feedbackModal").style.display =
+      "flex";
+    document.getElementById("feedbackText").focus();
   }
 
-  let message = `*ORDEN DE HIELO*\n\n`;
-  message += `*Productos:*\n`;
-
-  if (potableQty > 0) {
-    message += `🧊 ${potableQty} bolsa(s) de Hielo Potable 5 lb\n`;
+  function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display =
+      "none";
+    document.getElementById("voiceFeedbackForm").reset();
+    document.getElementById("feedbackLoader").style.display =
+      "none";
   }
 
-  if (icePounds > 0) {
-    message += `🧊 Hielo a granel: ${icePounds} lb\n`;
+  function startVoiceInput() {
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "es-SV";
+
+    const feedbackText =
+      document.getElementById("feedbackText");
+
+    recognition.onresult = event => {
+      const result = event.results[0][0].transcript;
+      feedbackText.value +=
+        (feedbackText.value ? " " : "") + result;
+    };
+
+    recognition.onerror = () => {
+      alert("No se pudo reconocer la voz.");
+    };
+
+    recognition.start();
   }
 
-  message += `\n*Total Estimado: $${total}*\n`;
-  message += `*Método de pago:* ${paymentMethod}\n\n`;
-  message += `*Detalles de Entrega:*\n`;
-  message += `*Nombre:* ${name}\n`;
-  message += `*Municipio:* ${municipality}\n`;
-  message += `*Ubicación:* ${location}\n`;
+  document.getElementById("voiceFeedbackForm")
+    .addEventListener("submit", async function(event) {
+      event.preventDefault();
 
-  window.open(
-    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-    "_blank"
-  );
-}
+      const loader =
+        document.getElementById("feedbackLoader");
 
+      loader.style.display = "block";
 
-    // Removing the scroll event for the now-static logo.
-    // The previous scroll function is not needed if the logo is static.
-    /*
-    document.addEventListener('scroll', function () {
-      //...
+      try {
+        const response = await fetch(
+          "https://formsubmit.co/ajax/info@autocuidadoclub.com",
+          {
+            method: "POST",
+            body: new FormData(this)
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error("Error al enviar");
+        }
+
+        alert("¡Gracias por tu opinión!");
+        closeFeedbackModal();
+      } catch (error) {
+        alert("No se pudo enviar. Intenta de nuevo.");
+      } finally {
+        loader.style.display = "none";
+      }
     });
-    */
 
-  </script>
+  // ========================================
+  // MENÚ Y PWA
+  // ========================================
 
-  <footer>
-    Powered by AutocuidadoClub.com
-  </footer>
+  let deferredPrompt = null;
 
-     
+  const ctaBar = document.getElementById("cta-install-bar");
+  const reopenBtn = document.getElementById("reopen-cta-btn");
+  const installBtn = document.getElementById("how-to-install-btn");
+
+  function closeCtaInstallBar() {
+    ctaBar.style.display = "none";
+    reopenBtn.style.display = "block";
+  }
+
+  reopenBtn.addEventListener("click", () => {
+    ctaBar.style.display = "block";
+    reopenBtn.style.display = "none";
+  });
+
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    deferredPrompt = event;
+  });
+
+  installBtn.addEventListener("click", async () => {
+    const isIos =
+      /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    const isAndroid =
+      /android/i.test(navigator.userAgent);
+
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    } else if (isIos) {
+      alert(
+        "En iPhone, abre el menú Compartir de Safari y selecciona Agregar a pantalla de inicio."
+      );
+    } else if (isAndroid) {
+      alert(
+        "En Android, abre el menú de Chrome y selecciona Agregar a pantalla de inicio."
+      );
+    } else {
+      alert(
+        "Para instalar la app, utiliza un navegador compatible con PWA."
+      );
+    }
+  });
+
+  // ========================================
+  // INICIALIZACIÓN
+  // ========================================
+
+  document.getElementById("rentalStart").min =
+    localToday();
+
+  updateTotal();
+
+</script>
+
 </body>
 </html>
